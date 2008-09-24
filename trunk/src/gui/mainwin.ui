@@ -10,7 +10,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>StdpC 2007</string>
+   <string>StdpC 2008</string>
   </property>
   <widget class="QWidget" name="centralwidget" >
    <widget class="QGroupBox" name="DataBox" >

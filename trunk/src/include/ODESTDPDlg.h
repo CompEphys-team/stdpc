@@ -10,13 +10,14 @@ class ODESTDPDlg : public QDialog, private Ui::ODESTDPDlg
      Q_OBJECT
 
   public:
-     ODESTDPDlg(QWidget *parent= 0);
+     ODESTDPDlg(QWidget *parent= 0, int no= 0);
      void exportData(ODEPlast &);
      void importData(ODEPlast);
 
   public slots:
 
   private:
+     int No;
 }; 
 
 #endif

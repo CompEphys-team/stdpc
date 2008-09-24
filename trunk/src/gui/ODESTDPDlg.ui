@@ -770,7 +770,7 @@
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="ChemSynDlgLabel" >
+  <widget class="QLabel" name="synSTDPLabel" >
    <property name="enabled" >
     <bool>true</bool>
    </property>
@@ -793,7 +793,7 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet" >
-    <string/>
+    <string notr="true" />
    </property>
    <property name="frameShape" >
     <enum>QFrame::Panel</enum>
