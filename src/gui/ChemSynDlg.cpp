@@ -12,8 +12,8 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      lb.setNum(No);
      ChemSynDlgLabel->setText(QString("Synapse ")+lb);
      
-     STDP= new STDPDlg(this);
-     ODESTDP= new ODESTDPDlg(this);
+     STDP= new STDPDlg(this, No);
+     ODESTDP= new ODESTDPDlg(this, No);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));

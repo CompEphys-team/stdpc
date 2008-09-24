@@ -1,10 +1,15 @@
 
 #include "STDPDlg.h"
 
-STDPDlg::STDPDlg(QWidget *parent)
+STDPDlg::STDPDlg(QWidget *parent, int no)
      : QDialog(parent)
  {
+     QString lb;
      setupUi(this);
+     
+     No= no;
+     lb.setNum(No);
+     synSTDPLabel->setText(QString("Synapse ")+lb);
 }
 
 void STDPDlg::exportData(STPlast &d)
