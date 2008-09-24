@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage{amsmath}
+
+\begin{document}
+\section{HH conductances}
+
+The HH conductances are described by two main types of equations. The
+first type is the popular mechanism of steady state activation
+($m_\infty$) and inactivation ($h_\infty$) variables that are
+approached with voltage-dependent time constants $\tau_m$ and
+$\tau_h$.
+Explicitly,
+\begin{align}
+I_{x}= g_{x} m_x^k h_x^l (V_{\text{rev},x}-V) 
+\end{align}
+where the activation and inactivation are governed by the first order
+differential equations
+\begin{align}
+\frac{dm_x}{dt}= \frac{1}{\tau_{mx}} (m_{\infty,x} - m_x)
+\end{align}
+and the voltage dependent steady state activation and time scale are
+\begin{align}
+m_{\infty,x}= \frac{1}{1+\exp(\frac{V-V_{mx}}{s_{mx}})} \\
+\tau_{mx}= \tau_{mx0} - \tau_{mxA} \frac{1}{1+\exp(\frac{V-V_{\tau
+      m}}{s_{\tau m}})}.
+\end{align}
+The differential equation is integrated according to an exponential
+Euler formula, i.e.,
+\begin{align}
+m(t)= m_{\infty,x} + (m(t-\Delta t)-m_{\infty,x})\exp\Big(\frac{-\Delta t}{\tau_{mx}}\Big) .
+\end{align}
+ 
+\end{document}
