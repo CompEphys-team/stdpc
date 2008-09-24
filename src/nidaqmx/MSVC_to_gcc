@@ -1,0 +1,54 @@
+*** How to get NIDAQmx work with MinGW ***
+
+
+1) Install Unix Utils
+http://unxutils.sourceforge.net/
+It provides various utilities, among which the bash shell and the ability to write
+bash scripts, sed, etc...
+It will let you run the sript that I am enclosing.
+
+
+2) Install LibDump
+http://www.softlookup.com/download.asp?ID=7534&RID=3461060&DID=4J58YURT
+If you have MS Visual C++, you can use dumpbin instead.
+
+
+3) Run LibDump :
+WIth LibDump, open C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\lib\msvc\NIDAQmx.lib
+Save the result in C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\lib\NIDAQmx.dump
+
+
+4) Export symbols from dll :
+pexports c:\windows\system32\nicaiu.dll > nicaiu.dll.exp
+(TN: pexports is freeware to download)
+
+
+5) Run mkdef.sh bash script :
+- copy the script to C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\lib
+- open the script file with a text editor to check the path to sh on your system
+- invoke the bash shell :
+sh
+- run the script :
+./mkdef.sh nicaiu.dll.exp NIDAQmx.dump > nidaqmx.def
+If you get errors, you may have to make 500-line chunks from the .exp, run the script on
+every chunk, and concatenate the .def chunks generated.
+To make chunks, check head --help and tail --help. Type grep -c -e "^" to count the lines in the file.
+I chunk a 1884 line file with the following commands :
+	head -500 > chunk1.exp
+	head -1000 | tail -500 > chunk2.exp
+	head -1500 | tail -500 > chunk3.exp
+	head -2000 | tail -384 > chunk4.exp
+I concatenate the results like this :
+	chunk1.def > nidaqmx.def
+	chunk2.def >> nidaqmx.def
+	chunk3.def >> nidaqmx.def
+	chunk4.def >> nidaqmx.def
+I personnally have to reboot the PC after such an error occurs. I suspect some memory leak
+somewhere in the UnxUtils package.
+
+6) Create the library (adjust the path to your configuration) :
+dlltool -d nidaqmx.def -D \WINDOWS\system32\nicaiu.dll -l libnidaqmx.a -k
+(TN: dlltool is part of mingw)
+
+7) Compile an example that comes with NIDAQmx :
+gcc Acq-IntClk.c -o Acq-IntClk.exe "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\lib\libnidaqmx.a" -I "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"

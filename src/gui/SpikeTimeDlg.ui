@@ -1,0 +1,523 @@
+<ui version="4.0" >
+ <class>SpikeTimeDlg</class>
+ <widget class="QDialog" name="SpikeTimeDlg" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>359</width>
+    <height>226</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Explicit Spike Times</string>
+  </property>
+  <widget class="QDialogButtonBox" name="buttonBox" >
+   <property name="geometry" >
+    <rect>
+     <x>181</x>
+     <y>180</y>
+     <width>160</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="font" >
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons" >
+    <set>QDialogButtonBox::Close</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi2E" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>80</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>68.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 1</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi4E" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>140</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>112.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_13" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>140</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_5" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>50</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 2</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_9" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>20</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 3</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_8" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>140</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 5</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>50</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi1E" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>50</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>50.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi0E" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>20</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>30.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_11" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>80</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_12" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>110</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi3E" >
+   <property name="geometry" >
+    <rect>
+     <x>70</x>
+     <y>110</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>88.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7" >
+   <property name="geometry" >
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 4</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi9E" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>140</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>308.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_15" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>80</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 8</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_23" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>140</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi7E" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>80</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>204.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_18" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>20</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 6</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_21" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>110</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 9</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_16" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>140</y>
+     <width>37</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike10</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi6E" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>50</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>168.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_17" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>80</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_20" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>50</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi5E" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>20</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>138.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_14" >
+   <property name="geometry" >
+    <rect>
+     <x>200</x>
+     <y>50</y>
+     <width>34</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>Spike 7</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_22" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>110</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="isi8E" >
+   <property name="geometry" >
+    <rect>
+     <x>250</x>
+     <y>110</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>248.0</string>
+   </property>
+   <property name="maxLength" >
+    <number>8</number>
+   </property>
+   <property name="alignment" >
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_19" >
+   <property name="geometry" >
+    <rect>
+     <x>320</x>
+     <y>20</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text" >
+    <string>ms</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SpikeTimeDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SpikeTimeDlg</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
