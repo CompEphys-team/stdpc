@@ -808,9 +808,9 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit77]
-FileName=tools.cpp
+FileName=src\gui\tools.cpp
 CompileCpp=1
-Folder=
+Folder=gui
 Compile=1
 Link=1
 Priority=1000
