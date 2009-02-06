@@ -71,10 +71,10 @@ void abHH::currentUpdate(double t, double dt)
       h+= (ha*(1.0-h)-hb*h)*dt;     // calculate h with previous values of ha, h, hb
       ha= p->hka*mhFunc((V-p->hVa)/p->hsa, p->haFunc);
       hb= p->hkb*mhFunc((V-p->hVb)/p->hsb, p->hbFunc);
-      powh= 0.0;
+      powh= h;
       for (i= 0; i < p->hExpo-1; i++) powh*= h;
     }
-    else powh= 0.0;
+    else powh= 1.0;
     I= p->gMax*powm*powh*(V-p->Vrev);
     out->I+= I;
   }
