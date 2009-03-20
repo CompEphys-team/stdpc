@@ -14,10 +14,12 @@ DCThread::DCThread()
   stopped= true;
   finished= true;
   csyn= new ChemSyn[MAX_SYN_NO];
+  absyn= new abSyn[MAX_SYN_NO];
   esyn= new GapJunction[MAX_SYN_NO];
   hh= new HH[MAX_HH_NO];
   abhh= new abHH[MAX_HH_NO];
   csIdx= new short int[MAX_SYN_NO];
+  absIdx= new short int[MAX_SYN_NO];
   esIdx= new short int[MAX_SYN_NO];
   hhIdx= new short int[MAX_HH_NO];
   abhhIdx= new short int[MAX_HH_NO];
@@ -32,10 +34,12 @@ DCThread::DCThread()
 DCThread::~DCThread() 
 {
    delete[] csyn;
+   delete[] absyn;
    delete[] esyn;
    delete[] hh;
    delete[] abhh;
    delete[] csIdx;
+   delete[] absIdx;
    delete[] esIdx;
    delete[] hhIdx;
    delete[] abhhIdx;
@@ -135,11 +139,16 @@ void DCThread::run()
    }
                  
    csNo= 0;
+   absNo= 0;
    esNo= 0;
    for (i= 0; i < MAX_SYN_NO; i++) {
      if (CSynp[i].active) {
        csyn[i].init(&CSynp[i],inIdx,outIdx,inChn,outChn);
        csIdx[csNo++]= i;
+     }
+     if (abSynp[i].active) {
+       absyn[i].init(&abSynp[i],inIdx,outIdx,inChn,outChn);
+       absIdx[absNo++]= i;
      }
      if (ESynp[i].active) {
        esyn[i].init(&ESynp[i],inIdx,outIdx,inChn,outChn);
@@ -158,12 +167,14 @@ void DCThread::run()
        abhhIdx[abhhNo++]= i;
      }
    }
-   QString cN, eN, hN, aN;
+   QString cN, abN, eN, hN, aN;
    cN.setNum(csNo);
+   abN.setNum(absNo);
    eN.setNum(esNo);
    hN.setNum(hhNo);
    aN.setNum(abhhNo);
    if (csNo > 0) message(QString("DynClamp: ")+cN+QString(" chemical synapse(s) "));
+   if (absNo > 0) message(QString("DynClamp: ")+abN+QString(" ab synapse(s) "));
    if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
    if (hhNo > 0) message(QString("DynClamp: ")+hN+QString(" HH conductance(s) "));
    if (abhhNo > 0) message(QString("DynClamp: ")+aN+QString(" abHH conductance(s) ..."));
@@ -203,6 +214,8 @@ void DCThread::run()
      }
      for (i= 0; i < csNo; i++) 
        csyn[csIdx[i]].currentUpdate(t, dt);
+     for (i= 0; i < absNo; i++) 
+       absyn[absIdx[i]].currentUpdate(t, dt);  
      for (i= 0; i < esNo; i++) 
        esyn[esIdx[i]].currentUpdate(t, dt);
      for (i= 0; i < hhNo; i++) 

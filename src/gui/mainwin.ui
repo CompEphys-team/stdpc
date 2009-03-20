@@ -286,21 +286,6 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
-      <item>
-       <property name="text" >
-        <string>Off</string>
-       </property>
-      </item>
-      <item>
-       <property name="text" >
-        <string>m/h/tau</string>
-       </property>
-      </item>
-      <item>
-       <property name="text" >
-        <string>alpha/beta</string>
-       </property>
-      </item>
      </widget>
      <widget class="QPushButton" name="HH1ParaBut" >
       <property name="enabled" >
@@ -819,6 +804,9 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="currentIndex" >
+       <number>0</number>
+      </property>
       <item>
        <property name="text" >
         <string>Off</string>
@@ -832,6 +820,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text" >
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>
@@ -923,6 +916,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn1ParaBut" >
       <property name="enabled" >
@@ -1009,6 +1007,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn2ParaBut" >
       <property name="enabled" >
@@ -1093,6 +1096,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text" >
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>
@@ -1197,6 +1205,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QFrame" name="frame_10" >
@@ -1281,6 +1294,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text" >
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>
@@ -2117,7 +2135,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1013</width>
-     <height>25</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile" >
