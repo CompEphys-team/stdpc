@@ -11,6 +11,7 @@
 #include "InputChannelDlg.h"
 #include "OutputChannelDlg.h"
 #include "ChemSynDlg.h"
+#include "abSynDlg.h"
 #include "GapJunctionDlg.h"
 #include "HHDlg.h"
 #include "AlphaBetaHHDlg.h"
@@ -55,6 +56,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      OutputChannelDlg *outChnDlg;
      
      ChemSynDlg *CSynDlg[MAX_SYN_NO];
+     abSynDlg *abSDlg[MAX_SYN_NO];
      GapJunctionDlg *GJunctDlg[MAX_SYN_NO];
      HHDlg *nHHDlg[MAX_HH_NO];
      AlphaBetaHHDlg *abHHDlg[MAX_HH_NO];

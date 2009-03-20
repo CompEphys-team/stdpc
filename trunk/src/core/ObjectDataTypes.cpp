@@ -58,7 +58,6 @@ DigiDataData &DigiDataData::operator=(DigiDataData old)
   return *this;
 }
 
-
 ostream &operator<<(ostream &os, NIDAQData &p) 
 {
   string buf;

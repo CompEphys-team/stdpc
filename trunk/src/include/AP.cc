@@ -306,8 +306,8 @@ void MyMainWindow::setupAP()
     iAP.append(&(inChnp[k].gain)); 
     APname.append(QString("inChnp[")+ qs + QString("].gainFac")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(inChnp[k].gainFac)); 
-    APname.append(QString("inChnp[")+ qs + QString("].spkDetect")); APtype.append(INTTYPE); APindex.append(iAP.size());
-    iAP.append(&(inChnp[k].spkDetect)); 
+    APname.append(QString("inChnp[")+ qs + QString("].spkDetect")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(inChnp[k].spkDetect)); 
     APname.append(QString("inChnp[")+ qs + QString("].spkDetectThresh")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(inChnp[k].spkDetectThresh)); 
   }
@@ -402,6 +402,11 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   DAQComboBox->setCurrentIndex(itmp);
   SDAQDlg->importData(SDAQp);
   DDataDlg->importData(DigiDatap);
+#ifdef NIDAQ
+  NDQDlg->importData(NIDAQp);
+#endif
+  
+  DAQSetup();
 
   setupAP();
   is >> name;
