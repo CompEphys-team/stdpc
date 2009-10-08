@@ -72,6 +72,30 @@ typedef struct {
 
 typedef struct {
   bool active;
+  bool LUTables;
+  int PreSynChannel;
+  int PostSynChannel;
+  int OutSynChannel;
+  double gSyn;
+  double Vrev;
+  double aS;
+  double VaS;
+  double saS;
+  double bS;
+  double aR;
+  double VaR;
+  double saR;
+  double bR;
+  int fixVpost;
+  double Vpost;
+  int Plasticity;
+  STPlast ST;
+  ODEPlast ODE;
+} abSynData;
+
+
+typedef struct {
+  bool active;
   int preInChannel;
   int postInChannel;
   int preOutChannel;
@@ -179,7 +203,7 @@ typedef struct {
   bool active;
   int gain;
   double gainFac;
-  int spkDetect;
+  bool spkDetect;
   double spkDetectThresh;
 } inChnData;
 
