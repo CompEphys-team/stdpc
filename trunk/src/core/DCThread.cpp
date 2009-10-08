@@ -251,7 +251,7 @@ void DCThread::run()
      }
    }
    else {
-     applyAEC == false;
+     applyAEC= false;
    }
    // Notify the user
    if(applyAEC == false){

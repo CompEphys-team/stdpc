@@ -33,6 +33,7 @@ class DAQ {
     double clock_frequency;
     double clock_cycle;
 
+    bool initialized;
 };
 
 #endif
