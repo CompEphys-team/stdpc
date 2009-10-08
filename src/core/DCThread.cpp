@@ -7,19 +7,17 @@
  #include <climits>
  #include <QMessageBox>
   
- #include "SimulDAQ.h" // vor debugging only ...
+ #include "SimulDAQ.h" // for debugging only ...
  
 DCThread::DCThread() 
 {
   stopped= true;
   finished= true;
   csyn= new ChemSyn[MAX_SYN_NO];
-  absyn= new abSyn[MAX_SYN_NO];
   esyn= new GapJunction[MAX_SYN_NO];
   hh= new HH[MAX_HH_NO];
   abhh= new abHH[MAX_HH_NO];
   csIdx= new short int[MAX_SYN_NO];
-  absIdx= new short int[MAX_SYN_NO];
   esIdx= new short int[MAX_SYN_NO];
   hhIdx= new short int[MAX_HH_NO];
   abhhIdx= new short int[MAX_HH_NO];
@@ -29,17 +27,17 @@ DCThread::DCThread()
   inIdx= NULL;
   outIdx= NULL;
   scripting= false;
+
+  applyAEC= false;
 }
 
 DCThread::~DCThread() 
 {
    delete[] csyn;
-   delete[] absyn;
    delete[] esyn;
    delete[] hh;
    delete[] abhh;
    delete[] csIdx;
-   delete[] absIdx;
    delete[] esIdx;
    delete[] hhIdx;
    delete[] abhhIdx;
@@ -47,7 +45,7 @@ DCThread::~DCThread()
    if (inChn != NULL) delete[] inChn;
    if (outChn != NULL) delete[] outChn;
    if (inIdx != NULL) delete[] inIdx;
-   if (outIdx != NULL) delete[] outIdx;
+   if (outIdx != NULL) delete[] outIdx;  
 }
  
 
@@ -69,14 +67,17 @@ void DCThread::run()
 {
    static int i;
    static double evt;
+
+
    // reset Lookup tables; they not be needed in this run ...
 //   tanhLU.reset();
 //   expLU.reset();
 //   expSigmoidLU.reset();
    // collect the active channels
    //exit(1);
+
    inNo= 0;  
-   for (i= 0; i < board->inChnNo; i++) {
+   for (i= 0; i < board->inChnNo; i++) {  
      if (inChnp[i].active) {
        inIdx[inNo++]= i;
        inChn[i].init(&inChnp[i]);
@@ -139,16 +140,11 @@ void DCThread::run()
    }
                  
    csNo= 0;
-   absNo= 0;
    esNo= 0;
    for (i= 0; i < MAX_SYN_NO; i++) {
      if (CSynp[i].active) {
        csyn[i].init(&CSynp[i],inIdx,outIdx,inChn,outChn);
        csIdx[csNo++]= i;
-     }
-     if (abSynp[i].active) {
-       absyn[i].init(&abSynp[i],inIdx,outIdx,inChn,outChn);
-       absIdx[absNo++]= i;
      }
      if (ESynp[i].active) {
        esyn[i].init(&ESynp[i],inIdx,outIdx,inChn,outChn);
@@ -167,14 +163,12 @@ void DCThread::run()
        abhhIdx[abhhNo++]= i;
      }
    }
-   QString cN, abN, eN, hN, aN;
+   QString cN, eN, hN, aN;
    cN.setNum(csNo);
-   abN.setNum(absNo);
    eN.setNum(esNo);
    hN.setNum(hhNo);
    aN.setNum(abhhNo);
    if (csNo > 0) message(QString("DynClamp: ")+cN+QString(" chemical synapse(s) "));
-   if (absNo > 0) message(QString("DynClamp: ")+abN+QString(" ab synapse(s) "));
    if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
    if (hhNo > 0) message(QString("DynClamp: ")+hN+QString(" HH conductance(s) "));
    if (abhhNo > 0) message(QString("DynClamp: ")+aN+QString(" abHH conductance(s) ..."));
@@ -199,10 +193,116 @@ void DCThread::run()
      evt= scrIter->t;
    }
    else evt= 1e10;
-   while (!stopped) {
-     dt= board->get_RTC();
+   
+   
+   //--------------//
+   // AEC checking //
+   //--------------//
+
+   long int sample = 0;
+   long int numOfSamples = 10000;
+
+   // To save out recordings
+   QString fname_currents="testI.dat";
+   QString fname_beforeCompV="testVb.dat";
+   QString fname_afterCompV="testVa.dat";
+   QString fname_controlV="testVc.dat";
+
+   QVector<double> currents = QVector<double>(numOfSamples);
+   QVector<double> beforeCompVs = QVector<double>(numOfSamples);
+   QVector<double> afterCompVs = QVector<double>(numOfSamples);
+   QVector<double> controlVs = QVector<double>(numOfSamples);
+
+   
+   // Checking validity of AEC channels
+   if(aecChannels != NULL){
+     for(int i=0; i<aecChannels->size(); i++){
+       if(inChnp[aecChannels->value(i)->inChnNum].active == true &&
+          outChnp[aecChannels->value(i)->outChnNum].active == true){
+         message(QString("AEC channel is active on input channel ")+QString::number(aecChannels->value(i)->inChnNum)+" and output channel "+QString::number(aecChannels->value(i)->outChnNum));
+         aecChannels->value(i)->active= true;
+       }
+       else{
+         if(inChnp[aecChannels->value(i)->inChnNum].active == false){
+           message(QString("Input channel ")+QString::number(aecChannels->value(i)->inChnNum)+QString(" is not active! AEC disabled on that channel."));
+           aecChannels->value(i)->active= false;
+         }
+         if(outChnp[aecChannels->value(i)->outChnNum].active == false){
+           message(QString("Output channel ")+QString::number(aecChannels->value(i)->outChnNum)+QString(" is not active! AEC disabled on that channel."));
+           aecChannels->value(i)->active= false;
+         }
+       }
+     }
+     // Check whether there's any active AEC channel
+     applyAEC= false;
+     for(int i=0; i<aecChannels->size(); i++){
+        if(aecChannels->value(i)->active == true){      
+         applyAEC= true;
+         break;
+       }   
+     }
+   }
+   else {
+     applyAEC == false;
+   }
+   // Notify the user
+   if(applyAEC == false){
+     message(QString("No active AEC channels, electrode compensation disabled"));          
+   }
+//   else{
+//     QString channelMessage = "Active AEC channels are (input/output): ";
+//     for(int i=0; i<aecChannels->size(); i++){
+//       if(aecChannels->value(i)->active == true)
+//         channelMessage+= QString::number(aecChannels->value(i)->inChnNum)+"/"+QString::number(aecChannels->value(i)->outChnNum)+" ";
+//     }
+//     message(channelMessage);
+//   }
+   
+
+   // DC loop
+   while (!stopped && sample != numOfSamples) {
+
+     //dt= board->get_RTC();
+     //t+= dt;
+
+     // Wait till the next sampling period is over
+     dt= 0.0;
+     do
+     {
+         dt+= board->get_RTC();
+     } while (dt < 0.0001);
      t+= dt;
+
      board->get_scan(inChn);
+
+     //------------------
+     // AEC data saving
+     controlVs[sample]= inChn[1].V;
+     //------------------
+
+     // AEC compensation part
+     if(applyAEC){    
+        for(int i=0; i<aecChannels->size(); i++){           
+
+            //------------------
+            // AEC data saving
+            beforeCompVs[sample]= inChn[aecChannels->value(i)->inChnNum].V;
+            //------------------
+
+            //------------------
+            // AEC data compensation
+            inChn[aecChannels->value(i)->inChnNum].V -= aecChannels->value(i)->Ve;
+            //------------------
+
+            //------------------
+            // AEC data saving
+            afterCompVs[sample]= inChn[aecChannels->value(i)->inChnNum].V;
+            //------------------
+        }
+     }
+
+
+
      if (SGp.active) { // SpkGen active
        SG.VUpdate(t, dt);
      }
@@ -214,8 +314,6 @@ void DCThread::run()
      }
      for (i= 0; i < csNo; i++) 
        csyn[csIdx[i]].currentUpdate(t, dt);
-     for (i= 0; i < absNo; i++) 
-       absyn[absIdx[i]].currentUpdate(t, dt);  
      for (i= 0; i < esNo; i++) 
        esyn[esIdx[i]].currentUpdate(t, dt);
      for (i= 0; i < hhNo; i++) 
@@ -225,6 +323,20 @@ void DCThread::run()
      // spike generator ... write stuff to DAQ
      // outChn[1].I= inChn[inIdx[inNo]].V;
      board->write_analog_out(outChn);
+     
+     //------------------
+     // AEC data saving
+     currents[sample]= outChn[aecChannels->value(0)->outChnNum].I;
+     sample++;
+     //------------------
+                       
+     // AEC channel update part
+     if(applyAEC){
+        for(int i=0; i<aecChannels->size(); i++){
+            aecChannels->value(i)->calcVe(outChn[aecChannels->value(i)->outChnNum].I);
+        }
+     }
+
      if (t-lastWrite[0] > Graphp[0].dt) {
        lastWrite[0]= t;   
        for (i= 0; i < grpNo[0]; i++) {
@@ -252,9 +364,34 @@ void DCThread::run()
        }
      }
    }
+
    board->reset_board();
+
+   if(applyAEC){
+     for(int i=0; i<aecChannels->size(); i++){
+       aecChannels->value(i)->resetChannel();
+     }
+   }
+
    finished= true;
+
+   saveData(fname_currents, currents);
+   saveData(fname_beforeCompV, beforeCompVs);
+   saveData(fname_afterCompV, afterCompVs);
+   saveData(fname_controlV, controlVs);
+
 } 
+
+void DCThread::saveData(QString &fname, QVector<double> data)
+{
+  ofstream os(fname.toAscii());
+  
+  for (int i= 0; i < data.size(); i++) {
+    os << data[i] << "\n";   
+  }
+  
+  os.close();
+}
 
 // Scripting support
 

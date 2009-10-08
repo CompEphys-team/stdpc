@@ -1,4 +1,4 @@
-#ifndef ODESTDPDLG_H
+#ifndef ODESTDPGLD_H
 #define ODESTDPDLG_H
 
 

@@ -64,7 +64,7 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet" >
-    <string notr="true" />
+    <string/>
    </property>
    <property name="frameShape" >
     <enum>QFrame::Panel</enum>
@@ -359,7 +359,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>1.4</string>
+    <string>-0.28</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -430,7 +430,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>1.28</string>
+    <string>0.32</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -494,7 +494,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>-4.0</string>
+    <string>4.0</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -552,7 +552,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>5.0</string>
+    <string>-5.0</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -699,7 +699,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>-5.0</string>
+    <string>5.0</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -860,7 +860,7 @@
     </rect>
    </property>
    <property name="text" >
-    <string>-18.0</string>
+    <string>18.0</string>
    </property>
    <property name="maxLength" >
     <number>8</number>
@@ -1164,9 +1164,6 @@
      <weight>50</weight>
      <bold>false</bold>
     </font>
-   </property>
-   <property name="currentIndex" >
-    <number>2</number>
    </property>
    <item>
     <property name="text" >

@@ -14,7 +14,6 @@
 
 extern int synType[MAX_SYN_NO];
 extern CSynData CSynp[MAX_SYN_NO];
-extern abSynData abSynp[MAX_SYN_NO];
 extern GJunctData ESynp[MAX_SYN_NO];
 
 extern int HHType[MAX_HH_NO];

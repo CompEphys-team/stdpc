@@ -72,30 +72,6 @@ typedef struct {
 
 typedef struct {
   bool active;
-  bool LUTables;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
-  double gSyn;
-  double Vrev;
-  double aS;
-  double VaS;
-  double saS;
-  double bS;
-  double aR;
-  double VaR;
-  double saR;
-  double bR;
-  int fixVpost;
-  double Vpost;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-} abSynData;
-
-
-typedef struct {
-  bool active;
   int preInChannel;
   int postInChannel;
   int preOutChannel;
@@ -157,6 +133,31 @@ typedef struct {
 } abHHData;
 
 typedef struct {
+
+  // General params
+  bool oneElectrode;
+  double injLen;
+  double samplingRate;
+  short int inputChannelNumber;
+  short int outputChannelNumber;
+
+  // Calibration params
+  double injCalAmp;
+
+  // Linearity check params
+  double iMax;
+  double iMin;
+  int numberOfLevels;
+
+  // Kernel test params
+  int testInputType;
+  double sqWaveLen;
+  double injTestAmp;
+  short int controlChannelNumber;
+
+} mmParams;
+
+typedef struct {
   bool active;
   int method;      
   int LUTables;
@@ -178,7 +179,7 @@ typedef struct {
   bool active;
   int gain;
   double gainFac;
-  bool spkDetect;
+  int spkDetect;
   double spkDetectThresh;
 } inChnData;
 

@@ -124,6 +124,9 @@ bool SimulDAQ::initialize_board(QString &name)
 //  delete[] outGainFac;
 //  outGainFac= new double[outChnNo];
   reset_RTC();
+  
+  initialized= success;
+  
   return success;
 }
 

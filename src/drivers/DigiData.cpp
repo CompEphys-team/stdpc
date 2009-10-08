@@ -15,22 +15,22 @@ DigiData::DigiData()
   outGainFac= new double[outChnNo];
   inGainNo= 4;
   inGain= new double[inGainNo];
-  inGain[0]= 10.0;
-  inGain[1]= 5.0;
-  inGain[2]= 2.5;
-  inGain[3]= 1.25;
+  inGain[0]= 10.24;
+  inGain[1]= 5.12;
+  inGain[2]= 2.56;
+  inGain[3]= 1.28;
   for (int i= 0; i < inGainNo; i++) inGain[i]/= COUNTS; 
   inGainText= new char*[inGainNo];
-  inGainText[0]= "-10 to +10 V";
-  inGainText[1]= "-5 to +5 V";
-  inGainText[2]= "-2.5 to +2.5 V";
-  inGainText[3]= "-1.25 to +1.25 V";          
+  inGainText[0]= "-10.24 to +10.24 V";
+  inGainText[1]= "-5.12 to +5.12 V";
+  inGainText[2]= "-2.56 to +2.56 V";
+  inGainText[3]= "-1.28 to +1.28 V";          
   outGainNo= 1;
   outGain= new double[outGainNo];
-  outGain[0]= 0.1;
+  outGain[0]= 1.0/10.24;
   for (int i= 0; i < outGainNo; i++) outGain[i]*= COUNTS;
   outGainText= new char*[outGainNo];
-  outGainText[0]= "-10 to +10 V";
+  outGainText[0]= "-10.24 to +10.24 V";
 
   inChnGain= new short int[inGainNo];
   inChnGain[0]= 0x0000;
@@ -124,6 +124,8 @@ bool DigiData::initialize_board(QString &name)
    WriteWord(DAC_data,0x0000);
 
    name= QString("DigiData1200(A) ");
+   
+   initialized= success;
    return success;
 }
 
@@ -194,7 +196,7 @@ void DigiData::generate_scan_list(short int chnNo, short int *Chns)
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac*inGain[inChnp[inIdx[i]].gain]/16.0; // dvivide by 16.0 b/c of 12 bit in chns
+    inGainFac[i]= inChnp[inIdx[i]].gainFac*inGain[inChnp[inIdx[i]].gain]/16.0; // divide by 16.0 b/c of 12 bit in chns
     Chan_Gain_Code= i + inChnGain[inChnp[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
     if(i == (actInChnNo -1)) Chan_Gain_Code+= LASTCHANNELFLAG;
     WriteWord(channel_scan_list, Chan_Gain_Code);
