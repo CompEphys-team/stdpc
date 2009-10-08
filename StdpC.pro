@@ -33,7 +33,8 @@ FORMS += mainwin.ui \
          OutputChannelDlg.ui \ 
          SimulDAQDlg.ui \ 
          DigiDataDlg.ui \ 
-         NIDAQDlg.ui
+         NIDAQDlg.ui \
+         abSynDlg.ui
 HEADERS += main.h \
            mainwin.h \
            ChemSynDlg.h \
@@ -64,7 +65,11 @@ HEADERS += main.h \
            GraphDlg.h \
            DAQDlg.h \
            AP.cc \
-           scripting.h 
+           scripting.h \
+           abSynDlg.h \
+           MeasMethodDlg.h \
+           abSyn.h \
+           AECChannel.h
 ## uncomment to compile with NIDAQmx support (needs NIDAQmx)           
 # HEADERS += NIDAQDlg.h \
 #          NIDAQ.h
@@ -99,7 +104,11 @@ SOURCES += main.cpp \
            GraphDlg.cpp \
            DAQDlg.cpp \
            ObjectDataTypes.cpp \
-           scripting.cpp 
+           scripting.cpp \
+           abSynDlg.cpp \
+           MeasMethodDlg.cpp \
+           abSyn.cpp \
+           AECChannel.cpp
           
 ## uncomment to compile with NIDAQmx support (needs NIDAQmx)           
 #SOURCES +=           NIDAQDlg.cpp \

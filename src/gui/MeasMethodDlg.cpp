@@ -490,7 +490,7 @@ bool MeasMethodDlg::generalInit(bool kernelTest)
         }                
     }
 
-    numberOfSamples = params.injLen*params.samplingRate;
+    numberOfSamples = (long) (params.injLen*params.samplingRate);
     samplingPeriod  = 1/params.samplingRate;
 
     // Reinit data storing objects
