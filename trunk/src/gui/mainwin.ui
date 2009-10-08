@@ -820,6 +820,9 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
+      <property name="currentIndex" >
+       <number>0</number>
+      </property>
       <item>
        <property name="text">
         <string>Off</string>
@@ -833,6 +836,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text">
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>
@@ -924,6 +932,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn1ParaBut">
       <property name="enabled">
@@ -1010,6 +1023,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn2ParaBut">
       <property name="enabled">
@@ -1094,6 +1112,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text">
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>
@@ -1198,6 +1221,11 @@ p, li { white-space: pre-wrap; }
         <string>Gap Junction</string>
        </property>
       </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QFrame" name="frame_10">
@@ -1282,6 +1310,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text">
         <string>Gap Junction</string>
+       </property>
+      </item>
+      <item>
+       <property name="text" >
+        <string>ab Synapse</string>
        </property>
       </item>
      </widget>

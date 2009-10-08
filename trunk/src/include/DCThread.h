@@ -4,6 +4,7 @@
 #include <QThread>
 #include "global.h"
 #include "ChemSyn.h"
+#include "abSyn.h"
 #include "GapJunction.h"
 #include "HH.h"
 #include "abHH.h"
@@ -38,6 +39,7 @@ class DCThread : public QThread
      bool scripting;
      SpkGen SG;
      ChemSyn *csyn;
+     abSyn *absyn;
      GapJunction *esyn;
      HH *hh;
      abHH *abhh;
@@ -50,11 +52,13 @@ class DCThread : public QThread
      short int outNo;
      
      short int csNo;
+     short int absNo;
      short int esNo;
      short int hhNo;
      short int abhhNo;
      
      short int *csIdx;
+     short int *absIdx;
      short int *esIdx;
      short int *hhIdx;
      short int *abhhIdx;

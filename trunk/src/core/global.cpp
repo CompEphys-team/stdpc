@@ -3,6 +3,7 @@
 
 int synType[MAX_SYN_NO];
 CSynData CSynp[MAX_SYN_NO];
+abSynData abSynp[MAX_SYN_NO];
 GJunctData ESynp[MAX_SYN_NO];
 
 int HHType[MAX_HH_NO];
