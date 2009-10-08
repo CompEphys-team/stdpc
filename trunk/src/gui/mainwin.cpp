@@ -78,17 +78,16 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 #ifdef NIDAQ
      NDQDlg= new NIDAQDlg(this);
      DAQComboBox->addItem(QString("National Instruments"));
-#endif     
+#endif
+     MMDlg= new MeasMethodDlg(this);
      inChnDlg= new InputChannelDlg(this);
      outChnDlg= new OutputChannelDlg(this);
      for (int i= 0; i < 6; i++) {
        CSynDlg[i]= new ChemSynDlg(i, this);
-       abSDlg[i]= new abSynDlg(i, this);
        GJunctDlg[i]= new GapJunctionDlg(i, this);
        nHHDlg[i]= new HHDlg(i, this);
        abHHDlg[i]= new AlphaBetaHHDlg(i, this);
      }
-
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
      graphDlg[1]= new GraphDlg(1, this);
@@ -137,11 +136,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionDAQ, SIGNAL(triggered()), SLOT(showDAQDlg()));
      connect(actionInput_channels, SIGNAL(triggered()), inChnDlg, SLOT(appear()));
      connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(appear()));
+     connect(actionMeasurement_method, SIGNAL(triggered()), MMDlg, SLOT(show()));     
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
      connect(actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
-     connect(actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
+     connect(actionLoad_Protocol, SIGNAL(triggered()), SLOT(show()));
      connect(LoadProtocolFileDlg, SIGNAL(accepted()), SLOT(LoadProtocol()));
      connect(actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
      connect(SaveProtocolFileDlg, SIGNAL(accepted()), SLOT(SaveProtocol()));
@@ -149,6 +149,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
      connect(actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));    
      connect(this, SIGNAL(destroyed()), SLOT(Exit()));
+     
      
      for (int i= 0; i < 6; i++) {
        connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), CSynDlg[i], SLOT(updateOutChn(int, int*)));
@@ -179,10 +180,13 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DCT,SIGNAL(addPoint1(double, double, int)), &Graphs[0], SLOT(addPoint(double, double, int)));
      connect(DCT,SIGNAL(addPoint2(double, double, int)), &Graphs[1], SLOT(addPoint(double, double, int)));
      
+     connect(MMDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
+     
      // graphical stuff
+     
      DataD1->setScene(&Graphs[0].Scene);
      DataD2->setScene(&Graphs[1].Scene);   
-     
+
      board= NULL;
      DAQSetup();
      
@@ -195,7 +199,6 @@ MyMainWindow::~MyMainWindow()
 {
   for (int i= 0; i < 6; i++) {
     delete CSynDlg[i];
-//    delete abSDlg[i]; 
     delete GJunctDlg[i];
     delete nHHDlg[i];
     delete abHHDlg[i];
@@ -310,6 +313,7 @@ void MyMainWindow::StartButClicked()
   actionOutput_channels->setEnabled(false);
   actionDAQ->setEnabled(false);
   actionSave_config->setEnabled(false);
+  actionMeasurement_method->setEnabled(false);
   DAQComboBox->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -337,6 +341,7 @@ void MyMainWindow::StopButClicked()
   actionOutput_channels->setEnabled(true);
   actionDAQ->setEnabled(true);
   actionSave_config->setEnabled(true);
+  actionMeasurement_method->setEnabled(true);
   DAQComboBox->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -356,10 +361,8 @@ void MyMainWindow::exportData()
 
   for (int i= 0; i < 6; i++) {
     CSynp[i].active= (synType[i] == 1);
-    abSynp[i].active= (synType[i] == 3);
     ESynp[i].active= (synType[i] == 2);
     CSynDlg[i]->exportData(CSynp[i]);
-    abSDlg[i]->exportData(abSynp[i]);
     GJunctDlg[i]->exportData(ESynp[i]);
   }
   // collect data from the HH conductances
@@ -393,23 +396,10 @@ void MyMainWindow::exportData()
  
 void MyMainWindow::importData()
 {
-  // do DAQs and channels first
-  DDataDlg->importData(DigiDatap);
-  SDAQDlg->importData(SDAQp);
-#ifdef NIDAQ
-  NDQDlg->importData(NIDAQp);
-#endif
-
-  inChnDlg->importData();
-  inChnDlg->accept();
-  outChnDlg->importData();
-  outChnDlg->accept();
-
   // collect data from the synapses
   for (int i= 0; i < MAX_SYN_NO; i++) {
     synType[i]= 0;
     if (CSynp[i].active) synType[i]= 1;
-    if (abSynp[i].active) synType[i]= 3;
     if (ESynp[i].active) synType[i]= 2;
   }
   Syn0Combo->setCurrentIndex(synType[0]);
@@ -421,7 +411,6 @@ void MyMainWindow::importData()
 
   for (int i= 0; i < 6; i++) {
     CSynDlg[i]->importData(CSynp[i]);
-    abSDlg[i]->importData(abSynp[i]);
     GJunctDlg[i]->importData(ESynp[i]);
   }
   
@@ -442,10 +431,21 @@ void MyMainWindow::importData()
     nHHDlg[i]->importData(mhHHp[i]);
     abHHDlg[i]->importData(abHHp[i]);
   }
+  
+  inChnDlg->importData();
+  inChnDlg->accept();
+  outChnDlg->importData();
+  outChnDlg->accept();
+  DDataDlg->importData(DigiDatap);
+  SDAQDlg->importData(SDAQp);
+#ifdef NIDAQ
+  NDQDlg->importData(NIDAQp);
+#endif
   importSGData();
   SpkTDlg->importData();
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
   // collect spike generator data
+      
 }
 
 void MyMainWindow::exportSGData() 

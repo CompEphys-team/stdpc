@@ -17,27 +17,27 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.VChannel= VChannelCombo->currentIndex();
   p.IChannel= IChannelCombo->currentIndex();
-  p.gMax= gMaxE->text().toDouble()*1e-9;
-  p.Vrev= VrevE->text().toDouble()*1e-3;
+  p.gMax= gMaxE->text().toDouble();
+  p.Vrev= VrevE->text().toDouble();
   p.mExpo= mExpoE->text().toInt();
   p.hExpo= hExpoE->text().toInt();
   // ab formalism
   p.maFunc= maFuncCombo->currentIndex();
-  p.mka= mkaE->text().toDouble()*1e3;
-  p.mVa= mVaE->text().toDouble()*1e-3;
-  p.msa= msaE->text().toDouble()*1e-3;
+  p.mka= mkaE->text().toDouble();
+  p.mVa= mVaE->text().toDouble();
+  p.msa= msaE->text().toDouble();
   p.mbFunc= mbFuncCombo->currentIndex();
-  p.mkb= mkbE->text().toDouble()*1e3;
-  p.mVb= mVbE->text().toDouble()*1e-3;
-  p.msb= msbE->text().toDouble()*1e-3;
+  p.mkb= mkbE->text().toDouble();
+  p.mVb= mVbE->text().toDouble();
+  p.msb= msbE->text().toDouble();
   p.haFunc= haFuncCombo->currentIndex();
-  p.hka= hkaE->text().toDouble()*1e3;
-  p.hVa= hVaE->text().toDouble()*1e-3;
-  p.hsa= hsaE->text().toDouble()*1e-3;
+  p.hka= hkaE->text().toDouble();
+  p.hVa= hVaE->text().toDouble();
+  p.hsa= hsaE->text().toDouble();
   p.hbFunc= hbFuncCombo->currentIndex();
-  p.hkb= hkbE->text().toDouble()*1e3;
-  p.hVb= hVbE->text().toDouble()*1e-3;
-  p.hsb= hsbE->text().toDouble()*1e-3;
+  p.hkb= hkbE->text().toDouble();
+  p.hVb= hVbE->text().toDouble();
+  p.hsb= hsbE->text().toDouble();
 }
 
 void AlphaBetaHHDlg::importData(abHHData p)
@@ -48,9 +48,9 @@ void AlphaBetaHHDlg::importData(abHHData p)
   else LUCombo->setCurrentIndex(0);
   VChannelCombo->setCurrentIndex(p.VChannel);
   IChannelCombo->setCurrentIndex(p.IChannel);
-  num.setNum(p.gMax*1e9);
+  num.setNum(p.gMax);
   gMaxE->setText(num);
-  num.setNum(p.Vrev*1e3);
+  num.setNum(p.Vrev);
   VrevE->setText(num);
   num.setNum(p.mExpo);
   mExpoE->setText(num);
@@ -58,32 +58,32 @@ void AlphaBetaHHDlg::importData(abHHData p)
   hExpoE->setText(num);
   // ab formalism
   maFuncCombo->setCurrentIndex(p.maFunc);
-  num.setNum(p.mka*1e-3);
+  num.setNum(p.mka);
   mkaE->setText(num);
-  num.setNum(p.mVa*1e3);
+  num.setNum(p.mVa);
   mVaE->setText(num);
-  num.setNum(p.msa*1e3);
+  num.setNum(p.msa);
   msaE->setText(num);
   mbFuncCombo->setCurrentIndex(p.mbFunc);
-  num.setNum(p.mkb*1e-3);
+  num.setNum(p.mkb);
   mkbE->setText(num);
-  num.setNum(p.mVb*1e3);
+  num.setNum(p.mVb);
   mVbE->setText(num);
-  num.setNum(p.msb*1e3);
+  num.setNum(p.msb);
   msbE->setText(num);
   haFuncCombo->setCurrentIndex(p.haFunc);
-  num.setNum(p.hka*1e-3);
+  num.setNum(p.hka);
   hkaE->setText(num);
-  num.setNum(p.hVa*1e3);
+  num.setNum(p.hVa);
   hVaE->setText(num);
-  num.setNum(p.hsa*1e3);
+  num.setNum(p.hsa);
   hsaE->setText(num);
   hbFuncCombo->setCurrentIndex(p.hbFunc);
-  num.setNum(p.hkb*1e-3);
+  num.setNum(p.hkb);
   hkbE->setText(num);
-  num.setNum(p.hVb*1e3);
+  num.setNum(p.hVb);
   hVbE->setText(num);
-  num.setNum(p.hsb*1e3);
+  num.setNum(p.hsb);
   hsbE->setText(num);
 }
   

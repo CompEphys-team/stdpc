@@ -4,14 +4,13 @@
 #include <QThread>
 #include "global.h"
 #include "ChemSyn.h"
-#include "abSyn.h"
 #include "GapJunction.h"
 #include "HH.h"
 #include "abHH.h"
 #include "SpkGen.h"
 #include "DigiData.h"
 #include "scripting.h"
-
+#include "AECChannel.h"
 
 class DCThread : public QThread 
 {
@@ -28,13 +27,17 @@ class DCThread : public QThread
      void init(DAQ *);
      bool LoadScript(QString &);
      void UnloadScript();
+     void saveData(QString &fname, QVector<double> data);
+
+     // List of AEC channels (io-channels pairs, kernels and current buffers)
+     QList<AECChannel*> *aecChannels;
+     bool applyAEC;
      
      bool stopped;
      bool finished;
      bool scripting;
      SpkGen SG;
      ChemSyn *csyn;
-     abSyn *absyn;
      GapJunction *esyn;
      HH *hh;
      abHH *abhh;
@@ -47,13 +50,11 @@ class DCThread : public QThread
      short int outNo;
      
      short int csNo;
-     short int absNo;
      short int esNo;
      short int hhNo;
      short int abhhNo;
      
      short int *csIdx;
-     short int *absIdx;
      short int *esIdx;
      short int *hhIdx;
      short int *abhhIdx;
@@ -68,6 +69,7 @@ class DCThread : public QThread
      int grpNo[2];
      int pen[2][4];
      double *grp[2][4];
+
 
      QList<scriptInstruction> scriptq;
      QList<scriptInstruction>::iterator scrIter;
