@@ -142,6 +142,7 @@ bool NIDAQ::initialize_board(QString &name)
   success= (DAQmxGetDevProductType(devName, cname, 1024) == 0);
   name= QString(cname);
   DAQmxResetDevice(devName);
+  initialized= success;
   return success;
 }
 
