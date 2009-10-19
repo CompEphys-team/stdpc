@@ -2,6 +2,7 @@
 
 DAQ::DAQ() 
 {
+  initialized= false;
 }
 
 
