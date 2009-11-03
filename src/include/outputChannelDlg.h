@@ -29,6 +29,7 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      QVector<QCheckBox *> act;
      QVector<QComboBox *> rng;
      QVector<QLineEdit *> factor;
+     QVector<QLineEdit *> bias;
      QVector<QLabel *> allLabel;
                
   public slots:

@@ -30,6 +30,7 @@ class outChannel {
      double I;
      outChannel();
      void init(outChnData *);
+     void reset();
 };
 
 #endif

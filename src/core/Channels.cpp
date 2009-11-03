@@ -40,3 +40,8 @@ void outChannel::init(outChnData *inp)
 {
   p= inp;
 }
+
+void outChannel::reset()
+{
+  I= p->bias;
+}

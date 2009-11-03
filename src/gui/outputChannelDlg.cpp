@@ -11,6 +11,7 @@ void OutputChannelDlg::clearAll()
   QVector<QCheckBox *>::Iterator actIter;
   QVector<QComboBox *>::Iterator rngIter;
   QVector<QLineEdit *>::Iterator factorIter;
+  QVector<QLineEdit *>::Iterator biasIter;
   QVector<QLabel *>::Iterator lbIter;
   
   for (actIter= act.begin(); actIter != act.end(); actIter++) {
@@ -24,7 +25,11 @@ void OutputChannelDlg::clearAll()
   for (factorIter= factor.begin(); factorIter != factor.end(); factorIter++) {
     delete *factorIter;
   }
-  factor.clear();
+  bias.clear();
+  for (biasIter= bias.begin(); biasIter != bias.end(); biasIter++) {
+    delete *biasIter;
+  }
+  bias.clear();
   for (lbIter= allLabel.begin(); lbIter != allLabel.end(); lbIter++) {
     delete *lbIter;
   }
@@ -40,7 +45,9 @@ void OutputChannelDlg::init(DAQ *board)
   #define X1 120
   #define X2 250
   #define X3 320
-
+  #define X4 480
+  #define X5 550
+  
   QLabel *lb;
   QCheckBox *cbtmp;
   QComboBox *qctmp;
@@ -58,6 +65,11 @@ void OutputChannelDlg::init(DAQ *board)
   lb= new QLabel(this);
   lb->setGeometry(QRect(X2, Y0-40, 120, 36));
   lb->setText(QString("Conversion factor"));
+  allLabel.append(lb);
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X4, Y0-40, 120, 36));
+  lb->setText(QString("Bias current"));
   allLabel.append(lb);
   
   for (int i= 0; i < ChnNo; i++) {
@@ -84,6 +96,15 @@ void OutputChannelDlg::init(DAQ *board)
     lb->setGeometry(QRect(X3, Y0+i*DY, 120, 18));
     lb->setText(QString("V [DAC]/nA [world]"));
     allLabel.append(lb);
+    letmp= new QLineEdit(this);
+    letmp->setGeometry(QRect(X4, Y0+i*DY, 60, 18));
+    nm.setNum(0.0);
+    letmp->setText(nm);
+    bias.append(letmp);
+    lb= new QLabel(this);
+    lb->setGeometry(QRect(X5, Y0+i*DY, 120, 18));
+    lb->setText(QString("nA"));
+    allLabel.append(lb);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
@@ -107,6 +128,7 @@ void OutputChannelDlg::exportData()
     outChnp[i].active= (act[i]->checkState() > 0);
     outChnp[i].gain= rng[i]->currentIndex();
     outChnp[i].gainFac= factor[i]->text().toDouble();
+    outChnp[i].bias= bias[i]->text().toDouble()*1e-9;
   }
 }
 
@@ -120,6 +142,8 @@ void OutputChannelDlg::importData()
     rng[i]->setCurrentIndex(inChnp[i].gain); 
     lb.setNum(outChnp[i].gainFac);
     factor[i]->setText(lb);
+    lb.setNum(outChnp[i].bias*1e9);
+    bias[i]->setText(lb);
   }
 }
 

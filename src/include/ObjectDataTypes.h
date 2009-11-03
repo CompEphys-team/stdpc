@@ -211,6 +211,7 @@ typedef struct {
   bool active;
   int gain;
   double gainFac;
+  double bias;
 } outChnData;
 
 class SDAQData {

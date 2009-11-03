@@ -1,3 +1,13 @@
-15:48:50: Bad news: SimulDAQ input files  not found or not opened successfully!
-15:48:50: Main: Dynamic Clamp starting ...
-15:48:56: Main: Dynamic Clamp stopped.
+23:20:52: Good news: SimulDAQ input 10000 points  found and opened successfully!
+23:20:52: Main: Dynamic Clamp starting ...
+23:21:17: Added 1 channels for Display
+23:21:17: Added 0 channels for Display
+23:21:17: DynClamp: Clamping ...
+23:21:17: No active AEC channels, electrode compensation disabled
+23:21:20: Main: Dynamic Clamp stopped.
+23:21:27: Added 1 channels for Display
+23:21:27: Added 0 channels for Display
+23:21:27: DynClamp: Clamping ...
+23:21:27: No active AEC channels, electrode compensation disabled
+23:21:29: Main: Dynamic Clamp stopped.
+23:34:29: Main: Dynamic Clamp stopped.
