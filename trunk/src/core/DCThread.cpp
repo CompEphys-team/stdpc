@@ -283,13 +283,12 @@ void DCThread::run()
 
      board->get_scan(inChn);
 
-     //------------------
-     // AEC data saving
-     controlVs[sample]= inChn[1].V;
-     //------------------
-
      // AEC compensation part
      if(applyAEC){    
+        //------------------
+        // AEC data saving
+        controlVs[sample]= inChn[1].V;
+        //------------------
         for(int i=0; i<aecChannels->size(); i++){           
 
             //------------------
@@ -318,7 +317,7 @@ void DCThread::run()
        inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
      }
      for (i= 0; i <= outNo; i++) {
-       outChn[outIdx[i]].I= 0.0;
+       outChn[outIdx[i]].reset();
      }
      for (i= 0; i < csNo; i++) 
        csyn[csIdx[i]].currentUpdate(t, dt);
@@ -334,16 +333,16 @@ void DCThread::run()
      // outChn[1].I= inChn[inIdx[inNo]].V;
      board->write_analog_out(outChn);
      
-     //------------------
-     // AEC data saving
-     if (sample < numOfSamples) {
-       currents[sample]= outChn[aecChannels->value(0)->outChnNum].I;
-       sample++;
-     }
-     //------------------
                        
      // AEC channel update part
      if(applyAEC){
+        //------------------
+        // AEC data saving
+        if (sample < numOfSamples) {
+          currents[sample]= outChn[aecChannels->value(0)->outChnNum].I;
+          sample++;
+        }
+        //------------------
         for(int i=0; i<aecChannels->size(); i++){
             aecChannels->value(i)->calcVe(outChn[aecChannels->value(i)->outChnNum].I);
         }
@@ -387,10 +386,12 @@ void DCThread::run()
 
    finished= true;
 
-   saveData(fname_currents, currents);
-   saveData(fname_beforeCompV, beforeCompVs);
-   saveData(fname_afterCompV, afterCompVs);
-   saveData(fname_controlV, controlVs);
+   if (applyAEC) {
+      saveData(fname_currents, currents);
+      saveData(fname_beforeCompV, beforeCompVs);
+      saveData(fname_afterCompV, afterCompVs);
+      saveData(fname_controlV, controlVs);
+   }
 
 } 
 

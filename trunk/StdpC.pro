@@ -34,7 +34,8 @@ FORMS += mainwin.ui \
          SimulDAQDlg.ui \ 
          DigiDataDlg.ui \ 
          NIDAQDlg.ui \
-         abSynDlg.ui
+         abSynDlg.ui \
+         MeasMethodDlg.ui
 HEADERS += main.h \
            mainwin.h \
            ChemSynDlg.h \

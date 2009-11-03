@@ -321,6 +321,8 @@ void MyMainWindow::setupAP()
     iAP.append(&(outChnp[k].gain)); 
     APname.append(QString("outChnp[")+ qs + QString("].gainFac")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(outChnp[k].gainFac)); 
+    APname.append(QString("outChnp[")+ qs + QString("].bias")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(outChnp[k].gainFac)); 
   }
   
   for (int k= 0; k < 2; k++) {
