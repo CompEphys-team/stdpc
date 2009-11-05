@@ -322,7 +322,7 @@ void MyMainWindow::setupAP()
     APname.append(QString("outChnp[")+ qs + QString("].gainFac")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(outChnp[k].gainFac)); 
     APname.append(QString("outChnp[")+ qs + QString("].bias")); APtype.append(DBLTYPE); APindex.append(dAP.size());
-    dAP.append(&(outChnp[k].gainFac)); 
+    dAP.append(&(outChnp[k].bias)); 
   }
   
   for (int k= 0; k < 2; k++) {
@@ -396,19 +396,21 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   is >> itmp;
   is >> SDAQp;
   is >> DigiDatap;
+#ifdef NIDAQ
   is >> NIDAQp;
+#endif
   if (!is.good()) {
     DisplayMessage(QString("Protocol file truncated ... error")); 
     return;
   }  
-  DAQComboBox->setCurrentIndex(itmp);
   SDAQDlg->importData(SDAQp);
   DDataDlg->importData(DigiDatap);
 #ifdef NIDAQ
   NDQDlg->importData(NIDAQp);
 #endif
+  DAQComboBox->setCurrentIndex(itmp);
   
-  DAQSetup();
+//  DAQSetup();
 
   setupAP();
   is >> name;
@@ -424,9 +426,9 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   } 
   is.close();
   importData();
-//  QMessageBox::warning(this, tr("My Application"),
-//                QString("last parameter "+APname[i]),
-//               QMessageBox::Close); 
+  QMessageBox::warning(this, tr("My Application"),
+                QString("last parameter ")+APname[i],
+               QMessageBox::Close); 
 
  
 }
