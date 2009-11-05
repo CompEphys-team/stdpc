@@ -1,13 +1,7 @@
-23:20:52: Good news: SimulDAQ input 10000 points  found and opened successfully!
-23:20:52: Main: Dynamic Clamp starting ...
-23:21:17: Added 1 channels for Display
-23:21:17: Added 0 channels for Display
-23:21:17: DynClamp: Clamping ...
-23:21:17: No active AEC channels, electrode compensation disabled
-23:21:20: Main: Dynamic Clamp stopped.
-23:21:27: Added 1 channels for Display
-23:21:27: Added 0 channels for Display
-23:21:27: DynClamp: Clamping ...
-23:21:27: No active AEC channels, electrode compensation disabled
-23:21:29: Main: Dynamic Clamp stopped.
-23:34:29: Main: Dynamic Clamp stopped.
+21:18:32: Bad news: DigiData1200(A)  not found or not opened successfully!
+21:18:32: Main: Dynamic Clamp starting ...
+21:18:52: Good news: SimulDAQ input 10000 points  found and opened successfully!
+21:19:00: Bad news: DigiData1200(A)  not found or not opened successfully!
+21:19:30: Good news: SimulDAQ input 10000 points  found and opened successfully!
+21:19:37: Bad news: DigiData1200(A)  not found or not opened successfully!
+21:21:15: Main: Dynamic Clamp stopped.

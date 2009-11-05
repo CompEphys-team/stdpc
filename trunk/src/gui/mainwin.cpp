@@ -42,7 +42,6 @@ void MyMainWindow::DAQSetup()
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
- 
   success= board->initialize_board(name);
   if (success) {
     DisplayMessage(QString("Good news: ")+name+QString(" found and opened successfully!"));
@@ -62,7 +61,6 @@ void MyMainWindow::DAQSetup()
   outChnDlg->init(board); // already exports to outChnp ...
 
   DCT->init(board);
-
   // set up the adjustable parameters that they reflect the right channel numbers ...     
   setupAP();
   

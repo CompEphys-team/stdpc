@@ -25,7 +25,7 @@ void OutputChannelDlg::clearAll()
   for (factorIter= factor.begin(); factorIter != factor.end(); factorIter++) {
     delete *factorIter;
   }
-  bias.clear();
+  factor.clear();
   for (biasIter= bias.begin(); biasIter != bias.end(); biasIter++) {
     delete *biasIter;
   }
