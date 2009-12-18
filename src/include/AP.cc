@@ -366,7 +366,9 @@ void MyMainWindow::doSaveProtocol(QString &fname)
   os << DAQComboBox->currentIndex() << endl;
   os << SDAQp << endl;
   os << DigiDatap << endl;
+#ifdef NIDAQ
   os << NIDAQp << endl;
+#endif
   os << endl;
 
   for (int i= 0; i < APname.size(); i++) {
