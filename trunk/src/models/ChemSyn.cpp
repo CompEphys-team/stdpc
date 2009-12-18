@@ -63,6 +63,7 @@ void ChemSyn::init(CSynData *inp, short int *inIdx, short int *outIdx, inChannel
   tauh= 1.0;
   g= p->gSyn;
   graw= invGFilter(g);
+  gfac= 1.0;
   if (p->Plasticity == 2) {
     P= p->ODE.InitialP;
     D= p->ODE.InitialD;
@@ -73,7 +74,7 @@ void ChemSyn::init(CSynData *inp, short int *inIdx, short int *outIdx, inChannel
 
 void ChemSyn::currentUpdate(double t, double dt)
 {
-  static double tmp;
+  static double tmp, V;
   
   // calculate synaptic current
   tmp= (1.0 - Sinf)*p->tauSyn;
@@ -97,8 +98,13 @@ void ChemSyn::currentUpdate(double t, double dt)
   }
   else h= 1.0;
 
-  if(p->fixVpost) I= p->gSyn * S * h * (p->VSyn - p->Vpost);
-  else I= p->gSyn * S * h * (p->VSyn - post->V);
+  if(p->fixVpost) V= p->Vpost;
+  else V= post->V;
+
+  if (p->MgBlock) {
+    gfac= 1.0/(1.0+p->Mgfac * exp(p->Mgexpo*V));
+  }
+  I= p->gSyn * S * h * (p->VSyn - V);
   out->I+= I;
 
   // if plastic, learn

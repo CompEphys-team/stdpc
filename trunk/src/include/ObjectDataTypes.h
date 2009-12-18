@@ -47,6 +47,7 @@ typedef struct {
 typedef struct {
   bool active;
   bool LUTables;
+  bool MgBlock;
   int PreSynChannel;
   int PostSynChannel;
   int OutSynChannel;
@@ -65,6 +66,8 @@ typedef struct {
   double STDtauVSlope;
   int fixVpost;
   double Vpost;
+  double Mgfac;
+  double Mgexpo;
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
