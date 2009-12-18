@@ -51,7 +51,6 @@ void MyMainWindow::DAQSetup()
     DisplayMessage(QString("Bad news: ")+name+QString(" not found or not opened successfully!"));
     StartBut->setEnabled(false);
   }
-
   if (inChnp != NULL) delete[] inChnp;
   inChnp= new inChnData[board->inChnNo];
   inChnDlg->init(board); // already exports to inChnp ...

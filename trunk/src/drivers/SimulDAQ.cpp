@@ -30,9 +30,9 @@ SimulDAQ::~SimulDAQ()
   delete[] inGainFac;
   delete[] outIdx;
   delete[] outGainFac;
-  delete[] inGainText[0];
+//  delete[] inGainText[0];
   delete[] inGainText;
-  delete[] outGainText[0];
+//  delete[] outGainText[0];
   delete[] outGainText;
   delete[] inq;
   delete[] outq;
