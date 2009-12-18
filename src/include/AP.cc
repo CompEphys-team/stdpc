@@ -94,6 +94,8 @@ void MyMainWindow::setupAP()
     bAP.append(&(CSynp[s].active));
     APname.append(QString("CSynp[") + qs + QString("].LUTables")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
     bAP.append(&(CSynp[s].LUTables));
+    APname.append(QString("CSynp[") + qs + QString("].MgBlock")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(CSynp[s].MgBlock));
     APname.append(QString("CSynp[") + qs + QString("].PreSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
     iAP.append(&(CSynp[s].PreSynChannel));
     APname.append(QString("CSynp[") + qs + QString("].PostSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
@@ -130,6 +132,10 @@ void MyMainWindow::setupAP()
     iAP.append(&(CSynp[s].fixVpost));
     APname.append(QString("CSynp[") + qs + QString("].Vpost"));  APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(CSynp[s].Vpost));
+    APname.append(QString("CSynp[") + qs + QString("].Mgfac"));  APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(CSynp[s].Mgfac));
+    APname.append(QString("CSynp[") + qs + QString("].Mgexpo"));  APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(CSynp[s].Mgexpo));
     APname.append(QString("CSynp[") + qs + QString("].Plasticity")); APtype.append(INTTYPE); APindex.append(iAP.size());
     iAP.append(&(CSynp[s].Plasticity));
   }

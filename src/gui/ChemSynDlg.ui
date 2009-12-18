@@ -1,44 +1,45 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ChemSynDlg</class>
- <widget class="QDialog" name="ChemSynDlg" >
-  <property name="geometry" >
+ <widget class="QDialog" name="ChemSynDlg">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>498</height>
+    <height>599</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Chemical Synapse</string>
   </property>
-  <widget class="QDialogButtonBox" name="ResCloseBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="ResCloseBox">
+   <property name="geometry">
     <rect>
      <x>200</x>
-     <y>450</y>
+     <y>540</y>
      <width>160</width>
      <height>32</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
+   <property name="standardButtons">
     <set>QDialogButtonBox::Close</set>
    </property>
   </widget>
-  <widget class="QLabel" name="ChemSynDlgLabel" >
-   <property name="enabled" >
+  <widget class="QLabel" name="ChemSynDlgLabel">
+   <property name="enabled">
     <bool>true</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>280</x>
      <y>20</y>
@@ -46,37 +47,37 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="autoFillBackground" >
+   <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <property name="styleSheet" >
+   <property name="styleSheet">
     <string/>
    </property>
-   <property name="frameShape" >
+   <property name="frameShape">
     <enum>QFrame::Panel</enum>
    </property>
-   <property name="frameShadow" >
+   <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <property name="lineWidth" >
+   <property name="lineWidth">
     <number>1</number>
    </property>
-   <property name="midLineWidth" >
+   <property name="midLineWidth">
     <number>0</number>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Synapse X</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>20</y>
@@ -84,12 +85,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Presynaptic Channel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="PreSynChannelCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="PreSynChannelCombo">
+   <property name="geometry">
     <rect>
      <x>130</x>
      <y>20</y>
@@ -98,23 +99,23 @@
     </rect>
    </property>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>0</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>1</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>SG</string>
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="label_3" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>50</y>
@@ -122,12 +123,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Postynaptic Channel</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="PostSynChannelCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="PostSynChannelCombo">
+   <property name="geometry">
     <rect>
      <x>130</x>
      <y>50</y>
@@ -135,27 +136,27 @@
      <height>22</height>
     </rect>
    </property>
-   <property name="currentIndex" >
+   <property name="currentIndex">
     <number>1</number>
    </property>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>0</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>1</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>SG</string>
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="label_4" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>160</y>
@@ -163,12 +164,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>gSyn</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>190</y>
@@ -176,12 +177,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>VSyn</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_6" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>220</y>
@@ -189,107 +190,107 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>tauSyn</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="gSynE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="gSynE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>160</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="VSynE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="VSynE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>190</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="tauSynE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="tauSynE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>220</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="VThreshE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="VThreshE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>250</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>-20.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="VSlopeE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="VSlopeE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>280</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_7" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>250</y>
@@ -297,12 +298,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>VThresh</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_8" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>280</y>
@@ -310,77 +311,77 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>VSlope</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_9" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>160</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_10" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>190</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_11" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>220</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>ms</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_12" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_12">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>250</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_13" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_13">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>280</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_14" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_14">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>130</y>
@@ -388,18 +389,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Standard</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_15" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_15">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>130</y>
@@ -407,21 +408,21 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Short Term Depression</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDVSlopeE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDVSlopeE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>260</y>
@@ -429,21 +430,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="STDAmplL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDAmplL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>200</y>
@@ -451,15 +452,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Amplitude</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDtauAmplE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDtauAmplE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>320</y>
@@ -467,21 +468,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="STDVThreshL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDVThreshL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>230</y>
@@ -489,15 +490,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>VThresh</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtauAmplL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtauAmplL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>320</y>
@@ -505,15 +506,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>tauAmpl</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDVSlopeL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDVSlopeL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>260</y>
@@ -521,15 +522,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>VSlope</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDVThreshU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDVThreshU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>230</y>
@@ -537,15 +538,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDVThreshE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDVThreshE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>230</y>
@@ -553,21 +554,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDAmplE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDAmplE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>200</y>
@@ -575,21 +576,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>1.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="STDVSlopeU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDVSlopeU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>260</y>
@@ -597,15 +598,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtau0U" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtau0U">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>290</y>
@@ -613,15 +614,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>ms</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDtau0E" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDtau0E">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>290</y>
@@ -629,21 +630,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>-20.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtau0L" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtau0L">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>290</y>
@@ -651,15 +652,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>tau0</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtauVThreshL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtauVThreshL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>350</y>
@@ -667,15 +668,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>tauVThresh</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtauVThreshU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtauVThreshU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>350</y>
@@ -683,15 +684,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDtauVThreshE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDtauVThreshE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>350</y>
@@ -699,21 +700,21 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtauVSlopeU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtauVSlopeU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>380</y>
@@ -721,15 +722,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLabel" name="STDtauVSlopeL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="STDtauVSlopeL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>380</y>
@@ -737,15 +738,15 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>tauVSlope</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="STDtauVSlopeE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="STDtauVSlopeE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>380</y>
@@ -753,18 +754,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_18" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_18">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>320</y>
@@ -772,38 +773,38 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>fix Vpost</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="fixVpostCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="fixVpostCombo">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>340</y>
-     <width>111</width>
+     <width>121</width>
      <height>22</height>
     </rect>
    </property>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Off</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Fixed</string>
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="label_29" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_29">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>370</y>
@@ -811,63 +812,219 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Vpost</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_30" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_30">
+   <property name="geometry">
     <rect>
-     <x>140</x>
+     <x>150</x>
      <y>370</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>mV</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="VpostE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="VpostE">
+   <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>80</x>
      <y>370</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_31" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_31">
+   <property name="geometry">
     <rect>
      <x>20</x>
-     <y>410</y>
+     <y>500</y>
      <width>52</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Plasticity</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="PlasticityCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="PlasticityCombo">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>520</y>
+     <width>121</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>None</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Spike STDP</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>ODE STDP</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QPushButton" name="PlastParaBut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>550</y>
+     <width>121</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Parameters</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>160</y>
+     <width>20</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Vertical</enum>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="STDCombo">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>160</y>
+     <width>121</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>Off</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>On</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="OutSynChannelL">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>80</y>
+     <width>98</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output Channel</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="OutSynChannelCombo">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>80</y>
+     <width>40</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <item>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>1</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="LUCombo">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>80</y>
+     <width>121</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <item>
+    <property name="text">
+     <string>Direct Functions</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>LookupTables</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="MethodL">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>60</y>
+     <width>69</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Method</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="MgBlockCombo">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>430</y>
@@ -876,150 +1033,113 @@
     </rect>
    </property>
    <item>
-    <property name="text" >
-     <string>None</string>
-    </property>
-   </item>
-   <item>
-    <property name="text" >
-     <string>Spike STDP</string>
-    </property>
-   </item>
-   <item>
-    <property name="text" >
-     <string>ODE STDP</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QPushButton" name="PlastParaBut" >
-   <property name="enabled" >
-    <bool>false</bool>
-   </property>
-   <property name="geometry" >
-    <rect>
-     <x>20</x>
-     <y>460</y>
-     <width>121</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text" >
-    <string>Parameters</string>
-   </property>
-  </widget>
-  <widget class="Line" name="line" >
-   <property name="geometry" >
-    <rect>
-     <x>170</x>
-     <y>160</y>
-     <width>20</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <property name="orientation" >
-    <enum>Qt::Vertical</enum>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="STDCombo" >
-   <property name="geometry" >
-    <rect>
-     <x>210</x>
-     <y>160</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text" >
+    <property name="text">
      <string>Off</string>
     </property>
    </item>
    <item>
-    <property name="text" >
-     <string>On</string>
+    <property name="text">
+     <string>Fixed</string>
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="OutSynChannelL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="MgfacL">
+   <property name="geometry">
     <rect>
      <x>20</x>
-     <y>80</y>
-     <width>98</width>
+     <y>460</y>
+     <width>51</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>Output Channel</string>
+   <property name="text">
+    <string>Mg factor</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="OutSynChannelCombo" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="MgfacE">
+   <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>80</y>
-     <width>40</width>
-     <height>22</height>
+     <x>80</x>
+     <y>460</y>
+     <width>61</width>
+     <height>20</height>
     </rect>
    </property>
-   <property name="currentIndex" >
-    <number>0</number>
+   <property name="text">
+    <string>0.5602</string>
    </property>
-   <item>
-    <property name="text" >
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text" >
-     <string>1</string>
-    </property>
-   </item>
+   <property name="maxLength">
+    <number>8</number>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
   </widget>
-  <widget class="QComboBox" name="LUCombo" >
-   <property name="geometry" >
+  <widget class="QLabel" name="MgBlockL">
+   <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>80</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font" >
-    <font>
-     <pointsize>8</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <item>
-    <property name="text" >
-     <string>Direct Functions</string>
-    </property>
-   </item>
-   <item>
-    <property name="text" >
-     <string>LookupTables</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="MethodL" >
-   <property name="geometry" >
-    <rect>
-     <x>210</x>
-     <y>60</y>
-     <width>69</width>
+     <x>20</x>
+     <y>410</y>
+     <width>52</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
-    <string>Method</string>
+   <property name="text">
+    <string>Mg Block</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="MgexpoL">
+   <property name="geometry">
+    <rect>
+     <x>170</x>
+     <y>460</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mg exponent</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="MgexpoE">
+   <property name="geometry">
+    <rect>
+     <x>250</x>
+     <y>460</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>-0.062</string>
+   </property>
+   <property name="maxLength">
+    <number>8</number>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="MgexpoU">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>460</y>
+     <width>31</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>1/V</string>
    </property>
   </widget>
  </widget>

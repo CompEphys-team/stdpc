@@ -28,6 +28,7 @@ class ChemSyn {
     double h;
     double g;
     double graw;
+    double gfac;
     double P;  // "potentiation var" in ODE STDP
     double D;  // "depression var" in ODE STDP
     double Pslope; // slope of the sigmoid for P

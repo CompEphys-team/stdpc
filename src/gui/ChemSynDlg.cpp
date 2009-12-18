@@ -84,6 +84,7 @@ void ChemSynDlg::STDComboChange()
 void ChemSynDlg::exportData(CSynData &p)
 {
   p.LUTables= (LUCombo->currentIndex() == 1);
+  p.MgBlock= (MgBlockCombo->currentIndex() == 1);
   p.PreSynChannel= PreSynChannelCombo->currentIndex();
   p.PostSynChannel= PostSynChannelCombo->currentIndex();
   p.OutSynChannel= OutSynChannelCombo->currentIndex();
@@ -102,6 +103,8 @@ void ChemSynDlg::exportData(CSynData &p)
   p.STDtauVSlope= STDtauVSlopeE->text().toDouble()*1e-3;
   p.fixVpost= fixVpostCombo->currentIndex();
   p.Vpost= VpostE->text().toDouble()*1e-3;
+  p.Mgfac= MgfacE->text().toDouble();
+  p.Mgexpo= MgexpoE->text().toDouble();
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
   STDP->exportData(p.ST);
@@ -114,6 +117,8 @@ void ChemSynDlg::importData(CSynData p)
   QString num;   
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
+  if (p.MgBlock) MgBlockCombo->setCurrentIndex(1);
+  else MgBlockCombo->setCurrentIndex(0);  
   PreSynChannelCombo->setCurrentIndex(p.PreSynChannel);
   PostSynChannelCombo->setCurrentIndex(p.PostSynChannel);
   OutSynChannelCombo->setCurrentIndex(p.OutSynChannel);
@@ -145,6 +150,10 @@ void ChemSynDlg::importData(CSynData p)
   fixVpostCombo->setCurrentIndex(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
+  num.setNum(p.Mgfac);
+  MgfacE->setText(num);
+  num.setNum(p.Mgexpo);
+  MgexpoE->setText(num);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
   // ST plasticity
   STDP->importData(p.ST);
