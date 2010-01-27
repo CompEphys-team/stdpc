@@ -104,7 +104,7 @@ void ChemSyn::currentUpdate(double t, double dt)
   if (p->MgBlock) {
     gfac= 1.0/(1.0+p->Mgfac * exp(p->Mgexpo*V));
   }
-  I= p->gSyn * S * h * (p->VSyn - V);
+  I= p->gSyn * gfac * S * h * (p->VSyn - V);
   out->I+= I;
 
   // if plastic, learn
