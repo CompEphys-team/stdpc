@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QFileDialog>
+#include "main.h"
 #include "global.h"
 #include "ui_mainwin.h"
 #include "InputChannelDlg.h"

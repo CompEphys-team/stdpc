@@ -3,6 +3,7 @@
 
 using namespace std;
 
+#include "main.h"
 #include <QString>
 #include <iostream>
 
@@ -231,14 +232,17 @@ class SDAQData {
 class DigiDataData {
   public: 
     short int baseAddress;
+    short int syncIOMask;
     DigiDataData &operator=(DigiDataData);
 };
 
+#ifdef NIDAQ
 class NIDAQData {
   public: 
     QString deviceName;
     NIDAQData &operator=(NIDAQData);
 };
+#endif
 
 typedef struct {
   bool active[4];
@@ -257,7 +261,9 @@ ostream &operator<<(ostream &os, SDAQData &p);
 istream &operator>>(istream &is, SDAQData &p); 
 ostream &operator<<(ostream &os, DigiDataData &p);
 istream &operator>>(istream &is, DigiDataData &p);
+#ifdef NIDAQ
 ostream &operator<<(ostream &os, NIDAQData &p); 
 istream &operator>>(istream &is, NIDAQData &p); 
+#endif
 
 #endif

@@ -1,4 +1,4 @@
-
+#include "main.h"
 #include "mainwin.h"
 #include "LUtables.h"
 #include <windows.h>
@@ -33,12 +33,12 @@ void MyMainWindow::DAQSetup()
     break;
 #ifdef NIDAQ
   case 2:
-    board= new NIDAQ;
+    board= new NIDAQx;
     theDAQDlg= NDQDlg;       
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2008 v19"));
+  LoadMsg.setWindowTitle(tr("StdpC 2008 v21"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
@@ -103,7 +103,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
-          
+     
+     // somewhat of a hack: Synchronous digital IO for DigiData boards
+     DigiDatap.syncIOMask= 0x0000;  
+     
      DCT= new DCThread();
    
      inChnp= NULL;
@@ -167,7 +170,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
      connect(SDAQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
-     
+#ifdef NIDAQ
+     connect(NDQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
+#endif
+
      connect(Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
      connect(Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
 

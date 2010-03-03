@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StdpC 2008</string>
+   <string>StdpC 2008 v21</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="DataBox">
@@ -820,7 +820,7 @@ p, li { white-space: pre-wrap; }
         <height>22</height>
        </rect>
       </property>
-      <property name="currentIndex" >
+      <property name="currentIndex">
        <number>0</number>
       </property>
       <item>
@@ -839,7 +839,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -933,7 +933,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -1024,7 +1024,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -1115,7 +1115,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -1222,7 +1222,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -1313,7 +1313,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </item>
       <item>
-       <property name="text" >
+       <property name="text">
         <string>ab Synapse</string>
        </property>
       </item>
@@ -2151,7 +2151,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1013</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

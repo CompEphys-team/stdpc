@@ -1,18 +1,18 @@
 #ifndef NIDAQ_H
 #define NIDAQ_H
 
+using namespace std;
+
 #include "Channels.h"
 #include "DAQ.h"
 
-#include <nidaqmx.h>
+#include <NIDAQmx.h>
 #include <windows.h>
-
-//-------------- Constants related to Digidata 1200A board ------------------
 
 #define MAXRANGES 64
 #define MAXCHANNELS 64
 
-class NIDAQ: public DAQ
+class NIDAQx: public DAQ
 {
   private:
    LARGE_INTEGER intClock_frequency;
@@ -32,10 +32,11 @@ class NIDAQ: public DAQ
    TaskHandle outTask;
    int outTaskActive;
    float64 *outBuf;
+   int DevicePresent;
             
   public:
-    NIDAQ();
-    virtual ~NIDAQ();
+    NIDAQx();
+    virtual ~NIDAQx();
     void init();
     virtual bool initialize_board(QString &);
     virtual void reset_RTC();

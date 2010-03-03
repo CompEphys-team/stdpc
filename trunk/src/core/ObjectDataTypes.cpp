@@ -1,4 +1,4 @@
-
+#include "main.h"
 #include "ObjectDataTypes.h"
 
 ostream &operator<<(ostream &os, SDAQData &p) 
@@ -58,6 +58,7 @@ DigiDataData &DigiDataData::operator=(DigiDataData old)
   return *this;
 }
 
+#ifdef NIDAQ
 ostream &operator<<(ostream &os, NIDAQData &p) 
 {
   string buf;
@@ -73,3 +74,4 @@ istream &operator>>(istream &is, NIDAQData &p)
   p.deviceName= QString(cBuf);;
   return is;
 } 
+#endif

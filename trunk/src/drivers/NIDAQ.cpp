@@ -2,7 +2,7 @@
 #include "NIDAQ.h"
 #include "limits.h"
 #include <sstream>
-#include "nidaqmx.h"
+#include "NIDAQmx.h"
 #include <QMessageBox>
 #include <QString>
 #include <cmath>
@@ -11,7 +11,7 @@
 
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ()
+NIDAQx::NIDAQx()
 {
   char data[1024];
   float64 fdata[128];
@@ -22,10 +22,10 @@ NIDAQ::NIDAQ()
   devName= new char[80];
   strcpy(devName, (const char *) NIDAQp.deviceName.toAscii());
   
-  DAQmxGetDevAIPhysicalChans (devName, data, 1024);
-    QMessageBox::warning(NULL, QString("My Application"),
-              QString(data),
-                QMessageBox::Ok); 
+  DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
+//if (!DevicePresent)  QMessageBox::warning(NULL, QString("My Application"),
+//              QString(data),
+//                QMessageBox::Ok); 
     
   istr=new istringstream(data);
   int k= 0;
@@ -95,14 +95,15 @@ NIDAQ::NIDAQ()
   clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
   
 //   QMessageBox::warning(NULL, QString("My Application"),
-//                QString("Finished scanning ouput ranges, exiting NIDAQ constructor"),
+//                QString("Finished scanning ouput ranges, exiting NIDAQx constructor"),
 //               QMessageBox::Close); 
 
 //  init();
 };
 
-NIDAQ::~NIDAQ()
+NIDAQx::~NIDAQx()
 {
+  if (DevicePresent) {
   for (int i= 0; i < inChnNo; i++) {
     delete[] iChnNm;
   }
@@ -127,27 +128,29 @@ NIDAQ::~NIDAQ()
   delete[] outIdx;
   delete[] outGainFac;
   DAQmxResetDevice(devName);
+  }
 }
 
-void NIDAQ::init()
+void NIDAQx::init()
 {
 }
 
 //---------------------------------------------------------------------------
-bool NIDAQ::initialize_board(QString &name)
+bool NIDAQx::initialize_board(QString &name)
 {
   char cname[1024];
   bool success= false;
 
   success= (DAQmxGetDevProductType(devName, cname, 1024) == 0);
-  name= QString(cname);
+  if (success) name= QString(cname);
+  else name= QString(devName);
   DAQmxResetDevice(devName);
   initialized= success;
   return success;
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::reset_RTC()
+void NIDAQx::reset_RTC()
 {
   // this is called when the dynamic clamp starts ... start tasks
   static LARGE_INTEGER inT;
@@ -161,7 +164,7 @@ void NIDAQ::reset_RTC()
 }
 
 //---------------------------------------------------------------------------
-double NIDAQ::get_RTC(void)
+double NIDAQx::get_RTC(void)
 {
   static LARGE_INTEGER inT;
   static double dt, lastT;
@@ -177,14 +180,14 @@ double NIDAQ::get_RTC(void)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::digital_out(unsigned char outbyte)
+void NIDAQx::digital_out(unsigned char outbyte)
 {
 //   WriteByte(digital_IO,outbyte);
 }
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
+void NIDAQx::generate_scan_list(short int chnNo, short int *Chns)
 {
   actInChnNo= chnNo;  
   if (inTaskActive != 0) {
@@ -207,7 +210,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_scan(inChannel *in)
+void NIDAQx::get_scan(inChannel *in)
 {
   static int i;
   static int32 spr;
@@ -216,7 +219,7 @@ void NIDAQ::get_scan(inChannel *in)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
+void NIDAQx::generate_analog_out_list(short int chnNo, short int *Chns)
 {
    actOutChnNo= chnNo;
    if (outTaskActive != 0) {
@@ -239,7 +242,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::write_analog_out(outChannel *out)
+void NIDAQx::write_analog_out(outChannel *out)
 {
   static int i;
   static int32 spw;
@@ -250,7 +253,7 @@ void NIDAQ::write_analog_out(outChannel *out)
 }
 
 
-void NIDAQ::reset_board() 
+void NIDAQx::reset_board() 
 {
  static int32 spw;
   // stop tasks first

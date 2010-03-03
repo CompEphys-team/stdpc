@@ -1,4 +1,4 @@
-
+#include "main.h"
 #include "global.h"
 
 int synType[MAX_SYN_NO];
@@ -17,7 +17,9 @@ outChnData outSpkGenChnp;
 
 DigiDataData DigiDatap;
 SDAQData SDAQp;
+#ifdef NIDAQ
 NIDAQData NIDAQp;
+#endif
 SGData SGp;
 
 graphData Graphp[2];
@@ -33,6 +35,7 @@ QVector<double *> dAP;
 QVector<int *> iAP;
 QVector<bool *> bAP;
 QVector<QString *> sAP;
+QVector<short int *> siAP;
 QVector<QString> APname;
 QVector<int> APindex;
 QVector<APTYPE> APtype;
