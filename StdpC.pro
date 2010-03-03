@@ -5,8 +5,9 @@ DEPENDPATH += . src src/core src/drivers src/gui src/models \
               src/nidaqmx src/include lib
 INCLUDEPATH += . src src/core src/drivers src/gui src/models \
                src/nidaqmx src/include lib
-INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include" \
-               
+
+##INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"         
+#INCLUDEPATH += src/nidaqmx    
 
 TEMPLATE = app
 CONFIG -= debug_and_release
@@ -33,7 +34,8 @@ FORMS += mainwin.ui \
          OutputChannelDlg.ui \ 
          SimulDAQDlg.ui \ 
          DigiDataDlg.ui \ 
-         NIDAQDlg.ui \
+##uncomment for NIDAQ use
+#         NIDAQDlg.ui \
          abSynDlg.ui \
          MeasMethodDlg.ui
 HEADERS += main.h \
@@ -73,7 +75,7 @@ HEADERS += main.h \
            AECChannel.h
 ## uncomment to compile with NIDAQmx support (needs NIDAQmx)           
 # HEADERS += NIDAQDlg.h \
-#          NIDAQ.h
+#            NIDAQ.h
      
 SOURCES += main.cpp \
            mainwin.cpp \
@@ -112,7 +114,7 @@ SOURCES += main.cpp \
            AECChannel.cpp
           
 ## uncomment to compile with NIDAQmx support (needs NIDAQmx)           
-#SOURCES +=           NIDAQDlg.cpp \
+#SOURCES += NIDAQDlg.cpp \
 #           NIDAQ.cpp
 
 LIBDIR += "C:\Qt\4.4.2\bin"

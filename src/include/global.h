@@ -1,6 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#include "main.h"
 #include <QVector>
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
@@ -28,7 +29,9 @@ extern outChnData outSpkGenChnp;
 
 extern DigiDataData DigiDatap;
 extern SDAQData SDAQp;
+#ifdef NIDAQ
 extern NIDAQData NIDAQp;
+#endif
 extern SGData SGp;
 
 extern graphData Graphp[2];
@@ -40,12 +43,13 @@ extern expSigmoidLUtable expSigmoidLU;
 
 // adjustable parameters
 
-enum APTYPE {DBLTYPE,INTTYPE,BOOLTYPE,STRTYPE};
+enum APTYPE {DBLTYPE,INTTYPE,BOOLTYPE,STRTYPE,SHORTINTTYPE};
 
 extern QVector<double *> dAP;
 extern QVector<int *> iAP;
 extern QVector<bool *> bAP;
 extern QVector<QString *> sAP;
+extern QVector<short int *> siAP;
 extern QVector<QString> APname;
 extern QVector<int> APindex;
 extern QVector<APTYPE> APtype;

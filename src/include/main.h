@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-//#define NIDAQ
-#include "mainwin.h" 
+// uncomment if compiling a NIDAQ version
+//efine NIDAQ
 
 #endif

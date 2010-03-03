@@ -16,6 +16,7 @@ scriptInstruction::scriptInstruction(const scriptInstruction &scr)
   int *ival;
   bool *bval;
   QString *sval;
+  short int *sival;
   
   t=scr.t;
   type= scr.type;
@@ -25,6 +26,7 @@ scriptInstruction::scriptInstruction(const scriptInstruction &scr)
     case INTTYPE: ival= new int; *ival= *((int *) scr.value); value= (void *) ival; break;
     case BOOLTYPE: bval= new bool; *bval= *((bool *) scr.value); value= (void *) bval; break;
     case STRTYPE: sval= new QString; *sval= *((QString *) scr.value); value= (void *) sval; break;
+    case SHORTINTTYPE: sival= new short int; *sival= *((short int *) scr.value); value= (void *) sival; break;
   }
 }
    
@@ -36,6 +38,7 @@ scriptInstruction::~scriptInstruction()
       case INTTYPE: delete ((int *) value); break;
       case BOOLTYPE: delete ((bool *) value); break;
       case STRTYPE: delete ((QString *) value); break;
+      case SHORTINTTYPE: delete ((short int *) value); break;      
     }
   }
 }
@@ -46,6 +49,7 @@ void scriptInstruction::set(double inT, APTYPE inType, int inIndex, void *inValu
   int *ival;
   bool *bval;
   QString *sval;
+  short int *sival;
   
   t= inT;
   type= inType;
@@ -66,6 +70,10 @@ void scriptInstruction::set(double inT, APTYPE inType, int inIndex, void *inValu
     case STRTYPE: 
          if (value != NULL) delete (QString *) value;
          sval= new QString; *sval= *((QString *) inValue); value= (void *) sval; 
+         break;
+    case SHORTINTTYPE: 
+         if (value != NULL) delete (short int *) value;
+         sival= new short int; *sival= *((short int *) inValue); value= (void *) sival; 
          break;
   }
 }

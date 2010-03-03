@@ -367,6 +367,7 @@ void DCThread::run()
          case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
          case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
          case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
+         case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
        }
        scrIter++;
        if (scrIter == scriptq.end()) evt= 1e10;
@@ -414,6 +415,7 @@ bool DCThread::LoadScript(QString &fname)
   QString pname;
   double dvalue;
   int ivalue, index;
+  short int sivalue;
   bool bvalue, done, success;
   QString svalue, qn, vn;
   scriptInstruction inst;
@@ -438,6 +440,7 @@ bool DCThread::LoadScript(QString &fname)
         case INTTYPE: is >> ivalue; break;
         case BOOLTYPE: is >> bvalue; break;
         case STRTYPE: is >> buf; svalue= QString(buf); break;
+        case SHORTINTTYPE: is >> sivalue; break;
       }
       if (is.good()) {
         switch (APtype[index]) {
@@ -445,6 +448,7 @@ bool DCThread::LoadScript(QString &fname)
           case INTTYPE: inst.set(et, APtype[index], APindex[index], &ivalue); break;
           case BOOLTYPE: inst.set(et, APtype[index], APindex[index], &bvalue); break;
           case STRTYPE: inst.set(et, APtype[index], APindex[index], &svalue); break;
+          case SHORTINTTYPE: inst.set(et, APtype[index], APindex[index], &sivalue); break;
         }
         scriptq.append(inst);
       }

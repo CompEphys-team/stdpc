@@ -235,6 +235,7 @@ void DigiData::write_analog_out(outChannel *out)
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
     int_I= (short int) (out[outIdx[i]].I*outGainFac[i]);
+    int_I|= DigiDatap.syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
   } 

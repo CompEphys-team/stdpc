@@ -1,4 +1,4 @@
-
+#include "main.h"
 
 void MyMainWindow::setupAP()
 {
@@ -14,6 +14,7 @@ void MyMainWindow::setupAP()
   APindex.clear();
   dAP.clear();
   iAP.clear();
+  siAP.clear();
   bAP.clear();
   sAP.clear();
  
@@ -358,8 +359,10 @@ void MyMainWindow::setupAP()
     iAP.append(&(Graphp[k].xtNo));
     APname.append(QString("Graphp[") + qs + QString("].ytNo")); APtype.append(INTTYPE); APindex.append(iAP.size());
     iAP.append(&(Graphp[k].ytNo));
+    APname.append(QString("DigiDatap.syncIOMask")); APtype.append(SHORTINTTYPE); APindex.append(siAP.size());
+    siAP.append(&(DigiDatap.syncIOMask));
   }    
- assert(APname.size() == dAP.size() + iAP.size() + bAP.size() + sAP.size());
+ assert(APname.size() == dAP.size() + iAP.size() + bAP.size() + sAP.size() + siAP.size());
 
 }
 
@@ -384,6 +387,7 @@ void MyMainWindow::doSaveProtocol(QString &fname)
       case INTTYPE: os << *(iAP[APindex[i]]) << endl; break;
       case BOOLTYPE: os << *(bAP[APindex[i]]) << endl; break;
       case STRTYPE: os << sAP[APindex[i]]->toStdString() << endl; break;
+      case SHORTINTTYPE: os << *(siAP[APindex[i]]) << endl; break;
     }
   }
   os.close();
@@ -429,6 +433,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
       case INTTYPE: is >> *(iAP[APindex[i]]); break;
       case BOOLTYPE: is >> *(bAP[APindex[i]]); break;
       case STRTYPE: is >> buf; *(sAP[APindex[i]])= QString(buf); break;
+      case SHORTINTTYPE: is >> *(siAP[APindex[i]]); break;
     }
     is >> name;
   } 
