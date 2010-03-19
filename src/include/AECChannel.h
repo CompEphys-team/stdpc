@@ -9,22 +9,28 @@ public:
     short int inChnNum;
     short int outChnNum;
 
-    long int freq;
     bool active;
-    int kernelSize;
-    int tbufferSize;
-    double Ve;
+    bool saving;
 
-    QVector<double> Kernel;
-    QVector<double> Ibuffer;
-    QVector<double> Tbuffer;
+    double kerSampPer;
+    double kernelTime;
+    double v_e;
+    int buffInd;
+
+    QVector<double> kernel;
+    QVector<double> iBuffer;
+    QVector<double> tBuffer;    
 
     AECChannel();
-    AECChannel(short int inChnNum, short int outChnNum);
 
-    void initializeKernel(QVector<double> *kernel);
-    void resetChannel();
-    double calcVe(double current);
+    void Activate();
+    void Inactivate();
+    bool IsActive();
+
+    void Initialize(short int inChnNum, short int outChnNum, double kerSampPer, QVector<double> kernel);
+    void ResetChannel();
+    double CalculateVe(double current, double dt);
+
 };
 
 #endif // AECCHANNEL_H

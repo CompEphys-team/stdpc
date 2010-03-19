@@ -1,7 +1,7 @@
 #ifndef SCRIPTING_H
 #define SCRIPTING_H
 
-#include "global.h"
+#include "Global.h"
 
 class  scriptInstruction
 {

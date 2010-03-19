@@ -1,5 +1,5 @@
-#include "main.h"
-#include "global.h"
+#include "Main.h"
+#include "Global.h"
 
 int synType[MAX_SYN_NO];
 CSynData CSynp[MAX_SYN_NO];
@@ -17,7 +17,7 @@ outChnData outSpkGenChnp;
 
 DigiDataData DigiDatap;
 SDAQData SDAQp;
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 NIDAQData NIDAQp;
 #endif
 SGData SGp;

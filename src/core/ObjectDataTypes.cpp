@@ -1,4 +1,4 @@
-#include "main.h"
+#include "Main.h"
 #include "ObjectDataTypes.h"
 
 ostream &operator<<(ostream &os, SDAQData &p) 
@@ -58,7 +58,7 @@ DigiDataData &DigiDataData::operator=(DigiDataData old)
   return *this;
 }
 
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 ostream &operator<<(ostream &os, NIDAQData &p) 
 {
   string buf;

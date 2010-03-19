@@ -1,7 +1,7 @@
 #ifndef DIGIDATA_H
 #define DIGIDATA_H
 
-#include "pt_ioctl_tn.h"
+#include "Pt_ioctl_tn.h"
 #include "Channels.h"
 #include "DAQ.h"
 
@@ -96,9 +96,6 @@ class DigiData: public DAQ
    short int reset_control;     
    bool portsOpen;
    double t;
-
-   double *inGain;
-   double *outGain;
             
   public:
     DigiData();

@@ -5,7 +5,7 @@
 #include "ui_NIDAQDlg.h"
 #include "ObjectDataTypes.h"
 #include "DAQDlg.h"
-#include "global.h"
+#include "Global.h"
 
 class NIDAQDlg : public DAQDlg, private Ui::NIDAQDlg
 {

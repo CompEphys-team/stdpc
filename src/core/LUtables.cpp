@@ -1,5 +1,5 @@
 
-#include "global.h"
+#include "Global.h"
 #include "LUtables.h"
 #include <cmath>
 #include <QString>

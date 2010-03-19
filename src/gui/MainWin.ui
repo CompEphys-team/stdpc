@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StdpC 2008 v21</string>
+   <string>StdpC 2008 v22</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="DataBox">
@@ -2151,7 +2151,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1013</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -2173,8 +2173,9 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionDAQ"/>
     <addaction name="actionInput_channels"/>
     <addaction name="actionOutput_channels"/>
+    <addaction name="actionElectrode_setup"/>
+    <addaction name="actionData_saving"/>
     <addaction name="actionSave_config"/>
-    <addaction name="actionMeasurement_method"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -2252,7 +2253,7 @@ p, li { white-space: pre-wrap; }
     <string>Clear Log</string>
    </property>
   </action>
-  <action name="actionMeasurement_method">
+  <action name="actionElectrode_setup">
    <property name="checkable">
     <bool>false</bool>
    </property>
@@ -2260,7 +2261,12 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Measurement method</string>
+    <string>Electrode setup</string>
+   </property>
+  </action>
+  <action name="actionData_saving">
+   <property name="text">
+    <string>Data saving</string>
    </property>
   </action>
  </widget>

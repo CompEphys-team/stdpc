@@ -1,4 +1,5 @@
-#include "main.h"
+#include "Main.h"
+#include <assert.h>
 
 void MyMainWindow::setupAP()
 {
@@ -375,7 +376,7 @@ void MyMainWindow::doSaveProtocol(QString &fname)
   os << DAQComboBox->currentIndex() << endl;
   os << SDAQp << endl;
   os << DigiDatap << endl;
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   os << NIDAQp << endl;
 #endif
   os << endl;
@@ -408,7 +409,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   is >> itmp;
   is >> SDAQp;
   is >> DigiDatap;
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   is >> NIDAQp;
 #endif
   if (!is.good()) {
@@ -417,12 +418,13 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }  
   SDAQDlg->importData(SDAQp);
   DDataDlg->importData(DigiDatap);
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   NDQDlg->importData(NIDAQp);
 #endif
   DAQComboBox->setCurrentIndex(itmp);
-  
-//  DAQSetup();
+ 
+  // comment this?!?
+  DAQSetup();
 
   setupAP();
   is >> name;
@@ -439,9 +441,9 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   } 
   is.close();
   importData();
-  QMessageBox::warning(this, tr("My Application"),
-                QString("last parameter ")+APname[i],
-               QMessageBox::Close); 
+//  QMessageBox::warning(this, tr("My Application"),
+//                QString("last parameter "+APname[i]),
+//               QMessageBox::Close); 
 
  
 }

@@ -2,16 +2,18 @@
 #define DCTHREAD_H
 
 #include <QThread>
-#include "global.h"
+#include "Global.h"
 #include "ChemSyn.h"
-#include "abSyn.h"
+#include "AbSyn.h"
 #include "GapJunction.h"
 #include "HH.h"
-#include "abHH.h"
+#include "AbHH.h"
 #include "SpkGen.h"
 #include "DigiData.h"
-#include "scripting.h"
+#include "Scripting.h"
 #include "AECChannel.h"
+#include "DataSaver.h"
+
 
 class DCThread : public QThread 
 {
@@ -21,18 +23,25 @@ class DCThread : public QThread
      void run();
      
  public slots:
- 
+
+private:
+     DataSaver *dataSaver;
+
  public:
      DCThread();
      virtual ~DCThread();
      void init(DAQ *);
+     void InitSaving(QString, QVector<bool>);
      bool LoadScript(QString &);
      void UnloadScript();
-     void saveData(QString &fname, QVector<double> data);
+     double WaitTillNextSampling(double);
 
      // List of AEC channels (io-channels pairs, kernels and current buffers)
-     QList<AECChannel*> *aecChannels;
-     bool applyAEC;
+     QVector<AECChannel*> aecChannels;
+
+     // Temporary data storing object
+     QVector<double> data;
+     int saveElecNum;
      
      bool stopped;
      bool finished;
@@ -83,7 +92,9 @@ class DCThread : public QThread
      void message(QString message);
      void addPoint1(double, double, int);
      void addPoint2(double, double, int);
-     
+     void CloseToLimit(QString, int, double, double, double);
+
+
 };
 
 

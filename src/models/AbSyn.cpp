@@ -1,5 +1,5 @@
 
-#include "abSyn.h"
+#include "AbSyn.h"
 #include <cmath>
     
 abSyn::abSyn() 

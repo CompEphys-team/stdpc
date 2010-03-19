@@ -1,7 +1,7 @@
 #ifndef GAPJUNCTION_H
 #define GAPJUNCTION_H
 
-#include "global_func.h"
+#include "Global_func.h"
 #include "Channels.h"
 
 class GapJunction {

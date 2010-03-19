@@ -4,7 +4,7 @@
 #include "ObjectDataTypes.h"
 #include "Channels.h"
 #include "LUtables.h"
-#include "global_func.h"
+#include "Global_func.h"
 
 class HH
 {

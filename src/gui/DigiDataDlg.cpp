@@ -1,5 +1,5 @@
 #include "DigiDataDlg.h"
-#include "tools.cpp"
+#include "Tools.cpp"
 
 DigiDataDlg::DigiDataDlg(QWidget *parent) : DAQDlg(parent)
 {

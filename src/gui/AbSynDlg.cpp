@@ -1,5 +1,5 @@
 
-#include "abSynDlg.h"
+#include "AbSynDlg.h"
 #include <QMessageBox>
 
 abSynDlg::abSynDlg(int no, QWidget *parent)

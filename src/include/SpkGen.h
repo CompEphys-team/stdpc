@@ -4,7 +4,7 @@
 using namespace std;
 
 #include <fstream>
-#include "global_func.h"
+#include "Global_func.h"
 #include "ObjectDataTypes.h"
 #include "Channels.h"
 #include <QObject>
