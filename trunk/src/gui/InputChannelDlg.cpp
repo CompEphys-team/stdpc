@@ -61,6 +61,11 @@ void InputChannelDlg::init(DAQ *board)
   
   clearAll(); 
   ChnNo= board->inChnNo;
+  inGain = QVector<double>(board->inGainNo);
+  for(int i= 0; i < board->inGainNo; i++){
+    inGain[i]= board->inGain[i];
+  }
+
   lbNum= 0;
   
   lb= new QLabel(this);
@@ -148,6 +153,8 @@ void InputChannelDlg::exportData()
     inChnp[i].gainFac= factor[i]->text().toDouble();
     inChnp[i].spkDetect= (sDetect[i]->checkState() > 0);
     inChnp[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
+    inChnp[i].minVoltage = -inGain[rng[i]->currentIndex()]*inChnp[i].gainFac;
+    inChnp[i].maxVoltage =  inGain[rng[i]->currentIndex()]*inChnp[i].gainFac;
   }
 }
 

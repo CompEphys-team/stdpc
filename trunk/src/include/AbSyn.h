@@ -1,7 +1,7 @@
 #ifndef ABSYN_H
 #define ABSYN_H
 
-#include "global_func.h"
+#include "Global_func.h"
 #include "Channels.h"
 
 class abSyn {

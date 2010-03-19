@@ -1,5 +1,5 @@
 #include "SimulDAQDlg.h"
-#include "tools.cpp"
+#include "Tools.cpp"
 
 SimulDAQDlg::SimulDAQDlg(QWidget *parent) : DAQDlg(parent)
 {

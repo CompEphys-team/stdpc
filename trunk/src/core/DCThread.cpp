@@ -1,13 +1,10 @@
- using namespace std;
- 
- #include <fstream>
- #include "DCThread.h"
- #include "AP.h"
- #include <cmath>
- #include <climits>
- #include <QMessageBox>
+#include "DCThread.h"
+#include "AP.h"
+#include <cmath>
+#include <climits>
+
   
- #include "SimulDAQ.h" // for debugging only ...
+#include "SimulDAQ.h" // for debugging only ...
  
 DCThread::DCThread() 
 {
@@ -30,7 +27,12 @@ DCThread::DCThread()
   outIdx= NULL;
   scripting= false;
 
-  applyAEC= false;
+  aecChannels = QVector<AECChannel*>(4);
+  for(int i=0; i<4; i++)
+    aecChannels[i] = new AECChannel();
+
+  dataSaver = new DataSaver();
+  saveElecNum = 0;
 }
 
 DCThread::~DCThread() 
@@ -66,6 +68,26 @@ void DCThread::init(DAQ *inBoard)
    inIdx= new short int[board->inChnNo+1];
    outIdx= new short int[board->outChnNo+1];
 }
+
+
+void DCThread::InitSaving(QString filename, QVector<bool> saveElectrodes)
+{    
+    saveElecNum = 0;
+    for ( int i=0; i<aecChannels.size(); i++ )
+        if(saveElectrodes[i] == true && aecChannels[i]->IsActive() == true) saveElecNum++;
+
+    if ( saveElecNum == 0 ) return;  // we don't have to do anything
+
+    // else, let's init saving
+    for ( int i=0; i<aecChannels.size(); i++ )
+        aecChannels[i]->saving = saveElectrodes[i] && aecChannels[i]->IsActive();
+
+    // TODO: electrode artifact component to remove!!!!!!!!!!!!!
+    data = QVector<double>(1+3*saveElecNum); // 1: timestamp, (k+1, k+2, k+3): (current, compensated voltage, electrode artifact) of the k. AEC channel
+
+    dataSaver->InitDataSaving(filename);
+}
+
 
 void DCThread::run()
 {
@@ -187,13 +209,52 @@ void DCThread::run()
    sz= expLU.generate();
    if (sz > 0) message(QString("Exp lookup table (re)generated"));
    sz= expSigmoidLU.generate();
-   if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated"));
+   if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated")); 
    
-   board->reset_RTC();
+   // Checking validity of AEC channels
+   for ( int i=0; i<aecChannels.size(); i++ ){
+     if ( aecChannels[i]->IsActive() ){
+       if ( inChnp[aecChannels[i]->inChnNum].active == true &&
+         outChnp[aecChannels[i]->outChnNum].active == true ){
+         message(QString("AEC channel is active on input channel ")+QString::number(aecChannels[i]->inChnNum)+" and output channel "+QString::number(aecChannels[i]->outChnNum));
+       }
+       else {
+         if ( inChnp[aecChannels[i]->inChnNum].active == false ){
+           message(QString("Input channel ")+QString::number(aecChannels[i]->inChnNum)+QString(" is not active! AEC disabled on that channel."));
+           aecChannels[i]->Inactivate();
+         }
+         if ( outChnp[aecChannels[i]->outChnNum].active == false ){
+           message(QString("Output channel ")+QString::number(aecChannels[i]->outChnNum)+QString(" is not active! AEC disabled on that channel."));
+           aecChannels[i]->Inactivate();
+         }
+       }
+     }
+   }
+
+
+   // Create tolerance limits for all AEC channels
+   QVector<double> iHiLim = QVector<double>(aecChannels.size());    // high limit for the current
+   QVector<double> iLoLim = QVector<double>(aecChannels.size());    // low limit for the current
+   QVector<double> vHiLim = QVector<double>(aecChannels.size());    // high limit for the voltage
+   QVector<double> vLoLim = QVector<double>(aecChannels.size());    // low limit for the voltage
+   double upTolFac = 0.9;   // upper tolerance factor
+   double doTolFac = 0.1;   // down  tolerance factor
+   for ( int i=0; i<aecChannels.size(); i++ ){
+     iHiLim[i] = outChnp[aecChannels[i]->outChnNum].minCurrent + upTolFac*(outChnp[aecChannels[i]->outChnNum].maxCurrent-outChnp[aecChannels[i]->outChnNum].minCurrent);
+     iLoLim[i] = outChnp[aecChannels[i]->outChnNum].minCurrent + doTolFac*(outChnp[aecChannels[i]->outChnNum].maxCurrent-outChnp[aecChannels[i]->outChnNum].minCurrent);
+     vHiLim[i] = inChnp[aecChannels[i]->inChnNum].minVoltage + upTolFac*(inChnp[aecChannels[i]->inChnNum].maxVoltage-inChnp[aecChannels[i]->inChnNum].minVoltage);
+     vLoLim[i] = inChnp[aecChannels[i]->inChnNum].minVoltage + doTolFac*(inChnp[aecChannels[i]->inChnNum].maxVoltage-inChnp[aecChannels[i]->inChnNum].minVoltage);
+   }
+   bool limitWarningEmitted = false;
+
+
+   board->reset_board();
    message(QString("DynClamp: Clamping ..."));
    stopped= false;
-   finished= false;    
+   finished= false;
    t= 0.0;
+   int sample= 0;
+   int elecNum = 0; // for data saving
    for (int i= 0; i < 2; i++) lastWrite[i]= t;
    // init scripting
    if (scripting) {
@@ -201,211 +262,157 @@ void DCThread::run()
      evt= scrIter->t;
    }
    else evt= 1e10;
-   
-   
-   //--------------//
-   // AEC checking //
-   //--------------//
 
-   long int sample = 0;
-   long int numOfSamples = 10000;
-
-   // To save out recordings
-   QString fname_currents="testI.dat";
-   QString fname_beforeCompV="testVb.dat";
-   QString fname_afterCompV="testVa.dat";
-   QString fname_controlV="testVc.dat";
-
-   QVector<double> currents = QVector<double>(numOfSamples);
-   QVector<double> beforeCompVs = QVector<double>(numOfSamples);
-   QVector<double> afterCompVs = QVector<double>(numOfSamples);
-   QVector<double> controlVs = QVector<double>(numOfSamples);
-
-   
-   // Checking validity of AEC channels
-   if(aecChannels != NULL){
-     for(int i=0; i<aecChannels->size(); i++){
-       if(inChnp[aecChannels->value(i)->inChnNum].active == true &&
-          outChnp[aecChannels->value(i)->outChnNum].active == true){
-         message(QString("AEC channel is active on input channel ")+QString::number(aecChannels->value(i)->inChnNum)+" and output channel "+QString::number(aecChannels->value(i)->outChnNum));
-         aecChannels->value(i)->active= true;
-       }
-       else{
-         if(inChnp[aecChannels->value(i)->inChnNum].active == false){
-           message(QString("Input channel ")+QString::number(aecChannels->value(i)->inChnNum)+QString(" is not active! AEC disabled on that channel."));
-           aecChannels->value(i)->active= false;
-         }
-         if(outChnp[aecChannels->value(i)->outChnNum].active == false){
-           message(QString("Output channel ")+QString::number(aecChannels->value(i)->outChnNum)+QString(" is not active! AEC disabled on that channel."));
-           aecChannels->value(i)->active= false;
-         }
-       }
-     }
-     // Check whether there's any active AEC channel
-     applyAEC= false;
-     for(int i=0; i<aecChannels->size(); i++){
-        if(aecChannels->value(i)->active == true){      
-         applyAEC= true;
-         break;
-       }   
-     }
-   }
-   else {
-     applyAEC= false;
-   }
-   // Notify the user
-   if(applyAEC == false){
-     message(QString("No active AEC channels, electrode compensation disabled"));          
-   }
-//   else{
-//     QString channelMessage = "Active AEC channels are (input/output): ";
-//     for(int i=0; i<aecChannels->size(); i++){
-//       if(aecChannels->value(i)->active == true)
-//         channelMessage+= QString::number(aecChannels->value(i)->inChnNum)+"/"+QString::number(aecChannels->value(i)->outChnNum)+" ";
-//     }
-//     message(channelMessage);
-//   }
-   
-
-   // DC loop
-   //   while (!stopped && sample != numOfSamples) {
+   // Dynamic clamp loop begins
    while (!stopped) {
-     //dt= board->get_RTC();
-     //t+= dt;
 
-     // Wait till the next sampling period is over
-     dt= 0.0;
-     do
-     {
-         dt+= board->get_RTC();
-     } while (dt < 0.0001);
-     t+= dt;
-
-     board->get_scan(inChn);
-
-     // AEC compensation part
-     if(applyAEC){    
-        //------------------
-        // AEC data saving
-        controlVs[sample]= inChn[1].V;
-        //------------------
-        for(int i=0; i<aecChannels->size(); i++){           
-
-            //------------------
-            // AEC data saving
-            beforeCompVs[sample]= inChn[aecChannels->value(i)->inChnNum].V;
-            //------------------
-
-            //------------------
-            // AEC data compensation
-            inChn[aecChannels->value(i)->inChnNum].V -= aecChannels->value(i)->Ve;
-            //------------------
-
-            //------------------
-            // AEC data saving
-            afterCompVs[sample]= inChn[aecChannels->value(i)->inChnNum].V;
-            //------------------
-        }
-     }
+     sample++;
 
 
+     // --- Write --- //    
+         board->write_analog_out(outChn);
+     // --- Write end --- //
 
-     if (SGp.active) { // SpkGen active
-       SG.VUpdate(t, dt);
-     }
-     for (i= 0; i <= inNo; i++) {
-       inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
-     }
-     for (i= 0; i <= outNo; i++) {
-       outChn[outIdx[i]].reset();
-     }
-     for (i= 0; i < csNo; i++) 
-       csyn[csIdx[i]].currentUpdate(t, dt);
-     for (i= 0; i < absNo; i++) 
-       absyn[absIdx[i]].currentUpdate(t, dt);  
-     for (i= 0; i < esNo; i++) 
-       esyn[esIdx[i]].currentUpdate(t, dt);
-     for (i= 0; i < hhNo; i++) 
-       hh[hhIdx[i]].currentUpdate(t, dt);
-     for (i= 0; i < abhhNo; i++) 
-       abhh[abhhIdx[i]].currentUpdate(t, dt);
-     // spike generator ... write stuff to DAQ
-     // outChn[1].I= inChn[inIdx[inNo]].V;
-     board->write_analog_out(outChn);
-     
-                       
-     // AEC channel update part
-     if(applyAEC){
-        //------------------
-        // AEC data saving
-        if (sample < numOfSamples) {
-          currents[sample]= outChn[aecChannels->value(0)->outChnNum].I;
-          sample++;
-        }
-        //------------------
-        for(int i=0; i<aecChannels->size(); i++){
-            aecChannels->value(i)->calcVe(outChn[aecChannels->value(i)->outChnNum].I);
-        }
-     }
 
-     if (t-lastWrite[0] > Graphp[0].dt) {
-       lastWrite[0]= t;   
-       for (i= 0; i < grpNo[0]; i++) {
-         addPoint1(t, *grp[0][i], pen[0][i]);
-       }
-     }
-     if (t-lastWrite[1] > Graphp[1].dt) {
-       lastWrite[1]= t;   
-       for (i= 0; i < grpNo[1]; i++) {
-         addPoint2(t, *grp[1][i], pen[1][i]);
-       }
-     }
-     // do scripting
-     if (t >= evt) { // event needs doing
-       switch (scrIter->type) {
-         case DBLTYPE: *dAP[scrIter->index]= *((double *) scrIter->value); break;
-         case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
-         case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
-         case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
-         case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
-       }
-       scrIter++;
-       if (scrIter == scriptq.end()) evt= 1e10;
-       else {
-         evt= scrIter->t;
-       }
-     }
+     // --- Calculate --- //
+
+         // AEC channel update part
+         for ( int k=0; k<aecChannels.size(); k++ )
+             if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);
+
+         // AEC compensation
+         for ( int k=0; k<aecChannels.size(); k++ ){
+              if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum].V -= aecChannels[k]->v_e;
+         }
+
+         // Dynamic clamp current generation
+         if (SGp.active) { // SpkGen active
+           SG.VUpdate(t, dt);
+         }
+         for (i= 0; i <= inNo; i++) {
+           inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
+         }
+         for (i= 0; i <= outNo; i++) {
+           outChn[outIdx[i]].I= 0.0;
+         }
+         for (i= 0; i < csNo; i++)
+           csyn[csIdx[i]].currentUpdate(t, dt);
+         for (i= 0; i < absNo; i++)
+           absyn[absIdx[i]].currentUpdate(t, dt);
+         for (i= 0; i < esNo; i++)
+           esyn[esIdx[i]].currentUpdate(t, dt);
+         for (i= 0; i < hhNo; i++)
+           hh[hhIdx[i]].currentUpdate(t, dt);
+         for (i= 0; i < abhhNo; i++)
+           abhh[abhhIdx[i]].currentUpdate(t, dt);
+         // spike generator ... write stuff to DAQ
+         // outChn[1].I= inChn[inIdx[inNo]].V;
+
+         // Updated display
+         if (t-lastWrite[0] > Graphp[0].dt) {
+           lastWrite[0]= t;
+           for (i= 0; i < grpNo[0]; i++) {
+             addPoint1(t, *grp[0][i], pen[0][i]);
+           }
+         }
+         if (t-lastWrite[1] > Graphp[1].dt) {
+           lastWrite[1]= t;
+           for (i= 0; i < grpNo[1]; i++) {
+             addPoint2(t, *grp[1][i], pen[1][i]);
+           }
+         }
+
+         // Scripting
+         if (t >= evt) { // event needs doing
+           switch (scrIter->type) {
+             case DBLTYPE: *dAP[scrIter->index]= *((double *) scrIter->value); break;
+             case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
+             case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
+             case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
+           }
+           scrIter++;
+           if (scrIter == scriptq.end()) evt= 1e10;
+           else {
+             evt= scrIter->t;
+           }
+         }
+
+         // Check channel limits
+         for ( int k=0; k<aecChannels.size(); k++ )
+             if ( aecChannels[k]->IsActive() ){
+                if ( inChn[aecChannels[k]->inChnNum].V > vHiLim[k] || inChn[aecChannels[k]->inChnNum].V < vLoLim[k] )
+                    if ( limitWarningEmitted == false){
+                        emit CloseToLimit(QString("Voltage"), aecChannels[k]->inChnNum, inChnp[aecChannels[k]->inChnNum].minVoltage, inChnp[aecChannels[k]->inChnNum].maxVoltage, inChn[aecChannels[k]->inChnNum].V);
+                        limitWarningEmitted = true;
+                    }
+                if ( outChn[aecChannels[k]->outChnNum].I > iHiLim[k] || outChn[aecChannels[k]->outChnNum].I < iLoLim[k] )
+                    if ( limitWarningEmitted == false){
+                        emit CloseToLimit(QString("Current"), aecChannels[k]->outChnNum, outChnp[aecChannels[k]->outChnNum].minCurrent, outChnp[aecChannels[k]->outChnNum].maxCurrent, outChn[aecChannels[k]->outChnNum].I);
+                        limitWarningEmitted = true;
+                    }
+             }
+
+         //--------------- Data saving ------------------------//
+         elecNum = 0;
+         // Time saving
+         if ( saveElecNum != 0 )
+            data[0] = t;
+         for ( int k=0; k<aecChannels.size(); k++ ){
+            if ( aecChannels[k]->IsActive() && aecChannels[k]->saving == true ){
+                  // Current saving (from last time step till now)
+                  data[3*elecNum+1]= outChn[aecChannels[k]->outChnNum].I;
+                  // Compensated voltage saving
+                  data[3*elecNum+2]= inChn[aecChannels[k]->inChnNum].V;
+                  // Electrode artifact
+                  // only for testing, TO REMOVE!!!
+                  data[3*elecNum+3]= aecChannels[k]->v_e;
+                  elecNum++;
+              }
+         }
+         if ( saveElecNum != 0)
+           dataSaver->SaveLine(data);
+         //--------------- Data saving end ---------------------//
+
+         // Adaptive time step
+         dt = board->get_RTC();
+         t += dt;
+
+     // --- Calculate end --- //
+
+
+     // --- Read --- //
+        board->get_scan(inChn);
+     // --- Read end --- //
+
    }
+   // Dynamic clamp loop ends
 
+
+   // In the end, let's do the cleaning up
    board->reset_board();
 
-   if(applyAEC){
-     for(int i=0; i<aecChannels->size(); i++){
-       aecChannels->value(i)->resetChannel();
-     }
-   }
+   for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
+
+   if ( saveElecNum != 0 ) dataSaver->EndDataSaving();
 
    finished= true;
 
-   if (applyAEC) {
-      saveData(fname_currents, currents);
-      saveData(fname_beforeCompV, beforeCompVs);
-      saveData(fname_afterCompV, afterCompVs);
-      saveData(fname_controlV, controlVs);
-   }
-
 } 
 
-void DCThread::saveData(QString &fname, QVector<double> data)
+
+// Completes the sampling cycle by waiting till the end of the sampling period
+double DCThread::WaitTillNextSampling(double time)
 {
-  ofstream os(fname.toAscii());
-  
-  for (int i= 0; i < data.size(); i++) {
-    os << data[i] << "\n";   
-  }
-  
-  os.close();
+    double t = 0.0;
+
+    do
+    {
+        t += board->get_RTC();
+    } while (t < time);
+
+    return t;
 }
+
 
 // Scripting support
 
@@ -449,7 +456,7 @@ bool DCThread::LoadScript(QString &fname)
           case BOOLTYPE: inst.set(et, APtype[index], APindex[index], &bvalue); break;
           case STRTYPE: inst.set(et, APtype[index], APindex[index], &svalue); break;
           case SHORTINTTYPE: inst.set(et, APtype[index], APindex[index], &sivalue); break;
-        }
+         }
         scriptq.append(inst);
       }
       else success= false;
@@ -483,3 +490,5 @@ void DCThread::UnloadScript()
   scripting= false;
   message(QString("script unloaded"));
 }
+
+

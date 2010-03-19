@@ -12,7 +12,7 @@ using namespace std;
 #define MAXRANGES 64
 #define MAXCHANNELS 64
 
-class NIDAQx: public DAQ
+class NIDAQ: public DAQ
 {
   private:
    LARGE_INTEGER intClock_frequency;
@@ -33,10 +33,10 @@ class NIDAQx: public DAQ
    int outTaskActive;
    float64 *outBuf;
    int DevicePresent;
-            
+             
   public:
-    NIDAQx();
-    virtual ~NIDAQx();
+    NIDAQ();
+    virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
     virtual void reset_RTC();

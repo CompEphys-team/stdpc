@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "main.h"
+#include "Main.h"
 #include <QVector>
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
@@ -29,7 +29,7 @@ extern outChnData outSpkGenChnp;
 
 extern DigiDataData DigiDatap;
 extern SDAQData SDAQp;
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 extern NIDAQData NIDAQp;
 #endif
 extern SGData SGp;

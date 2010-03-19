@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#include "main.h"
+#include "Main.h"
 #include <QString>
 #include <iostream>
 
@@ -163,27 +163,27 @@ typedef struct {
 typedef struct {
 
   // General params
-  bool oneElectrode;
   double injLen;
   double samplingRate;
   short int inputChannelNumber;
   short int outputChannelNumber;
 
-  // Calibration params
-  double injCalAmp;
-
-  // Linearity check params
-  double iMax;
-  double iMin;
+  // Electrode measurement params
+  double iMaxElec;
+  double iMinElec;
   int numberOfLevels;
 
-  // Kernel test params
-  int testInputType;
-  double sqWaveLen;
-  double injTestAmp;
-  short int controlChannelNumber;
+  // Membrane measurement params
+  double iMembStep;
+  int numberOfRepeats;
 
-} mmParams;
+  // Calibration params
+  double hyperpolCurr;
+  double injCalAmp;
+  double fullKernelLen;
+  double electrodeKernelLen;
+
+} elecCalibParams;
 
 typedef struct {
   bool active;
@@ -209,6 +209,8 @@ typedef struct {
   double gainFac;
   bool spkDetect;
   double spkDetectThresh;
+  double minVoltage;
+  double maxVoltage;
 } inChnData;
 
 typedef struct {
@@ -216,6 +218,8 @@ typedef struct {
   int gain;
   double gainFac;
   double bias;
+  double minCurrent;
+  double maxCurrent;
 } outChnData;
 
 class SDAQData {
@@ -236,7 +240,7 @@ class DigiDataData {
     DigiDataData &operator=(DigiDataData);
 };
 
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 class NIDAQData {
   public: 
     QString deviceName;
@@ -261,7 +265,7 @@ ostream &operator<<(ostream &os, SDAQData &p);
 istream &operator>>(istream &is, SDAQData &p); 
 ostream &operator<<(ostream &os, DigiDataData &p);
 istream &operator>>(istream &is, DigiDataData &p);
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 ostream &operator<<(ostream &os, NIDAQData &p); 
 istream &operator>>(istream &is, NIDAQData &p); 
 #endif

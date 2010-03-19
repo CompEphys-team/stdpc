@@ -14,21 +14,21 @@ DigiData::DigiData()
   outIdx= new short int[outChnNo];
   outGainFac= new double[outChnNo];
   inGainNo= 4;
-  inGain= new double[inGainNo];
+  inGain= QVector<double>(inGainNo);
   inGain[0]= 10.24;
   inGain[1]= 5.12;
   inGain[2]= 2.56;
   inGain[3]= 1.28;
-  for (int i= 0; i < inGainNo; i++) inGain[i]/= COUNTS; 
+  //for (int i= 0; i < inGainNo; i++) inGain[i]/= COUNTS; // generate_scan_list() does this now
   inGainText= new char*[inGainNo];
   inGainText[0]= "-10.24 to +10.24 V";
   inGainText[1]= "-5.12 to +5.12 V";
   inGainText[2]= "-2.56 to +2.56 V";
   inGainText[3]= "-1.28 to +1.28 V";          
   outGainNo= 1;
-  outGain= new double[outGainNo];
+  outGain= QVector<double>(outGainNo);
   outGain[0]= 1.0/10.24;
-  for (int i= 0; i < outGainNo; i++) outGain[i]*= COUNTS;
+  //for (int i= 0; i < outGainNo; i++) outGain[i] *= COUNTS; // generate_analog_out_list() does this now
   outGainText= new char*[outGainNo];
   outGainText[0]= "-10.24 to +10.24 V";
 
@@ -51,12 +51,12 @@ DigiData::DigiData()
 
 DigiData::~DigiData()
 {
-  delete[] inGain;
+  //  inGain.~QVector();
   for (int i= 0; i < inGainNo; i++) {
     delete[] inGainText[i];
   }
   delete[] inGainText;
-  delete[] outGain;
+  //  outGain.~QVector();
   for (int i= 0; i < outGainNo; i++) {
     delete[] outGainText[i];
   }
@@ -196,7 +196,7 @@ void DigiData::generate_scan_list(short int chnNo, short int *Chns)
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac*inGain[inChnp[inIdx[i]].gain]/16.0; // divide by 16.0 b/c of 12 bit in chns
+    inGainFac[i]= inChnp[inIdx[i]].gainFac*inGain[inChnp[inIdx[i]].gain]/16.0/COUNTS; // divide by 16.0 b/c of 12 bit in chns
     Chan_Gain_Code= i + inChnGain[inChnp[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
     if(i == (actInChnNo -1)) Chan_Gain_Code+= LASTCHANNELFLAG;
     WriteWord(channel_scan_list, Chan_Gain_Code);
@@ -224,7 +224,7 @@ void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
   actOutChnNo= chnNo;
   for (int i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac*outGain[outChnp[outIdx[i]].gain]*16.0*1e9;
+    outGainFac[i]= outChnp[outIdx[i]].gainFac*outGain[outChnp[outIdx[i]].gain]*16.0*1e9*COUNTS;
   }
 }
 

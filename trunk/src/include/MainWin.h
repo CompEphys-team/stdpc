@@ -6,32 +6,33 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QFileDialog>
-#include "main.h"
-#include "global.h"
+#include "Main.h"
+#include "Global.h"
 #include "ui_mainwin.h"
 #include "InputChannelDlg.h"
 #include "OutputChannelDlg.h"
 #include "ChemSynDlg.h"
-#include "abSynDlg.h"
+#include "AbSynDlg.h"
 #include "GapJunctionDlg.h"
 #include "HHDlg.h"
 #include "AlphaBetaHHDlg.h"
 #include "SpikeTimeDlg.h"
 #include "DigiDataDlg.h"
 #include "SimulDAQDlg.h"
-#include "MeasMethodDlg.h"
+#include "ElectrodeCompDlg.h"
+#include "DataSavingDlg.h"
 #include "AECChannel.h"
 
 
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
 #include "NIDAQDlg.h" 
 #endif
 
 #include "ObjectDataTypes.h"
 #include "SimulDAQ.h"
 
-#ifdef NIDAQ
-#include "NIDAQ.h"
+#ifdef NATIONAL_INSTRUMENTS
+#include "Nidaq.h"
 #endif
 
 #include "DCThread.h"
@@ -60,7 +61,8 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      OutputChannelDlg *outChnDlg;
 
      
-     MeasMethodDlg *MMDlg;
+     ElectrodeCompDlg *ECDlg;
+     DataSavingDlg *DSDlg;
      ChemSynDlg *CSynDlg[MAX_SYN_NO];
      abSynDlg *abSDlg[MAX_SYN_NO];
      GapJunctionDlg *GJunctDlg[MAX_SYN_NO];
@@ -75,7 +77,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      DigiDataDlg *DDataDlg;
      SimulDAQDlg *SDAQDlg;
 
-#ifdef NIDAQ     
+#ifdef NATIONAL_INSTRUMENTS     
      NIDAQDlg *NDQDlg;
 #endif
      
@@ -85,6 +87,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
   public slots:
      void DAQSetup();
      void updateSGInChn(int, int*);
+     void CloseToLimitWarning(QString, int, double, double, double);
                  
   private slots:
      void SGMethodChanged();

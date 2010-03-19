@@ -18,9 +18,13 @@ class DAQ {
     
     int inChnNo;
     int outChnNo;
+
     int inGainNo;
+    QVector<double> inGain;
     char **inGainText;
+
     int outGainNo;
+    QVector<double> outGain;
     char **outGainText;
 
 // activated stuff

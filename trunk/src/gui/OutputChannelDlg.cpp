@@ -47,7 +47,7 @@ void OutputChannelDlg::init(DAQ *board)
   #define X3 320
   #define X4 480
   #define X5 550
-  
+
   QLabel *lb;
   QCheckBox *cbtmp;
   QComboBox *qctmp;
@@ -56,6 +56,11 @@ void OutputChannelDlg::init(DAQ *board)
      
   clearAll();
   ChnNo= board->outChnNo;
+
+  outGain = QVector<double>(board->outGainNo);
+  for(int i= 0; i < board->outGainNo; i++){
+    outGain[i]= board->outGain[i];
+  }
  
   lb= new QLabel(this);
   lb->setGeometry(QRect(X1, Y0-40, 100, 36));
@@ -66,6 +71,7 @@ void OutputChannelDlg::init(DAQ *board)
   lb->setGeometry(QRect(X2, Y0-40, 120, 36));
   lb->setText(QString("Conversion factor"));
   allLabel.append(lb);
+  
 
   lb= new QLabel(this);
   lb->setGeometry(QRect(X4, Y0-40, 120, 36));
@@ -120,8 +126,6 @@ OutputChannelDlg::~OutputChannelDlg()
   clearAll();
 }
 
-
-
 void OutputChannelDlg::exportData()
 {
   for (int i= 0; i < ChnNo; i++) {
@@ -129,6 +133,8 @@ void OutputChannelDlg::exportData()
     outChnp[i].gain= rng[i]->currentIndex();
     outChnp[i].gainFac= factor[i]->text().toDouble();
     outChnp[i].bias= bias[i]->text().toDouble()*1e-9;
+    outChnp[i].minCurrent= -1e-9/outGain[rng[i]->currentIndex()]*outChnp[i].gainFac;
+    outChnp[i].maxCurrent=  1e-9/outGain[rng[i]->currentIndex()]*outChnp[i].gainFac;
   }
 }
 

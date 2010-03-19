@@ -26,6 +26,7 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      int lbNum;
 
   protected:
+     QVector<double> outGain;
      QVector<QCheckBox *> act;
      QVector<QComboBox *> rng;
      QVector<QLineEdit *> factor;

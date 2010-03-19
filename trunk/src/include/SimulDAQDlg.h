@@ -5,7 +5,7 @@
 #include "ui_SimulDAQDlg.h"
 #include "ObjectDataTypes.h"
 #include "DAQDlg.h"
-#include "global.h"
+#include "Global.h"
 
 class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
 {

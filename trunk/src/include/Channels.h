@@ -1,7 +1,7 @@
 #ifndef CHANNELS_H
 #define CHANNELS_H
 
-#include "global.h"
+#include "Global.h"
 
 class inChannel {
  private:

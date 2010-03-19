@@ -1,5 +1,5 @@
-#include "main.h"
-#include "mainwin.h"
+#include "Main.h"
+#include "MainWin.h"
 #include "LUtables.h"
 #include <windows.h>
 
@@ -13,7 +13,7 @@ void MyMainWindow::DAQSetup()
   DAQName= DAQComboBox->currentText();
   DDataDlg->exportData(DigiDatap);
   SDAQDlg->exportData(SDAQp);
-#ifdef NIDAQ 
+#ifdef NATIONAL_INSTRUMENTS 
   NDQDlg->exportData(NIDAQp);
 #endif
 
@@ -31,17 +31,18 @@ void MyMainWindow::DAQSetup()
     board= new DigiData;
     theDAQDlg= DDataDlg;
     break;
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   case 2:
-    board= new NIDAQx;
+    board= new NIDAQ;
     theDAQDlg= NDQDlg;       
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2008 v21"));
+  LoadMsg.setWindowTitle(tr("StdpC 2008 v22"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
+ 
   success= board->initialize_board(name);
   if (success) {
     DisplayMessage(QString("Good news: ")+name+QString(" found and opened successfully!"));
@@ -51,6 +52,7 @@ void MyMainWindow::DAQSetup()
     DisplayMessage(QString("Bad news: ")+name+QString(" not found or not opened successfully!"));
     StartBut->setEnabled(false);
   }
+
   if (inChnp != NULL) delete[] inChnp;
   inChnp= new inChnData[board->inChnNo];
   inChnDlg->init(board); // already exports to inChnp ...
@@ -60,6 +62,7 @@ void MyMainWindow::DAQSetup()
   outChnDlg->init(board); // already exports to outChnp ...
 
   DCT->init(board);
+
   // set up the adjustable parameters that they reflect the right channel numbers ...     
   setupAP();
   
@@ -72,11 +75,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      setupUi(this);
      DDataDlg= new DigiDataDlg(this);
      SDAQDlg= new SimulDAQDlg(this);
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
      NDQDlg= new NIDAQDlg(this);
      DAQComboBox->addItem(QString("National Instruments"));
 #endif
-     MMDlg= new MeasMethodDlg(this);
+     ECDlg= new ElectrodeCompDlg(this);
+     DSDlg= new DataSavingDlg(this);
      inChnDlg= new InputChannelDlg(this);
      outChnDlg= new OutputChannelDlg(this);
      for (int i= 0; i < 6; i++) {
@@ -103,10 +107,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
-     
-     // somewhat of a hack: Synchronous digital IO for DigiData boards
+
+      // somewhat of a hack: Synchronous digital IO for DigiData boards
      DigiDatap.syncIOMask= 0x0000;  
-     
+         
      DCT= new DCThread();
    
      inChnp= NULL;
@@ -137,7 +141,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionDAQ, SIGNAL(triggered()), SLOT(showDAQDlg()));
      connect(actionInput_channels, SIGNAL(triggered()), inChnDlg, SLOT(appear()));
      connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(appear()));
-     connect(actionMeasurement_method, SIGNAL(triggered()), MMDlg, SLOT(show()));     
+     connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(show()));
+     connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(show()));
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
@@ -170,10 +175,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
      connect(SDAQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
      connect(NDQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
 #endif
-
+     
      connect(Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
      connect(Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
 
@@ -183,7 +188,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DCT,SIGNAL(addPoint1(double, double, int)), &Graphs[0], SLOT(addPoint(double, double, int)));
      connect(DCT,SIGNAL(addPoint2(double, double, int)), &Graphs[1], SLOT(addPoint(double, double, int)));
      
-     connect(MMDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
+     connect(ECDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
+
+     connect(ECDlg->calibrator,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
+     connect(DCT,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
      
      // graphical stuff
      DataD1->setScene(&Graphs[0].Scene);
@@ -211,7 +219,7 @@ MyMainWindow::~MyMainWindow()
   delete DDataDlg;
   delete SDAQDlg;
 
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   delete NDQDlg;
 #endif
   
@@ -220,6 +228,13 @@ MyMainWindow::~MyMainWindow()
   delete SaveProtocolFileDlg;
 //  delete[] inChnp;
 //  delete[] outChnp;
+}
+
+void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowLimit, double highLimit, double value)
+{
+   QString msg = what+QString(" is close to channel limit!\nChannel number: ")+QString::number(channelNum)+QString("\nLow limit: ")+QString::number(lowLimit)+QString(", high limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value);
+   QMessageBox::warning(this, tr("Warning"), msg);
+   return;
 }
 
 
@@ -316,7 +331,8 @@ void MyMainWindow::StartButClicked()
   actionOutput_channels->setEnabled(false);
   actionDAQ->setEnabled(false);
   actionSave_config->setEnabled(false);
-  actionMeasurement_method->setEnabled(false);
+  actionElectrode_setup->setEnabled(false);
+  actionData_saving->setEnabled(false);
   DAQComboBox->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -328,7 +344,8 @@ void MyMainWindow::StartButClicked()
 //      QMessageBox::warning(this, tr("My Application"),
 //                tr("init'ing outChnDlg!"),
 //                QMessageBox::Ok); 
-    
+
+  DCT->InitSaving(DSDlg->GetFileName(), DSDlg->GetSaveSettings());
   DCT->start();
 }
 
@@ -344,7 +361,8 @@ void MyMainWindow::StopButClicked()
   actionOutput_channels->setEnabled(true);
   actionDAQ->setEnabled(true);
   actionSave_config->setEnabled(true);
-  actionMeasurement_method->setEnabled(true);
+  actionElectrode_setup->setEnabled(true);
+  actionData_saving->setEnabled(true);
   DAQComboBox->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -389,7 +407,7 @@ void MyMainWindow::exportData()
   outChnDlg->exportData();
   DDataDlg->exportData(DigiDatap);
   SDAQDlg->exportData(SDAQp);
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   NDQDlg->exportData(NIDAQp);
 #endif
   exportSGData();
@@ -404,7 +422,7 @@ void MyMainWindow::importData()
   // do DAQs and channels first
   DDataDlg->importData(DigiDatap);
   SDAQDlg->importData(SDAQp);
-#ifdef NIDAQ
+#ifdef NATIONAL_INSTRUMENTS
   NDQDlg->importData(NIDAQp);
 #endif
 

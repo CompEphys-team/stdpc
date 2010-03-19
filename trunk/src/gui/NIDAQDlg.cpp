@@ -1,5 +1,5 @@
 #include "NIDAQDlg.h"
-#include "tools.cpp"
+#include "Tools.cpp"
 
 NIDAQDlg::NIDAQDlg(QWidget *parent) : DAQDlg(parent)
 {

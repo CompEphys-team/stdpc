@@ -5,7 +5,7 @@
 #include <QAbstractButton>
 #include "ui_SpikeTimeDlg.h"
 #include "ObjectDataTypes.h"
-#include "global.h"
+#include "Global.h"
 
 class SpikeTimeDlg : public QDialog, private Ui::SpikeTimeDlg
 {
@@ -21,6 +21,6 @@ class SpikeTimeDlg : public QDialog, private Ui::SpikeTimeDlg
   private:
 }; 
 
-#include "mainwin.h"
+#include "MainWin.h"
 
 #endif

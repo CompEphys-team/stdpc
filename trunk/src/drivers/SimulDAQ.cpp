@@ -13,9 +13,13 @@ SimulDAQ::SimulDAQ()
   inGainNo= 1;
   inGainText= new char*[inGainNo];
   inGainText[0]= "n/a";
+  inGain = QVector<double>(inChnNo);
+  inGain[0] = 1.28;
   outGainNo= 1;
   outGainText= new char*[outGainNo];
   outGainText[0]= "n/a";
+  outGain = QVector<double>(outChnNo);
+  outGain[0] = 1.0/10.24;
   QueryPerformanceFrequency(&intClock_frequency);
   clock_frequency= (double) intClock_frequency.LowPart;
   clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
@@ -30,9 +34,9 @@ SimulDAQ::~SimulDAQ()
   delete[] inGainFac;
   delete[] outIdx;
   delete[] outGainFac;
-//  delete[] inGainText[0];
+  //  delete[] inGainText[0];
   delete[] inGainText;
-//  delete[] outGainText[0];
+  //  delete[] outGainText[0];
   delete[] outGainText;
   delete[] inq;
   delete[] outq;

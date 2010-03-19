@@ -5,7 +5,7 @@
 #include "ui_DigiDataDlg.h"
 #include "ObjectDataTypes.h"
 #include "DAQDlg.h"
-#include "global.h"
+#include "Global.h"
 
 class DigiDataDlg : public DAQDlg, private Ui::DigiDataDlg
 {
