@@ -329,6 +329,7 @@ void DCThread::run()
              case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
              case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
              case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
+	     case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
            }
            scrIter++;
            if (scrIter == scriptq.end()) evt= 1e10;
