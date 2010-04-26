@@ -42,7 +42,7 @@ void MyMainWindow::DAQSetup()
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
- 
+
   success= board->initialize_board(name);
   if (success) {
     DisplayMessage(QString("Good news: ")+name+QString(" found and opened successfully!"));
@@ -63,9 +63,9 @@ void MyMainWindow::DAQSetup()
 
   DCT->init(board);
 
-  // set up the adjustable parameters that they reflect the right channel numbers ...     
+  // set up the adjustable parameters that they reflect the right channel numbers ...
   setupAP();
-  
+
   LoadMsg.hide();
 }
 
@@ -154,7 +154,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
      connect(actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));    
-     connect(this, SIGNAL(destroyed()), SLOT(Exit()));
+     connect(this, SIGNAL(destroyed()), SLOT(close()));
      
      for (int i= 0; i < 6; i++) {
        connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), CSynDlg[i], SLOT(updateOutChn(int, int*)));
@@ -232,8 +232,9 @@ MyMainWindow::~MyMainWindow()
 
 void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowLimit, double highLimit, double value)
 {
-   QString msg = what+QString(" is close to channel limit!\nChannel number: ")+QString::number(channelNum)+QString("\nLow limit: ")+QString::number(lowLimit)+QString(", high limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value);
-   QMessageBox::warning(this, tr("Warning"), msg);
+   QString msg = what+QString(" is close to channel limit!\nChannel number: ")+QString::number(channelNum)+QString("\nHigh limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value)+QString("\nLow limit: ")+QString::number(lowLimit);
+   //QMessageBox::warning(this, tr("Warning"), msg);
+   DisplayMessage(msg);
    return;
 }
 
@@ -270,6 +271,8 @@ void MyMainWindow::SGMethodChanged()
   int index= SGMethodCombo->currentIndex();
   int index2= BurstDetectionCombo->currentIndex();
 
+  SGSave->setEnabled(false);
+  SGLUTableCombo->setEditable(false);
   SpikesL->setEnabled(false);              
   VSpikeE->setEnabled(false); VSpikeL->setEnabled(false); VSpikeU->setEnabled(false);
   WidthE->setEnabled(false); WidthL->setEnabled(false); WidthU->setEnabled(false);
@@ -286,11 +289,14 @@ void MyMainWindow::SGMethodChanged()
   NUnderE->setEnabled(false); NUnderL->setEnabled(false); 
   NOverE->setEnabled(false); NOverL->setEnabled(false);
   STInputFileL->setEnabled(false); STInputFileE->setEnabled(false); 
+  if (index == 0) SGSave->setChecked(false);
   if (index == 3) {
-    STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
+    SGSave->setEnabled(true); STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
   }
   else {
     if (index > 0) {
+      SGSave->setEnabled(true);
+      SGLUTableCombo->setEditable(true);
       SpikesL->setEnabled(true);              
       VSpikeE->setEnabled(true); VSpikeL->setEnabled(true); VSpikeU->setEnabled(true);
       WidthE->setEnabled(true); WidthL->setEnabled(true); WidthU->setEnabled(true);
@@ -345,7 +351,6 @@ void MyMainWindow::StartButClicked()
 //                tr("init'ing outChnDlg!"),
 //                QMessageBox::Ok); 
 
-  DCT->InitSaving(DSDlg->GetFileName(), DSDlg->GetSaveSettings());
   DCT->start();
 }
 
@@ -413,7 +418,9 @@ void MyMainWindow::exportData()
   exportSGData();
   SpkTDlg->exportData();
   for (int i= 0; i < 2; i++) graphDlg[i]->exportData(Graphp[i]);
-  // collect spike generator data
+
+  DSDlg->exportData();
+  ECDlg->exportData();
       
 }
  
@@ -471,7 +478,9 @@ void MyMainWindow::importData()
   importSGData();
   SpkTDlg->importData();
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
-  // collect spike generator data
+
+  DSDlg->importData();
+  ECDlg->importData();
 }
 
 void MyMainWindow::exportSGData() 
@@ -479,6 +488,7 @@ void MyMainWindow::exportSGData()
   SGp.method= SGMethodCombo->currentIndex();
   SGp.active= (SGp.method > 0);
   SGp.LUTables= SGLUTableCombo->currentIndex();
+  SGp.saving= (SGSave->checkState() > 0);
   SGp.VSpike= VSpikeE->text().toDouble()/1e3;
   SGp.spkTimeScaling= 5e3/WidthE->text().toDouble();
   SGp.VRest= VRestE->text().toDouble()/1e3;

@@ -29,24 +29,10 @@ Calibrator::Calibrator() :
 }
 
 
-void Calibrator::GeneralInit(int numOfSamp, double sampPer, DAQ *brd, DCThread *DCThrd)
+void Calibrator::GeneralInit(DAQ *brd, DCThread *DCThrd)
 {
-    // Set general params
-    numberOfSamples = numOfSamp;
-    samplingPeriod = sampPer;
-
-    // Reinit data storing objects
-    currents.clear();
-    currents.resize(numberOfSamples);
-    voltages.clear();
-    voltages.resize(numberOfSamples);
-    times.clear();
-    times.resize(numberOfSamples);
-
     board = brd;
     DCT = DCThrd;
-
-    fname="test.dat"; // for testing results
 }
 
 
@@ -115,7 +101,7 @@ int Calibrator::ChannelInit(int inChNum, int outChNum)
 // Gets the steady state electrode resistance at different current levels,
 // computes the variance in the R values for assessing electrode linearity
 // and also estimates the electrode time constant
-void Calibrator::ElectrodeMeasurement(int levelNum, double minI, double maxI)
+void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, int levelNum, double minI, double maxI)
 {    
     int sample, level, i, samplesPerLevel;
 
@@ -142,12 +128,25 @@ void Calibrator::ElectrodeMeasurement(int levelNum, double minI, double maxI)
     }
     levelNum -= zeroOcc;
 
+
+    // Set general params   
+    samplingPeriod = 1.0/sampRate;
+    samplesPerLevel = (int) (injLenPerLevel*sampRate);
+    numberOfSamples = samplesPerLevel * levelNum;
+    incorrectMeasurement = 0;
+
+
+    // Reinit data storing objects
+    currents.clear();
+    currents.resize(numberOfSamples);
+    voltages.clear();
+    voltages.resize(numberOfSamples);
+    times.clear();
+    times.resize(numberOfSamples);
+
     vLevels.resize(levelNum);
     tauE.resize(levelNum);
     rLevels.resize(levelNum);
-
-    samplesPerLevel = numberOfSamples/levelNum;
-    numberOfSamples = samplesPerLevel * levelNum; // make numberOfSamples/levelNum an integer number for easier data processing
 
 
     // Generate input current
@@ -184,13 +183,20 @@ void Calibrator::ElectrodeMeasurement(int levelNum, double minI, double maxI)
         {
             if ( (voltages[i]-prevVLevel)/vJump > fraction )    // get the sample which exceeds the predefined ratio
             {
-                fraction = (voltages[i]-prevVLevel)/vJump;      // recalculate fraction and tauFactor to reduce digitalization error
-                tauFactor = -log(1-fraction);
+                fraction = (voltages[i]-prevVLevel)/vJump;      // recalculate fraction and tauFactor to reduce digitalization error                
+
+                if ( fraction < 1 )  tauFactor = -log(1-fraction);
+                else                 i=endIndex;  // error, voltage jump is too big (interruption?)
+
                 break;   // get the sample which exceeds the predefined ratio                
             }
         }
-        if ( i==endIndex ) tauE[level] = 0.0; // erroreous case, sampling freq can be too slow
-        else               tauE[level] = (times[i]-startTime) / tauFactor; // calculate tau
+        if ( i==endIndex )
+        {
+            tauE[level] = 0.0; // erroreous case, sampling freq can be too slow
+            incorrectMeasurement++;
+        }
+        else tauE[level] = (times[i]-startTime) / tauFactor; // calculate tau
     }
 
     // Resistances
@@ -233,7 +239,7 @@ void Calibrator::ElectrodeMeasurement(int levelNum, double minI, double maxI)
 // Measures the passive membrane response (time constant and steady state resistance)
 // while stepping the input current from 0 to maxI,
 // and averages the calculated R_m and Tau_m values over 'repeat' number of repeats
-void Calibrator::MembraneMeasurement(int repeat, double iStep)
+void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int repeat, double iStep)
 {
     int sample, rep, i, samplesPerRepeat;
 
@@ -242,19 +248,31 @@ void Calibrator::MembraneMeasurement(int repeat, double iStep)
     double tauFactor;
     double fraction;
 
-    QVector<double> vOffSets(repeat);   // Voltage offsets
+    QVector<double> vOffSets(repeat);  // Voltage offsets
     QVector<double> vLevels(repeat);   // Steady state voltages
     QVector<double> tauM(repeat);      // Calculated time constants
     QVector<double> rLevels(repeat);   // Calculated resistances
 
-    samplesPerRepeat = numberOfSamples/repeat;
+    // Set general params
+    samplingPeriod = 1.0/sampRate;
+    samplesPerRepeat = (int) (2*injLenPerRep*sampRate);  // multiplied by 2 to allow 'steady state' recording at both levels
     numberOfSamples = samplesPerRepeat * repeat; // make numberOfSamples/repeat an integer number for easier data processing
+    incorrectMeasurement = 0;
+
+    // Reinit data storing objects
+    currents.clear();
+    currents.resize(numberOfSamples);
+    voltages.clear();
+    voltages.resize(numberOfSamples);
+    times.clear();
+    times.resize(numberOfSamples);
+
 
     // Generate input current
     for ( rep=0; rep<repeat; rep++ )
         for ( sample=0; sample<samplesPerRepeat; sample++ )
             if ( sample<samplesPerRepeat/2.0 ) currents[rep*samplesPerRepeat+sample] = 0.0;   // first half: zero
-            else                             currents[rep*samplesPerRepeat+sample] = iStep; // second half: maxI
+            else                               currents[rep*samplesPerRepeat+sample] = iStep; // second half: maxI
 
     //------------------- Injection & Recording ----------------//
     // Current injection and voltage recording
@@ -294,13 +312,20 @@ void Calibrator::MembraneMeasurement(int repeat, double iStep)
             if ( (voltages[i]-vMembZeroLevel)/vJump > fraction )    // get the sample which exceeds the predefined ratio
             {
                 fraction = (voltages[i]-vMembZeroLevel)/vJump;      // recalculate fraction and tauFactor to reduce digitalization error
-                tauFactor = -log(1-fraction);
+
+                if ( fraction < 1 )  tauFactor = -log(1-fraction);
+                else                 i=endIndex;  // error, voltage jump is too big (interruption?)
+
                 break;   // get the sample which exceeds the predefined ratio
             }
         }
 
-        if ( i==endIndex ) tauM[rep] = 0.0; // erroreous case, sampling freq can be too slow
-        else               tauM[rep] = (times[i]-startTime) / tauFactor; // calculate tau
+        if ( i==endIndex )
+        {
+            tauM[rep] = 0.0; // erroreous case, sampling freq can be too slow
+            incorrectMeasurement++;
+        }
+        else tauM[rep] = (times[i]-startTime) / tauFactor; // calculate tau
 
     }
 
@@ -341,16 +366,30 @@ void Calibrator::MembraneMeasurement(int repeat, double iStep)
 }
 
 
-void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
+void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
 {
     fullKerLen = fullKLen;
-    elecKerLen = elecKLen;
+    elecKerLen = elecKLen;   
+
+    // Set general params
+    samplingPeriod = 1.0/sampRate;
+    numberOfSamples = (long) (injCalLen * sampRate);
+
+    // Reinit data storing objects
+    currents.clear();
+    currents.resize(numberOfSamples);
+    voltages.clear();
+    voltages.resize(numberOfSamples);
+    times.clear();
+    times.resize(numberOfSamples);
+
 
     // Create current input
     int sample;
     double rnd;
     srand((unsigned) time(NULL));
-    for (sample=0; sample<numberOfSamples-fullKerLen; sample++){
+    currents[0] = 0.0;  // To be able to neglect the first high jitter in the sampling times
+    for (sample=1; sample<numberOfSamples-fullKerLen; sample++){
         rnd = 2*(((double) rand())/RAND_MAX-0.5);     // Random number in [-1, 1]
         currents[sample]= injAmp*rnd+hyperpolCurr;    // Generate a random current value
     }
@@ -359,14 +398,33 @@ void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double inj
 
     //------------------- Injection & Recording ----------------//
     // Obtain current-voltage pairs
-    InjectAndRecord(numberOfSamples);        
+    InjectAndRecord(numberOfSamples);
     //----------------------------------------------------------//
 
+    // Get rid of the first elements (high jitter in sampling time)
+    for ( sample=0; sample<numberOfSamples-1; sample++ )
+    {
+        currents[sample] = currents[sample+1];
+        voltages[sample] = voltages[sample+1];
+        times[sample] = times[sample+1];
+    }
+    numberOfSamples -= 1;
+    currents.resize(numberOfSamples);
+    voltages.resize(numberOfSamples);
+    times.resize(numberOfSamples);
+
     // Subtract hyperpolarizing current used
-    for (sample=0; sample<numberOfSamples; sample++)
+    for ( sample=0; sample<currents.size(); sample++ )
         currents[sample] -= hyperpolCurr;
 
-    kerCalc->SetParams(fullKerLen, elecKerLen, 1.0/samplingPeriod, currents, voltages);
+    // Recalculate sampling rate based on the actual sampling times
+    double actSampRate = 0.0;
+    for ( sample=0; sample<times.size()-1; sample++ )
+        if ( times[sample+1] != times[sample] )
+            actSampRate += 1.0/(times[sample+1]-times[sample]);
+    actSampRate /= times.size()-1;
+
+    kerCalc->SetParams(fullKerLen, elecKerLen, actSampRate, currents, voltages);
 
     kerCalc->CalculateKernel();
 
@@ -374,6 +432,16 @@ void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double inj
     calMembTau = kerCalc->GetTauM();
     calElecRes = kerCalc->GetRE();
     calElecTau = kerCalc->GetTauE();
+
+    // To test
+    fname = QString("full_kernel_")+QString::number(elecNum)+QString(".dat");
+    saveData(fname, kerCalc->fullKernel);
+    fname = QString("currents_")+QString::number(elecNum)+QString(".dat");
+    saveData(fname, currents);
+    fname = QString("voltages_")+QString::number(elecNum)+QString(".dat");
+    saveData(fname, voltages);
+    fname = QString("times_")+QString::number(elecNum)+QString(".dat");
+    saveData(fname, times);
 
 
 //    //-----------------------------------
@@ -393,7 +461,7 @@ void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double inj
 //    int minKeLen = 5;
 //    int maxKeLen = 80;
 //    int minKfLen = 100;
-//    int maxKfLen = 500;
+//    int maxKfLen = 1000;
 //
 //    for(int i=minKfLen; i<maxKfLen; i++)  {
 //
@@ -407,23 +475,24 @@ void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double inj
 //        TauM.resize(maxKeLen-minKeLen);
 //        TauE.resize(maxKeLen-minKeLen);
 //
+//
 //        for(int j=minKeLen; j<maxKeLen; j++){
 //            if(j<i){
 //                kerCalc->SetParams(i, j, 1.0/samplingPeriod, currents, voltages);
 //                kerCalc->CalculateKernel();
 //
 //                Re[j-minKeLen] = kerCalc->GetRE();
-//                if(Re[j-minKeLen] > 1e9) Re[j-minKeLen] = 1e9;
-//                if(Re[j-minKeLen] < -1e9) Re[j-minKeLen] = -1e9;
+//                if(Re[j-minKeLen] > 0.75e8) Re[j-minKeLen] = 0.75e8;
+//                if(Re[j-minKeLen] < 0) Re[j-minKeLen] = 0;
 //                Rm[j-minKeLen] = kerCalc->GetRM();
-//                if(Rm[j-minKeLen] > 1e9) Rm[j-minKeLen] = 1e9;
-//                if(Rm[j-minKeLen] < -1e9) Rm[j-minKeLen] = -1e9;
+//                if(Rm[j-minKeLen] > 0.75e8) Rm[j-minKeLen] = 0.75e8;
+//                if(Rm[j-minKeLen] < 0) Rm[j-minKeLen] = 0;
 //                TauM[j-minKeLen] = kerCalc->GetTauM();
-//                if(TauM[j-minKeLen] > 1e5) TauM[j-minKeLen] = 1e5;
-//                if(TauM[j-minKeLen] < -1e5) TauM[j-minKeLen] = -1e5;
+//                if(TauM[j-minKeLen] > 0.5e-1) TauM[j-minKeLen] = 0.5e-1;
+//                if(TauM[j-minKeLen] < 0) TauM[j-minKeLen] = 0;
 //                TauE[j-minKeLen] = kerCalc->GetTauE();
-//                if(TauE[j-minKeLen] > 1e5) TauE[j-minKeLen] = 1e5;
-//                if(TauE[j-minKeLen] < -1e5) TauE[j-minKeLen] = -1e5;
+//                if(TauE[j-minKeLen] > 1e-3) TauE[j-minKeLen] = 1e-3;
+//                if(TauE[j-minKeLen] < 0) TauE[j-minKeLen] = 0;
 //            }
 //        }
 //
@@ -447,21 +516,11 @@ void Calibrator::Calibration(int elecNum, int fullKLen, int elecKLen, double inj
 //    //-----------------------------------
 
     // Init AECChannel with the kernel
-    DCT->aecChannels[elecNum]->Initialize(inputChannelNumber, outputChannelNumber, samplingPeriod, kerCalc->GetElecKernel());
+    DCT->aecChannels[elecNum]->Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());
 
-    // Save the kernel for testing   
+    // Save the kernel for testing
     QString fname = QString("kernel_")+QString::number(elecNum)+QString(".dat");
     saveData(fname, kerCalc->GetElecKernel());
-
-    // To test
-    fname = QString("full_kernel_")+QString::number(elecNum)+QString(".dat");
-    saveData(fname, kerCalc->fullKernel);
-    fname = QString("currents_")+QString::number(elecNum)+QString(".dat");
-    saveData(fname, currents);
-    fname = QString("voltages_")+QString::number(elecNum)+QString(".dat");
-    saveData(fname, voltages);
-    fname = QString("times_")+QString::number(elecNum)+QString(".dat");
-    saveData(fname, times);
 
 }
 
@@ -485,7 +544,7 @@ double Calibrator::WaitTillNextSampling(double time)
 void Calibrator::InjectAndRecord(int numOfSamples)
 {
     int sample;
-    double t, time;
+    double t;
 
     // Error handling
     if ( currents.size() < numOfSamples ) currents.resize(numOfSamples);
@@ -499,24 +558,11 @@ void Calibrator::InjectAndRecord(int numOfSamples)
     double lowerLimit =  inChnp[inputChannelNumber].minVoltage + 0.1*(inChnp[inputChannelNumber].maxVoltage-inChnp[inputChannelNumber].minVoltage);
     bool limitWarningEmitted = false;
 
-    board->reset_board();
+    // board->reset_board();
+    board->reset_RTC();
 
     for ( sample=1; sample<numOfSamples; sample++ )
-    {
-
-        // --- Write --- //
-        outChn[outputChannelNumber].I= currents[sample];
-        board->write_analog_out(outChn);
-        // --- Write end --- //
-
-
-        // --- Wait --- //
-        time = (sample+1)*samplingPeriod - t; // wait till the next sampling period is over
-        if ( time < 0.0 ) time = 0.0; // in case there was an OS interruption and we've already overrun: let's not wait any time
-        t += WaitTillNextSampling(time);
-        times[sample] = t; // save the time stamp
-        // --- Wait end --- //
-
+    {       
 
         // --- Read --- //
         board->get_scan(inChn);
@@ -528,6 +574,27 @@ void Calibrator::InjectAndRecord(int numOfSamples)
             }
         // --- Read end --- //
 
+
+        // --- Wait --- //
+        t += WaitTillNextSampling(samplingPeriod);
+        times[sample] = t; // save the time stamp
+        // --- Wait end --- //
+
+
+        // --- Write --- //
+        outChn[outputChannelNumber].I= currents[sample];
+        board->write_analog_out(outChn);
+        // --- Write end --- //
+
+
+    }
+
+    // Shift the time vector to zero beginning to get rid of the initial sampling jitter
+    if ( times[1] > samplingPeriod )
+    {
+        double shift = times[1] - samplingPeriod;
+        for ( sample=1; sample<numOfSamples; sample++ )
+            times[sample] -= shift;
     }
 
     // Reset board
@@ -589,6 +656,9 @@ void Calibrator::CalcSamplingStats()
     for ( i=0; i<rates.size(); i++ ) stdSampRate += (rates[i] - averSampRate) * (rates[i] - averSampRate);
     stdSampRate = sqrt(stdSampRate/rates.size());
 
+    // Std / Average rate ratio
+    stdPerAverRate= stdSampRate / averSampRate;
+
     // Minimal rate (Hz)
     minSampRate = 1.0/samplingPeriod;
     for ( i=0; i<rates.size(); i++ ) if ( rates[i] < minSampRate ) minSampRate = rates[i];
@@ -599,11 +669,6 @@ void Calibrator::CalcSamplingStats()
     // Maximal sampling time (msec)
     maxSampTime = 1.0 / minSampRate;
 
-// Testing the timeing
-//    QString timefn = "time.dat";
-//    saveData(timefn, times);
-//    QString ratefn = "rate.dat";
-//    saveData(ratefn, rates);
 }
 
 

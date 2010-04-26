@@ -273,6 +273,8 @@ void MyMainWindow::setupAP()
   bAP.append(&(SGp.active));
   APname.append(QString("SGp.method")); APtype.append(INTTYPE); APindex.append(iAP.size());      
   iAP.append(&(SGp.method));
+  APname.append(QString("SGp.saving")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+  bAP.append(&(SGp.saving));
   APname.append(QString("SGp.LUTables")); APtype.append(INTTYPE); APindex.append(iAP.size());
   iAP.append(&(SGp.LUTables));
   APname.append(QString("SGp.VSpike")); APtype.append(DBLTYPE); APindex.append(dAP.size());
@@ -318,6 +320,8 @@ void MyMainWindow::setupAP()
     bAP.append(&(inChnp[k].spkDetect)); 
     APname.append(QString("inChnp[")+ qs + QString("].spkDetectThresh")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(inChnp[k].spkDetectThresh)); 
+    APname.append(QString("inChnp[")+ qs + QString("].chnlSaving")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(inChnp[k].chnlSaving));
   }
 
   for (int k= 0; k < board->outChnNo; k++) {
@@ -331,7 +335,55 @@ void MyMainWindow::setupAP()
     dAP.append(&(outChnp[k].gainFac)); 
     APname.append(QString("outChnp[")+ qs + QString("].bias")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(outChnp[k].bias)); 
+    APname.append(QString("outChnp[")+ qs + QString("].chnlSaving")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(outChnp[k].chnlSaving));
   }
+
+  // Data saving
+  APname.append(QString("dataSavingPs.fileName")); APtype.append(STRTYPE); APindex.append(sAP.size());
+  sAP.append(&(dataSavingPs.fileName));
+  APname.append(QString("dataSavingPs.savingFreq")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+  dAP.append(&(dataSavingPs.savingFreq));
+  APname.append(QString("dataSavingPs.isBinary")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+  bAP.append(&(dataSavingPs.isBinary));
+
+  // Electrode compensation
+  for (int e= 0; e < MAX_ELECTRODE_NO; e++)
+  {
+    qs.setNum(e);
+
+    APname.append(QString("elecCalibPs[") + qs + QString("].samplingRate")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].samplingRate));
+    APname.append(QString("elecCalibPs[") + qs + QString("].inputChannelNumber")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(elecCalibPs[e].inputChannelNumber));
+    APname.append(QString("elecCalibPs[") + qs + QString("].outputChannelNumber")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(elecCalibPs[e].outputChannelNumber));
+    APname.append(QString("elecCalibPs[") + qs + QString("].iMaxElec")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].iMaxElec));
+    APname.append(QString("elecCalibPs[") + qs + QString("].iMinElec")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].iMinElec));
+    APname.append(QString("elecCalibPs[") + qs + QString("].numberOfLevels")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(elecCalibPs[e].numberOfLevels));
+    APname.append(QString("elecCalibPs[") + qs + QString("].injLenPerLevel")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].injLenPerLevel));
+    APname.append(QString("elecCalibPs[") + qs + QString("].iMembStep")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].iMembStep));
+    APname.append(QString("elecCalibPs[") + qs + QString("].numberOfRepeats")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(elecCalibPs[e].numberOfRepeats));
+    APname.append(QString("elecCalibPs[") + qs + QString("].injLenPerRepeat")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].injLenPerRepeat));
+    APname.append(QString("elecCalibPs[") + qs + QString("].hyperpolCurr")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].hyperpolCurr));
+    APname.append(QString("elecCalibPs[") + qs + QString("].injCalAmp")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].injCalAmp));
+    APname.append(QString("elecCalibPs[") + qs + QString("].injCalLen")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].injCalLen));
+    APname.append(QString("elecCalibPs[") + qs + QString("].fullKernelLen")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].fullKernelLen));
+    APname.append(QString("elecCalibPs[") + qs + QString("].electrodeKernelLen")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(elecCalibPs[e].electrodeKernelLen));
+  }
+
   
   for (int k= 0; k < 2; k++) {
     qs.setNum(k);

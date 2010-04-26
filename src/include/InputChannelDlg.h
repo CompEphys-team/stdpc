@@ -26,14 +26,16 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      int lbNum;
      
   protected:
-     QVector<double> inGain;
+     QVector<double> inLow;
+     QVector<double> inHigh;
      QVector<QCheckBox *> act;
      QVector<QComboBox *> rng;
      QVector<QLineEdit *> factor;
      QVector<QLabel *> allLabel;
      QVector<QCheckBox *> sDetect;
      QVector<QLineEdit *> SDThresh;
-               
+     QVector<QCheckBox *> saveChnl;
+
   public slots:
     void accept();
     void reject();

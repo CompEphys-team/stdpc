@@ -8,6 +8,8 @@ class KernelCalculator
 
 public:
 
+    double tFac; // to scale up the timevector in order to achieve better precision
+
     // Membrane and electrode parameters (tau time constant and R resistance)
     double tau_m;
     double tau_e;

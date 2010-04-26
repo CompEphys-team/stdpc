@@ -52,6 +52,8 @@ public:
 
     DCThread *DCT;
 
+    int incorrectMeasurement; // for error checking
+
     // Kernel params
     double fullKernelTauMRatio;  // The length of the full kernel is how many times the membrane time constant
     double elecKernelTauERatio;  // The length of the electrode kernel is how many times the electrode time constant
@@ -76,17 +78,18 @@ public:
 
     // Timing stats
     double averSampRate;
-    double minSampRate;
+    double minSampRate;    
     double maxSampTime;
     double stdSampRate;
     double desPerMinRate;
+    double stdPerAverRate;
 
     Calibrator();
-    void GeneralInit(int, double, DAQ*, DCThread*);
+    void GeneralInit(DAQ*, DCThread*);
     int  ChannelInit(int, int);
-    void ElectrodeMeasurement(int, double, double);
-    void MembraneMeasurement(int, double);
-    void Calibration(int, int, int, double, double);
+    void ElectrodeMeasurement(double, double, int, double, double);
+    void MembraneMeasurement(double, double, int, double);
+    void Calibration(double, double, int, int, int, double, double);
     void CalcSamplingStats();
     void SetChannelActivation(int, bool);
 

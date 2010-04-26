@@ -1,5 +1,6 @@
 #include "DCThread.h"
 #include "AP.h"
+#include "Global.h"
 #include <cmath>
 #include <climits>
 
@@ -27,12 +28,11 @@ DCThread::DCThread()
   outIdx= NULL;
   scripting= false;
 
-  aecChannels = QVector<AECChannel*>(4);
-  for(int i=0; i<4; i++)
+  aecChannels = QVector<AECChannel*>(MAX_ELECTRODE_NO);
+  for(int i=0; i<aecChannels.size(); i++)
     aecChannels[i] = new AECChannel();
 
   dataSaver = new DataSaver();
-  saveElecNum = 0;
 }
 
 DCThread::~DCThread() 
@@ -67,25 +67,6 @@ void DCThread::init(DAQ *inBoard)
    outChn= new outChannel[board->outChnNo+1]; // +1 for "none" output
    inIdx= new short int[board->inChnNo+1];
    outIdx= new short int[board->outChnNo+1];
-}
-
-
-void DCThread::InitSaving(QString filename, QVector<bool> saveElectrodes)
-{    
-    saveElecNum = 0;
-    for ( int i=0; i<aecChannels.size(); i++ )
-        if(saveElectrodes[i] == true && aecChannels[i]->IsActive() == true) saveElecNum++;
-
-    if ( saveElecNum == 0 ) return;  // we don't have to do anything
-
-    // else, let's init saving
-    for ( int i=0; i<aecChannels.size(); i++ )
-        aecChannels[i]->saving = saveElectrodes[i] && aecChannels[i]->IsActive();
-
-    // TODO: electrode artifact component to remove!!!!!!!!!!!!!
-    data = QVector<double>(1+3*saveElecNum); // 1: timestamp, (k+1, k+2, k+3): (current, compensated voltage, electrode artifact) of the k. AEC channel
-
-    dataSaver->InitDataSaving(filename);
 }
 
 
@@ -231,30 +212,52 @@ void DCThread::run()
      }
    }
 
-
    // Create tolerance limits for all AEC channels
-   QVector<double> iHiLim = QVector<double>(aecChannels.size());    // high limit for the current
-   QVector<double> iLoLim = QVector<double>(aecChannels.size());    // low limit for the current
-   QVector<double> vHiLim = QVector<double>(aecChannels.size());    // high limit for the voltage
-   QVector<double> vLoLim = QVector<double>(aecChannels.size());    // low limit for the voltage
-   double upTolFac = 0.9;   // upper tolerance factor
-   double doTolFac = 0.1;   // down  tolerance factor
-   for ( int i=0; i<aecChannels.size(); i++ ){
-     iHiLim[i] = outChnp[aecChannels[i]->outChnNum].minCurrent + upTolFac*(outChnp[aecChannels[i]->outChnNum].maxCurrent-outChnp[aecChannels[i]->outChnNum].minCurrent);
-     iLoLim[i] = outChnp[aecChannels[i]->outChnNum].minCurrent + doTolFac*(outChnp[aecChannels[i]->outChnNum].maxCurrent-outChnp[aecChannels[i]->outChnNum].minCurrent);
-     vHiLim[i] = inChnp[aecChannels[i]->inChnNum].minVoltage + upTolFac*(inChnp[aecChannels[i]->inChnNum].maxVoltage-inChnp[aecChannels[i]->inChnNum].minVoltage);
-     vLoLim[i] = inChnp[aecChannels[i]->inChnNum].minVoltage + doTolFac*(inChnp[aecChannels[i]->inChnNum].maxVoltage-inChnp[aecChannels[i]->inChnNum].minVoltage);
+   QVector<double> iHiLim = QVector<double>(outNo);   // high limit for current
+   QVector<double> iLoLim = QVector<double>(outNo);   // low limit for currents
+   QVector<double> vHiLim = QVector<double>(inNo);    // high limit for voltages
+   QVector<double> vLoLim = QVector<double>(inNo);    // low limit for voltages
+   double upTolFac = 0.99;   // upper tolerance factor
+   double loTolFac = 0.01;   // lower  tolerance factor
+   for ( int i=0; i<outNo; i++ ){
+     iHiLim[i] = outChnp[i].minCurrent + upTolFac*(outChnp[i].maxCurrent-outChnp[i].minCurrent);
+     iLoLim[i] = outChnp[i].minCurrent + loTolFac*(outChnp[i].maxCurrent-outChnp[i].minCurrent);
    }
+   for ( int i=0; i<inNo; i++ ){
+     vHiLim[i] = inChnp[i].minVoltage + upTolFac*(inChnp[i].maxVoltage-inChnp[i].minVoltage);
+     vLoLim[i] = inChnp[i].minVoltage + loTolFac*(inChnp[i].maxVoltage-inChnp[i].minVoltage);
+   }
+
+   // Generate the index vector of in and out channels to be saved
+   inChnsToSave = QVector<int>(0);
+   for( i= 0; i < inNo; i++ )
+     if( inChn[inIdx[i]].save ) inChnsToSave.append(inIdx[i]);
+   outChnsToSave = QVector<int>(0);
+   for( i= 0; i < outNo; i++ )
+     if( outChn[outIdx[i]].save ) outChnsToSave.append(outIdx[i]);
+
+   // Init data saving
+   dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
+   double savingPeriod = 1.0 / dataSavingPs.savingFreq;
+   /////////////////////////////////////////////// don't need the last plus one below, only testing
+   data = QVector<double>(inChnsToSave.size()+outChnsToSave.size()+1+SG.saveSG+1); // time + in + out + SG (which can be 0)
+   QVector<QString> header = QVector<QString>(data.size()); // write file header
+   header[0] = "Time";
+   QString tmp;
+   for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
+   if( SG.saveSG ) header[1+inChnsToSave.size()] = "SpikeGenerator";
+   for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SG.saveSG+i] = "I"+tmp.setNum(outChnsToSave[i]);
+   /////////////////////////////////////////////// don't need the line below, only testing
+   header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()] = "Ve";
+   dataSaver->SaveHeader(header);
+
    bool limitWarningEmitted = false;
 
-
-   board->reset_board();
    message(QString("DynClamp: Clamping ..."));
    stopped= false;
    finished= false;
    t= 0.0;
-   int sample= 0;
-   int elecNum = 0; // for data saving
+   double lastSave = t;
    for (int i= 0; i < 2; i++) lastWrite[i]= t;
    // init scripting
    if (scripting) {
@@ -262,28 +265,56 @@ void DCThread::run()
      evt= scrIter->t;
    }
    else evt= 1e10;
+   board->reset_RTC();
 
    // Dynamic clamp loop begins
-   while (!stopped) {
+   while (!stopped) {       
 
-     sample++;
-
-
-     // --- Write --- //    
-         board->write_analog_out(outChn);
-     // --- Write end --- //
+     // --- Read --- //
+        board->get_scan(inChn);
+     // --- Read end --- //
 
 
      // --- Calculate --- //
 
+        // Adaptive time step
+        dt = board->get_RTC();
+        t += dt;
+
+//        //Fixed time step
+//        double tstep = 0.0001;
+//        dt=0.0;
+//        do
+//        {
+//            dt += board->get_RTC();
+//        } while (dt < tstep);
+//        t += dt;
+
          // AEC channel update part
          for ( int k=0; k<aecChannels.size(); k++ )
-             if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);
+             if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);                  
 
          // AEC compensation
          for ( int k=0; k<aecChannels.size(); k++ ){
               if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum].V -= aecChannels[k]->v_e;
          }
+
+         //--------------- Data saving ------------------------//
+         if ( t >= lastSave + savingPeriod )
+         {
+            data[0] = t;
+
+            for (i= 0; i < inChnsToSave.size(); i++)   data[i+1] = inChn[inChnsToSave[i]].V;    // voltages
+            if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
+            for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
+
+data[data.size()-1] = aecChannels[0]->v_e;
+
+            dataSaver->SaveLine(data);
+            lastSave = t;
+         }
+         //--------------- Data saving end ---------------------//
+
 
          // Dynamic clamp current generation
          if (SGp.active) { // SpkGen active
@@ -309,17 +340,21 @@ void DCThread::run()
          // outChn[1].I= inChn[inIdx[inNo]].V;
 
          // Updated display
-         if (t-lastWrite[0] > Graphp[0].dt) {
-           lastWrite[0]= t;
-           for (i= 0; i < grpNo[0]; i++) {
-             addPoint1(t, *grp[0][i], pen[0][i]);
-           }
+         if (Graphp[0].active) {
+             if (t-lastWrite[0] > Graphp[0].dt) {
+               lastWrite[0]= t;
+               for (i= 0; i < grpNo[0]; i++) {
+                 addPoint1(t, *grp[0][i], pen[0][i]);
+               }
+             }
          }
-         if (t-lastWrite[1] > Graphp[1].dt) {
-           lastWrite[1]= t;
-           for (i= 0; i < grpNo[1]; i++) {
-             addPoint2(t, *grp[1][i], pen[1][i]);
-           }
+         if (Graphp[1].active) {
+             if (t-lastWrite[1] > Graphp[1].dt) {
+               lastWrite[1]= t;
+               for (i= 0; i < grpNo[1]; i++) {
+                 addPoint2(t, *grp[1][i], pen[1][i]);
+               }
+             }
          }
 
          // Scripting
@@ -339,62 +374,49 @@ void DCThread::run()
          }
 
          // Check channel limits
-         for ( int k=0; k<aecChannels.size(); k++ )
-             if ( aecChannels[k]->IsActive() ){
-                if ( inChn[aecChannels[k]->inChnNum].V > vHiLim[k] || inChn[aecChannels[k]->inChnNum].V < vLoLim[k] )
-                    if ( limitWarningEmitted == false){
-                        emit CloseToLimit(QString("Voltage"), aecChannels[k]->inChnNum, inChnp[aecChannels[k]->inChnNum].minVoltage, inChnp[aecChannels[k]->inChnNum].maxVoltage, inChn[aecChannels[k]->inChnNum].V);
+         for (i= 0; i < inNo; i++)
+             if( inChn[inIdx[i]].V > vHiLim[i] || inChn[inIdx[i]].V < vLoLim[i])
+                  if ( limitWarningEmitted == false){
+                        emit CloseToLimit(QString("Voltage"), inIdx[i], inChnp[inIdx[i]].minVoltage, inChnp[inIdx[i]].maxVoltage, inChn[inIdx[i]].V);
                         limitWarningEmitted = true;
                     }
-                if ( outChn[aecChannels[k]->outChnNum].I > iHiLim[k] || outChn[aecChannels[k]->outChnNum].I < iLoLim[k] )
-                    if ( limitWarningEmitted == false){
-                        emit CloseToLimit(QString("Current"), aecChannels[k]->outChnNum, outChnp[aecChannels[k]->outChnNum].minCurrent, outChnp[aecChannels[k]->outChnNum].maxCurrent, outChn[aecChannels[k]->outChnNum].I);
-                        limitWarningEmitted = true;
-                    }
-             }
 
-         //--------------- Data saving ------------------------//
-         elecNum = 0;
-         // Time saving
-         if ( saveElecNum != 0 )
-            data[0] = t;
-         for ( int k=0; k<aecChannels.size(); k++ ){
-            if ( aecChannels[k]->IsActive() && aecChannels[k]->saving == true ){
-                  // Current saving (from last time step till now)
-                  data[3*elecNum+1]= outChn[aecChannels[k]->outChnNum].I;
-                  // Compensated voltage saving
-                  data[3*elecNum+2]= inChn[aecChannels[k]->inChnNum].V;
-                  // Electrode artifact
-                  // only for testing, TO REMOVE!!!
-                  data[3*elecNum+3]= aecChannels[k]->v_e;
-                  elecNum++;
+          for (i= 0; i < outNo; i++) {
+              if( outChn[outIdx[i]].I > iHiLim[i] ) {
+                outChn[outIdx[i]].I = iHiLim[i];
+                if ( limitWarningEmitted == false){
+                        emit CloseToLimit(QString("Current"), outIdx[i], outChnp[outIdx[i]].minCurrent, outChnp[outIdx[i]].maxCurrent, outChn[outIdx[i]].I);
+                        limitWarningEmitted = true;
+                }
               }
-         }
-         if ( saveElecNum != 0)
-           dataSaver->SaveLine(data);
-         //--------------- Data saving end ---------------------//
+              if( outChn[outIdx[i]].I < iLoLim[i] ) {
+                 outChn[outIdx[i]].I = iLoLim[i];
+                 if ( limitWarningEmitted == false){
+                        emit CloseToLimit(QString("Current"), outIdx[i], outChnp[outIdx[i]].minCurrent, outChnp[outIdx[i]].maxCurrent, outChn[outIdx[i]].I);
+                        limitWarningEmitted = true;
+                 }
+              }
 
-         // Adaptive time step
-         dt = board->get_RTC();
-         t += dt;
+           }
 
      // --- Calculate end --- //
 
 
-     // --- Read --- //
-        board->get_scan(inChn);
-     // --- Read end --- //
+     // --- Write --- //
+         board->write_analog_out(outChn);
+     // --- Write end --- //
+
 
    }
    // Dynamic clamp loop ends
 
 
-   // In the end, let's do the cleaning up
+   // In the end, let's do the cleanup
+   for (i= 0; i < outNo; i++) outChn[outIdx[i]].I = 0.0;
    board->reset_board();
-
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
 
-   if ( saveElecNum != 0 ) dataSaver->EndDataSaving();
+   dataSaver->EndDataSaving();
 
    finished= true;
 
@@ -402,6 +424,7 @@ void DCThread::run()
 
 
 // Completes the sampling cycle by waiting till the end of the sampling period
+// Not used for adaptive sampling
 double DCThread::WaitTillNextSampling(double time)
 {
     double t = 0.0;

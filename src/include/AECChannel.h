@@ -10,7 +10,6 @@ public:
     short int outChnNum;
 
     bool active;
-    bool saving;
 
     double kerSampPer;
     double kernelTime;

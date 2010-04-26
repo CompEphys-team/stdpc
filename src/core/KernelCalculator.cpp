@@ -10,10 +10,14 @@ KernelCalculator::KernelCalculator()
 void KernelCalculator::SetParams(int fullKerLen, int elecKerLen, double sRate,
                                  QVector<double> iVector, QVector<double> vVector)
 {
+    tFac = 1e-3;
+
+    fullKernel.clear();
     fullKernel.resize(fullKerLen);
+    elecKernel.clear();
     elecKernel.resize(elecKerLen);
 
-    samplingRate = sRate;
+    samplingRate = tFac*sRate;
 
     iVec = iVector;
     vVec = vVector;
@@ -43,8 +47,7 @@ void KernelCalculator::CalcFullKernel()
     QVector<double> VI(fullKernel.size());
     QVector<double> II(fullKernel.size());
 
-
-    // taking <v> as the reference potential simplifies the formulas (from Brette's code)
+    // taking <v> as the reference potential simplifies the formuli (from Brette's code)
     for ( int i=0; i<dataLen; i++ )
     {
         averV += vVec[i];
@@ -52,13 +55,18 @@ void KernelCalculator::CalcFullKernel()
     }
     averV /= dataLen;
     averI /= dataLen;
-    double averI2 = averI * averI;
+
+    // Subtract offsets
+    for ( int i=0; i<dataLen; i++ )
+    {
+        vVec[i] -= averV;
+        iVec[i] -= averI;
+    }
 
     for ( int k=0; k<fullKernel.size(); k++ )
     {
-        for ( int i=0; i<dataLen-k; i++ ) VI[k] += (vVec[k+i]-averV)*iVec[i];
+        for ( int i=0; i<dataLen-k; i++ ) VI[k] += vVec[k+i]*iVec[i];
         VI[k] /= dataLen-k;
-        VI[k] -= averI2;
 
         for ( int i=0; i<dataLen-k; i++ ) II[k] += iVec[k+i]*iVec[i];
         II[k] /= dataLen-k;
@@ -135,8 +143,9 @@ void KernelCalculator::CalcElecKernel()
     R_e = 0.0;
     for ( int i=0; i<elecKernel.size(); i++ ) R_e += fullKernel[i] - R_m/tau_m/samplingRate * exp(-i/samplingRate/tau_m);
 
-    OptimizeKe(); // final optimization on electrode kernel
-    elecKernel[0] = fullKernel[0]; // restore first element for this implementation
+    OptimizeKe(); // final optimization on electrode kernel    
+    elecKernel.remove(0);   // remove first two elements for this implementation
+    elecKernel.remove(0);
 
     // Calculate tau_e and R_e for result check
 
@@ -177,11 +186,6 @@ QVector<double> KernelCalculator::ExpFit(QVector<double> x, QVector<double> y)
 
     int n = x.size();
 
-    // Substitute negative elements with the minimal positive value
-    double minPosY = y[0];
-    for ( int i=1; i<n; i++ ) if ( minPosY < 0.0 || (y[i] < minPosY && y[i] > 0.0)) minPosY = y[i];
-    for ( int i=0; i<n; i++ ) if ( y[i] <= 0.0 ) y[i] = minPosY;
-
     double Sx2y    = 0.0;
     double Sylogy  = 0.0;
     double Sxy     = 0.0;
@@ -191,12 +195,17 @@ QVector<double> KernelCalculator::ExpFit(QVector<double> x, QVector<double> y)
     // Calculate the sums
     for ( int i=0; i<n; i++ )
     {
-        Sx2y    += x[i] * x[i] * y[i];
-        Sylogy  += y[i] * log(y[i]);
-        Sxy     += x[i] * y[i];
-        Sxylogy += x[i] * y[i] * log(y[i]);
-        Sy      += y[i];
+        if( y[i] > 0 )  // Omit negative elements
+        {
+            Sx2y    += x[i] * x[i] * y[i];
+            Sylogy  += y[i] * log(y[i]);
+            Sxy     += x[i] * y[i];
+            Sxylogy += x[i] * y[i] * log(y[i]);
+            Sy      += y[i];
+
+        }
     }
+
 
     // Solve for a and b
     a = ( Sx2y * Sylogy  - Sxy * Sxylogy ) / ( Sy * Sx2y - Sxy * Sxy );
@@ -228,7 +237,8 @@ void KernelCalculator::OptimizeKe()
     middleY2 = RemoveKm(middleX2);
 
     int i = 0;
-    while ( fabs(upperX-lowerX) > tolerance * R_e || i++ < 100 )
+
+    while ( fabs(upperX-lowerX) > tolerance * R_e )
     {
         if ( middleY1 < middleY2 )
         {
@@ -247,6 +257,7 @@ void KernelCalculator::OptimizeKe()
             middleY1 = middleY2;
             middleY2 = RemoveKm(middleX2);
         }
+        if ( i++ > 1000 ) break; // just to be safe
     }
 
     if ( middleY1 < middleY2 )
@@ -294,12 +305,6 @@ void KernelCalculator::SetFullKernel(QVector<double> kernel)
     for( int i=0; i<kernel.size(); i++ ) fullKernel.append(kernel[i]);
 }
 
-void KernelCalculator::SetElecKernel(QVector<double> kernel)
-{
-    elecKernel.clear();
-    for( int i=0; i<kernel.size(); i++ ) elecKernel.append(kernel[i]);
-}
-
 
 QVector<double> KernelCalculator::GetElecKernel()
 {
@@ -311,9 +316,16 @@ QVector<double> KernelCalculator::GetElecKernel()
 }
 
 
+void KernelCalculator::SetElecKernel(QVector<double> kernel)
+{
+    elecKernel.clear();
+    for( int i=0; i<kernel.size(); i++ ) elecKernel.append(kernel[i]);
+}
+
+
 double KernelCalculator::GetTauM()
 {
-   return tau_m;
+   return tFac*tau_m;
 }
 
 
@@ -325,7 +337,7 @@ double KernelCalculator::GetRM()
 
 double KernelCalculator::GetTauE()
 {
-    return tau_e;
+    return tFac*tau_e;
 }
 
 double KernelCalculator::GetRE()

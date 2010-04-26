@@ -20,11 +20,13 @@ class DAQ {
     int outChnNo;
 
     int inGainNo;
-    QVector<double> inGain;
+    QVector<double> inLow;
+    QVector<double> inHigh;
     char **inGainText;
 
     int outGainNo;
-    QVector<double> outGain;
+    QVector<double> outLow;
+    QVector<double> outHigh;
     char **outGainText;
 
 // activated stuff

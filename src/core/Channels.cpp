@@ -6,6 +6,7 @@ inChannel::inChannel() {
 void inChannel::init(inChnData *inp)
 {
   p= inp;
+  save = inp->chnlSaving;
   V= 0.0;
   startSpiking= 0;
   spiking= 0;
@@ -36,9 +37,10 @@ outChannel::outChannel()
   I= 0.0;
 }
 
-void outChannel::init(outChnData *inp) 
+void outChannel::init(outChnData *outp)
 {
-  p= inp;
+  p= outp;
+  save = outp->chnlSaving;
 }
 
 void outChannel::reset()

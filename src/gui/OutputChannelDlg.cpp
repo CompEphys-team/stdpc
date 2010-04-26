@@ -1,4 +1,5 @@
 #include "OutputChannelDlg.h"
+#include <QMessageBox>
 
 OutputChannelDlg::OutputChannelDlg(QWidget *parent)
      : QDialog(parent)
@@ -13,6 +14,7 @@ void OutputChannelDlg::clearAll()
   QVector<QLineEdit *>::Iterator factorIter;
   QVector<QLineEdit *>::Iterator biasIter;
   QVector<QLabel *>::Iterator lbIter;
+  QVector<QCheckBox *>::Iterator saveIter;
   
   for (actIter= act.begin(); actIter != act.end(); actIter++) {
     delete *actIter;
@@ -34,6 +36,10 @@ void OutputChannelDlg::clearAll()
     delete *lbIter;
   }
   allLabel.clear();
+  for (saveIter= saveChnl.begin(); saveIter != saveChnl.end(); saveIter++) {
+    delete *saveIter;
+  }
+  saveChnl.clear();
 }
 
 
@@ -47,6 +53,7 @@ void OutputChannelDlg::init(DAQ *board)
   #define X3 320
   #define X4 480
   #define X5 550
+  #define X6 595
 
   QLabel *lb;
   QCheckBox *cbtmp;
@@ -57,11 +64,14 @@ void OutputChannelDlg::init(DAQ *board)
   clearAll();
   ChnNo= board->outChnNo;
 
-  outGain = QVector<double>(board->outGainNo);
+  outLow = QVector<double>(board->outGainNo);
   for(int i= 0; i < board->outGainNo; i++){
-    outGain[i]= board->outGain[i];
+    outLow[i]= board->outLow[i];
   }
- 
+  outHigh = QVector<double>(board->outGainNo);
+  for(int i= 0; i < board->outGainNo; i++){
+    outHigh[i]= board->outHigh[i];
+  }
   lb= new QLabel(this);
   lb->setGeometry(QRect(X1, Y0-40, 100, 36));
   lb->setText(QString("Aquisition Range"));
@@ -72,10 +82,14 @@ void OutputChannelDlg::init(DAQ *board)
   lb->setText(QString("Conversion factor"));
   allLabel.append(lb);
   
-
   lb= new QLabel(this);
   lb->setGeometry(QRect(X4, Y0-40, 120, 36));
   lb->setText(QString("Bias current"));
+  allLabel.append(lb);
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X6, Y0-45, 60, 36));
+  lb->setText(QString("  Save\nChannel"));
   allLabel.append(lb);
   
   for (int i= 0; i < ChnNo; i++) {
@@ -91,7 +105,7 @@ void OutputChannelDlg::init(DAQ *board)
     for (int j= 0; j < board->outGainNo; j++) {
       qctmp->addItem(QString(board->outGainText[j]));
     }
-    qctmp->setCurrentIndex(board->outGainNo-1);
+    qctmp->setCurrentIndex((board->outGainNo)-1);
     rng.append(qctmp);
     letmp= new QLineEdit(this);
     letmp->setGeometry(QRect(X2, Y0+i*DY, 60, 18));
@@ -111,6 +125,10 @@ void OutputChannelDlg::init(DAQ *board)
     lb->setGeometry(QRect(X5, Y0+i*DY, 120, 18));
     lb->setText(QString("nA"));
     allLabel.append(lb);
+    cbtmp= new QCheckBox(this);
+    cbtmp->setGeometry(QRect(X6+15, Y0+i*DY, 15, 18));
+    cbtmp->setObjectName(QString("Save Channel ")+nm);
+    saveChnl.append(cbtmp);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
@@ -133,8 +151,9 @@ void OutputChannelDlg::exportData()
     outChnp[i].gain= rng[i]->currentIndex();
     outChnp[i].gainFac= factor[i]->text().toDouble();
     outChnp[i].bias= bias[i]->text().toDouble()*1e-9;
-    outChnp[i].minCurrent= -1e-9/outGain[rng[i]->currentIndex()]*outChnp[i].gainFac;
-    outChnp[i].maxCurrent=  1e-9/outGain[rng[i]->currentIndex()]*outChnp[i].gainFac;
+    outChnp[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/outChnp[i].gainFac;
+    outChnp[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/outChnp[i].gainFac;
+    outChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
@@ -145,11 +164,13 @@ void OutputChannelDlg::importData()
   for (int i= 0; i < ChnNo; i++) {
     if (outChnp[i].active) act[i]->setCheckState(Qt::Checked);
     else act[i]->setCheckState(Qt::Unchecked);
-    rng[i]->setCurrentIndex(inChnp[i].gain); 
+    rng[i]->setCurrentIndex(outChnp[i].gain);
     lb.setNum(outChnp[i].gainFac);
     factor[i]->setText(lb);
     lb.setNum(outChnp[i].bias*1e9);
     bias[i]->setText(lb);
+    if (outChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
+    else saveChnl[i]->setCheckState(Qt::Unchecked);
   }
 }
 

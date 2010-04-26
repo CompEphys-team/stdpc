@@ -23,9 +23,10 @@ NIDAQ::NIDAQ()
   strcpy(devName, (const char *) NIDAQp.deviceName.toAscii());
   
   DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
-//if (!DevicePresent)  QMessageBox::warning(NULL, QString("My Application"),
-//              QString(data),
-//                QMessageBox::Ok); 
+  //if (!DevicePresent)
+//  QMessageBox::warning(NULL, QString("My Application"),
+//                QString(data),
+//                QMessageBox::Ok);
     
   istr=new istringstream(data);
   int k= 0;
@@ -42,11 +43,12 @@ NIDAQ::NIDAQ()
 //  inGainFac= new double[inChnNo];
   for (int i= 0; i < 128; i++) fdata[i]= 0.0; 
   DAQmxGetDevAIVoltageRngs(devName, fdata, 128);
-  while ((fdata[k] != 0.0) || (fdata[k+1] != 0.0)) k+=2;
+  k= 0;
+  while ((abs(fdata[k]) > 1e-10) || (abs(fdata[k+1]) > 1e-10)) k+=2;
   inGainNo= k/2;
   inGainText= new char*[inGainNo];
-  inLow= new double[inGainNo];
-  inHigh= new double[inGainNo];
+  inLow= QVector<double>(inGainNo);
+  inHigh= QVector<double>(inGainNo);
   for (int i= 0; i < inGainNo; i++) {
     ostr.clear();
     ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
@@ -75,8 +77,8 @@ NIDAQ::NIDAQ()
   while ((fdata[k] != 0.0) || (fdata[k+1] != 0.0)) k+=2;
   outGainNo= k/2;
   outGainText= new char*[outGainNo];
-  outLow= new double[outGainNo];
-  outHigh= new double[outGainNo];
+  outLow= QVector<double>(outGainNo);
+  outHigh= QVector<double>(outGainNo);
   for (int i= 0; i < outGainNo; i++) {
     ostr.clear();
     ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
@@ -111,8 +113,6 @@ NIDAQ::~NIDAQ()
     delete[] inGainText[i];
   }
   delete[] inGainText;
-  delete[] inLow;
-  delete[] inHigh;
   for (int i= 0; i < outChnNo; i++) {
     delete[] oChnNm;
   }
@@ -120,8 +120,6 @@ NIDAQ::~NIDAQ()
     delete[] outGainText[i];
   }
   delete[] outGainText;
-  delete[] outLow;
-  delete[] outHigh;
   delete[] inChnGain;
   delete[] inIdx;
   delete[] inGainFac;
@@ -155,12 +153,13 @@ void NIDAQ::reset_RTC()
   // this is called when the dynamic clamp starts ... start tasks
   static LARGE_INTEGER inT;
    
-  QueryPerformanceCounter(&inT);
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  t= 0.0;
 
   DAQmxStartTask(inTask);
   DAQmxStartTask(outTask);
+
+  QueryPerformanceCounter(&inT);
+  sysT= ((double) inT.LowPart)/clock_frequency;
+  t= 0.0;
 }
 
 //---------------------------------------------------------------------------
@@ -199,7 +198,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
   
   for (int i= 0; i < chnNo; i++) {
     inIdx[i]= Chns[i];
-    DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[inChnp[inIdx[i]].gain], 
+    DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[inChnp[inIdx[i]].gain],
                               inHigh[inChnp[inIdx[i]].gain], DAQmx_Val_Volts, "");
     inGainFac[i]= inChnp[inIdx[i]].gainFac; 
   }
@@ -214,7 +213,13 @@ void NIDAQ::get_scan(inChannel *in)
 {
   static int i;
   static int32 spr;
+//  QString temp;
+
   DAQmxReadAnalogF64(inTask, 1, 1.0e-4, DAQmx_Val_GroupByScanNumber, inBuf, actInChnNo, &spr, NULL);
+//  temp.setNum(inBuf[0]);
+//  QMessageBox::warning(NULL, QString("My Application"),
+//                temp,
+//                QMessageBox::Ok);
   for (i= 0; i < actInChnNo; i++) in[inIdx[i]].V= inGainFac[i]*inBuf[i];
 }
 
@@ -231,7 +236,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
    
    for (int i= 0; i < chnNo; i++) {
      outIdx[i]= Chns[i];
-     DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[outChnp[outIdx[i]].gain], 
+     DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[outChnp[outIdx[i]].gain],
                               outHigh[outChnp[outIdx[i]].gain], DAQmx_Val_Volts, "");
      outGainFac[i]= outChnp[outIdx[i]].gainFac*1e9;
    }

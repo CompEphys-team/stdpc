@@ -74,7 +74,7 @@ void abSyn::currentUpdate(double t, double dt)
   
   // calculate synaptic current
   dS= (1.0 - S)*p->aS*(*theExpSigmoid)((pre->V-p->VaS)/p->saS) - S*p->bS;
-  dR= (1.0 - R)*p->aR*(*theExpSigmoid)((pre->V-p->VaR)/p->saR) - R*p->bS;
+  dR= (1.0 - R)*p->aR*(*theExpSigmoid)((pre->V-p->VaR)/p->saR) - R*p->bR;
   // Linear Euler:
   S+= dS*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;

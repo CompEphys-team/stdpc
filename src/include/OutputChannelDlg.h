@@ -26,12 +26,14 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      int lbNum;
 
   protected:
-     QVector<double> outGain;
+     QVector<double> outLow;
+     QVector<double> outHigh;
      QVector<QCheckBox *> act;
      QVector<QComboBox *> rng;
      QVector<QLineEdit *> factor;
      QVector<QLineEdit *> bias;
      QVector<QLabel *> allLabel;
+     QVector<QCheckBox *> saveChnl;
                
   public slots:
      void accept();

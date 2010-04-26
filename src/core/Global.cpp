@@ -24,6 +24,9 @@ SGData SGp;
 
 graphData Graphp[2];
 
+dataSavingParams dataSavingPs;
+elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
+
 // LU tables
 tanhLUtable tanhLU;
 expLUtable expLU;

@@ -14,6 +14,7 @@ void InputChannelDlg::clearAll()
   QVector<QComboBox *>::Iterator rngIter;
   QVector<QLineEdit *>::Iterator factorIter;
   QVector<QLabel *>::Iterator lbIter;
+  QVector<QCheckBox *>::Iterator saveIter;
   
   for (actIter= act.begin(); actIter != act.end(); actIter++) {
     delete *actIter;
@@ -39,6 +40,10 @@ void InputChannelDlg::clearAll()
     delete *factorIter;
   }
   SDThresh.clear();
+  for (saveIter= saveChnl.begin(); saveIter != saveChnl.end(); saveIter++) {
+    delete *saveIter;
+  }
+  saveChnl.clear();
 }
 
 void InputChannelDlg::init(DAQ *board)
@@ -52,42 +57,51 @@ void InputChannelDlg::init(DAQ *board)
   #define X4 420
   #define X5 480
   #define X6 555
-  
+  #define X7 600
+
   QCheckBox *cbtmp;
   QComboBox *qctmp;
   QLineEdit *letmp;
   QLabel *lb;
   QString nm;
-  
-  clearAll(); 
-  ChnNo= board->inChnNo;
-  inGain = QVector<double>(board->inGainNo);
-  for(int i= 0; i < board->inGainNo; i++){
-    inGain[i]= board->inGain[i];
-  }
 
+  clearAll();
+  ChnNo= board->inChnNo;
+  inLow = QVector<double>(board->inGainNo);
+  for(int i= 0; i < board->inGainNo; i++){
+    inLow[i]= board->inLow[i];
+  }
+  inHigh = QVector<double>(board->inGainNo);
+  for(int i= 0; i < board->inGainNo; i++){
+    inHigh[i]= board->inHigh[i];
+  }
   lbNum= 0;
-  
+
   lb= new QLabel(this);
   lb->setGeometry(QRect(X1, Y0-45, 100, 36));
   lb->setText(QString("Aquisition Range"));
   allLabel.append(lb);
-  
+
   lb= new QLabel(this);
   lb->setGeometry(QRect(X2, Y0-45, 120, 36));
   lb->setText(QString("Conversion factor"));
   allLabel.append(lb);
-  
+
   lb= new QLabel(this);
   lb->setGeometry(QRect(X4, Y0-45, 80, 36));
-  lb->setText(QString("Spike \nDetection"));
+  lb->setText(QString("   Spike\nDetection"));
   allLabel.append(lb);
-  
+
   lb= new QLabel(this);
   lb->setGeometry(QRect(X5, Y0-45, 120, 36));
   lb->setText(QString("Detection Threshold"));
   allLabel.append(lb);
-  
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X7, Y0-45, 60, 36));
+  lb->setText(QString("  Save\nChannel"));
+  allLabel.append(lb);
+
   for (int i= 0; i < ChnNo; i++) {
     nm.setNum(i);
     cbtmp= new QCheckBox(this);
@@ -127,6 +141,10 @@ void InputChannelDlg::init(DAQ *board)
     lb->setGeometry(QRect(X6, Y0+i*DY, 40, 18));
     lb->setText(QString("mV"));
     allLabel.append(lb);
+    cbtmp= new QCheckBox(this);
+    cbtmp->setGeometry(QRect(X7+15, Y0+i*DY, 15, 18));
+    cbtmp->setObjectName(QString("Save Channel ")+nm);
+    saveChnl.append(cbtmp);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
@@ -136,7 +154,7 @@ void InputChannelDlg::init(DAQ *board)
   buttonBox->setGeometry(geo);
 //  QMessageBox::warning((QWidget *)parent(), tr("My Application"),
 //                tr("The signal for index change has been received"),
-//               QMessageBox::Close); 
+//               QMessageBox::Close);
   accept();   // export the current state, update chn info in other dialogs
 }    
 
@@ -153,8 +171,9 @@ void InputChannelDlg::exportData()
     inChnp[i].gainFac= factor[i]->text().toDouble();
     inChnp[i].spkDetect= (sDetect[i]->checkState() > 0);
     inChnp[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
-    inChnp[i].minVoltage = -inGain[rng[i]->currentIndex()]*inChnp[i].gainFac;
-    inChnp[i].maxVoltage =  inGain[rng[i]->currentIndex()]*inChnp[i].gainFac;
+    inChnp[i].minVoltage = inLow[rng[i]->currentIndex()]*inChnp[i].gainFac;
+    inChnp[i].maxVoltage = inHigh[rng[i]->currentIndex()]*inChnp[i].gainFac;
+    inChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
@@ -172,6 +191,8 @@ void InputChannelDlg::importData()
     else sDetect[i]->setCheckState(Qt::Unchecked);
     lb.setNum(inChnp[i].spkDetectThresh*1e3);
     SDThresh[i]->setText(lb);
+    if (inChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
+    else saveChnl[i]->setCheckState(Qt::Unchecked);
   }
 }
 

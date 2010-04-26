@@ -19,10 +19,6 @@ class NIDAQ: public DAQ
    double sysT;
    double t;
    char *devName;
-   double *inLow;
-   double *inHigh;
-   double *outLow;
-   double *outHigh;
    char *iChnNm[MAXCHANNELS];
    char *oChnNm[MAXCHANNELS];
           

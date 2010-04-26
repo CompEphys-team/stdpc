@@ -163,31 +163,42 @@ typedef struct {
 typedef struct {
 
   // General params
-  double injLen;
   double samplingRate;
-  short int inputChannelNumber;
-  short int outputChannelNumber;
+  int inputChannelNumber;
+  int outputChannelNumber;
 
   // Electrode measurement params
   double iMaxElec;
   double iMinElec;
   int numberOfLevels;
+  double injLenPerLevel;
 
   // Membrane measurement params
   double iMembStep;
   int numberOfRepeats;
+  double injLenPerRepeat;
 
   // Calibration params
   double hyperpolCurr;
   double injCalAmp;
+  double injCalLen;
   double fullKernelLen;
   double electrodeKernelLen;
 
 } elecCalibParams;
 
 typedef struct {
+
+  QString fileName;
+  double savingFreq;
+  bool isBinary;
+
+} dataSavingParams;
+
+typedef struct {
   bool active;
-  int method;      
+  int method;
+  bool saving;
   int LUTables;
   double VSpike;
   double spkTimeScaling;
@@ -211,6 +222,7 @@ typedef struct {
   double spkDetectThresh;
   double minVoltage;
   double maxVoltage;
+  bool chnlSaving;
 } inChnData;
 
 typedef struct {
@@ -220,6 +232,7 @@ typedef struct {
   double bias;
   double minCurrent;
   double maxCurrent;
+  bool chnlSaving;
 } outChnData;
 
 class SDAQData {

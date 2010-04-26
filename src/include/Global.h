@@ -11,6 +11,7 @@
 #define MAX_HH_NO 6
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
+#define MAX_ELECTRODE_NO 4
 
 
 extern int synType[MAX_SYN_NO];
@@ -33,6 +34,10 @@ extern SDAQData SDAQp;
 extern NIDAQData NIDAQp;
 #endif
 extern SGData SGp;
+
+extern dataSavingParams dataSavingPs;
+extern elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
+
 
 extern graphData Graphp[2];
 
