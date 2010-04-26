@@ -18,74 +18,79 @@ class ElectrodeCompDlg : public QDialog, private Ui::ElectrodeCompDlg
     Q_OBJECT
     //Q_DISABLE_COPY(ElectrodeCompDlg)
 
-    private:       
-        int tabNum;
+    private:
+        int elecNum;
 
         //------------------------------------------------------//
-        // Objects to store the GUI elements of the current tab
-            QLabel *lInfo;
-            QCheckBox *cbCompOn;
+        // Objects to store the GUI elements of the tabs
+
+            // Buttons
+            QPushButton *elecMeasButton[MAX_ELECTRODE_NO];
+            QPushButton *membMeasButton[MAX_ELECTRODE_NO];
+            QPushButton *calibrateButton[MAX_ELECTRODE_NO];
+
+            // Header
+            QLabel *lInfo[MAX_ELECTRODE_NO];
+            QCheckBox *cbCompOn[MAX_ELECTRODE_NO];
 
             // General group box
-            QLineEdit *leGenInjLen;
-            QLineEdit *leGenSamplingRate;
-            QLineEdit *leGenInChannelNum;
-            QLineEdit *leGenOutChannelNum;
+            QLineEdit *leGenSamplingRate[MAX_ELECTRODE_NO];
+            QLineEdit *leGenInChannelNum[MAX_ELECTRODE_NO];
+            QLineEdit *leGenOutChannelNum[MAX_ELECTRODE_NO];
 
             // Electrode measurement group box
-            QLineEdit *leElecMaxCurrent;
-            QLineEdit *leElecMinCurrent;
-            QLineEdit *leElecLevelNum;
+            QLineEdit *leElecMaxCurrent[MAX_ELECTRODE_NO];
+            QLineEdit *leElecMinCurrent[MAX_ELECTRODE_NO];
+            QLineEdit *leElecLevelNum[MAX_ELECTRODE_NO];
+            QLineEdit *leElecInjLen[MAX_ELECTRODE_NO];
 
             // Membrane measurement group box
-            QLineEdit *leMembIStep;
-            QLineEdit *leMembRepNum;
+            QLineEdit *leMembIStep[MAX_ELECTRODE_NO];
+            QLineEdit *leMembRepNum[MAX_ELECTRODE_NO];
+            QLineEdit *leMembInjLen[MAX_ELECTRODE_NO];
 
             // Calibration group box
-            QLineEdit *leHyperpolCurr;
-            QLineEdit *leCalInjAmp;
-            QLineEdit *leCalFKLen;
-            QLineEdit *leCalEKLen;
+            QLineEdit *leHyperpolCurr[MAX_ELECTRODE_NO];
+            QLineEdit *leCalInjAmp[MAX_ELECTRODE_NO];
+            QLineEdit *leCalFKLen[MAX_ELECTRODE_NO];
+            QLineEdit *leCalEKLen[MAX_ELECTRODE_NO];
+            QLineEdit *leCalInjLen[MAX_ELECTRODE_NO];
 
             // Electrode results group box
-            QLineEdit *leElecMeasRes;
-            QLineEdit *leElecMeasTime;
-            QLineEdit *leElecCalibRes;
-            QLineEdit *leElecResStd;
-            QLineEdit *leElecTimeStd;
-            QLineEdit *leElecCalibTime;
+            QLineEdit *leElecMeasRes[MAX_ELECTRODE_NO];
+            QLineEdit *leElecMeasTime[MAX_ELECTRODE_NO];
+            QLineEdit *leElecCalibRes[MAX_ELECTRODE_NO];
+            QLineEdit *leElecResStd[MAX_ELECTRODE_NO];
+            QLineEdit *leElecTimeStd[MAX_ELECTRODE_NO];
+            QLineEdit *leElecCalibTime[MAX_ELECTRODE_NO];
 
             // Membrane results group box
-            QLineEdit *leCellMeasRes;
-            QLineEdit *leCellMeasTime;
-            QLineEdit *leCellResStd;
-            QLineEdit *leCellTimeStd;
-            QLineEdit *leCellCalibRes;
-            QLineEdit *leCellCalibTime;
+            QLineEdit *leCellMeasRes[MAX_ELECTRODE_NO];
+            QLineEdit *leCellMeasTime[MAX_ELECTRODE_NO];
+            QLineEdit *leCellResStd[MAX_ELECTRODE_NO];
+            QLineEdit *leCellTimeStd[MAX_ELECTRODE_NO];
+            QLineEdit *leCellCalibRes[MAX_ELECTRODE_NO];
+            QLineEdit *leCellCalibTime[MAX_ELECTRODE_NO];
 
             // Data acquisition results group box
-            QLineEdit *leAverSamplRate;
-            QLineEdit *leSTDSamplingRate;
-            QLineEdit *leMinSRate;
-            QLineEdit *leDesPerMinRate;
-            QLineEdit *leMaxSTime;
+            QLineEdit *leAverSamplRate[MAX_ELECTRODE_NO];
+            QLineEdit *leSTDSamplingRate[MAX_ELECTRODE_NO];
+            QLineEdit *leStdPerMeanRate[MAX_ELECTRODE_NO];
+            QLineEdit *leMinSRate[MAX_ELECTRODE_NO];
+            QLineEdit *leDesPerMinRate[MAX_ELECTRODE_NO];
+            QLineEdit *leMaxSTime[MAX_ELECTRODE_NO];
 
         //------------------------------------------------------//
 
-        int numOfElectrodes;
-
-        elecCalibParams params;
-
-        void GetGuiElements();
         bool InitCalibrator();        
-        void ExportParams();
-        void ImportParams();
         void TimingTest();
 
-    public:        
-        Calibrator *calibrator;
+    public:                
+        Calibrator *calibrator;        
         ElectrodeCompDlg(QWidget *parent = 0);
         ~ElectrodeCompDlg();
+        void exportData();
+        void importData();
 
     public slots:
         void MeasureElectrode();

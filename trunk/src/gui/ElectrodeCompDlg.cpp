@@ -5,6 +5,7 @@
 #include "ElectrodeCompDlg.h"
 #include "ui_ElectrodeCompDlg.h"
 #include "MainWin.h"
+#include "Global.h"
 
 
 ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
@@ -14,20 +15,73 @@ ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
 
     calibrator = new Calibrator();
 
-    numOfElectrodes = 4;
+    // Get the objects and buttons from each tab and connect the buttons with their slots
+    for ( elecNum=0; elecNum<MAX_ELECTRODE_NO; elecNum++ ){
 
-    // Get the buttons from each tab and connects them with their slots
-    for ( tabNum=1; tabNum<=numOfElectrodes; tabNum++ ){
-        QPushButton *elecMeasButton = electrodeTabs->findChild<QPushButton *>(QString("elecMeasButton_")+QString::number(tabNum));
-        QPushButton *membMeasButton = electrodeTabs->findChild<QPushButton *>(QString("membMeasButton_")+QString::number(tabNum));
-        QPushButton *calibrateButton = electrodeTabs->findChild<QPushButton *>(QString("calibrateButton_")+QString::number(tabNum));
-        QCheckBox *cbCompOn = electrodeTabs->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(tabNum));
+        // Info line
+        lInfo[elecNum] = electrodeTabs->widget(elecNum)->findChild<QLabel *>(QString("lInfo_")+QString::number(elecNum+1));
 
-        QObject::connect(elecMeasButton, SIGNAL(released()), this, SLOT(MeasureElectrode()));
-        QObject::connect(membMeasButton, SIGNAL(released()), this, SLOT(MeasureMembrane()));
-        QObject::connect(calibrateButton, SIGNAL(released()), this, SLOT(CalibrateElectrode()));        
-        QObject::connect(cbCompOn, SIGNAL(toggled(bool)), this, SLOT(ToggleCompensation()));
+        // Compensation toggler checkbox
+        cbCompOn[elecNum] = electrodeTabs->widget(elecNum)->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(elecNum));
+
+        // General group box
+        leGenSamplingRate[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenSamplingRate_")+QString::number(elecNum+1));
+        leGenInChannelNum[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenInChannelNum_")+QString::number(elecNum+1));
+        leGenOutChannelNum[elecNum] = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenOutChannelNum_")+QString::number(elecNum+1));
+
+        // Electrode measurement group box
+        leElecMaxCurrent[elecNum]   = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecMaxCurrent_")+QString::number(elecNum+1));
+        leElecMinCurrent[elecNum]   = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecMinCurrent_")+QString::number(elecNum+1));
+        leElecLevelNum[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecLevelNum_")+QString::number(elecNum+1));
+        leElecInjLen[elecNum]       = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecInjLen_")+QString::number(elecNum+1));
+
+        // Membrane measurement group box
+        leMembIStep[elecNum]        = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leMembIStep_")+QString::number(elecNum+1));
+        leMembRepNum[elecNum]       = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leMembRepNum_")+QString::number(elecNum+1));
+        leMembInjLen[elecNum]       = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leMembInjLen_")+QString::number(elecNum+1));
+
+        // Calibration group box
+        leHyperpolCurr[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leHyperpolCurr_")+QString::number(elecNum+1));
+        leCalInjAmp[elecNum]        = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCalInjAmp_")+QString::number(elecNum+1));
+        leCalInjLen[elecNum]        = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCalInjLen_")+QString::number(elecNum+1));
+        leCalFKLen[elecNum]         = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCalFKLen_")+QString::number(elecNum+1));
+        leCalEKLen[elecNum]         = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCalEKLen_")+QString::number(elecNum+1));
+
+        // Electrode results group box
+        leElecMeasRes[elecNum]      = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecMeasRes_")+QString::number(elecNum+1));
+        leElecMeasTime[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecMeasTime_")+QString::number(elecNum+1));
+        leElecCalibRes[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecCalibRes_")+QString::number(elecNum+1));
+        leElecResStd[elecNum]       = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecResStd_")+QString::number(elecNum+1));
+        leElecTimeStd[elecNum]      = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecTimeStd_")+QString::number(elecNum+1));
+        leElecCalibTime[elecNum]    = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecCalibTime_")+QString::number(elecNum+1));
+
+        // Membrane results group box
+        leCellMeasRes[elecNum]      = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellMeasRes_")+QString::number(elecNum+1));
+        leCellMeasTime[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellMeasTime_")+QString::number(elecNum+1));
+        leCellResStd[elecNum]       = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellResStd_")+QString::number(elecNum+1));
+        leCellTimeStd[elecNum]      = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellTimeStd_")+QString::number(elecNum+1));
+        leCellCalibRes[elecNum]     = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellCalibRes_")+QString::number(elecNum+1));
+        leCellCalibTime[elecNum]    = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leCellCalibTime_")+QString::number(elecNum+1));
+
+        // Data acquisition results group box
+        leAverSamplRate[elecNum]    = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leAverSamplRate_")+QString::number(elecNum+1));
+        leSTDSamplingRate[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leSTDSamplingRate_")+QString::number(elecNum+1));
+        leStdPerMeanRate[elecNum]   = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leStdPerMeanRate_")+QString::number(elecNum+1));
+        leMinSRate[elecNum]         = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leMinSRate_")+QString::number(elecNum+1));
+        leDesPerMinRate[elecNum]    = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leDesPerMinRate_")+QString::number(elecNum+1));
+        leMaxSTime[elecNum]         = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leMaxSTime_")+QString::number(elecNum+1));
+
+        elecMeasButton[elecNum] = electrodeTabs->findChild<QPushButton *>(QString("elecMeasButton_")+QString::number(elecNum+1));
+        membMeasButton[elecNum] = electrodeTabs->findChild<QPushButton *>(QString("membMeasButton_")+QString::number(elecNum+1));
+        calibrateButton[elecNum] = electrodeTabs->findChild<QPushButton *>(QString("calibrateButton_")+QString::number(elecNum+1));
+        cbCompOn[elecNum] = electrodeTabs->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(elecNum+1));
+
+        QObject::connect(elecMeasButton[elecNum], SIGNAL(released()), this, SLOT(MeasureElectrode()));
+        QObject::connect(membMeasButton[elecNum], SIGNAL(released()), this, SLOT(MeasureMembrane()));
+        QObject::connect(calibrateButton[elecNum], SIGNAL(released()), this, SLOT(CalibrateElectrode()));
+        QObject::connect(cbCompOn[elecNum], SIGNAL(toggled(bool)), this, SLOT(ToggleCompensation()));
     }
+
 }
 
 
@@ -36,155 +90,91 @@ ElectrodeCompDlg::~ElectrodeCompDlg()
 }
 
 
-// Gets the gui objects from the current electrode tab
-void ElectrodeCompDlg::GetGuiElements()
-{
-    // The current tab
-    tabNum = electrodeTabs->currentIndex()+1;
-
-    // Info line
-    lInfo = electrodeTabs->currentWidget()->findChild<QLabel *>(QString("lInfo_")+QString::number(tabNum));
-
-    // Compensation toggler checkbox
-    cbCompOn = electrodeTabs->currentWidget()->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(tabNum));
-
-    // General group box
-    leGenInjLen        = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leGenInjLen_")+QString::number(tabNum));
-    leGenSamplingRate  = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leGenSamplingRate_")+QString::number(tabNum));
-    leGenInChannelNum  = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leGenInChannelNum_")+QString::number(tabNum));
-    leGenOutChannelNum = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leGenOutChannelNum_")+QString::number(tabNum));
-
-    // Electrode measurement group box
-    leElecMaxCurrent   = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecMaxCurrent_")+QString::number(tabNum));
-    leElecMinCurrent   = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecMinCurrent_")+QString::number(tabNum));
-    leElecLevelNum     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecLevelNum_")+QString::number(tabNum));
-
-    // Membrane measurement group box
-    leMembIStep        = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leMembIStep_")+QString::number(tabNum));
-    leMembRepNum       = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leMembRepNum_")+QString::number(tabNum));
-
-    // Calibration group box
-    leHyperpolCurr     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leHyperpolCurr_")+QString::number(tabNum));
-    leCalInjAmp        = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCalInjAmp_")+QString::number(tabNum));
-    leCalFKLen         = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCalFKLen_")+QString::number(tabNum));
-    leCalEKLen         = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCalEKLen_")+QString::number(tabNum));
-
-    // Electrode results group box
-    leElecMeasRes      = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecMeasRes_")+QString::number(tabNum));
-    leElecMeasTime     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecMeasTime_")+QString::number(tabNum));
-    leElecCalibRes     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecCalibRes_")+QString::number(tabNum));
-    leElecResStd       = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecResStd_")+QString::number(tabNum));
-    leElecTimeStd      = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecTimeStd_")+QString::number(tabNum));
-    leElecCalibTime    = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leElecCalibTime_")+QString::number(tabNum));
-
-    // Membrane results group box
-    leCellMeasRes      = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellMeasRes_")+QString::number(tabNum));
-    leCellMeasTime     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellMeasTime_")+QString::number(tabNum));
-    leCellResStd       = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellResStd_")+QString::number(tabNum));
-    leCellTimeStd      = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellTimeStd_")+QString::number(tabNum));
-    leCellCalibRes     = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellCalibRes_")+QString::number(tabNum));
-    leCellCalibTime    = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leCellCalibTime_")+QString::number(tabNum));
-
-    // Data acquisition results group box
-    leAverSamplRate    = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leAverSamplRate_")+QString::number(tabNum));
-    leSTDSamplingRate  = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leSTDSamplingRate_")+QString::number(tabNum));
-    leMinSRate         = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leMinSRate_")+QString::number(tabNum));
-    leDesPerMinRate    = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leDesPerMinRate_")+QString::number(tabNum));
-    leMaxSTime         = electrodeTabs->currentWidget()->findChild<QLineEdit *>(QString("leMaxSTime_")+QString::number(tabNum));
-
-}
-
 // Turns on/off the compensation on the corresponding electrode
 void ElectrodeCompDlg::ToggleCompensation()
 {    
-    int electrodeNum = electrodeTabs->currentIndex();  // the index of the electrode
-    // Compensation toggler checkbox
-    cbCompOn = electrodeTabs->currentWidget()->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(electrodeNum+1));
-
-    calibrator->SetChannelActivation(electrodeNum, cbCompOn->isChecked());
+    elecNum = electrodeTabs->currentIndex();  // the index of the electrode
+    calibrator->SetChannelActivation(elecNum, cbCompOn[elecNum]->isChecked());
 }
 
 
 // Reads in the parameters of the calibration, etc., from the form
-void ElectrodeCompDlg::ExportParams()
-{
-  GetGuiElements();
+void ElectrodeCompDlg::exportData()
+{    
 
-  // General params
-  params.injLen              = leGenInjLen->text().toDouble() * 1e-3;  // msec -> sec
-  params.samplingRate        = leGenSamplingRate->text().toDouble();   // Hz = 1/sec
-  params.inputChannelNumber  = leGenInChannelNum->text().toInt();
-  params.outputChannelNumber = leGenOutChannelNum->text().toInt();
+    for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
-  // Calibration params
-  params.hyperpolCurr       = leHyperpolCurr->text().toDouble() * 1e-12;// pA -> A
-  params.injCalAmp          = leCalInjAmp->text().toDouble() * 1e-12;   // pA -> A
-  params.fullKernelLen      = leCalFKLen->text().toDouble() * 1e-3;     // msec -> sec
-  params.electrodeKernelLen = leCalEKLen->text().toDouble() * 1e-3;     // msec -> sec
+        // General params
+        elecCalibPs[i].samplingRate        = leGenSamplingRate[i]->text().toDouble() * 1e3; // kHz -> Hz
+        elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->text().toInt();
+        elecCalibPs[i].outputChannelNumber = leGenOutChannelNum[i]->text().toInt();
 
-  // Electrode measurement params
-  params.iMaxElec       = leElecMaxCurrent->text().toDouble() * 1e-12; // pA -> A
-  params.iMinElec       = leElecMinCurrent->text().toDouble() * 1e-12; // pA -> A
-  params.numberOfLevels = leElecLevelNum->text().toInt();
+        // Calibration params
+        elecCalibPs[i].hyperpolCurr       = leHyperpolCurr[i]->text().toDouble() * 1e-9; // nA -> A
+        elecCalibPs[i].injCalAmp          = leCalInjAmp[i]->text().toDouble() * 1e-9;    // nA -> A
+        elecCalibPs[i].injCalLen          = leCalInjLen[i]->text().toDouble() * 1e-3;    // msec -> sec
+        elecCalibPs[i].fullKernelLen      = leCalFKLen[i]->text().toDouble() * 1e-3;     // msec -> sec
+        elecCalibPs[i].electrodeKernelLen = leCalEKLen[i]->text().toDouble() * 1e-3;     // msec -> sec
 
-  // Membrane measurement params
-  params.iMembStep       = leMembIStep->text().toDouble() * 1e-12; // pA -> A
-  params.numberOfRepeats = leMembRepNum->text().toInt();
+        // Electrode measurement params
+        elecCalibPs[i].iMaxElec       = leElecMaxCurrent[i]->text().toDouble() * 1e-9;  // nA -> A
+        elecCalibPs[i].iMinElec       = leElecMinCurrent[i]->text().toDouble() * 1e-9;  // nA -> A
+        elecCalibPs[i].numberOfLevels = leElecLevelNum[i]->text().toInt();
+        elecCalibPs[i].injLenPerLevel = leElecInjLen[i]->text().toDouble() * 1e-3;      // msec -> sec
 
+        // Membrane measurement params
+        elecCalibPs[i].iMembStep       = leMembIStep[i]->text().toDouble() * 1e-9;   // nA -> A
+        elecCalibPs[i].numberOfRepeats = leMembRepNum[i]->text().toInt();
+        elecCalibPs[i].injLenPerRepeat = leMembInjLen[i]->text().toDouble() * 1e-3;  // msec -> sec
+    }
 }
 
 
 // Writes out the parameters to the form
-void ElectrodeCompDlg::ImportParams()
+void ElectrodeCompDlg::importData()
 {
   QString num;
 
-  GetGuiElements();
+  for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
-  // General params
-  num.setNum(params.injLen * 1e3);  // sec -> msec
-  leGenInjLen->setText(num);
+    // General params
+    num.setNum(elecCalibPs[i].samplingRate / 1e3);  // Hz -> kHz
+    leGenSamplingRate[i]->setText(num);
+    num.setNum(elecCalibPs[i].inputChannelNumber);
+    leGenInChannelNum[i]->setText(num);
+    num.setNum(elecCalibPs[i].outputChannelNumber);
+    leGenOutChannelNum[i]->setText(num);
 
-  num.setNum(params.samplingRate);
-  leGenSamplingRate->setText(num);
+    // Calibration params
+    num.setNum(elecCalibPs[i].hyperpolCurr * 1e9);  // A -> nA
+    leHyperpolCurr[i]->setText(num);
+    num.setNum(elecCalibPs[i].injCalAmp * 1e9);  // A -> nA
+    leCalInjAmp[i]->setText(num);
+    num.setNum(elecCalibPs[i].injCalLen * 1e3);  // sec -> msec
+    leCalInjLen[i]->setText(num);
+    num.setNum(elecCalibPs[i].fullKernelLen * 1e3);  // sec -> msec
+    leCalFKLen[i]->setText(num);
+    num.setNum(elecCalibPs[i].electrodeKernelLen * 1e3);  // sec -> msec
+    leCalEKLen[i]->setText(num);
 
-  num.setNum(params.inputChannelNumber);
-  leGenInChannelNum->setText(num);
+    // Electrode measurement params
+    num.setNum(elecCalibPs[i].iMaxElec * 1e9);  // A -> nA
+    leElecMaxCurrent[i]->setText(num);
+    num.setNum(elecCalibPs[i].iMinElec * 1e9);  // A -> nA
+    leElecMinCurrent[i]->setText(num);
+    num.setNum(elecCalibPs[i].numberOfLevels);
+    leElecLevelNum[i]->setText(num);
+    num.setNum(elecCalibPs[i].injLenPerLevel * 1e3);  // sec -> msec
+    leElecInjLen[i]->setText(num);
 
-  num.setNum(params.outputChannelNumber);
-  leGenOutChannelNum->setText(num);
-
-
-  // Calibration params
-  num.setNum(params.hyperpolCurr * 1e12); // A -> pA
-  leHyperpolCurr->setText(num);
-
-  num.setNum(params.injCalAmp * 1e12); // A -> pA
-  leCalInjAmp->setText(num);
-
-  num.setNum(params.fullKernelLen * 1e3);  // sec -> msec
-  leCalFKLen->setText(num);
-
-  num.setNum(params.electrodeKernelLen * 1e3);  // sec -> msec
-  leCalEKLen->setText(num);
-
-
-  // Electrode measurement params
-  num.setNum(params.iMaxElec * 1e12); // A -> pA
-  leElecMaxCurrent->setText(num);
-
-  num.setNum(params.iMinElec * 1e12); // A -> pA
-  leElecMinCurrent->setText(num);
-
-  num.setNum(params.numberOfLevels);
-  leElecLevelNum->setText(num);
-
-  // Membrane measurement params
-  num.setNum(params.iMembStep * 1e12); // A -> pA
-  leMembIStep->setText(num);
-
-  num.setNum(params.numberOfRepeats);
-  leMembRepNum->setText(num);
+    // Membrane measurement params
+    num.setNum(elecCalibPs[i].iMembStep * 1e9); // A -> nA
+    leMembIStep[i]->setText(num);
+    num.setNum(elecCalibPs[i].numberOfRepeats);
+    leMembRepNum[i]->setText(num);
+    num.setNum(elecCalibPs[i].injLenPerRepeat * 1e3);  // sec -> msec
+    leMembInjLen[i]->setText(num);
+  }
 
 }
 
@@ -193,84 +183,102 @@ void ElectrodeCompDlg::MeasureElectrode()
 {
     QString num;
 
-    ExportParams();
+    exportData();
+    elecNum = electrodeTabs->currentIndex();
 
     // Check the task specific parameters provided by the user
-    if ( params.numberOfLevels < 2 )
+    if ( elecCalibPs[elecNum].numberOfLevels < 2 )
     {
          QMessageBox::warning(this, tr("Warning"), tr("Number of current levels must be at least 2"));
          return;
     }
-    if ( params.iMaxElec <= params.iMinElec )
+    if ( elecCalibPs[elecNum].injLenPerLevel <= 0 )
+    {
+         QMessageBox::warning(this, tr("Warning"), tr("Injection length must be positive"));
+         return;
+    }
+    if ( elecCalibPs[elecNum].iMaxElec <= elecCalibPs[elecNum].iMinElec )
     {
          QMessageBox::warning(this, tr("Warning"), tr("Maximal current level must be higher than minimal level"));
          return;
     }
-    if ( params.iMaxElec >= outChnp[params.inputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].iMaxElec > outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested maximal current level exceeds the max limit of the channel"));
+         QString temp;
+         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested maximal current level exceeds the max limit of the channel: ")+temp+QString("A"));
          return;
     }
-    if ( params.iMinElec <= outChnp[params.inputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].iMinElec < outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested minimal current level exceeds the min limit of the channel"));
+         QString temp;
+         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested minimum current level exceeds the min limit of the channel: ")+temp+QString("A"));
          return;
     }
 
     // Init
     if ( InitCalibrator() == false ) return;
 
-    QString prevText = lInfo->text();
-    lInfo->setText("Elec. meas. in progress ...");
-    lInfo->repaint();
+    lInfo[elecNum]->setText("Elec. meas. in progress ...");
 
+    QString prevText = lInfo[elecNum]->text();
+    lInfo[elecNum]->setText("Elec. meas. in progress ...");
+    lInfo[elecNum]->repaint();
+
+
+    // ------------------------------------------- //
     // Measure
-    calibrator->ElectrodeMeasurement(params.numberOfLevels, params.iMinElec, params.iMaxElec);    
+    calibrator->ElectrodeMeasurement(elecCalibPs[elecNum].injLenPerLevel, elecCalibPs[elecNum].samplingRate, elecCalibPs[elecNum].numberOfLevels, elecCalibPs[elecNum].iMinElec, elecCalibPs[elecNum].iMaxElec);
+    // ------------------------------------------- //
 
 
+    if ( calibrator->incorrectMeasurement > 0 )   // Some error handling
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("Incorrect measurements occurred possibly due to OS interruption"));
+    }
     if ( calibrator->elecTau <= 0.0 )   // Some error handling
     {
-        QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant calculated!"));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant measured!"));
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
         return;
     }
     if ( calibrator->elecRes <= 0.0 )   // Some error handling
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode resistance measured!"));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
         return;
     }
 
     // Display the calculated/measured results
-    num.setNum(calibrator->elecRes/1e6);       // Ohm -> MOhm
-    leElecMeasRes->setText(num);
+    num.setNum(calibrator->elecRes/1e6, 'f', 2);       // Ohm -> MOhm
+    leElecMeasRes[elecNum]->setText(num);
 
-    num.setNum(calibrator->elecResStd/1e6);    // Ohm -> MOhm
-    leElecResStd->setText(num);        
+    num.setNum(calibrator->elecResStd/1e6, 'f', 2);    // Ohm -> MOhm
+    leElecResStd[elecNum]->setText(num);
 
-    int length = (int) (calibrator->elecKernelTauERatio*calibrator->elecTau*1e3);   // sec -> msec
-    if ( length == 0 ) length = 1;
+    int length = (int) (calibrator->elecKernelTauERatio*calibrator->elecTau*1e3 + 1);   // sec -> msec
     num.setNum(length);
-    leCalEKLen->setText(num);
+    leCalEKLen[elecNum]->setText(num);
 
-    num.setNum(calibrator->elecTau*1e3);     // sec -> msec
-    leElecMeasTime->setText(num);
+    num.setNum(calibrator->elecTau*1e3, 'f', 2);     // sec -> msec
+    leElecMeasTime[elecNum]->setText(num);
 
-    num.setNum(calibrator->elecTauStd*1e3);  // sec -> msec
-    leElecTimeStd->setText(num);
+    num.setNum(calibrator->elecTauStd*1e3, 'f', 2);  // sec -> msec
+    leElecTimeStd[elecNum]->setText(num);
 
     TimingTest();
 
-    lInfo->setText("Electrode has been measured");
-    lInfo->repaint();
-    this->setEnabled(true);   
+    lInfo[elecNum]->setText("Electrode has been measured");
+    lInfo[elecNum]->repaint();
+    this->setEnabled(true);
 
-    message(QString("Electrode characteristic measurement on input channel ")+QString::number(params.inputChannelNumber)+
-            QString(" and output channel ")+QString::number(params.outputChannelNumber)+QString(" finished."));
+    message(QString("Electrode characteristic measurement on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
+            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
 
 }
 
@@ -279,73 +287,97 @@ void ElectrodeCompDlg::MeasureMembrane()
 {
     QString num;
 
-    ExportParams();
+    exportData();
+    elecNum = electrodeTabs->currentIndex();
 
     // Check the task specific parameters provided by the user
-    if ( params.iMembStep >= outChnp[params.inputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].numberOfRepeats < 1 )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested maximal current step exceeds the max limit of the channel"));
+         QMessageBox::warning(this, tr("Warning"), tr("Number of repeats must be at least 1"));
          return;
     }
-    if ( params.iMembStep <= outChnp[params.inputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].injLenPerRepeat <= 0 )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested minimal current step exceeds the min limit of the channel"));
+         QMessageBox::warning(this, tr("Warning"), tr("Injection length must be positive"));
          return;
+    }
+    if ( elecCalibPs[elecNum].iMembStep > outChnp[elecCalibPs[elecNum].inputChannelNumber].maxCurrent )
+    {
+         QString temp;
+         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested maximal current step exceeds the max limit of the channel: ")+temp+QString("A"));
+         return;
+    }
+    if ( elecCalibPs[elecNum].iMembStep < outChnp[elecCalibPs[elecNum].inputChannelNumber].minCurrent )
+    {
+         QString temp;
+         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested minimum current step exceeds the min limit of the channel: ")+temp+QString("A"));
+         return;
+
     }
 
     // Init
     if ( InitCalibrator() == false ) return;
 
-    QString prevText = lInfo->text();
-    lInfo->setText("Memb. meas. in progress ...");
-    lInfo->repaint();
+    QString prevText = lInfo[elecNum]->text();
+    lInfo[elecNum]->setText("Memb. meas. in progress ...");
+    lInfo[elecNum]->repaint();
 
+
+    // ------------------------------------------- //
     // Measure
-    calibrator->MembraneMeasurement(params.numberOfRepeats, params.iMembStep);
+    calibrator->MembraneMeasurement(elecCalibPs[elecNum].injLenPerRepeat, elecCalibPs[elecNum].samplingRate, elecCalibPs[elecNum].numberOfRepeats, elecCalibPs[elecNum].iMembStep);
+    // ------------------------------------------- //
 
+
+    if ( calibrator->incorrectMeasurement > 0 )   // Some error handling
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("Incorrect measurements occurred possibly due to OS interruption"));
+    }
     if ( calibrator->membRes <= 0.0 )   // Some error handling
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive membrane resistance measured!"));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
         return;
     }
     if ( calibrator->membTau <= 0.0 )   // Some error handling
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive membrane time constant measured!"));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
         return;
     }
 
     // Display the calculated/measured results
-    num.setNum(calibrator->membRes/1e6);       // Ohm -> MOhm
-    leCellMeasRes->setText(num);
+    num.setNum(calibrator->membRes/1e6, 'f', 2);       // Ohm -> MOhm
+    leCellMeasRes[elecNum]->setText(num);
 
     int length = (int) (calibrator->fullKernelTauMRatio*calibrator->membTau*1e3);   // sec -> msec
-    if ( length == 0 ) length = 1;
+    if ( length <= elecCalibPs[elecNum].electrodeKernelLen ) length = elecCalibPs[elecNum].electrodeKernelLen + 5;
     num.setNum(length);
-    leCalFKLen->setText(num);
+    leCalFKLen[elecNum]->setText(num);
 
-    num.setNum(calibrator->membResStd/1e6);    // Ohm -> MOhm
-    leCellResStd->setText(num);
+    num.setNum(calibrator->membResStd/1e6, 'f', 2);    // Ohm -> MOhm
+    leCellResStd[elecNum]->setText(num);
 
-    num.setNum(calibrator->membTau*1e3);       // sec -> msec
-    leCellMeasTime->setText(num);
+    num.setNum(calibrator->membTau*1e3, 'f', 2);       // sec -> msec
+    leCellMeasTime[elecNum]->setText(num);
 
-    num.setNum(calibrator->membTauStd*1e3);    // sec -> msec
-    leCellTimeStd->setText(num);
+    num.setNum(calibrator->membTauStd*1e3, 'f', 2);    // sec -> msec
+    leCellTimeStd[elecNum]->setText(num);
 
     TimingTest();
 
-    lInfo->setText("Membrane has been measured");
-    lInfo->repaint();
+    lInfo[elecNum]->setText("Membrane has been measured");
+    lInfo[elecNum]->repaint();
     this->setEnabled(true);
 
-    message(QString("Membrane characteristic measurement on input channel ")+QString::number(params.inputChannelNumber)+
-            QString(" and output channel ")+QString::number(params.outputChannelNumber)+QString(" finished."));
+    message(QString("Membrane characteristic measurement on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
+            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
 
 }
 
@@ -354,22 +386,41 @@ void ElectrodeCompDlg::CalibrateElectrode()
 {
     QString num;
 
-    ExportParams();
+    exportData();
+    elecNum = electrodeTabs->currentIndex();
 
     // Check the task specific parameters provided by the user
-    if ( params.injCalAmp+params.hyperpolCurr >= outChnp[params.inputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr > outChnp[elecCalibPs[elecNum].inputChannelNumber].maxCurrent )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested calibration current (amplitude + hyperolarizing level) exceeds the max limit of the channel"));
+         QString temp1;
+         QString temp2;
+         temp1.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the max limit of the channel: ")+temp1+QString("A"));
+         return;         
+    }
+    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr < outChnp[elecCalibPs[elecNum].inputChannelNumber].minCurrent )
+    {
+         QString temp1;
+         QString temp2;
+         temp1.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
+         QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the min limit of the channel: ")+temp1+QString("A"));
+         return;
+    }    
+    if ( elecCalibPs[elecNum].fullKernelLen >= elecCalibPs[elecNum].injCalLen )
+    {
+         QMessageBox::warning(this, tr("Warning"), tr("Full kernel must not be longer than the injection"));
          return;
     }
-    if ( params.injCalAmp+params.hyperpolCurr <= outChnp[params.inputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].fullKernelLen <= elecCalibPs[elecNum].electrodeKernelLen )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Requested calibration current (amplitude + hyperolarizing level) exceeds the min limit of the channel"));
+         QMessageBox::warning(this, tr("Warning"), tr("Full kernel must higher than electrode kernel"));
          return;
     }
-    if ( params.fullKernelLen >= params.injLen )
+    if ( elecCalibPs[elecNum].electrodeKernelLen <= 0 )
     {
-         QMessageBox::warning(this, tr("Warning"), tr("Full kernel must be longer than the injection!"));
+         QMessageBox::warning(this, tr("Warning"), tr("Electrode kernel must have a positive length"));
          return;
     }
 
@@ -377,12 +428,16 @@ void ElectrodeCompDlg::CalibrateElectrode()
     // Init
     if ( InitCalibrator() == false ) return;
 
-    QString prevText = lInfo->text();
-    lInfo->setText("Calibration in progress ...");
-    lInfo->repaint();
+    QString prevText = lInfo[elecNum]->text();
+    lInfo[elecNum]->setText("Calibration in progress ...");
+    lInfo[elecNum]->repaint();
 
+
+    // ------------------------------------------- //
     // Calibrate
-    calibrator->Calibration(tabNum-1, (int) (params.fullKernelLen*params.samplingRate), (int) (params.electrodeKernelLen*params.samplingRate), params.injCalAmp, params.hyperpolCurr);
+    calibrator->Calibration(elecCalibPs[elecNum].injCalLen, elecCalibPs[elecNum].samplingRate, elecNum, (int) (elecCalibPs[elecNum].fullKernelLen*elecCalibPs[elecNum].samplingRate), (int) (elecCalibPs[elecNum].electrodeKernelLen*elecCalibPs[elecNum].samplingRate), elecCalibPs[elecNum].injCalAmp, elecCalibPs[elecNum].hyperpolCurr);
+    // ------------------------------------------- //
+
 
     if ( calibrator->calMembTau <= 0.0 )   // Some error handling
     {
@@ -397,46 +452,49 @@ void ElectrodeCompDlg::CalibrateElectrode()
     if ( calibrator->calElecRes <= 0.0 )   // Some error handling
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode resistance calculated!\n AEC channel is inactivated."));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
-        calibrator->DCT->aecChannels[tabNum-1]->Inactivate();
+        calibrator->DCT->aecChannels[elecNum]->Inactivate();
         return;
     }
 
     if ( calibrator->calElecTau <= 0.0 )   // Some error handling
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant calculated!\n AEC channel is inactivated."));
-        lInfo->setText(prevText);
-        lInfo->repaint();
+        lInfo[elecNum]->setText(prevText);
+        lInfo[elecNum]->repaint();
         this->setEnabled(true);
-        calibrator->DCT->aecChannels[tabNum-1]->Inactivate();
+        calibrator->DCT->aecChannels[elecNum]->Inactivate();
         return;
-    }
+    }   
 
-    num.setNum(calibrator->calMembRes/1e6); // Ohm -> MOhm
-    leCellCalibRes->setText(num);
+    num.setNum(calibrator->calMembRes/1e6, 'f', 2); // Ohm -> MOhm
+    leCellCalibRes[elecNum]->setText(num);
 
-    num.setNum(calibrator->calElecRes/1e6); // Ohm -> MOhm
-    leElecCalibRes->setText(num);
+    num.setNum(calibrator->calElecRes/1e6, 'f', 2); // Ohm -> MOhm
+    leElecCalibRes[elecNum]->setText(num);
 
-    num.setNum(calibrator->calMembTau*1e3); // sec -> msec
-    leCellCalibTime->setText(num);
+    num.setNum(calibrator->calMembTau*1e3, 'f', 2); // sec -> msec
+    leCellCalibTime[elecNum]->setText(num);
 
-    num.setNum(calibrator->calElecTau*1e3); // sec -> msec
-    leElecCalibTime->setText(num);
+    num.setNum(calibrator->calElecTau*1e3, 'f', 2); // sec -> msec
+    leElecCalibTime[elecNum]->setText(num);
 
     TimingTest();
 
-    lInfo->setText("Electrode has been calibrated");
-    lInfo->repaint();
-    cbCompOn->setEnabled(true);
-    cbCompOn->setCheckable(true);
-    cbCompOn->setChecked(true);
+    if ( calibrator->stdPerAverRate > 0.05 ) QMessageBox::warning(this, tr("Warning"), tr("High std/mean rate in sampling times.\nToo many program running in the background?\nYou might want to consider recalibration."));
+    if ( calibrator->desPerMinRate > 50 )    QMessageBox::warning(this, tr("Warning"), tr("High desired/min rate in sampling times.\nToo many program running in the background?\nYou might want to consider recalibration."));
+
+    lInfo[elecNum]->setText("Electrode has been calibrated");
+    lInfo[elecNum]->repaint();
+    cbCompOn[elecNum]->setEnabled(true);
+    cbCompOn[elecNum]->setCheckable(true);
+    cbCompOn[elecNum]->setChecked(true);
     this->setEnabled(true);
 
-    message(QString("Calibration on input channel ")+QString::number(params.inputChannelNumber)+
-            QString(" and output channel ")+QString::number(params.outputChannelNumber)+QString(" finished."));
+    message(QString("Calibration on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
+            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
 }
 
 
@@ -445,10 +503,7 @@ void ElectrodeCompDlg::CalibrateElectrode()
 // warns if the DAQ has not yet been initialized or the input or output channel
 // are invalid (not active) and also returns false in these cases
 bool ElectrodeCompDlg::InitCalibrator()
-{
-    long int numOfSamp = (long) (params.injLen*params.samplingRate);
-    double sampPer = 1.0 / params.samplingRate;
-
+{    
     DAQ *board = ((MyMainWindow*) this->parent())->board;
 
     if ( board->initialized == false )
@@ -460,12 +515,12 @@ bool ElectrodeCompDlg::InitCalibrator()
     DCThread *DCT = (((MyMainWindow*) this->parent())->DCT);
 
     // General init    
-    calibrator->GeneralInit(numOfSamp, sampPer, board, DCT);
+    calibrator->GeneralInit(board, DCT);
 
     this->setEnabled(false);
 
     // Channel init
-    switch ( calibrator->ChannelInit(params.inputChannelNumber, params.outputChannelNumber) )
+    switch ( calibrator->ChannelInit( (short int) elecCalibPs[elecNum].inputChannelNumber, (short int) elecCalibPs[elecNum].outputChannelNumber) )
     {
             case 0: break;
             case 1: QMessageBox::warning(this, tr("Warning"), tr("Selected input channel is not an exsisting active channel"));
@@ -488,18 +543,21 @@ void ElectrodeCompDlg::TimingTest()
     calibrator->CalcSamplingStats();
 
     // Display them
-    num.setNum(calibrator->averSampRate);
-    leAverSamplRate->setText(num);
+    num.setNum((int) (calibrator->averSampRate));
+    leAverSamplRate[elecNum]->setText(num);
 
-    num.setNum(calibrator->stdSampRate);
-    leSTDSamplingRate->setText(num);
+    num.setNum((int) (calibrator->stdSampRate));
+    leSTDSamplingRate[elecNum]->setText(num);
 
-    num.setNum(calibrator->minSampRate);
-    leMinSRate->setText(num);
+    num.setNum(calibrator->stdPerAverRate, 'f', 3);
+    leStdPerMeanRate[elecNum]->setText(num);
 
-    num.setNum(calibrator->desPerMinRate);
-    leDesPerMinRate->setText(num);
+    num.setNum((int) (calibrator->minSampRate));
+    leMinSRate[elecNum]->setText(num);
 
-    num.setNum(calibrator->maxSampTime*1e3);  // sec -> msec
-    leMaxSTime->setText(num);
+    num.setNum(calibrator->desPerMinRate, 'f', 2);
+    leDesPerMinRate[elecNum]->setText(num);
+
+    num.setNum(calibrator->maxSampTime*1e3, 'f', 2);  // sec -> msec
+    leMaxSTime[elecNum]->setText(num);
 }

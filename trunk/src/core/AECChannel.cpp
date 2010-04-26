@@ -8,7 +8,6 @@ AECChannel::AECChannel()
     outChnNum = -1;
 
     active = false;
-    saving = false;
 
     kerSampPer = 0.0;
     kernelTime = 0.0;
@@ -22,7 +21,7 @@ AECChannel::AECChannel()
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// For fixed timestep (need to be removed eventually) (don't forget to change DCThread main loop as well!!)
+//// For fixed timestep (need to be removed eventually)
 //void AECChannel::Initialize(short int inChnNum, short int outChnNum, double kerSampPer, QVector<double> ker)
 //{
 //    this->inChnNum = inChnNum;
@@ -71,12 +70,13 @@ AECChannel::AECChannel()
 //    for ( int i=0; i<kernel.size(); i++ )
 //    {
 //        // the same order, as Ibuffer is in reverse order (smaller index is later in time)
+//        //v_e += kernel[i-1]*iBuffer[i]; from i=1 in the for loop
 //        v_e += kernel[i]*iBuffer[i];
 //    }
 //
 //    return v_e;
 //}
-// Fixed timestep codeblock ends
+//// Fixed timestep codeblock ends
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -237,7 +237,7 @@ double AECChannel::CalculateVe(double current, double dt)
         if ( run_ind > 0 ) run_ind--;
         else               run_ind = iBuffer.size()-1;
     }
-    
+
     return v_e;
 }
 

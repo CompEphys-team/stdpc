@@ -31,7 +31,6 @@ private:
      DCThread();
      virtual ~DCThread();
      void init(DAQ *);
-     void InitSaving(QString, QVector<bool>);
      bool LoadScript(QString &);
      void UnloadScript();
      double WaitTillNextSampling(double);
@@ -41,7 +40,8 @@ private:
 
      // Temporary data storing object
      QVector<double> data;
-     int saveElecNum;
+     QVector<int> inChnsToSave;
+     QVector<int> outChnsToSave;
      
      bool stopped;
      bool finished;

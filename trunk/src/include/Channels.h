@@ -9,6 +9,7 @@ class inChannel {
       
  public:
      bool active;
+     bool save;
      double V;
      bool startSpiking;
      bool spiking;
@@ -27,6 +28,7 @@ class outChannel {
      
  public:
      bool active;
+     bool save;
      double I;
      outChannel();
      void init(outChnData *);
