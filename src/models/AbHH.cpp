@@ -75,7 +75,7 @@ void abHH::currentUpdate(double t, double dt)
       for (i= 0; i < p->hExpo-1; i++) powh*= h;
     }
     else powh= 1.0;
-    I= p->gMax*powm*powh*(V-p->Vrev);
+    I= p->gMax*powm*powh*(p->Vrev-V);
     out->I+= I;
   }
 }
