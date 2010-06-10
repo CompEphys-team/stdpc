@@ -6,18 +6,14 @@ DEPENDPATH += . \
     src/drivers \
     src/gui \
     src/models \
-    src/nidaqmx \
     src/include \
     lib
-#INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"         
-#INCLUDEPATH += src/nidaqmx    
 INCLUDEPATH += . \
     src \
     src/core \
     src/drivers \
     src/gui \
     src/models \
-    src/nidaqmx \
     src/include \
     lib
 INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
@@ -45,9 +41,6 @@ FORMS += MainWin.ui \
     OutputChannelDlg.ui \
     SimulDAQDlg.ui \
     DigiDataDlg.ui \
-##uncomment for NIDAQ use
-#         NIDAQDlg.ui \
-    NIDAQDlg.ui \
     ElectrodeCompDlg.ui \
     AbSynDlg.ui \
     DataSavingDlg.ui
@@ -91,9 +84,6 @@ HEADERS += Main.h \
     Datasaver.h \
     DataSavingDlg.h
 
-# # uncomment to compile with NIDAQmx support (needs NIDAQmx)
-# HEADERS += NIDAQDlg.h \
-# NIDAQ.h
 SOURCES += Main.cpp \
     MainWin.cpp \
     ChemSynDlg.cpp \
@@ -133,12 +123,18 @@ SOURCES += Main.cpp \
     Calibrator.cpp \
     Datasaver.cpp \
     DataSavingDlg.cpp
-
-# # uncomment to compile with NIDAQmx support (needs NIDAQmx)
-# SOURCES += NIDAQDlg.cpp \
-# NIDAQ.cpp
-LIBDIR += "C:\Qt\4.4.2\bin"
 LIBS += staticlib/Pt_ioctl_tn.a
 
-## uncomment to compile with NIDAQmx support (needs NIDAQmx)           
-# LIBS += staticlib/libnidaqmx.a
+# uncomment to compile with NIDAQmx support (needs NIDAQmx)
+DEPENDPATH += src/nidaqmx
+SOURCES += NIDAQDlg.cpp \
+NIDAQ.cpp
+FORMS += NIDAQDlg.ui
+
+HEADERS += NIDAQDlg.h \
+NIDAQ.h
+
+INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+INCLUDEPATH += src/nidaqmx
+
+LIBS += staticlib/libnidaqmx.a

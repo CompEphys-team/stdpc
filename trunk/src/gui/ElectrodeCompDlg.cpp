@@ -9,8 +9,8 @@
 
 
 ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
-    QDialog(parent)   
-{   
+    QDialog(parent)
+{
     setupUi(this);
 
     calibrator = new Calibrator();
@@ -92,7 +92,7 @@ ElectrodeCompDlg::~ElectrodeCompDlg()
 
 // Turns on/off the compensation on the corresponding electrode
 void ElectrodeCompDlg::ToggleCompensation()
-{    
+{
     elecNum = electrodeTabs->currentIndex();  // the index of the electrode
     calibrator->SetChannelActivation(elecNum, cbCompOn[elecNum]->isChecked());
 }
@@ -100,7 +100,7 @@ void ElectrodeCompDlg::ToggleCompensation()
 
 // Reads in the parameters of the calibration, etc., from the form
 void ElectrodeCompDlg::exportData()
-{    
+{
 
     for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
@@ -220,8 +220,6 @@ void ElectrodeCompDlg::MeasureElectrode()
     // Init
     if ( InitCalibrator() == false ) return;
 
-    lInfo[elecNum]->setText("Elec. meas. in progress ...");
-
     QString prevText = lInfo[elecNum]->text();
     lInfo[elecNum]->setText("Elec. meas. in progress ...");
     lInfo[elecNum]->repaint();
@@ -235,11 +233,11 @@ void ElectrodeCompDlg::MeasureElectrode()
 
     if ( calibrator->incorrectMeasurement > 0 )   // Some error handling
     {
-        QMessageBox::warning(this, tr("Warning"), tr("Incorrect measurements occurred possibly due to OS interruption"));
+        QMessageBox::warning(this, tr("Warning"), tr("Incorrect measurements occurred! (OS interruption or low sampling frequency?)"));
     }
     if ( calibrator->elecTau <= 0.0 )   // Some error handling
     {
-        QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant measured!"));
+        QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant measured. Try increasing the sampling frequency!"));
         lInfo[elecNum]->setText(prevText);
         lInfo[elecNum]->repaint();
         this->setEnabled(true);
@@ -261,8 +259,12 @@ void ElectrodeCompDlg::MeasureElectrode()
     num.setNum(calibrator->elecResStd/1e6, 'f', 2);    // Ohm -> MOhm
     leElecResStd[elecNum]->setText(num);
 
-    int length = (int) (calibrator->elecKernelTauERatio*calibrator->elecTau*1e3 + 1);   // sec -> msec
-    num.setNum(length);
+    double length = calibrator->elecKernelTauERatio*calibrator->elecTau*1e3;   // sec -> msec
+    if( length < 1.0 ) length = 1.0;        // minimal limit
+    else if( length > 5.0 ) length = 5.0;   // maximal limit
+    if( elecCalibPs[elecNum].fullKernelLen * 1e3 < length ) length = elecCalibPs[elecNum].fullKernelLen * 1e3 / calibrator->maxElecKFullKRation; // hopefully not the case :)
+
+    num.setNum(length, 'f', 1);
     leCalEKLen[elecNum]->setText(num);
 
     num.setNum(calibrator->elecTau*1e3, 'f', 2);     // sec -> msec
@@ -356,9 +358,12 @@ void ElectrodeCompDlg::MeasureMembrane()
     num.setNum(calibrator->membRes/1e6, 'f', 2);       // Ohm -> MOhm
     leCellMeasRes[elecNum]->setText(num);
 
-    int length = (int) (calibrator->fullKernelTauMRatio*calibrator->membTau*1e3);   // sec -> msec
-    if ( length <= elecCalibPs[elecNum].electrodeKernelLen ) length = elecCalibPs[elecNum].electrodeKernelLen + 5;
-    num.setNum(length);
+    double length = calibrator->fullKernelTauMRatio*calibrator->membTau*1e3;   // sec -> msec
+    if( length < 10.0 ) length = 10.0;        // minimal limit
+    else if( length > 50.0 ) length = 50.0;   // maximal limit
+    if( elecCalibPs[elecNum].electrodeKernelLen * 1e3 > length ) length = elecCalibPs[elecNum].electrodeKernelLen * 1e3 * calibrator->maxElecKFullKRation; // hopefully not the case :)
+
+    num.setNum(length, 'f', 0);
     leCalFKLen[elecNum]->setText(num);
 
     num.setNum(calibrator->membResStd/1e6, 'f', 2);    // Ohm -> MOhm
@@ -397,7 +402,7 @@ void ElectrodeCompDlg::CalibrateElectrode()
          temp1.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
          temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
          QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the max limit of the channel: ")+temp1+QString("A"));
-         return;         
+         return;
     }
     if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr < outChnp[elecCalibPs[elecNum].inputChannelNumber].minCurrent )
     {
@@ -407,7 +412,7 @@ void ElectrodeCompDlg::CalibrateElectrode()
          temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
          QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the min limit of the channel: ")+temp1+QString("A"));
          return;
-    }    
+    }
     if ( elecCalibPs[elecNum].fullKernelLen >= elecCalibPs[elecNum].injCalLen )
     {
          QMessageBox::warning(this, tr("Warning"), tr("Full kernel must not be longer than the injection"));
@@ -453,8 +458,9 @@ void ElectrodeCompDlg::CalibrateElectrode()
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode resistance calculated!\n AEC channel is inactivated."));
         lInfo[elecNum]->setText(prevText);
+        cbCompOn[elecNum]->setEnabled(false);
         lInfo[elecNum]->repaint();
-        this->setEnabled(true);
+        this->setEnabled(true);        
         calibrator->DCT->aecChannels[elecNum]->Inactivate();
         return;
     }
@@ -463,11 +469,12 @@ void ElectrodeCompDlg::CalibrateElectrode()
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode time constant calculated!\n AEC channel is inactivated."));
         lInfo[elecNum]->setText(prevText);
+        cbCompOn[elecNum]->setEnabled(false);
         lInfo[elecNum]->repaint();
-        this->setEnabled(true);
+        this->setEnabled(true);        
         calibrator->DCT->aecChannels[elecNum]->Inactivate();
         return;
-    }   
+    }
 
     num.setNum(calibrator->calMembRes/1e6, 'f', 2); // Ohm -> MOhm
     leCellCalibRes[elecNum]->setText(num);
@@ -503,7 +510,7 @@ void ElectrodeCompDlg::CalibrateElectrode()
 // warns if the DAQ has not yet been initialized or the input or output channel
 // are invalid (not active) and also returns false in these cases
 bool ElectrodeCompDlg::InitCalibrator()
-{    
+{
     DAQ *board = ((MyMainWindow*) this->parent())->board;
 
     if ( board->initialized == false )
@@ -514,7 +521,7 @@ bool ElectrodeCompDlg::InitCalibrator()
 
     DCThread *DCT = (((MyMainWindow*) this->parent())->DCT);
 
-    // General init    
+    // General init
     calibrator->GeneralInit(board, DCT);
 
     this->setEnabled(false);

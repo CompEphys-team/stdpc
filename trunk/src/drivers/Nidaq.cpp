@@ -28,64 +28,72 @@ NIDAQ::NIDAQ()
 //                QString(data),
 //                QMessageBox::Ok);
     
-  istr=new istringstream(data);
-  int k= 0;
-  while (istr->good()) {
-    iChnNm[k]= new char[80];
-    istr->getline(iChnNm[k++], 80, ',');
-    istr->get(cbuf);
-  }
-  delete istr;
-  inChnNo= k;
-  inIdx= new short int[inChnNo];
-  inGainFac= new double[inChnNo];
+  if (DevicePresent) {
+    istr=new istringstream(data);
+    int k= 0;
+    while (istr->good()) {
+      iChnNm[k]= new char[80];
+      istr->getline(iChnNm[k++], 80, ',');
+      istr->get(cbuf);
+    }
+    delete istr;
+    inChnNo= k;
+    inIdx= new short int[inChnNo];
+    inGainFac= new double[inChnNo];
   
 //  inGainFac= new double[inChnNo];
-  for (int i= 0; i < 128; i++) fdata[i]= 0.0; 
-  DAQmxGetDevAIVoltageRngs(devName, fdata, 128);
-  k= 0;
-  while ((abs(fdata[k]) > 1e-10) || (abs(fdata[k+1]) > 1e-10)) k+=2;
-  inGainNo= k/2;
-  inGainText= new char*[inGainNo];
-  inLow= QVector<double>(inGainNo);
-  inHigh= QVector<double>(inGainNo);
-  for (int i= 0; i < inGainNo; i++) {
-    ostr.clear();
-    ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
-    inGainText[i]= new char[80];
-    ostr.getline(inGainText[i], 80);
-    inLow[i]= fdata[2*i];
-    inHigh[i]= fdata[2*i+1];
-  }
+    for (int i= 0; i < 128; i++) fdata[i]= 0.0;
+    DAQmxGetDevAIVoltageRngs(devName, fdata, 128);
+    k= 0;
+    while ((abs(fdata[k]) > 1e-10) || (abs(fdata[k+1]) > 1e-10)) k+=2;
+    inGainNo= k/2;
+    inGainText= new char*[inGainNo];
+    inLow= QVector<double>(inGainNo);
+    inHigh= QVector<double>(inGainNo);
+    for (int i= 0; i < inGainNo; i++) {
+      ostr.clear();
+      ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
+      inGainText[i]= new char[80];
+      ostr.getline(inGainText[i], 80);
+      inLow[i]= fdata[2*i];
+      inHigh[i]= fdata[2*i+1];
+    }
   
-  DAQmxGetDevAOPhysicalChans (devName, data, 1024);
-  istr=new istringstream(data);
-  k= 0;
-  while (istr->good()) {
-    oChnNm[k]= new char[80];
-    istr->getline(oChnNm[k++], 80, ',');
-    istr->get(cbuf);
-  }
-  delete istr;
-  outChnNo= k;
-  outIdx= new short int[outChnNo];
-  outGainFac= new double[outChnNo];
+    DAQmxGetDevAOPhysicalChans (devName, data, 1024);
+    istr=new istringstream(data);
+    k= 0;
+    while (istr->good()) {
+      oChnNm[k]= new char[80];
+      istr->getline(oChnNm[k++], 80, ',');
+      istr->get(cbuf);
+    }
+    delete istr;
+    outChnNo= k;
+    outIdx= new short int[outChnNo];
+    outGainFac= new double[outChnNo];
 
-  for (int i= 0; i < 128; i++) fdata[i]= 0.0; 
-  DAQmxGetDevAOVoltageRngs(devName, fdata, 128);
-  k= 0;
-  while ((fdata[k] != 0.0) || (fdata[k+1] != 0.0)) k+=2;
-  outGainNo= k/2;
-  outGainText= new char*[outGainNo];
-  outLow= QVector<double>(outGainNo);
-  outHigh= QVector<double>(outGainNo);
-  for (int i= 0; i < outGainNo; i++) {
-    ostr.clear();
-    ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
-    outGainText[i]= new char[80];
-    ostr.getline(outGainText[i], 80);
-    outLow[i]= fdata[2*i];
-    outHigh[i]= fdata[2*i+1];
+    for (int i= 0; i < 128; i++) fdata[i]= 0.0;
+    DAQmxGetDevAOVoltageRngs(devName, fdata, 128);
+    k= 0;
+    while ((fdata[k] != 0.0) || (fdata[k+1] != 0.0)) k+=2;
+    outGainNo= k/2;
+    outGainText= new char*[outGainNo];
+    outLow= QVector<double>(outGainNo);
+    outHigh= QVector<double>(outGainNo);
+    for (int i= 0; i < outGainNo; i++) {
+      ostr.clear();
+      ostr << fdata[2*i] << " to " << fdata[2*i+1] << " V" << ends;
+      outGainText[i]= new char[80];
+      ostr.getline(outGainText[i], 80);
+      outLow[i]= fdata[2*i];
+      outHigh[i]= fdata[2*i+1];
+    }
+  }
+  else {
+    inChnNo= 0;
+    inGainNo= 0;
+    outChnNo= 0;
+    outGainNo= 0;
   }
 
   inTaskActive= 0;
