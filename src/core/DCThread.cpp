@@ -282,13 +282,14 @@ void DCThread::run()
         t += dt;
 
 //        //Fixed time step
-//        double tstep = 0.0001;
+//        double tstep = 0.000178;
 //        dt=0.0;
 //        do
 //        {
 //            dt += board->get_RTC();
 //        } while (dt < tstep);
 //        t += dt;
+
 
          // AEC channel update part
          for ( int k=0; k<aecChannels.size(); k++ )
@@ -308,7 +309,7 @@ void DCThread::run()
             if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
             for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
 
-data[data.size()-1] = aecChannels[0]->v_e;
+for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) {data[data.size()-1] = aecChannels[i]->v_e; break; }
 
             dataSaver->SaveLine(data);
             lastSave = t;

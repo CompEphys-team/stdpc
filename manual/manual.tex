@@ -36,14 +36,13 @@
 \addtolength{\leftmargin}{\labelsep}
 }}{\end{list}}
 
-\renewcommand{\rmdefault}{phv}
 
 \begin{document}
 
 \begin{titlepage}
   \begin{center}
   {{\bf \Large 
-    StdpC 2010 }\\[0.3cm]
+    StdpC 2007 }\\[0.3cm]
     \large (Spike timing dependent plasticity Clamp)}, \\[1cm]
   {\large 
     in parts based on {\bf DYNCLAMP2} \cite{Pinto2001} 
@@ -53,8 +52,7 @@
 \vspace*{5cm}
 
 \noindent
-{\large Thomas Nowotny} \\
-{\large David Samu} \\[0.5cm]
+{\large Thomas Nowotny} \\[0.5cm]
 Centre for Computational Neuroscience and Robotics, \\
 Department of Informatics, \\
 University of Sussex, \\
@@ -75,23 +73,24 @@ La Jolla, CA 92093-0402, USA \\
 
 \end{titlepage}
 
-StdpC 2010 is software building on the ideas that led to the
-development of the earlier DYNCLAMP2 software. The new software is
-based on QT and has in addition to the original native support for the
-old DigiData 1200/1200A interface now also {\bf support for all National
-Instruments devices that support NI's NIDAQmx API}.
+StdpC 2007 is software building on the ideas that led
+to the development of the earlier DYNCLAMP2
+software. The new software is based on QT and has in addition to the
+original native support for the old DigiData 1200/A interface now also
+support for all National Instruments devices that support NI's NIDAQmx
+API.
  
-This is the second beta version of the software. Some functionality has
-not been tested thoroughly. Any feedback on problems with the
-software or potential bugs is greatly appreciated. An older version
+This is the first beta version of the software. Some functionality has
+not been tested thouroughly. Any feedback on problems with the
+software or potential bugs is greatly appreciated.  An older version
 of the software (StdpC) is described in Journal of Neuroscience
-Methods \cite{Nowotny2006}. If you use StdpC 2010 and publish results
+Methods \cite{Nowotny2006}. If you use StdpC 2007 and publish results
 based on its use, please cite the website and this paper. Please
 contact us for any further questions (t.nowotny@sussex.ac.uk).
 
-Copyright 2010 T.~Nowotny
+Copyright 2008 T.~Nowotny
 
-StdpC 2010 is free software; you can redistribute it and/or modify  
+StdpC 2007 is free software; you can redistribute it and/or modify  
 it under the terms of the GNU General Public License as published by 
 the Free Software Foundation; either version 2 of the License, or 
 (at your option) any later version.                               
@@ -113,7 +112,7 @@ The Dynamic Clamp protocol, developed by \cite{Sharp1993} and
 independently by \cite{Robinson1993} allows inserting simulated
 membrane conductances into cells, and/or adding synapses between cells
 as well as a variety of other manipulations. Here, we describe StdpC
-2010, a software for controlling biological neurons and an internal
+2007, a software for controlling biological neurons and an internal
 spike generator in (soft) real time.
 
 The software allows to define up to $6$ artificial synapses, $6$
@@ -121,47 +120,31 @@ Hodgkin-Huxley conductances \cite{Hodgkin1949} and one presynaptic
 artificial neuron (spike generator). The parameters of these simulated
 entities can be controlled on the graphical user interface (GUI) or
 through script files.  
-
-Th emost prominent new feature besides NI support in StdpC 2010 is a
-{\bf built in electrode compensation method} (Active
-Electrode Compensation) \cite{Brette2008}. After
-going through a short and automatic calibration procedure, it allows
-to use a single electrode both
-for stimulation and recording with higher signal fidelity than conventional
-compensation techniques, like bridge balancing or discontinuous
-injection/recording. This allows the use of StdpC 2010 with mammalian
-cells that do not allow insertion of multiple electrodes into the same cell.
-
-During the experiment, the acquired data can be saved continuously into a
-data file either in ASCII or binary format for off-line post-processing and
-results analysis.
  
-The software supports the DIGIDATA 1200/1200A data acquisition card of
-Axon Instruments, Inc (now part of MDS Analytical Technologies), {\bf
-  all NIDAQmx capable devices of National Instruments}, and a pure
-simulation mode for testing. The program was written in C++ (using the
-Bloodshed Dev-C++ environment which is based on the popular gcc
-compiler (mingw)). The graphical user interface is based on Nokia's
-(formerly Trolltech's) QT libraries. The program has been tested on
-Windows XP but should also be compatible with earlier versions of
-Windows (Windows NT, Windows 2000). The actual performance of the
-dynamic clamp cycle depends on the speed of the PC hardware used. The
-DIGIDATA driver is based on a modified/extended version of PortTalk by
-Craig Peacock and is unlikely to work in Windows Vista or later
-Windows versions. The NIDAQmx based driver will likely work with
-Windows Vista and later Windows versions but has not been tested in
-this environment.
+The software supports the DIGIDATA 1200A data acquisition card of Axon
+Instruments, Inc (now part of MDS Analytical Technologies), all
+NIDAQmx capable devices of National Instruments, and a pure simulation
+mode for testing. The program was written in C++ (using the Bloodshed
+Dev-C++ environment which is based on the popular gcc compiler
+(mingw)). The graphical user interface is based on Trolltech's QT
+libraries. The program has been tested on Windows XP but should also
+be compatible with earlier versions of Windows (Windows NT, Windows
+2000). The actual performance of the dynamic clamp cycle depends
+on the speed of the PC hardware used. The DIGIDATA driver is
+based on a modified/extended version of PortTalk by Craig Peacock and
+is unlikely to work in Windows Vista. The NIDAQmx based driver may
+work with Windows Vista but has not been tested in this environment.
 
 \section{Hardware and software requirements} 
  
 A standard PC (Pentium IV and up recommended), Windows XP (potentially
 Windows NT, 2000 ok). A DIGIDATA 1200A ADC/DAC board from Axon
-Instruments, or a National Instruments DAQ and installed NI driver libraries.
+Instruments, or a National Instruments DAQ and installed NIDAQmx
+driver.
 
 The program was tested on a PC with Windows XP professional and a
 DigiData 1200A board as well as with a NI PCI-MIO-16-4 DAQ using NIDAQmx for
-Windows, version 8.7.2. It has also been tested with a more recent NI
-PCI-6229 board.
+Windows, version 8.7.2.
 
 \section{Asynchronous Dynamic Clamp Cycle}
  
@@ -170,7 +153,7 @@ potential of the cells, calculating the current to be injected into
 the cells according to the synapses and conductances that are to be
 simulated, and generating the voltage commands that will generate the
 currents. StdpC aims at repeating this cycle at the maximal rate
-supported by the hardware in order to simulate a continuous biological
+supported by the hardware in order to simulate continuous biological
 processes. Since Windows is not a real time operating system, the
 actual time from one cycle to the next can not be controlled in a
 strict way. Instead of aiming at such a control StdpC is based on an
@@ -181,11 +164,12 @@ devices) which allows to calculate the duration of the previous
 Dynamic Clamp cycle. The measured time intervals between voltage
 updates are used in the computation of the currents. This limits the
 impact of unequal delays during repeated cycles unless these delays
-become prohibitively large compared to the biological time scales in the system
+become large compared to the biological time scales in the system
 studied. As a side effect of the asynchronous Dynamic Clamp cycle,
-StdpC update cycles will always run at the maximum rate supported by
+StdpC update cycles will always run at the maximume rate supported by
 the hardware. With the typical successive upgrade of computer hardware
 the quality of the Dynamic Clamp interaction will improve over time.
+
 
 \section{How to install the software}
 
@@ -195,13 +179,13 @@ C:$\backslash$ Program Files$\backslash$ StdpC. Then execute ``StdpC.exe''.
 
 \subsection{Source package}
 Download the source package and unzip it to a convenient
-location. The sources can be compiled using QT's QTcreator
-environment and opening ``StdpC.pro''. To disable or enable NI
-support, comment or uncomment the relevant sections in ``StdpC.pro''
-and ``Main.h''. {\bf Note: If StdpC 2010 is compiled with NI support
-  enabled it will not run if NI driver libraries are not installed!}
+location. Open a shell and execute ``myqmake.bat''. Then open the
+dev-c++ project ``StdC.dev'' and compile. Make sure that the Makefile
+generated by qmake is used. Note that you will need Dev-C++/mingw and
+QT 4 installed on your computer. If you are compiling for the NIDAQmx
+interface you need to have NIDAQmx installed and to enable the option ``NIDAQmx'' in the ``.config'' file.
 
-\section{Troubleshooting}
+\section{Troublshooting}
 \subsection{I/O conflicts}
  
 In the past, there have been problems with I/O conflicts between the
@@ -209,10 +193,10 @@ DigiData board and other hardware devices. If you are experiencing
 problems, you may need to change the base address of the DigiData
 board. Hardware conflicts can occur even if the DIGIDATA board works
 fine with Axon programs like Axoscope because, unlike these, StdpC
-2010 does read the Real Time Counter (RTC) in the Digidata
+2007 does read the Real Time Counter (RTC) in the Digidata
 board. Usually, the DigiData board is configured to use the I/O base
 address 0x320, and in this case the RTC reading ports are in the range
-of 0x330 - 0x332. Some computers use the address 0x330 for devices like
+of 0x330 - 0x332. Many computers use the address 0x330 for some devices like
 sound cards, etc.
 
 To check for and resolve a hardware address conflict,
@@ -243,10 +227,10 @@ and avoid other problems due to the I/O conflict.
 {\em Changing the base address of the Digidata Board and in the StdpC
   program: } \\ Identify a free range of port addresses.  If 0x330 is
 in use, addresses around 340-370 are usually available which is
-sufficient for the Digidata ports. Reconfigure the Digidata
+suifficient for the Digidata ports. Reconfigure the Digidata
 board for the base address 340 or 350 manually (the RTC will be 350 or
 360 and no conflicts!) and run the StdpC program. The Digidata base
-address can be changed within StdpC on the Settings $\rightarrow$ DAQ dialog.
+address can be changed within StdpC on the Settings->DAQ dialog.
 
 \section{Changes from previous versions/programs}
 \subsection{Changes DYNCLAMP2 to StdpC version 3}
@@ -260,26 +244,26 @@ The following is a list of features which were new in StdpC v3:
   \item {\em Hidden parameter panels} \\
     To de-clutter the screen of the dynamic clamp computer, in StdpC the
     parameter dialogs for chemical synapses and Hodgkin-Huxley conductances
-    have been moved to separate pop-up windows.
+    have been moved to seperate popup windows.
   \item {\em Data displays for debugging} \\
     To allow for easy debugging of wiring and gain problems the software now
     has two data displays that can show input and/ or output channels or
-    functions thereof (averages, spikes detected).
+    functions thereof (averages, spikes detetected).
   \item {\em Save and load parameter settings} \\
     You can now save and load the current parameter settings of the
     clamp. This way one does not have to redo parameter settings every time
     the StdpC program is restarted. The settings are stored in a simple ASCII
     format that allows editing by hand or snooping around for curiosity. 
   \item {\em Spike timing dependent plasticity} \\
-    The two chemical synapses can now be made plastic obeying a Spike Timing
+    The two chemical synapses can now be made plastic abeying a Spike Timing
     Dependent Plasticity protocol. There are two different protocols to
-    choose from and a variety of parameters determining the details of the
+    choose from and a variety of paramters determining the details of the
     learning mechanism
   \item {\em Experimental automatization and scripting} \\
-    The StdpC supports a simple form of experimental protocol automation
+    The StdpC supports a simple form of experimental protocol automization
     (scripting). The user can specify a script file that contains events at
     given times. These events include switching on and off of synaptic
-    connections or Hodgkin-Huxley type conductances as well as arbitrary
+    connections or Hodgkin=Huxley type conductances as well as arbitrary
     parameter changes. The script is loaded on starting the clamping process
     and executes the commands at the given times after clamping started.
 \end{myitem}
@@ -296,7 +280,7 @@ The following is a list of features which were new in StdpC v3:
   flexibility in the experimental design
 \item Each chemical synapse can now been chosen individually to be plastic or not.
 \item The initial value for a plastic synapse is given by its individual G\_s
-  setting, not by a global initialisation value in the plasticity block. The
+  setting, not by a global initialization value in the plasticity block. The
   displays for the synaptic strength have been removed because they turned
   out to be disruptive for the clamping performance.
 \item Some smaller adjustments aiming at better user interaction and
@@ -311,7 +295,7 @@ The following is a list of features which were new in StdpC v3:
 \item The driver for the DigiData 1200 board was re-created using (an
   extended version of) the free PortTalk package.
 \item StdpC 2007 supports all NIDAQmx capable National Instruments boards
-\item The source code has been re-organised to allow for rapid
+\item The source code has been re-organized to allow for rapid
   inclusion of additional hardware support.
 \item StdpC 2007 allows to use all input and output channels available
   on the acquisition hardware.
@@ -328,43 +312,14 @@ The following is a list of features which were new in StdpC v3:
   synapses and HH conductances.
 \end{myitem}
 
-\subsection{Changes from StdpC 2007 to StdpC 2010}
-\begin{myitem}
-\item Active Electrode Compensation feature included as an optional,
-  automatic, digital electrode compensation technique calculated within the
-  software.                  
-\item A new feature allows for the measurement of the resistance and
-  capacitance properties of both the electrode and cell membrane,
-  conveniently controlled from the software.  
-\item Full experimental data saving support has been included. Any
-  combination of the active input and output channels, along with the spike generator, can
-  be saved, with a frequency (quasi) independent of the main dynamic clamp
-  loop frequency. Data can be saved either in ASCII, or in binary format.
-\item A constant bias current can now be defined for any active output
-  channel for special experiment configuration needs. 
-\item {\bf National instruments cards are now fully supported for use with StdpC.}
-\end{myitem}
-
 \section{How to use StdpC}
 
 \subsection{"Connecting" the program to the cells}
  
-To avoid the generation of wrong current commands due to artifacts
-introduced into the membrane measurement by the current injection,
-one must either (1) insert two electrodes into each cell (one for
-injection, the other one for recording), or
-(2) use of a careful compensation of a single electrode in order to recover the
-actual membrane potential from the raw artefactual voltage. For the
-latter solution StdpC 2010 has a built-in artifact compensation method, AEC
-(Active Electrode Compensation \cite{Brette2008}), that allows for a
-convenient, software-based electrode compensation. One can think of
-special experiment configurations, like simultaneously recoding in multiple
-machines, in which AEC might not be found appropriate for compensation. In
-these cases external analogue methods offered by the microelectrode amplifier could
-be applied instead of (and NOT in conjunction with) AEC. However, we
-generally encourage the use of AEC, as it is an automatic method
-that provides high quality signals at arbitrary high time resolution.
-See section \ref{eleccomp} for more detail about electrode compensation.
+We encourage the insertion of two electrodes into each cell (or a
+careful impedance compensation of a single electrode) to avoid the
+generation of a wrong current commands due to artifacts introduced
+into the membrane potential measurement by the current injection.
 
 The membrane potential output of the microelectrode amplifiers should
 be connected to the analog inputs channels chosen to be scanned in the
@@ -377,16 +332,14 @@ channel SG.
 
 The currents are calculated individually for each conductance and
 synapse and then are summed for each cell to generate the
-corresponding current command (expressed as a voltage on the DAQ) for
-the microelectrode amplifiers. It is 
+corresponding voltage command for the microelectrode amplifiers. It is
 recommended to turn on the dynamic clamp cycle and to monitor the
 current command voltage in an oscilloscope before turning on the
 injection of the current in the microelectrode amplifier, to see if it
 looks like what is expected. If it is orders of magnitude wrong, check
 the conversion factors in the ``input channels'' and ``output
-channels'' dialogs. Alternatively, the channel setup settings can be checked and
-corrected safely on a model cell, which are usually shipped with the
-microelectrode amplifiers.
+channels'' dialogs.
+
  
 \subsection{Control Panel of the Program}
 
@@ -436,25 +389,25 @@ entered in the ``DAQ'' dialog.
 Make sure that NIDAQmx is installed and the board is working properly
 (using the NI Automation explorer). Make sure your device is in the
 list of devices that support NIDAQmx (as opposed to the older devices
-supporting ``old style'' NIDAQ / NIDAQ legacy only).
+supporting ``old style'' NIDAQ / NIDAQ legacy only.
 \item I you are running with simulated data acquisition: \\
 Make sure that you have a correctly formatted input file for the
-membrane potential of cells and that the file name in the ``DAQ''
+membrane potential of cells and that the filename in the ``DAQ''
 dialog points to the right location of this file. Also make sure that the
-location the output file name points to is writable to you.
+location the output filename points to is writable to you.
 \end{myenum}
 
 The remaining controls are the ``start'' and the ``stop'' button.  The
 ``start'' button initiates the start of dynamic clamp cycles. In
 particular, pressing this button will stop a running dynamic clamp
 thread, load the settings from (almost) all dialogs into memory, and
-start the dynamic clamp thread again with the new settings. The
+start a the dynamic clamp thread again with the new settings. The
 dynamic clamp thread will then run until stopped by pressing the
-``stop'' button or restarted by another activation of the ``start'' button.
+``stop'' button.
 
 The data acquisition hardware can be chosen in the combo box on the
 top. Note that the software that has been compiled with support for
-the NIDAQmx libraries will not run if these are not installed {\bf
+the NIDAQmx libraries will not run if these are not installed {\em
   even if a different device is chosen}. The specific hardware
 settings can be adjusted in the ``DAQ'' dialog int the ``Config''
 menu of the main menu bar.
@@ -471,15 +424,15 @@ menu bar.
 \
 \begin{itemize}
 \item[-] ``Load Protocol'': Load parameter settings from a previous
-  session. The standard file name extension for these is ``cpr'',
-  albeit the settings are saved in plain ASCII format.
+  session. The standard filename extension for these is ``cpr'',
+  albeit the settings are saved in it in plain ASCII format.
 \item[-] ``Save Protocol'': Save the current parameter settings into a
   file for later use or documentation.
  \item[-] ``Load Script'': Load a script for experiment
    automation. Scripting is described in section \ref{scriptsect}.
 \item[-] ``Unload Script'': Remove a script from memory and use StdpC
   interactively.
-\item[-] ``Export Log'': Export the contents of the message box to a
+\item[-] ``Export Log'': Export the contents od the message box to a
   file.
 \item[-] ``Clear Log'': Remove the message box contents.
 \item[-] ``Exit'': Quit StdpC.
@@ -488,15 +441,11 @@ menu bar.
 \begin{itemize}
 \item[-] ``DAQ'': Controls for the properties of the data acquisition
   hardware. This will show a dialog window that is specific to the
-  chosen hardware.
+  chosen hardware. For an example for a simulated DAQ, see below.
 \item[-] ``Input Channels'': Brings up a dialog to change settings for
   the analog input channels, see below for more details.
 \item[-] ``Output channels'': Brings up a corresponding dialog for the
   output channels, see below.
-\item[-] ``Electrode compensation''Shows Electrode Compensation dialog
- for electrode calibration, see below.
-\item[-] ``Data saving'' Shows Data Saving dialog to configure data saving
-  settings, see below.
 \end{itemize}
 \item ``Help'': Offers a one-line description about StdpC. 
 \end{myitem}
@@ -543,7 +492,7 @@ menu bar.
 Each subunit in the synapses block can be configured to be a
 chemical or an electrical synapse (gap junction). Clicking the
 ``Parameters'' button will open a control panel that allows to change
-properties of the synapse. \\
+propertis of the synapse. \\
 
 \noindent
 \parbox{0.4\textwidth}{
@@ -570,17 +519,17 @@ rectifying, $I_x (t)= 0$ if $V_{\text{pre}}(t) < V_{\text{post}}(t)$.
 \item Presynaptic input channel: Combo to choose the input channel
   that contains the membrane potential of the presynaptic cell (SP= spike
   generator) 
-\item Postsynaptic input channel: Combo to choose the input channel
-  that contains the membrane potential of the postsynaptic cell 
+\item Postynaptic input channel: Combo to choose the input channel
+  that contains the membrane potential of the postynaptic cell 
 \item Presynaptic output channel: Combo to choose the output channel
   that will contain the current command for the presynaptic cell. 
-\item Postsynaptic output channel: Combo to choose the output channel
-  for the current command intended for the postsynaptic cell.
+\item Postynaptic output channel: Combo to choose the output channel
+  fot the current command intended for the postsynaptic cell.
 \item Type combo: Choose whether the gap junction is ordinary (the
   current can flow from the pre-synaptic cell to the postsynaptic cell
   an vice versa; both cells have perfectly symmetrical roles in this
   case) or rectifying (positive current can only from the presynaptic
-  cell to the postsynaptic cell but not in the other direction). 
+  cell to the possynaptic cell but not in the other direction). 
 \item gSyn: Conductance of the gap junction in nS.  
 \end{myitem}
 
@@ -619,13 +568,13 @@ h_\infty(V_{\text{pre}})&=
 \frac{A_\tau}{1+\exp\left(\frac{V_{\text{pre}} -
     V_{\text{Thresh},\tau}}{V_{\text{Slope},\tau}} \right)}
 \end{align}                                              
-  The controls in the parameter dialog for the chemical synapse are
+  The controls in the paramter dialog for the chemical synapse are
   \begin{myitem}
   \item Presynaptic Channel: Combo box to choose the input channel
     that contains the membrane potential of the presynaptic cell (SP = spike
     generator) 
-  \item Postsynaptic Channel: Combo box that contains the membrane
-    potential of the postsynaptic cell
+  \item Postynaptic Channel: Combo box that contains the membrane
+    potential of the postynaptic cell
 \item Output Channel: The output channel to which the current command
   for the synapse will be added
 \end{myitem}
@@ -671,24 +620,10 @@ h_\infty(V_{\text{pre}})&=
   corresponding control panel that appears upon clicking the
   ``Parameters'' button. If ``ODE STDP'' is chosen, the synaptic
   plasticity is implemented according to the ordinary differential
-  equation (ODE) description in \cite{Abarbanel2002}. Parameters again
+  equation (ODE) description in \cite{Abarbanel2002}. Prameters again
   are adjusted in the separate panel that appears after pressing
   ``Parameters''.
 } \\\mbox{}
-
-\subsection{Alpha beta synapse}
-
-\begin{align}
-I_{\text{syn}}&= g_{\text{syn}} S (1-R) (V_{\text{rev}} -
-V_{\text{post}}) \\
- \frac{dS}{dt} &= \alpha_S (1-S) \frac{1}{1+
-   \exp (\frac{V_{\text{pre}}-V_{\alpha S}}{s_{\alpha S}})} -
- \beta_S S  \\
- \frac{dR}{dt} &= \alpha_R (1-R) \frac{1}{1+
-   \exp (\frac{V_{\text{pre}}-V_{\alpha R}}{s_{\alpha R}})} -
- \beta_R R  
-\end{align}
-
 \subsection{Spike Timing Dependent Plasticity}
 As described above, synapses can be equipped with a form of Spike
 Timing Dependent Plasticity (STDP).
@@ -744,7 +679,7 @@ The control parameters are: \\
   calculated for the last and the next to last spike in the
   presynaptic neuron.
 \item The method combo box allows to choose whether the STDP function is
-  calculated directly with the appropriate C functions when needed or
+  calculated directly with the approriate C functions when needed or
   whether it is tabled up front and this lookup-table is being used.
 \item table dt: The time step in the lookup table.
 \item dgMin: The minimum value for $\Delta g$ that should be in the
@@ -824,7 +759,7 @@ The control parameters for ODE based STDP are: \\
 ``Sigmoid Filter Function gSyn''
 \begin{myitem}
 \item gMax: The maximal allowed value for $g_{\text{Syn}}$.
-\item gMid: The mid point of the sigmoid filter for $g_{\text{Syn}}$
+\item gMid: The mid point of the sigmoid filter gor $g_{\text{Syn}}$
 \item gSlope: The ``slope'' parameter of the sigmoid filter function
   for $g_{\text{Syn}}$.
 \item The method combo allows to switch between direct evaluation of
@@ -833,9 +768,6 @@ The control parameters for ODE based STDP are: \\
 \item maxEntry: The maximum of $g_{\text{raw}}$ for which table
   entries are generated.
 \end{myitem}  
-{\bf Note that this description of synaptic plasticity has not been
-  tested in any strict sense.}
-
 \subsection{Hodgkin-Huxley Type Conductances}
 
 \parbox{\textwidth}{
@@ -853,7 +785,7 @@ into a cell with membrane potential V(t) is calculated according to
 \begin{align}
   I_{HH}(t) = g_{\text{Max}} m(t)^p h(t)^q (V_{\text{rev}}-V(t)),
 \end{align}
-where $m$ and $h$ are modelled as
+where $m$ and $h$ are modeled as
 \begin{align}
   \tau_m \frac{dm}{dt} &= m_\infty(V)-m , \\
   \tau_h \frac{dh}{dt} &= h_\infty(V)- h, 
@@ -1003,7 +935,7 @@ The control parameters are
 \end{myitem}
 
 
-\subsection{Spike generator} \label{spikegen}
+\subsection{Spike generator}
 The spike generator unit can replace a presynaptic cell. It can
 operate in several very different modes. When its input are spike
 timings, the spikes have a
@@ -1012,7 +944,7 @@ a file directly. The spike time information can either be explicit
 spike times from a file, spike patterns (bursts) specified in a file,
 or a spike pattern defined explicitly through the graphical interface.
 The pattern options can be combined with burst detection, in which
-each spike pattern is triggered by a detected threshold event in
+each spike pattern is triggered by a detected thershold event in
 another (measured) neuron.
 
 The control elements for the spike generator are
@@ -1022,9 +954,6 @@ The control elements for the spike generator are
   (that includes explicit times if burst detection is not enabled, or
   burst patterns if it is), and replay of a voltage waveform from a
   file.
-\item The ``Save Spike Generator'' checkbox allows the user to choose if
-  the spike generator channel would be saved or not (only if the spike
-  generator is on in any of its possible modes)
 \item The method combo allows to choose for the use of functions or
   lookup tables.
 \end{myitem}
@@ -1079,11 +1008,11 @@ If this method was chosen, the parameters are
 \end{myitem}
 ``Spike Time Input File''
 \begin{myitem}
-\item The input file name for the file that contains the spike time
+\item The input filename for the file that contains the spike time
   information. If burst detection is off, the file should contain one
   clear text column containing times in seconds when spikes shall
   occur.
-If burst detection is on, StdpC 2010 expects descriptions of spike
+If burst detection is on, StdpC 2007 expects descriptions of spike
 patterns containing of 
 \begin{myitem}
 \item[-] An integer denoting the number of spikes in the pattern
@@ -1122,19 +1051,19 @@ The control elements are:
 }
 \begin{myitem}
 \item time range: The length of the x axis in ms
-\item time ticks: Number of ticks on the x axis. 
+\item time ticks: Tumber of ticks on the x axis. 
 \item update frequency: The rate with which points on the display are
   updated. Note that a too high rate will likely lead to an overload
   and subsequent freeze of the program. A more efficient and safe
   implementation of the displays is on the todo list.
 \end{myitem}
 
-\section{Experiment automation} \label{scriptsect}
+\section{Experiment automation}
 
-So far we have described how to control StdpC 2010 using the graphical
+So far we have described how to cotrol StdpC 2007 using the graphical
 user interface. Instead, or in addition, most parameters can be
 controlled through a scripting mechanism. Through the
-File $\rightarrow$ Load Script one can specify a script file. The script
+File$rightarrow$Load Script one can specify a script file. The script
 file should contain three columns:
 \begin{myenum}
 \item A time in seconds when a certain event shall occur
@@ -1147,10 +1076,10 @@ depending on the parameter being changed.
 The script file will be read into a list of events in memory such that
 changes to the file have no effect after the script was loaded.
 
-The parameter names are the same as used when the state of the GUI is
+The parameter names are the same as used when the state of the gui is
 saved (``save protocol''). However, not all parameters can reasonably
-be changed while the clamp is running. A list of the most common
-parameters one may want to change through scripting are given in the table. \\
+changed while the clamp is running. A list of the most common
+parameters on may want to change through scripting are given in the table. \\
 \begin{table}
 \begin{tabular}[t]{|ll|}
 \hline
@@ -1265,356 +1194,7 @@ SGp.SpikeT[9] & double \\ \hline
 \end{table}
 
 Please note that internally, all parameters and variables are in SI
-units V, A, s, S, etc. The same applies to values in the script files. The
-variable $i$ in the variable names in the table has to be replaced by the
-appropriate number of the synapse or conductance, $i \in \{0, \ldots,
-5\}$. 
-
-
-\section{Electrode compensation} \label{eleccomp}
-
-For the compensation of electrode artifacts, StdpC 2010 uses the so-called Active
-Electrode Compensation (AEC) algorithm, developed by Romain Brette and his 
-colleagues. Here we only discuss those parts of this cutting-edge
-compensation technique, that are necessary for the StdpC end-user to be aware of,
-however we also encourage users to consult \cite{Brette2008} 
-and its supplementary material for a full description of the algorithm.
-
-The AEC method consist of two parts: an initial calibration phase and
-the subsequent compensation phase happening during the actual
-experiment. The first part is the calibration phase, during which
-StdpC 2010 injects a probing current into the cell (which is an
-uncorrelated white noise signal), and records the voltage response of
-the system (comprising of the cell and the electrode) to that
-current. Based on the acquired signal-response relationship, the
-software then calculates the actual parameter values of the used
-electrode for the general AEC model. Having had the electrode
-calibrated, in the second phase, StdpC 2010 automatically uses this
-digital model of the electrode on the corresponding input channel to
-calculate the artefactual voltage drop across the electrode
-occurring on the recording of that channel due to current injection
-through the electrode. The calculated artefact is then removed from the
-corresponding input channel.
-
-\subsection{Basic considerations and troubleshooting for electrode compensation}
-
-High fidelity artifact compensation requires well-calibrated
-electrodes, thus the calibration phase is a crucial part of the electrode
-compensation process. Even though it is implemented in the most automated
-way possible, there are several points the user must consider before
-calibration and take care of after calibration (just like in the case of any other
-calibration technique). Briefly these are the
-following (see \cite{Brette2008} Supp. Mat. for details): 
-\begin{myitem}
-\item \emph{Do the calibration only when the electrode is already in the
-  cell.} Electrode properties change after cell membrane impalement, and
-  the electrode has to be calibrated in its stable state.
-\item \emph{Make sure that the electrode is (sufficiently) linear in terms
-  of its steady state resistance.} One of 
-  the basic assumptions of AEC is that the steady state electrode voltage
-  response changes linear with the amplitude of the current level injected
-  into it. The Electrode Compensation dialog has a built-in feature to
-  assess the linearity of the electrode (see below). If you experience too
-  high deviation in the steady-state voltage levels in response to
-  different voltage levels (e.g. above 10\% of the electrode resistance),
-  we recommend to change the electrode, and rerun the linearity test for
-  the new one.
-\item \emph{Make sure that the electrode has reached an equilibrium state
-  in terms of its steady state resistance before calibration.} During
-  experiment, any change in the electrode properties after calibration
-  would result in an error in the artifact compensation. The most varying
-  property is the resistance of the electrode, which can change remarkably
-  especially in the first few minutes after cell
-  impalement. Thus one must always make sure that the steady-state
-  electrode resistance is stable (ceases to change) before calibration. The
-  electrode measurement feature on the Electrode Compensation dialog
-  provides a convenient way for this assessment (see below).  
-\item \emph{Make sure that the electrode is at least ten times faster than
-  the cell membrane.} Another basic assumption of the AEC calibration phase
-  is that the electrode and the passive cell membrane (i.e. not spiking, but
-  subthreshold) responses are separable in the time domain. This
-  usually is satisfied in general
-  electrode/cell configurations, but does not hold in case of very slow
-  electrodes and a very fast cell membranes. The Electrode Calibration dialog
-  provides means for the measuring both electrode and cell membrane
-  response properties (resistance levels, time constants and their standard
-  deviations, see below). As in the case of large cells it can
-  be difficult to effectively drive and measure the cell's subthreshold properties,
-  generally one can satisfy this criterion by making sure that the electrode
-  time constant (which can be measure more reliably) is around half
-  millisecond or less. If the electrode has been found to be too
-  slow, one can use a certain level of capacitance neutralization (CN)
-  during the calibration and the compensation. This CN level must be set before
-  calibration, and left unchanged during the usage of the same calibrated
-  model of the electrode. See also next point for applying CN.
-\item \emph{Turn other compensation techniques off before calibration and
-  during compensation as well.} AEC is a complete
-  electrode compensation method. The simultaneous operation of any
-  other active electrode compensation technique, like bridge balancing or
-  discontinuous injection/recoding, would lead to disastrous compensation
-  results. The only exception from this rule is the capacitance neutralization
-  feature of many microelectrode amplifier, which is able to increase the artifact
-  compensation fidelity of AEC, if it is carefully set to the maximum
-  possible level before calibration and left unchanged during the
-  experiment (see previous point).
-\item \emph{Assess actual data acquisition frequency after calibration.}
-  Right after calibration the user should make sure that StdpC 2010 had been
-  able to run the data acquisition part of the compensation in a relatively
-  constant frequency by observing the \emph{Std in sampling rate} text
-  field in the \emph{Data acquisition results} subpanel (in the bottom
-  right corner). The software automatically warns the user if this
-  deviation is higher than 0.01, what results in a degradation in the
-  quality of the electrode calibration and thus in the subsequent artifact
-  compensation as well. Most of the time the appearance of this warning
-  means that a significant interrupt by the operating system has occurred
-  during calibration (it is also possible that the hardware (PC and/or DAQ)
-  is not able to reach the required sampling rate set in the top right
-  corner, in which case lowering the rate should solve the issue). To avoid
-  the operating system interrupt problem, and also to reach the best
-  clamping quality, we strongly recommend to stop
-  all computationally intensive processes the computer might run in the
-  background during calibration and dynamic clamping.
-\item \emph{Recalibrate if electrode properties has changed over time.} As
-  for all electrode artifact compensation technique, the compensation quality
-  degrades if changes in the electrode properties (mostly in the
-  resistance) have occured as a long experiment goes on. To rule out this
-  possibility, we recommend the check of the electrode resistance or even
-  the recalibration of the electrode from time to time during the
-  experiment, and also the assessment of the electrode after the
-  experiment has finished to validate the quality of the compensation. 
-\end{myitem}
-
-\subsection{Supported features and the dialog panel}
-
-Along with the electrode calibration, the Electrode Compensation dialog has
-two auxiliary features to facilitate calibration and subsequent
-artifact compensation at high quality. 
-
-The \emph{electrode measurement} feature acquires the electrode resistance
-and time constants according to a simple parallel RC circuit model by
-injecting different constant current levels into the electrode and
-simultaneously recording the onset-dynamic and equilibrium level of the
-voltage response. There are three important things to assess here: (1) the
-electrode is fast enough (ie. that its average time constant is less then
-about 1 ms), (2) the electrode is linear enough (ie. that the standard
-deviation in its resistance levels at different current levels is below
-10\% of its absolute average resistance), and (3) the electrode has reached
-an equilibrium level in its resistance (ie. the average electrode
-resistance does not change remarkably in between subsequent
-measurements). Also see the troubleshooting subsection above for a more
-detailed discussion of these issues. It is crucial to find a long enough,
-but not too long injection length while the electrode is in the cell, in
-order to let the electrode reach its steady state voltage response, but at
-the same time prevent the cell membrane to markedly influence the
-measurement of the electrode characteristics. A rule of thumb is to set the
-injection length between 3 and 5 times of the expected electrode time
-constant, which usually leads to injection lengths around 1 to 2 ms. An
-incidental spike of the cell simultaneously with the electrode measurement
-always result in incorrectly measured properties. In this case one should
-re-measure the electrode. 
-
-The \emph{cell membrane measurement} feature allows measuring the
-corresponding (passive) properties of the cell membrane, based on the
-same parallel RC model applied to the membrane and taking into
-consideration the already acquired electrode characteristics. This
-measurement is done by injecting a particular current step into the
-cell, holding it for a certain duration, then stepping back to zero
-current level, waiting for the same amount of time to allow the
-membrane potential to recover, and then doing the same
-injection/waiting cycle for a user-settable number of times. This
-feature is included to allow the user to get a rough idea of the
-time constant of the cell membrane and this way the appropriateness of
-the electrode for AEC (the electrode must be at least 10 times faster
-than the passive cell membrane for good quality artifact compensation).
-Also see the troubleshooting subsection above for a more detailed
-discussion of this issue. Please be aware, that because of the nature
-of the measurement protocol, it is likely to provide good estimates of
-cell properties only if (1) the electrode has been measured previously and its
-resistance has not changed significantly in the meantime, (2) the passive
-membrane response is at least one order of magnitude slower than the
-electrode (only required for precise membrane time constant
-calculation), and most importantly (3) the injected current is able to
-effectively drive the membrane potential of the cell, that is, no
-independent activity of the cell (let it be sub- or suprathreshold)
-intervenes and contaminates the measurement significantly. This last point
-implies that successful membrane property measurements of large cells
-probably require high amplitude currents, if it is possible at all
-with this technique. As large cells usually have slower membranes, in
-these cases the user can satify the ``time-separability'' criterion
-(see Troubleshooting section) by making sure that they do not use a
-very slow electrodes (i.e. the time constant is lower than 1ms).
-
-
-
-\includegraphics[scale=0.6]{elecCalibDialog}
-
-The AEC dialog allows for the calibration of four electrodes (Electrode 1 to
-Electrode 4) through the tabular menus on the top of the calibration
-panel. The control and result elements on each tab page are the following:  
-\begin{myitem}
-\item Information line: Each page has a text line on the top (saying
-  \emph{Uncalibrated} on the included picture) to provide some basic
-  information about the calibration process to the user. 
-\item \emph{Compensation on}: after calibration, this checkbox allows the
-  user to turn the compensation on and off on the corresponding electrode.
-\item \emph{General settings}: This panel contains the settings that
-  applies to all the available features (i.e. the electrode measurement, the
-  membrane measurement and the calibration) on the current tabular page.
-\item \emph{Input channel}: The number of the input channel assigned to the
-  electrode, must be one of the active input channels.
-\item \emph{Output channel}: The number of the output channel assigned to the
-  electrode, must be one of the active output channels.
-\item \emph{Desired sampling rate}: The sampling frequency that StdpC 2010 will
-  aim to achieve during the calibration or the electrode/membrane measurement.
-\item \emph{Electrode linearity check}: This panel contains the settings specific for
-  the electrode measurement feature. See also \emph{General settings}.
-\item \emph{I\_max}: Maximal current level injected into the electrode.
-\item \emph{I\_min}: Minimal current level injected into the electrode.
-\item \emph{Number of injection levels}: Number of current levels
-  injected during electrode measurement. The current levels are equally
-  spaced between the maximal and minimal levels, with the limits
-  included. For example, if I\_max = 1 nA, I\_min = -1 nA and \emph{Number of
-  current levels} = 4, then the current levels to be injected are $I_1 =
-  -1 nA, I_2 = -1/3 nA, I_3 = +1/3 nA, and I_4 = +1 nA$. Zero current level
-  is always skipped.
-\item \emph{Inj. length per level}: defines how long the injection of each
-  current level lasts. 
-\item \emph{Cell membrane measurement}: This panel contains the settings specific for
-  the cell membrane measurement feature. See also \emph{General settings}. 
-\item \emph{Current step to}: Sets the current step at which the cell
-  properties will be measured. Negative current steps are highly
-  recommended, as depolarization increases the chance that active membrane
-  phenomena, like spiking, will disrupt the measurement of passive membrane
-  properties. 
-\item \emph{Number of repeats}: defines how many times the above current level
-  will be injected into the cell. Higher repeat numbers give numerical
-  stability to the measurement, but only if no spike has occured during any
-  of the injections. 
-\item \emph{Inj. length per repeat}: defines how long each injection will
-  last. Also defines the recovery time in between current level injections. 
-\item \emph{Calibration}: This panel contains the settings specific for
-  the electrode electrode calibration feature. See also \emph{General
-    settings}.
-\item \emph{Hyperpol. current level}: allows for the injection of a certain
-  constant level of  hyperpolarization current into the cell during the
-  whole duration of the calibration in order to minimize the number of
-  spikes occurring during calibration. High hyperpolarization levels
-  (i.e. beyond -1nA) are not favourable, as they can remarkably change the electrode 
-  characteristics.
-\item \emph{Injection amplitude}: the amplitude of the injected
-  white noise current signal. Setting 1 nA here usually means a good
-  tradeoff between reaching a high signal-to-noise ratio and avoiding
-  driving the cell into 
-  an active state (like spiking) at the same time. Always make sure, that
-  the DAQ hardware allows issuing this current level (both to
-  positive and negative levels).
-\item \emph{Injection length}: defines how long the current injection during
-  the calibration phase lasts. In most cases, a 4-5 second long calibration
-  is sufficient to acquire statistically significant amounts of data for the
-  electrode parameter calculation.   
-\item \emph{Full kernel length}: one of the crucial parameters of the AEC
-  technique. A rule of thumb is to set it to one or two times of the time constant of
-  the membrane. After cell membrane measurement StdpC 2010 automatically
-  fills this field, however, as the membrane property measurement can be
-  quite imprecise in some cases (huge cells, changing electrode properties
-  or spiking activity), always check that it is somewhere in between 30 and
-  60 ms before issuing the calibration command.
-\item \emph{Electrode kernel length}: the other very important parameter for
-  the calibration. A rule of thumb here is to set it to 10 times of the
-  time constant of the electrode, but to no more than 5ms. After electrode
-  measurement StdpC 2010 automatically fills this field, however, always
-  check that it is somewhere in between 1 and 5 ms before issuing the
-  calibration command.
-\end{myitem}
-
-\section{Saving of experiment data} \label{datasaving}
-
-A new feature in StdpC 2010 is the experiment data saving
-facility. The user can choose between binary of ASCII data formats, pick
-any subset of the active channels (see Section \ref{inchnconfig} and
-\ref{outchnconfig}) including the voltage of the spike generator as an input
-channel, set the data saving frequency and also find a file which the
-experiment data will be saved into. After starting the dynamic clamping,  in
-each clamping cycle the software decides whether it is time to perform data
-saving operations by comparing the last saving time and the current time. This way the
-saving frequency is quasi-independent of the dynamic clamping
-frequency. When data saving occurs, a new line is being added to the
-data file obeying the following pattern:
-\begin{equation*}
-Time\_stamp\ \ \ Input\_chnl\_1
-\ \ \ ...\ \ \ Input\_chnl\_n\ \ \  Output\_chnl\_1\ \ \ ...\ \ \ Output\_chnl\_n  
-\end{equation*}
-where the spike generator is always the last input channel
-($Input\_channel\_n$), if it has been set to be saved.
-
-Please be aware, that, as no offline compression is implemented in the
-current version, StdpC 2010 can generate huge data files during long
-experiments. The size of the saved data can be reduced by
-\begin{myitem} 
-\item choosing binary format rather than ASCII
-\item decreasing the saving frequency
-\item only saving the channels which are going to be important for the data
-  post-processing and analysis
-\end{myitem}
-For a simple comparison, the simulation of a gap junction (electrical
-synapse) between two neurons produces about 30 MByte/minute data if the
-user chooses to save all the four channels (2 input and 2 output channels
-+ the extra time stamp) at 10kHz frequency in ASCII mode, while the same
-experiment produces about 3.6 MByte/minute data in case the user only saves the
-membrane voltages of the two cells (2 input channels + the extra time
-stamp) at 5kHz in binary mode. 
-Having finished the experiment, the user can load the experiment data file
-into any data analysis platform they prefer (Matlab, R, Octave, Scilab,
-etc) for the offline processing and analysis of the data.
-
-\includegraphics[scale=0.6]{dataSavingDialog}
-
-The configuration settings on the \emph{Data saving settings} dialog are
-the following:
-\begin{myitem}
-\item Filename: the text line indicates which file is selected for data
-  saving. The user must make sure that they have writing rights on the
-  selected file, and also that the content of that file is not needed any
-  more, as it will be deleted by StdpC 2010 as soon as the clamping cycle
-  begins. The rectangular button on the right of the text line allows for
-  file browsing.
-\item Saving frequency: sets the frequency of the data saving.
-\item Saving format: this combo allows for choosing between ASCII and
-  binary output format.
-\end{myitem}
-
-
-\section{Input channel configuration} \label{inchnconfig}
-
-The \emph{Input Channels} dialog contains the basic configurable
-properties for the input channels, like whether they are going to be
-active or not, their acquisition range and conversion factor, along
-with some more StdpC specific properties, like whether spike detection
-active on them (see Section \ref{spikegen}), and if it is on, what
-spike detection threshold will be applied, and finally whether the
-channel is going to be saved or not during dynamic clamping (Section
-\ref{datasaving}). Always make sure that the right conversion factor
-is applied for each active channel, and a sufficiently wide
-acquisition range is set in order to prevent out of range data being
-cut off in the recorded data.
-
-\includegraphics[scale=0.6]{inputChnDialog}
-
-
-\section{Output channel configuration} \label{outchnconfig}
-
-The \emph{Output Channels} dialog contains the basic configurable properties
-for the output channels, like whether they are going to be active or not,
-their acquisition range and conversion factor, what is the bias current
-level applied on that channel if any, and finally whether the channel is
-going to be saved or not during dynamic clamping (Section
-\ref{datasaving}). Always make sure that the right conversion factor is
-applied for each active channel, and a sufficiently wide acquisition range
-is set in order to prevent out of range values being cut off in the
-injected current.
-
-\includegraphics[scale=0.6]{outputChnDialog}
-
+units V, A, s, S, etc. The same applies to values in the script files. The variable $i$ in the variable names in the table has to be replaced by the appropriate number of the synapse or conductance, $i \in \{0, \ldots, 5\}$.
 
 \section{User feedback} 
 Please do give feedback if you found the software useful, buggy, or
@@ -1623,14 +1203,13 @@ the sourceforge email or directly to T.Nowotny@sussex.ac.uk.
 If you are interested in contributing to the future development please
 do not hesitate to contact me as well.  
  
-\section{Acknowledgements} 
+\section{Acknowledgments} 
  
 The StdpC software would not exist without the early dynamic clamp
-versions developed by Reynaldo D. Pinto and I (TN) am grateful to him
-for supplying the source code for further development back then. I am
-also grateful to Attila Sz\"ucs for his excellent suggestions for
-improving and extending the software and his tireless testing of new
-and buggy versions.
+versions developed by Reynaldo D. Pinto and I (TN) am grateful to him for supplying the source code for further
+development back then. I am also grateful to Attila Sz\"ucs for his excellent
+suggestions for improving and extending the software and his tireless
+testing of new and buggy versions.
 
 \bibliographystyle{apalike}
 \bibliography{master}

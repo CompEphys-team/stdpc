@@ -24,7 +24,8 @@ Calibrator::Calibrator() :
     kerCalc = new KernelCalculator();
 
     elecKernelTauERatio = 10;  // The length of the electrode kernel is how many times the electrode time constant
-    fullKernelTauMRatio = 1;   // The length of the full kernel is how many times the membrane time constant
+    fullKernelTauMRatio = 1.5; // The length of the full kernel is how many times the membrane time constant
+    maxElecKFullKRation = 2.0; // To avoid to too high (electrode kernel length) / (full kernel length) ratios
 
 }
 
@@ -159,7 +160,7 @@ void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, in
     vOffSet = VoltageOffsetMeasurement();
 
     // Current injection and voltage recording
-    InjectAndRecord(numberOfSamples);
+    InjectAndRecord(numberOfSamples, false);
     //----------------------------------------------------------//
 
     // Process each current level
@@ -276,7 +277,7 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
 
     //------------------- Injection & Recording ----------------//
     // Current injection and voltage recording
-    InjectAndRecord(numberOfSamples);
+    InjectAndRecord(numberOfSamples, false);
     //----------------------------------------------------------//
 
 
@@ -398,7 +399,7 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
 
     //------------------- Injection & Recording ----------------//
     // Obtain current-voltage pairs
-    InjectAndRecord(numberOfSamples);
+    InjectAndRecord(numberOfSamples, true);
     //----------------------------------------------------------//
 
     // Get rid of the first elements (high jitter in sampling time)
@@ -541,7 +542,7 @@ double Calibrator::WaitTillNextSampling(double time)
 
 // Injects the current and records the voltage
 // for 'numOfSamples' samples
-void Calibrator::InjectAndRecord(int numOfSamples)
+void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 {
     int sample;
     double t;
@@ -561,33 +562,61 @@ void Calibrator::InjectAndRecord(int numOfSamples)
     // board->reset_board();
     board->reset_RTC();
 
-    for ( sample=1; sample<numOfSamples; sample++ )
-    {       
+    if( isCalibration == true ) // read -- wait -- write order in case of calibration
+        for ( sample=1; sample<numOfSamples; sample++ )
+        {
 
-        // --- Read --- //
-        board->get_scan(inChn);
-        voltages[sample]= inChn[inputChannelNumber].V; // save voltage
-        if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
-            if ( limitWarningEmitted == false){
-                  emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
-                  limitWarningEmitted = true;
-            }
-        // --- Read end --- //
-
-
-        // --- Wait --- //
-        t += WaitTillNextSampling(samplingPeriod);
-        times[sample] = t; // save the time stamp
-        // --- Wait end --- //
+            // --- Read --- //
+            board->get_scan(inChn);
+            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
+                if ( limitWarningEmitted == false){
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      limitWarningEmitted = true;
+                }
+            // --- Read end --- //
 
 
-        // --- Write --- //
-        outChn[outputChannelNumber].I= currents[sample];
-        board->write_analog_out(outChn);
-        // --- Write end --- //
+            // --- Wait --- //
+            t += WaitTillNextSampling(samplingPeriod);
+            times[sample] = t; // save the time stamp
+            // --- Wait end --- //
 
 
-    }
+            // --- Write --- //
+            outChn[outputChannelNumber].I= currents[sample];
+            board->write_analog_out(outChn);
+            // --- Write end --- //
+
+        }
+
+    else    // write -- wait -- read order in case of electrode and membrane measurement
+        for ( sample=1; sample<numOfSamples; sample++ )
+        {
+
+            // --- Write --- //
+            outChn[outputChannelNumber].I= currents[sample];
+            board->write_analog_out(outChn);
+            // --- Write end --- //
+
+
+            // --- Wait --- //
+            t += WaitTillNextSampling(samplingPeriod);
+            times[sample] = t; // save the time stamp
+            // --- Wait end --- //
+
+
+            // --- Read --- //
+            board->get_scan(inChn);
+            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
+                if ( limitWarningEmitted == false){
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      limitWarningEmitted = true;
+                }
+            // --- Read end --- //
+
+        }
 
     // Shift the time vector to zero beginning to get rid of the initial sampling jitter
     if ( times[1] > samplingPeriod )

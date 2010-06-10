@@ -311,6 +311,7 @@ void MyMainWindow::SGMethodChanged()
       }
     }
     if (index == 1) {
+      ExplicitSpikeTimesL->setEnabled(true);
       NumberE->setEnabled(true); NumberL->setEnabled(true); NumberU->setEnabled(true);
       PeriodE->setEnabled(true); PeriodL->setEnabled(true); PeriodU->setEnabled(true);
       SpikeTimesBut->setEnabled(true);
@@ -509,6 +510,7 @@ void MyMainWindow::importSGData()
 {
   QString num;
   SGMethodCombo->setCurrentIndex(SGp.method);
+  SGSave->setChecked(SGp.saving);
   SGLUTableCombo->setCurrentIndex(SGp.LUTables);
   num.setNum(SGp.VSpike*1e3);
   VSpikeE->setText(num);

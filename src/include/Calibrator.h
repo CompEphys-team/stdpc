@@ -42,7 +42,7 @@ private:
     // Inner functions
     bool InitChannels();   
     double WaitTillNextSampling(double);
-    void InjectAndRecord(int);
+    void InjectAndRecord(int, bool);
     double VoltageOffsetMeasurement();
 
     // Test and checker functions
@@ -57,6 +57,7 @@ public:
     // Kernel params
     double fullKernelTauMRatio;  // The length of the full kernel is how many times the membrane time constant
     double elecKernelTauERatio;  // The length of the electrode kernel is how many times the electrode time constant
+    double maxElecKFullKRation;  // To avoid to too high (electrode kernel length) / (full kernel length) ratios
 
     // Measured electrode params
     double elecRes;
