@@ -231,7 +231,7 @@ void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
   actOutChnNo= chnNo;
   for (int i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac/outHigh[outChnp[outIdx[i]].gain]*16.0*1e9*COUNTS;
+    outGainFac[i]= outChnp[outIdx[i]].gainFac/outHigh[outChnp[outIdx[i]].gain]*1e9*COUNTS;
   }
 }
 
@@ -241,7 +241,7 @@ void DigiData::write_analog_out(outChannel *out)
 {
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
-    int_I= (short int) (out[outIdx[i]].I*outGainFac[i]);
+    int_I= ((short int) (out[outIdx[i]].I*outGainFac[i]))*16;
     int_I|= DigiDatap.syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
