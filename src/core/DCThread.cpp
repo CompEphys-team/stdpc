@@ -325,7 +325,7 @@ for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) {da
            inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
          }
          for (i= 0; i <= outNo; i++) {
-           outChn[outIdx[i]].I= 0.0;
+           outChn[outIdx[i]].I= outChnp[outIdx[i]].bias;
          }
          for (i= 0; i < csNo; i++)
            csyn[csIdx[i]].currentUpdate(t, dt);
