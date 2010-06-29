@@ -101,7 +101,6 @@ void ElectrodeCompDlg::ToggleCompensation()
 // Reads in the parameters of the calibration, etc., from the form
 void ElectrodeCompDlg::exportData()
 {
-
     for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
         // General params
@@ -458,6 +457,7 @@ void ElectrodeCompDlg::CalibrateElectrode()
     {
         QMessageBox::warning(this, tr("Warning"), tr("Error: Nonpositive electrode resistance calculated!\n AEC channel is inactivated."));
         lInfo[elecNum]->setText(prevText);
+        cbCompOn[elecNum]->setChecked(false);
         cbCompOn[elecNum]->setEnabled(false);
         lInfo[elecNum]->repaint();
         this->setEnabled(true);        
