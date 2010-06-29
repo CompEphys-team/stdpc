@@ -225,6 +225,7 @@ void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, in
 
 
     //-----------------Only for testing---------------//
+  #ifdef TEST_VERSION
     fname = QString("iLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
     saveData(fname, iLevels);
     fname = QString("vLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
@@ -233,6 +234,7 @@ void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, in
     saveData(fname, rLevels);
     fname = QString("tauE_")+QString::number(inputChannelNumber)+QString(".dat");
     saveData(fname, tauE);
+ #endif
     //-----------------Only for testing---------------//
 }
 
@@ -250,9 +252,14 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
     double fraction;
 
     QVector<double> vOffSets(repeat);  // Voltage offsets
+    QVector<double> iLevels(repeat);   // Current levels
     QVector<double> vLevels(repeat);   // Steady state voltages
     QVector<double> tauM(repeat);      // Calculated time constants
     QVector<double> rLevels(repeat);   // Calculated resistances
+
+
+    // Init current levels
+    for ( i=0; i<repeat; i++ ) iLevels[i] = iStep;
 
     // Set general params
     samplingPeriod = 1.0/sampRate;
@@ -353,17 +360,18 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
     for ( i=0; i<repeat; i++ )  membTauStd += (tauM[i] - membTau) * (tauM[i] - membTau);
     membTauStd = sqrt(membTauStd/repeat);
 
-
+  #ifdef TEST_VERSION
     //-----------------Only for testing---------------//
     fname = QString("iLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
-    saveData(fname, *(new QVector<double>(iStep)));
+    saveData(fname, iLevels);
     fname = QString("vLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
     saveData(fname, vLevels);
     fname = QString("rLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
     saveData(fname, rLevels);
     fname = QString("tauM_")+QString::number(inputChannelNumber)+QString(".dat");
-    saveData(fname, tauM);
+    saveData(fname, tauM);  
     //-----------------Only for testing---------------//
+  #endif
 }
 
 
@@ -434,7 +442,8 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
     calElecRes = kerCalc->GetRE();
     calElecTau = kerCalc->GetTauE();
 
-    // To test
+    //-----------------Only for testing---------------//
+  #ifdef TEST_VERSION
     fname = QString("full_kernel_")+QString::number(elecNum)+QString(".dat");
     saveData(fname, kerCalc->fullKernel);
     fname = QString("currents_")+QString::number(elecNum)+QString(".dat");
@@ -443,78 +452,8 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
     saveData(fname, voltages);
     fname = QString("times_")+QString::number(elecNum)+QString(".dat");
     saveData(fname, times);
-
-
-//    //-----------------------------------
-//    // FullKerLen and ElecKerLen tester code
-//    QString fre = "re.dat";
-//    QString frm = "rm.dat";
-//    QString ftaum = "taum.dat";
-//    QString ftaue = "taue.dat";
-//
-//    ofstream os1(fre.toAscii());
-//    ofstream os2(frm.toAscii());
-//    ofstream os3(ftaum.toAscii());
-//    ofstream os4(ftaue.toAscii());
-//
-//    QVector<double> Re, TauE, Rm, TauM, Kf;
-//
-//    int minKeLen = 5;
-//    int maxKeLen = 80;
-//    int minKfLen = 100;
-//    int maxKfLen = 1000;
-//
-//    for(int i=minKfLen; i<maxKfLen; i++)  {
-//
-//        Re.clear();
-//        Rm.clear();
-//        TauM.clear();
-//        TauE.clear();
-//
-//        Re.resize(maxKeLen-minKeLen);
-//        Rm.resize(maxKeLen-minKeLen);
-//        TauM.resize(maxKeLen-minKeLen);
-//        TauE.resize(maxKeLen-minKeLen);
-//
-//
-//        for(int j=minKeLen; j<maxKeLen; j++){
-//            if(j<i){
-//                kerCalc->SetParams(i, j, 1.0/samplingPeriod, currents, voltages);
-//                kerCalc->CalculateKernel();
-//
-//                Re[j-minKeLen] = kerCalc->GetRE();
-//                if(Re[j-minKeLen] > 0.75e8) Re[j-minKeLen] = 0.75e8;
-//                if(Re[j-minKeLen] < 0) Re[j-minKeLen] = 0;
-//                Rm[j-minKeLen] = kerCalc->GetRM();
-//                if(Rm[j-minKeLen] > 0.75e8) Rm[j-minKeLen] = 0.75e8;
-//                if(Rm[j-minKeLen] < 0) Rm[j-minKeLen] = 0;
-//                TauM[j-minKeLen] = kerCalc->GetTauM();
-//                if(TauM[j-minKeLen] > 0.5e-1) TauM[j-minKeLen] = 0.5e-1;
-//                if(TauM[j-minKeLen] < 0) TauM[j-minKeLen] = 0;
-//                TauE[j-minKeLen] = kerCalc->GetTauE();
-//                if(TauE[j-minKeLen] > 1e-3) TauE[j-minKeLen] = 1e-3;
-//                if(TauE[j-minKeLen] < 0) TauE[j-minKeLen] = 0;
-//            }
-//        }
-//
-//        for (int k= minKeLen; k < maxKeLen; k++) {
-//            os1 << Re[k-minKeLen] << " ";
-//            os2 << Rm[k-minKeLen] << " ";
-//            os3 << TauM[k-minKeLen] << " ";
-//            os4 << TauE[k-minKeLen] << " ";
-//        }
-//
-//        os1 << "\n";
-//        os2 << "\n";
-//        os3 << "\n";
-//        os4 << "\n";
-//    }
-//
-//    os1.close();
-//    os2.close();
-//    os3.close();
-//    os4.close();
-//    //-----------------------------------
+  #endif
+    //-----------------Only for testing---------------//
 
     // Init AECChannel with the kernel
     DCT->aecChannels[elecNum]->Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());

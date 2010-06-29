@@ -72,6 +72,8 @@ void DCThread::init(DAQ *inBoard)
 
 void DCThread::run()
 {
+   int numOfAecChannels;
+
    static int i;
    static double evt;
    // reset Lookup tables; they not be needed in this run ...
@@ -193,11 +195,15 @@ void DCThread::run()
    if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated")); 
    
    // Checking validity of AEC channels
+   numOfAecChannels = 0;
    for ( int i=0; i<aecChannels.size(); i++ ){
      if ( aecChannels[i]->IsActive() ){
        if ( inChnp[aecChannels[i]->inChnNum].active == true &&
          outChnp[aecChannels[i]->outChnNum].active == true ){
          message(QString("AEC channel is active on input channel ")+QString::number(aecChannels[i]->inChnNum)+" and output channel "+QString::number(aecChannels[i]->outChnNum));
+       #ifdef TEST_VERSION
+         numOfAecChannels++;
+       #endif
        }
        else {
          if ( inChnp[aecChannels[i]->inChnNum].active == false ){
@@ -239,16 +245,19 @@ void DCThread::run()
    // Init data saving
    dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
    double savingPeriod = 1.0 / dataSavingPs.savingFreq;
-   /////////////////////////////////////////////// don't need the last plus one below, only testing
-   data = QVector<double>(inChnsToSave.size()+outChnsToSave.size()+1+SG.saveSG+1); // time + in + out + SG (which can be 0)
+
+   // numOfAecChannels is only nonzero if TEST_VERSION is defined
+   data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SG.saveSG+numOfAecChannels); // time + in + out + SG (which can be 0)
    QVector<QString> header = QVector<QString>(data.size()); // write file header
    header[0] = "Time";
    QString tmp;
    for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
    if( SG.saveSG ) header[1+inChnsToSave.size()] = "SpikeGenerator";
    for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SG.saveSG+i] = "I"+tmp.setNum(outChnsToSave[i]);
-   /////////////////////////////////////////////// don't need the line below, only testing
-   header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()] = "Ve";
+
+   // numOfAecChannels is only nonzero if TEST_VERSION is defined
+   for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
+
    dataSaver->SaveHeader(header);
 
    bool limitWarningEmitted = false;
@@ -281,15 +290,6 @@ void DCThread::run()
         dt = board->get_RTC();
         t += dt;
 
-//        //Fixed time step
-//        double tstep = 0.000178;
-//        dt=0.0;
-//        do
-//        {
-//            dt += board->get_RTC();
-//        } while (dt < tstep);
-//        t += dt;
-
 
          // AEC channel update part
          for ( int k=0; k<aecChannels.size(); k++ )
@@ -309,7 +309,15 @@ void DCThread::run()
             if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
             for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
 
-for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) {data[data.size()-1] = aecChannels[i]->v_e; break; }
+          #ifdef TEST_VERSION                        
+            int aecChannelNum = 0;
+            for ( int i=0; i<aecChannels.size(); i++ ) 
+                if ( aecChannels[i]->IsActive() ) 
+                {
+                    data[inChnsToSave.size()+1+SG.saveSG+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
+                    aecChannelNum++;
+                }
+          #endif
 
             dataSaver->SaveLine(data);
             lastSave = t;
