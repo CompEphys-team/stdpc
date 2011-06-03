@@ -16,7 +16,7 @@ INCLUDEPATH += . \
     src/models \
     src/include \
     lib
-INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
 TEMPLATE = app
 CONFIG += qt \
     thread
@@ -123,7 +123,7 @@ SOURCES += Main.cpp \
     Calibrator.cpp \
     Datasaver.cpp \
     DataSavingDlg.cpp
-LIBS += staticlib/Pt_ioctl_tn.a
+LIBS += ../trunk/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)
 DEPENDPATH += src/nidaqmx
@@ -134,7 +134,7 @@ FORMS += NIDAQDlg.ui
 HEADERS += NIDAQDlg.h \
 NIDAQ.h
 
-INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
 INCLUDEPATH += src/nidaqmx
 
-LIBS += staticlib/libnidaqmx.a
+LIBS += ../trunk/staticlib/nidaqmx.a
