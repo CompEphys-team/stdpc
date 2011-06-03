@@ -1,0 +1,15 @@
+2011-06-03:
+Installed new Qt version onto the "zone" dynamic clamp
+computer. Sources wouldn't compile because of the following issues:
+a) the static libraries pt_ioctl_tn.a and libnidaqmx.a could not be
+located (the Qt creator builds the executibles in StdpC-build-desktop
+(in the main stdpc directory) nowadays. Prefixing the files in the
+.pro file by "../trunk/staticlib" made them visible again
+
+b) libnidaqmx.a was automatically classified as a dynamically linked
+library based on the filename starting with "lib". I.e. the generated
+Makefile contained -lnidaqmx.a 
+Renaming to nidaqmx.a solved this issue.
+
+
+

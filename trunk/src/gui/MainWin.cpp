@@ -38,7 +38,7 @@ void MyMainWindow::DAQSetup()
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2008 v22"));
+  LoadMsg.setWindowTitle(tr("StdpC 2010"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
