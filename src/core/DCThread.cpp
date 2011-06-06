@@ -73,6 +73,7 @@ void DCThread::init(DAQ *inBoard)
 void DCThread::run()
 {
    int numOfAecChannels;
+   double savingPeriod= 1.0;
 
    static int i;
    static double evt;
@@ -243,22 +244,24 @@ void DCThread::run()
      if( outChn[outIdx[i]].save ) outChnsToSave.append(outIdx[i]);
 
    // Init data saving
-   dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
-   double savingPeriod = 1.0 / dataSavingPs.savingFreq;
+   if (dataSavingPs.enabled) {
+     dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
+     savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
-   // numOfAecChannels is only nonzero if TEST_VERSION is defined
-   data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SG.saveSG+numOfAecChannels); // time + in + out + SG (which can be 0)
-   QVector<QString> header = QVector<QString>(data.size()); // write file header
-   header[0] = "Time";
-   QString tmp;
-   for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
-   if( SG.saveSG ) header[1+inChnsToSave.size()] = "SpikeGenerator";
-   for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SG.saveSG+i] = "I"+tmp.setNum(outChnsToSave[i]);
+     // numOfAecChannels is only nonzero if TEST_VERSION is defined
+     data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SG.saveSG+numOfAecChannels); // time + in + out + SG (which can be 0)
+     QVector<QString> header = QVector<QString>(data.size()); // write file header
+     header[0] = "Time";
+     QString tmp;
+     for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
+     if( SG.saveSG ) header[1+inChnsToSave.size()] = "SpikeGenerator";
+     for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SG.saveSG+i] = "I"+tmp.setNum(outChnsToSave[i]);
 
-   // numOfAecChannels is only nonzero if TEST_VERSION is defined
-   for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
+     // numOfAecChannels is only nonzero if TEST_VERSION is defined
+     for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
 
-   dataSaver->SaveHeader(header);
+     dataSaver->SaveHeader(header);
+   }
 
    bool limitWarningEmitted = false;
 
@@ -301,26 +304,28 @@ void DCThread::run()
          }
 
          //--------------- Data saving ------------------------//
-         if ( t >= lastSave + savingPeriod )
-         {
-            data[0] = t;
+         if (dataSavingPs.enabled) {
+           if ( t >= lastSave + savingPeriod )
+           {
+              data[0] = t;
 
-            for (i= 0; i < inChnsToSave.size(); i++)   data[i+1] = inChn[inChnsToSave[i]].V;    // voltages
-            if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
-            for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
+              for (i= 0; i < inChnsToSave.size(); i++)   data[i+1] = inChn[inChnsToSave[i]].V;    // voltages
+              if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
+              for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
 
-          #ifdef TEST_VERSION                        
-            int aecChannelNum = 0;
-            for ( int i=0; i<aecChannels.size(); i++ ) 
-                if ( aecChannels[i]->IsActive() ) 
-                {
-                    data[inChnsToSave.size()+1+SG.saveSG+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
-                    aecChannelNum++;
-                }
-          #endif
+            #ifdef TEST_VERSION
+              int aecChannelNum = 0;
+              for ( int i=0; i<aecChannels.size(); i++ )
+                  if ( aecChannels[i]->IsActive() )
+                  {
+                      data[inChnsToSave.size()+1+SG.saveSG+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
+                      aecChannelNum++;
+                  }
+            #endif
 
-            dataSaver->SaveLine(data);
-            lastSave = t;
+              dataSaver->SaveLine(data);
+              lastSave = t;
+           }
          }
          //--------------- Data saving end ---------------------//
 
@@ -425,7 +430,9 @@ void DCThread::run()
    board->reset_board();
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
 
-   dataSaver->EndDataSaving();
+   if (dataSavingPs.enabled) {
+       dataSaver->EndDataSaving();
+   }
 
    finished= true;
 

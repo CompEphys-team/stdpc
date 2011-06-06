@@ -4,6 +4,6 @@
 // uncomment if compiling a National Instruments version
 #define NATIONAL_INSTRUMENTS
 
-#define TEST_VERSION
+//#define TEST_VERSION
 
 #endif

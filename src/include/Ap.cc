@@ -340,6 +340,8 @@ void MyMainWindow::setupAP()
   }
 
   // Data saving
+  APname.append(QString("dataSavingPs.enabled")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+  bAP.append(&(dataSavingPs.enabled));
   APname.append(QString("dataSavingPs.fileName")); APtype.append(STRTYPE); APindex.append(sAP.size());
   sAP.append(&(dataSavingPs.fileName));
   APname.append(QString("dataSavingPs.savingFreq")); APtype.append(DBLTYPE); APindex.append(dAP.size());

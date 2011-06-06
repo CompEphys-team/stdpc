@@ -26,10 +26,14 @@ DigiData::DigiData()
   inHigh[3]= 1.28;
 
   inGainText= new char*[inGainNo];
-  inGainText[0]= "-10.24 to +10.24 V";
-  inGainText[1]= "-5.12 to +5.12 V";
-  inGainText[2]= "-2.56 to +2.56 V";
-  inGainText[3]= "-1.28 to +1.28 V";          
+  inGainText[0]= new char[80];
+  strcpy(inGainText[0], "-10.24 to +10.24 V");
+  inGainText[1]= new char[80];
+  strcpy(inGainText[1], "-5.12 to +5.12 V");
+  inGainText[2]= new char[80];
+  strcpy(inGainText[2], "-2.56 to +2.56 V");
+  inGainText[3]= new char[80];
+  strcpy(inGainText[3], "-1.28 to +1.28 V");
   outGainNo= 1;
   outLow= QVector<double>(outGainNo);
   outLow[0]= -10.24;
@@ -37,7 +41,8 @@ DigiData::DigiData()
   outHigh[0]= 10.24;
 
   outGainText= new char*[outGainNo];
-  outGainText[0]= "-10.24 to +10.24 V";
+  outGainText[0]= new char[80];
+  strcpy(outGainText[0], "-10.24 to +10.24 V");
 
   inChnGain= new short int[inGainNo];
   inChnGain[0]= 0x0000;

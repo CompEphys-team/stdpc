@@ -188,7 +188,7 @@ typedef struct {
 } elecCalibParams;
 
 typedef struct {
-
+  bool enabled;
   QString fileName;
   double savingFreq;
   bool isBinary;

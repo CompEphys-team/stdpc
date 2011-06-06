@@ -82,7 +82,8 @@ HEADERS += Main.h \
     KernelCalculator.h \
     Calibrator.h \
     Datasaver.h \
-    DataSavingDlg.h
+    DataSavingDlg.h \
+    src/include/ObjectDataTypes.h
 
 SOURCES += Main.cpp \
     MainWin.cpp \

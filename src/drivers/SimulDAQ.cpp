@@ -12,18 +12,20 @@ SimulDAQ::SimulDAQ()
   outGainFac= new double[outChnNo];
   inGainNo= 1;
   inGainText= new char*[inGainNo];
-  inGainText[0]= "n/a";
+  inGainText[0]= new char[80];
+  strcpy(inGainText[0], "n/a");
   inLow = QVector<double>(inChnNo);
-  inLow[0] = -1.28;
+  inLow[0] = -1e10;
   inHigh = QVector<double>(inChnNo);
-  inHigh[0] = 1.28;
+  inHigh[0] = 1e10;
   outGainNo= 1;
   outGainText= new char*[outGainNo];
-  outGainText[0]= "n/a";
+  outGainText[0]= new char[80];
+  strcpy(outGainText[0], "n/a");
   outLow = QVector<double>(outChnNo);
-  outLow[0] = -10.24;
+  outLow[0] = -1e10;
   outHigh = QVector<double>(outChnNo);
-  outHigh[0] = +10.24;
+  outHigh[0] = +1e10;
   QueryPerformanceFrequency(&intClock_frequency);
   clock_frequency= (double) intClock_frequency.LowPart;
   clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
@@ -38,9 +40,9 @@ SimulDAQ::~SimulDAQ()
   delete[] inGainFac;
   delete[] outIdx;
   delete[] outGainFac;
-  //  delete[] inGainText[0];
+  delete[] inGainText[0];
   delete[] inGainText;
-  //  delete[] outGainText[0];
+  delete[] outGainText[0];
   delete[] outGainText;
   delete[] inq;
   delete[] outq;
@@ -75,7 +77,7 @@ void SimulDAQ::reset_RTC() {
 bool SimulDAQ::initialize_board(QString &name)
 {
   bool success= true;
-  double t, data;
+  double t, t0, data;
   QString lb;
   
   name= QString("SimulDAQ files ");
@@ -86,11 +88,12 @@ bool SimulDAQ::initialize_board(QString &name)
 //  delete[] inIter;
   is.open(SDAQp.inFileName.toAscii());
   is >> t;
+  t0= t;
 //  inChnNo= SDAQp.inChnNo;
 //  inq= new QList<double>[inChnNo];
 //  inIter= new QList<double>::const_iterator[inChnNo];
   while (is.good()) {
-    intq.append(t);
+    intq.append((t-t0)*SDAQp.inTFac);
     for (int i= 0; i < inChnNo; i++) {
       is >> data;
       inq[i].append(data);
@@ -105,7 +108,8 @@ bool SimulDAQ::initialize_board(QString &name)
     lb.setNum(intq.size());
     name=QString("SimulDAQ input ")+lb+QString(" points ");
     intIter= intq.begin();
-    dataT= *(intq.end()-1)*SDAQp.inTFac;
+    inT= *intIter;
+    dataT= *(intq.end()-1);
     for (int i= 0; i < inChnNo; i++) inIter[i]= inq[i].begin();
   }       
   is.close();
@@ -155,7 +159,8 @@ void SimulDAQ::get_scan(inChannel *in)
   short int idx;
   static double V;
 
-  while (t > inT) {
+  os << t << endl;
+  if (t >= inT) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {
       inIter[i]++;
@@ -165,14 +170,15 @@ void SimulDAQ::get_scan(inChannel *in)
       lastWrite-= dataT;
       rewind();
     }
-    inT= *intIter*SDAQp.inTFac;
-  }
-  for (i= 0; i < inChnNo; i++) {
-    idx= 0;
-    V= *inIter[i];
-    if ((idx < actInChnNo) && (i == inIdx[idx])) {
-      in[i].V= V*inGainFac[idx];
-      idx++;
+    inT= *intIter;
+
+    for (i= 0; i < inChnNo; i++) {
+      idx= 0;
+      V= *inIter[i];
+      if ((idx < actInChnNo) && (i == inIdx[idx])) {
+        in[i].V= V*inGainFac[idx];
+        idx++;
+      }
     }
   }
 }
@@ -234,6 +240,6 @@ void SimulDAQ::rewind()
     for (int i= 0; i < inChnNo; i++) {
       inIter[i]= inq[i].begin();
     }
-    inT= *intIter*SDAQp.inTFac;
+    inT= *intIter;
   }
 }

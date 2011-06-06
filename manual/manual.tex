@@ -42,7 +42,7 @@
 \begin{titlepage}
   \begin{center}
   {{\bf \Large 
-    StdpC 2007 }\\[0.3cm]
+    StdpC 2010 }\\[0.3cm]
     \large (Spike timing dependent plasticity Clamp)}, \\[1cm]
   {\large 
     in parts based on {\bf DYNCLAMP2} \cite{Pinto2001} 
@@ -73,7 +73,7 @@ La Jolla, CA 92093-0402, USA \\
 
 \end{titlepage}
 
-StdpC 2007 is software building on the ideas that led
+StdpC 2010 is software building on the ideas that led
 to the development of the earlier DYNCLAMP2
 software. The new software is based on QT and has in addition to the
 original native support for the old DigiData 1200/A interface now also
@@ -84,13 +84,13 @@ This is the first beta version of the software. Some functionality has
 not been tested thouroughly. Any feedback on problems with the
 software or potential bugs is greatly appreciated.  An older version
 of the software (StdpC) is described in Journal of Neuroscience
-Methods \cite{Nowotny2006}. If you use StdpC 2007 and publish results
+Methods \cite{Nowotny2006}. If you use StdpC 2010 and publish results
 based on its use, please cite the website and this paper. Please
 contact us for any further questions (t.nowotny@sussex.ac.uk).
 
 Copyright 2008 T.~Nowotny
 
-StdpC 2007 is free software; you can redistribute it and/or modify  
+StdpC 2010 is free software; you can redistribute it and/or modify  
 it under the terms of the GNU General Public License as published by 
 the Free Software Foundation; either version 2 of the License, or 
 (at your option) any later version.                               
@@ -112,7 +112,7 @@ The Dynamic Clamp protocol, developed by \cite{Sharp1993} and
 independently by \cite{Robinson1993} allows inserting simulated
 membrane conductances into cells, and/or adding synapses between cells
 as well as a variety of other manipulations. Here, we describe StdpC
-2007, a software for controlling biological neurons and an internal
+2010, a software for controlling biological neurons and an internal
 spike generator in (soft) real time.
 
 The software allows to define up to $6$ artificial synapses, $6$
@@ -193,7 +193,7 @@ DigiData board and other hardware devices. If you are experiencing
 problems, you may need to change the base address of the DigiData
 board. Hardware conflicts can occur even if the DIGIDATA board works
 fine with Axon programs like Axoscope because, unlike these, StdpC
-2007 does read the Real Time Counter (RTC) in the Digidata
+2010 does read the Real Time Counter (RTC) in the Digidata
 board. Usually, the DigiData board is configured to use the I/O base
 address 0x320, and in this case the RTC reading ports are in the range
 of 0x330 - 0x332. Many computers use the address 0x330 for some devices like
@@ -289,7 +289,9 @@ The following is a list of features which were new in StdpC v3:
   only and degrade clamping performance considerably when used.
 \end{myitem}
 
+
 \subsection{Changes from StdpC v4 to StdpC 2007}
+(Changes from StdpC 2007 to StdpC 2010 are not documented yet.)
 \begin{myitem}
 \item The user interface is now based on QT
 \item The driver for the DigiData 1200 board was re-created using (an
@@ -1012,7 +1014,7 @@ If this method was chosen, the parameters are
   information. If burst detection is off, the file should contain one
   clear text column containing times in seconds when spikes shall
   occur.
-If burst detection is on, StdpC 2007 expects descriptions of spike
+If burst detection is on, StdpC 2010 expects descriptions of spike
 patterns containing of 
 \begin{myitem}
 \item[-] An integer denoting the number of spikes in the pattern
@@ -1059,8 +1061,8 @@ The control elements are:
 \end{myitem}
 
 \section{Experiment automation}
-
-So far we have described how to cotrol StdpC 2007 using the graphical
+\label{scriptsect}
+So far we have described how to control StdpC 2010 using the graphical
 user interface. Instead, or in addition, most parameters can be
 controlled through a scripting mechanism. Through the
 File$rightarrow$Load Script one can specify a script file. The script
