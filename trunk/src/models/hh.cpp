@@ -21,10 +21,10 @@ void HH::init(mhHHData *inp, short int *inIdx, short int *outIdx, inChannel *inC
   }
   m= 0.0;
   minf= 0.0;
-  taum= 1.0;
+  taum= p->taum;
   h= 0.9;
   hinf= 0.9;
-  tauh= 1.0;
+  tauh= p->tauh;
 }
 
 void HH::currentUpdate(double t, double dt) 

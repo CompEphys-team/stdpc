@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SimulDAQDlg</class>
- <widget class="QDialog" name="SimulDAQDlg" >
-  <property name="geometry" >
+ <widget class="QDialog" name="SimulDAQDlg">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,11 +10,11 @@
     <height>217</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Simulated DAQ Setup</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
     <rect>
      <x>221</x>
      <y>170</y>
@@ -21,15 +22,15 @@
      <height>32</height>
     </rect>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="InputFileE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="InputFileE">
+   <property name="geometry">
     <rect>
      <x>100</x>
      <y>30</y>
@@ -37,12 +38,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>c:\StdpcIn1short.dat</string>
+   <property name="text">
+    <string>StdpcIn1.dat</string>
    </property>
   </widget>
-  <widget class="QLabel" name="InputFileL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="InputFileL">
+   <property name="geometry">
     <rect>
      <x>40</x>
      <y>30</y>
@@ -50,12 +51,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Input File</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="OutputFileE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="OutputFileE">
+   <property name="geometry">
     <rect>
      <x>100</x>
      <y>60</y>
@@ -63,12 +64,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>c:\StdpCOut1.dat</string>
+   <property name="text">
+    <string>StdpCOut1.dat</string>
    </property>
   </widget>
-  <widget class="QLabel" name="OutputFileL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="OutputFileL">
+   <property name="geometry">
     <rect>
      <x>30</x>
      <y>60</y>
@@ -76,12 +77,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Output File</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="inChannelE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="inChannelE">
+   <property name="geometry">
     <rect>
      <x>100</x>
      <y>100</y>
@@ -89,12 +90,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>2</string>
    </property>
   </widget>
-  <widget class="QLabel" name="inChannelL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="inChannelL">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>100</y>
@@ -102,12 +103,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string># in Channels</string>
    </property>
   </widget>
-  <widget class="QLabel" name="outChannelL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="outChannelL">
+   <property name="geometry">
     <rect>
      <x>10</x>
      <y>130</y>
@@ -115,12 +116,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string># out Channels</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="outChannelE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="outChannelE">
+   <property name="geometry">
     <rect>
      <x>100</x>
      <y>130</y>
@@ -128,12 +129,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>2</string>
+   <property name="text">
+    <string>1</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="outDtE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="outDtE">
+   <property name="geometry">
     <rect>
      <x>300</x>
      <y>130</y>
@@ -141,12 +142,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>0.1</string>
+   <property name="text">
+    <string>1</string>
    </property>
   </widget>
-  <widget class="QLabel" name="outDtL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="outDtL">
+   <property name="geometry">
     <rect>
      <x>240</x>
      <y>130</y>
@@ -154,12 +155,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Output dt</string>
    </property>
   </widget>
-  <widget class="QLabel" name="outDtU" >
-   <property name="geometry" >
+  <widget class="QLabel" name="outDtU">
+   <property name="geometry">
     <rect>
      <x>360</x>
      <y>130</y>
@@ -167,12 +168,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>ms</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="inTFacE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="inTFacE">
+   <property name="geometry">
     <rect>
      <x>300</x>
      <y>100</y>
@@ -180,12 +181,12 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
-    <string>0.001</string>
+   <property name="text">
+    <string>1</string>
    </property>
   </widget>
-  <widget class="QLabel" name="inTFacU" >
-   <property name="geometry" >
+  <widget class="QLabel" name="inTFacU">
+   <property name="geometry">
     <rect>
      <x>360</x>
      <y>100</y>
@@ -193,12 +194,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>s</string>
    </property>
   </widget>
-  <widget class="QLabel" name="InTFacL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="InTFacL">
+   <property name="geometry">
     <rect>
      <x>180</x>
      <y>100</y>
@@ -206,7 +207,7 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Input t conversion  1 =</string>
    </property>
   </widget>
@@ -219,11 +220,11 @@
    <receiver>SimulDAQDlg</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -235,11 +236,11 @@
    <receiver>SimulDAQDlg</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>

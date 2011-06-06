@@ -14,7 +14,8 @@ DataSavingDlg::DataSavingDlg(QWidget *parent) :
 
     QObject::connect(browseButton, SIGNAL(released()), SaveFileNameDlg, SLOT(show()));
     QObject::connect(SaveFileNameDlg, SIGNAL(accepted()), SLOT(updateSaveFileName()));
-
+    QObject::connect(enabledE, SIGNAL(clicked()), SLOT(toggleEnabled()));
+    toggleEnabled();
 }
 
 
@@ -30,6 +31,7 @@ void DataSavingDlg::updateSaveFileName()
 
 void DataSavingDlg::exportData()
 {
+    dataSavingPs.enabled= enabledE->isChecked();
     dataSavingPs.fileName = leFileName->text();
     double sFreq = 1000 * leSavingFreq->text().toDouble();   // kHz -> Hz
     if ( sFreq <= 0.0 ) sFreq = 1000; // set to 1kHz by default
@@ -40,9 +42,26 @@ void DataSavingDlg::exportData()
 void DataSavingDlg::importData()
 {
     QString sFreq;
-
+    enabledE->setChecked(dataSavingPs.enabled);
     leFileName->setText(dataSavingPs.fileName);
     sFreq.setNum(dataSavingPs.savingFreq / 1000);   // Hz -> kHz
     leSavingFreq->setText(sFreq);
     cbSavingFormat->setCurrentIndex(dataSavingPs.isBinary);
+    toggleEnabled();
+}
+
+void DataSavingDlg::toggleEnabled()
+{
+    if (enabledE->isChecked()) {
+        leFileName->setEnabled(true);
+        browseButton->setEnabled(true);
+        leSavingFreq->setEnabled(true);
+        cbSavingFormat->setEnabled(true);
+    }
+    else {
+        leFileName->setEnabled(false);
+        browseButton->setEnabled(false);
+        leSavingFreq->setEnabled(false);
+        cbSavingFormat->setEnabled(false);
+    }
 }

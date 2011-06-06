@@ -24,14 +24,14 @@ void HHDlg::exportData(mhHHData &p)
   // mh formalism
   p.Vm= VmE->text().toDouble()*1e-3;
   p.sm= smE->text().toDouble()*1e-3;
-  p.Cm= CmE->text().toDouble()*1e-3;
+  p.Cm= CmE->text().toDouble();
   p.taum= taumE->text().toDouble()*1e-3;
-  p.taumAmpl= taumAmplE->text().toDouble();
+  p.taumAmpl= taumAmplE->text().toDouble()*1e-3;
   p.Vtaum= VtaumE->text().toDouble()*1e-3;
   p.staum= staumE->text().toDouble()*1e-3;
   p.Vh= VhE->text().toDouble()*1e-3;
   p.sh= shE->text().toDouble()*1e-3;
-  p.Ch= ChE->text().toDouble()*1e-3;
+  p.Ch= ChE->text().toDouble();
   p.tauh= tauhE->text().toDouble()*1e-3;
   p.tauhAmpl= tauhAmplE->text().toDouble()*1e-3;
   p.Vtauh= VtauhE->text().toDouble()*1e-3;
@@ -59,11 +59,11 @@ void HHDlg::importData(mhHHData p)
   VmE->setText(num);
   num.setNum(p.sm*1e3);
   smE->setText(num);
-  num.setNum(p.Cm*1e3);
+  num.setNum(p.Cm);
   CmE->setText(num);
   num.setNum(p.taum*1e3);
   taumE->setText(num);
-  num.setNum(p.taumAmpl);
+  num.setNum(p.taumAmpl*1e3);
   taumAmplE->setText(num);
   num.setNum(p.Vtaum*1e3);
   VtaumE->setText(num);
@@ -73,7 +73,7 @@ void HHDlg::importData(mhHHData p)
   VhE->setText(num);
   num.setNum(p.sh*1e3);
   shE->setText(num);
-  num.setNum(p.Ch*1e3);
+  num.setNum(p.Ch);
   ChE->setText(num);
   num.setNum(p.tauh*1e3);
   tauhE->setText(num);
