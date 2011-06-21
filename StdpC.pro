@@ -127,15 +127,15 @@ SOURCES += Main.cpp \
 LIBS += ../trunk/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)
-#DEPENDPATH += src/nidaqmx
-#SOURCES += NIDAQDlg.cpp \
-#NIDAQ.cpp
-#FORMS += NIDAQDlg.ui
+DEPENDPATH += src/nidaqmx
+SOURCES += NIDAQDlg.cpp \
+NIDAQ.cpp
+FORMS += NIDAQDlg.ui
 
-#HEADERS += NIDAQDlg.h \
-#NIDAQ.h
+HEADERS += NIDAQDlg.h \
+NIDAQ.h
 
-#INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
-#INCLUDEPATH += src/nidaqmx
+INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+INCLUDEPATH += src/nidaqmx
 
-#LIBS += ../trunk/staticlib/nidaqmx.a
+LIBS += ../trunk/staticlib/nidaqmx.a
