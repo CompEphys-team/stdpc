@@ -159,7 +159,7 @@ void SimulDAQ::get_scan(inChannel *in)
   short int idx;
   static double V;
 
-  os << t << endl;
+  //os << t << endl;
   if (t >= inT) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {
@@ -172,8 +172,8 @@ void SimulDAQ::get_scan(inChannel *in)
     }
     inT= *intIter;
 
+    idx= 0;
     for (i= 0; i < inChnNo; i++) {
-      idx= 0;
       V= *inIter[i];
       if ((idx < actInChnNo) && (i == inIdx[idx])) {
         in[i].V= V*inGainFac[idx];
