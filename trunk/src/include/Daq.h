@@ -13,6 +13,7 @@ class DAQ {
     virtual void generate_scan_list(short int, short int *)= 0;
     virtual void generate_analog_out_list(short int, short int *)= 0;
     virtual void get_scan(inChannel *)= 0;
+    virtual void get_single_scan(inChannel *, int)= 0;
     virtual void write_analog_out(outChannel *)= 0;
     virtual void reset_board()= 0;
     

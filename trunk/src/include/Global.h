@@ -18,6 +18,7 @@ extern int synType[MAX_SYN_NO];
 extern CSynData CSynp[MAX_SYN_NO];
 extern abSynData abSynp[MAX_SYN_NO];
 extern GJunctData ESynp[MAX_SYN_NO];
+extern DestexheSynData DxheSynp[MAX_SYN_NO];
 
 extern int HHType[MAX_HH_NO];
 extern mhHHData mhHHp[MAX_HH_NO];
@@ -40,6 +41,9 @@ extern elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
 
 
 extern graphData Graphp[2];
+
+// Attilas Sample-and-Hold
+extern SampleHoldData SampleHoldp;
 
 // LU tables
 extern tanhLUtable tanhLU;

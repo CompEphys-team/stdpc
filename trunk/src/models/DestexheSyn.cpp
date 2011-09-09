@@ -1,12 +1,12 @@
 
-#include "AbSyn.h"
+#include "DestexheSyn.h"
 #include <cmath>
     
-abSyn::abSyn() 
+DestexheSyn::DestexheSyn()
 {
 }
 
-double abSyn::invGFilter(double ing)
+double DestexheSyn::invGFilter(double ing)
 {
   static double gr;
   
@@ -21,7 +21,7 @@ double abSyn::invGFilter(double ing)
   return gr;
 }
 
-double abSyn::gFilter(double ingr)
+double DestexheSyn::gFilter(double ingr)
 {
   static double ng;
   
@@ -36,7 +36,7 @@ double abSyn::gFilter(double ingr)
   return ng;
 }
 
-void abSyn::init(abSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
+void DestexheSyn::init(DestexheSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
 {
   p= inp;
   pre= &inChn[inIdx[p->PreSynChannel]];
@@ -57,7 +57,7 @@ void abSyn::init(abSynData *inp, short int *inIdx, short int *outIdx, inChannel 
     theTanh= &tanhFunc;
   }
   S= 0.0;
-  R= 0.0;
+  tlast= -1.0e10;
   g= p->gSyn;
   graw= invGFilter(g);
   if (p->Plasticity == 2) {
@@ -68,20 +68,30 @@ void abSyn::init(abSynData *inp, short int *inIdx, short int *outIdx, inChannel 
   }
 }
 
-void abSyn::currentUpdate(double t, double dt)
+void DestexheSyn::currentUpdate(double t, double dt)
 {
-  static double dS, dR;
+  static double rt, dS;
   
   // calculate synaptic current
-  dS= (1.0 - S)*p->aS*R - S*p->bS;
-  dR= (1.0 - R)*p->aR*(*theExpSigmoid)((pre->V-p->VaR)/p->saR) - R*p->bR;
+  rt= t - tlast;
+  if ((rt >= 0.0) && (rt <= p->trelease)) {
+    // continue release from an old spike
+    dS= p->alpha*(1.0-S) - p->beta*S;
+  } else {
+    if (pre->V > p->Vpre) {
+      // new spike ... start releasing
+      tlast= t;
+      dS= p->alpha*(1.0-S) - p->beta*S;
+    }
+    else {
+      // no release
+      dS= -p->beta*S;
+    }
+  }
   // Linear Euler:
-  S+= dS*dt;   /// use previous values of Sinf, S
+  S+= dS*dt;
   if (S > 1.0) S= 1.0;
   if (S < 0.0) S= 0.0;
-  R+= dR*dt;
-  if (R > 1.0) R= 1.0;
-  if (R < 0.0) R= 0.0;
   
   if(p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
   else I= g * S * (p->Vrev - post->V);
@@ -98,7 +108,7 @@ void abSyn::currentUpdate(double t, double dt)
   }
 }
 
-void abSyn::STlearn(double t)
+void DestexheSyn::STlearn(double t)
 {
   static int sn;
   static double tmp;
@@ -125,7 +135,7 @@ void abSyn::STlearn(double t)
   }
 }
 
-double abSyn::STDPFunc(double indt) 
+double DestexheSyn::STDPFunc(double indt)
 {
   static double dt;     
   dt= indt-p->ST.Shift;
@@ -152,21 +162,21 @@ double abSyn::STDPFunc(double indt)
   }
 }
 
-double abSyn::P_f(double V) 
+double DestexheSyn::P_f(double V)
 {
   if (V > p->ODE.highP) return 1.0;
   if (V < p->ODE.lowP) return 0.0;
   return Pslope*(V-p->ODE.lowP);
 }
 
-double abSyn::D_f(double V)
+double DestexheSyn::D_f(double V)
 {
   if (V > p->ODE.highD) return 1.0;
   if (V < p->ODE.lowD) return 0.0;
   return Dslope*(V-p->ODE.lowD); 
 }
 
-void abSyn::ODElearn(double dt)
+void DestexheSyn::ODElearn(double dt)
 {
   static double tmp1, tmp2;
 

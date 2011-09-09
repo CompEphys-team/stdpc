@@ -108,6 +108,7 @@ class DigiData: public DAQ
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
     virtual void get_scan(inChannel *);
+    virtual void get_single_scan(inChannel *, int);
     virtual void write_analog_out(outChannel *);
     virtual void reset_board();
     short int* inChnGain;

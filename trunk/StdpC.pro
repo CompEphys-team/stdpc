@@ -16,10 +16,12 @@ INCLUDEPATH += . \
     src/models \
     src/include \
     lib
-INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+INCLUDEPATH += "C:\Program Files\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
+#INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
 TEMPLATE = app
 CONFIG += qt \
-    thread
+    thread \
+    release
 
 # A directory to place intermediary build files.
 RCC_DIR = build
@@ -43,7 +45,8 @@ FORMS += MainWin.ui \
     DigiDataDlg.ui \
     ElectrodeCompDlg.ui \
     AbSynDlg.ui \
-    DataSavingDlg.ui
+    DataSavingDlg.ui \
+    DestexheSynDlg.ui
 HEADERS += Main.h \
     Mainwin.h \
     ChemSynDlg.h \
@@ -83,7 +86,10 @@ HEADERS += Main.h \
     Calibrator.h \
     Datasaver.h \
     DataSavingDlg.h \
-    src/include/ObjectDataTypes.h
+    ObjectDataTypes.h \
+    Global.h \
+    DestexheSynDlg.h \
+    DestexheSyn.h
 
 SOURCES += Main.cpp \
     MainWin.cpp \
@@ -123,7 +129,9 @@ SOURCES += Main.cpp \
     KernelCalculator.cpp \
     Calibrator.cpp \
     Datasaver.cpp \
-    DataSavingDlg.cpp
+    DataSavingDlg.cpp \
+    DestexheSynDlg.cpp \
+    DestexheSyn.cpp
 LIBS += ../trunk/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)

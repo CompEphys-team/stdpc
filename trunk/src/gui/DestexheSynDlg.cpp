@@ -1,25 +1,25 @@
 
-#include "AbSynDlg.h"
+#include "DestexheSynDlg.h"
 #include <QMessageBox>
 
-abSynDlg::abSynDlg(int no, QWidget *parent)
+DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
      QString lb;
      setupUi(this);
-     
+
      No= no;
      lb.setNum(No);
-     abSynDlgLabel->setText(QString("Synapse ")+lb);
-     
+     DestexheSynDlgLabel->setText(QString("Synapse ")+lb);
+
      STDP= new STDPDlg(this, No);
      ODESTDP= new ODESTDPDlg(this, No);
-     
+
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
 }
 
-void abSynDlg::ResCloseClicked(QAbstractButton *but)
+void DestexheSynDlg::ResCloseClicked(QAbstractButton *but)
 {
   if (but->text() == QString("Close")) {
     hide();
@@ -29,20 +29,20 @@ void abSynDlg::ResCloseClicked(QAbstractButton *but)
   }
 }
 
-void abSynDlg::PlastMethodChange()
+void DestexheSynDlg::PlastMethodChange()
 {
   int index= PlasticityCombo->currentIndex();
   STDP->hide();
   ODESTDP->hide();
   PlastParaBut->disconnect();
-  
+
   if (index == 0) {
     PlastParaBut->setEnabled(false);
   }
   else {
     PlastParaBut->setEnabled(true);
   }
-     
+
   if (index == 1) {
     connect(PlastParaBut, SIGNAL(clicked()), STDP, SLOT(show()));
   }
@@ -51,20 +51,18 @@ void abSynDlg::PlastMethodChange()
   }
 }
 
-void abSynDlg::exportData(abSynData &p)
+void DestexheSynDlg::exportData(DestexheSynData &p)
 {
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.PreSynChannel= PreSynChannelCombo->currentIndex();
   p.PostSynChannel= PostSynChannelCombo->currentIndex();
   p.OutSynChannel= OutSynChannelCombo->currentIndex();
   p.gSyn= gSynE->text().toDouble()*1e-9;
+  p.Vpre= VpreE->text().toDouble()*1e-3;
   p.Vrev= VrevE->text().toDouble()*1e-3;
-  p.aS= aSE->text().toDouble()*1e3;
-  p.bS= bSE->text().toDouble()*1e3;
-  p.aR= aRE->text().toDouble()*1e3;
-  p.VaR= VaRE->text().toDouble()*1e-3;
-  p.saR= saRE->text().toDouble()*1e-3;
-  p.bR= bRE->text().toDouble()*1e3;
+  p.trelease= treleaseE->text().toDouble()*1e-3;
+  p.alpha= alphaE->text().toDouble()*1e3;
+  p.beta= betaE->text().toDouble()*1e3;
   p.fixVpost= fixVpostCombo->currentIndex();
   p.Vpost= VpostE->text().toDouble()*1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
@@ -74,9 +72,9 @@ void abSynDlg::exportData(abSynData &p)
   ODESTDP->exportData(p.ODE);
 }
 
-void abSynDlg::importData(abSynData p)
+void DestexheSynDlg::importData(DestexheSynData p)
 {
-  QString num;   
+  QString num;
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   PreSynChannelCombo->setCurrentIndex(p.PreSynChannel);
@@ -84,20 +82,16 @@ void abSynDlg::importData(abSynData p)
   OutSynChannelCombo->setCurrentIndex(p.OutSynChannel);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
+  num.setNum(p.Vpre*1e3);
+  VpreE->setText(num);
   num.setNum(p.Vrev*1e3);
   VrevE->setText(num);
-  num.setNum(p.aS*1e-3);
-  aSE->setText(num);
-  num.setNum(p.bS*1e-3);
-  bSE->setText(num);
-  num.setNum(p.aR*1e-3);
-  aRE->setText(num);
-  num.setNum(p.VaR*1e3);
-  VaRE->setText(num);
-  num.setNum(p.saR*1e3);
-  saRE->setText(num);
-  num.setNum(p.bR*1e-3);
-  bRE->setText(num);
+  num.setNum(p.trelease*1e3);
+  treleaseE->setText(num);
+  num.setNum(p.alpha*1e-3);
+  alphaE->setText(num);
+  num.setNum(p.beta*1e-3);
+  betaE->setText(num);
   fixVpostCombo->setCurrentIndex(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
@@ -109,7 +103,7 @@ void abSynDlg::importData(abSynData p)
 }
 
 
-void abSynDlg::updateOutChn(int chN, int *chns) 
+void DestexheSynDlg::updateOutChn(int chN, int *chns)
 {
   QString current;
   QString lb;
@@ -128,7 +122,7 @@ void abSynDlg::updateOutChn(int chN, int *chns)
   else OutSynChannelCombo->setCurrentIndex(0);
 }
 
-void abSynDlg::updateInChn(int chN, int *chns) 
+void DestexheSynDlg::updateInChn(int chN, int *chns)
 {
   QString currentPre, currentPost;
   QString lb;

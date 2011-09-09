@@ -6,6 +6,7 @@
 #include "ChemSyn.h"
 #include "AbSyn.h"
 #include "GapJunction.h"
+#include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
 #include "SpkGen.h"
@@ -50,6 +51,7 @@ private:
      ChemSyn *csyn;
      abSyn *absyn;
      GapJunction *esyn;
+     DestexheSyn *dsyn;
      HH *hh;
      abHH *abhh;
      DAQ *board;
@@ -63,12 +65,14 @@ private:
      short int csNo;
      short int absNo;
      short int esNo;
+     short int dsNo;
      short int hhNo;
      short int abhhNo;
      
      short int *csIdx;
      short int *absIdx;
      short int *esIdx;
+     short int *dsIdx;
      short int *hhIdx;
      short int *abhhIdx;
      

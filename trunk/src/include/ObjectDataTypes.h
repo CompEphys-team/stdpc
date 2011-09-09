@@ -83,8 +83,6 @@ typedef struct {
   double gSyn;
   double Vrev;
   double aS;
-  double VaS;
-  double saS;
   double bS;
   double aR;
   double VaR;
@@ -97,6 +95,24 @@ typedef struct {
   ODEPlast ODE;
 } abSynData;
 
+typedef struct {
+  bool active;
+  bool LUTables;
+  int PreSynChannel;
+  int PostSynChannel;
+  int OutSynChannel;
+  double gSyn;
+  double Vpre;
+  double Vrev;
+  double trelease;
+  double alpha;
+  double beta;
+  int fixVpost;
+  double Vpost;
+  int Plasticity;
+  STPlast ST;
+  ODEPlast ODE;
+} DestexheSynData;
 
 typedef struct {
   bool active;
@@ -273,6 +289,12 @@ typedef struct {
   int ytNo;
   double yfac[4];
 } graphData;
+
+typedef struct {
+  bool active;
+  double threshV;
+  int trigChn;
+} SampleHoldData;
 
 ostream &operator<<(ostream &os, SDAQData &p);
 istream &operator>>(istream &is, SDAQData &p); 

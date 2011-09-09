@@ -34,7 +34,6 @@ void SpkGen::init(SGData *inp, short int inNo, short int *inIdx, inChannel *inCh
   int sn;
      
   p= inp;
-  saveSG = p->saving;
   VChn= &inChn[inIdx[inNo]];
   bdChn= &inChn[inIdx[p->bdChannel]];
   if (p->LUTables) {
