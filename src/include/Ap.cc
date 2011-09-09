@@ -19,6 +19,8 @@ void MyMainWindow::setupAP()
   bAP.clear();
   sAP.clear();
  
+
+  // Chemical synapses
   for (int s= 0; s < MAX_SYN_NO; s++)
   {
     qs.setNum(s);
@@ -142,7 +144,218 @@ void MyMainWindow::setupAP()
     iAP.append(&(CSynp[s].Plasticity));
   }
  
+  // alpha-beta synapses
+  for (int s= 0; s < MAX_SYN_NO; s++)
+  {
+    qs.setNum(s);
+
+    // STPlast
+    APname.append(QString("abSynp[") + qs + QString("].ST.AMinus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.AMinus));
+    APname.append(QString("abSynp[") + qs + QString("].ST.tauMinus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.tauMinus));
+    APname.append(QString("abSynp[") + qs + QString("].ST.APlus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.APlus));
+    APname.append(QString("abSynp[") + qs + QString("].ST.tauPlus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.tauPlus));
+    APname.append(QString("abSynp[") + qs + QString("].ST.Exponent")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].ST.Exponent));
+    APname.append(QString("abSynp[") + qs + QString("].ST.Shift")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.Shift));
+    APname.append(QString("abSynp[") + qs + QString("].ST.History")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].ST.History));
+    APname.append(QString("abSynp[") + qs + QString("].ST.Table")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(abSynp[s].ST.Table));
+    APname.append(QString("abSynp[") + qs + QString("].ST.tableDt")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.tableDt));
+    APname.append(QString("abSynp[") + qs + QString("].ST.tableDgMin")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.tableDgMin));
+    APname.append(QString("abSynp[") + qs + QString("].ST.gMax")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.gMax));
+    APname.append(QString("abSynp[") + qs + QString("].ST.gMid")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.gMid));
+    APname.append(QString("abSynp[") + qs + QString("].ST.gSlope")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.gSlope));
+    APname.append(QString("abSynp[") + qs + QString("].ST.sigmoidTable")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(abSynp[s].ST.sigmoidTable));
+    APname.append(QString("abSynp[") + qs + QString("].ST.sigmoidTableDg")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.sigmoidTableDg));
+    APname.append(QString("abSynp[") + qs + QString("].ST.sigmoidTableMaxEntry")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ST.sigmoidTableMaxEntry));
+
+  // ODEPlast
+    APname.append(QString("abSynp[") + qs + QString("].ODE.InitialP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.InitialP));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.InitialD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.InitialD));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.betaP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.betaP));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.betaD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.betaD));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.gamma")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.gamma));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.eta")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].ODE.eta));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.highP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.highP));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.lowP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.lowP));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.highD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.highD));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.lowD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.lowD));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.gMax")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.gMax));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.gMid")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.gMid));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.gSlope")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.gSlope));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.sigmoidTable")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(abSynp[s].ODE.sigmoidTable));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.sigmoidTableDg")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.sigmoidTableDg));
+    APname.append(QString("abSynp[") + qs + QString("].ODE.sigmoidTableMaxEntry")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].ODE.sigmoidTableMaxEntry));
+
+    // main abSynp
+    APname.append(QString("abSynp[") + qs + QString("].active")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(abSynp[s].active));
+    APname.append(QString("abSynp[") + qs + QString("].LUTables")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(abSynp[s].LUTables));
+    APname.append(QString("abSynp[") + qs + QString("].PreSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].PreSynChannel));
+    APname.append(QString("abSynp[") + qs + QString("].PostSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].PostSynChannel));
+    APname.append(QString("abSynp[") + qs + QString("].OutSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].OutSynChannel));
+    APname.append(QString("abSynp[") + qs + QString("].gSyn")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].gSyn));
+    APname.append(QString("abSynp[") + qs + QString("].Vrev")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].Vrev));
+    APname.append(QString("abSynp[") + qs + QString("].aS")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].aS));
+    APname.append(QString("abSynp[") + qs + QString("].bS")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].bS));
+    APname.append(QString("abSynp[") + qs + QString("].aR")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].aR));
+    APname.append(QString("abSynp[") + qs + QString("].VaR")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].VaR));
+    APname.append(QString("abSynp[") + qs + QString("].saR")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].saR));
+    APname.append(QString("abSynp[") + qs + QString("].bR")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].bR));
+    APname.append(QString("abSynp[") + qs + QString("].fixVpost")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].fixVpost));
+    APname.append(QString("abSynp[") + qs + QString("].Vpost"));  APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(abSynp[s].Vpost));
+    APname.append(QString("abSynp[") + qs + QString("].Plasticity")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(abSynp[s].Plasticity));
+  }
   
+  // Destexhe synapses
+  for (int s= 0; s < MAX_SYN_NO; s++)
+  {
+    qs.setNum(s);
+
+    // STPlast
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.AMinus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.AMinus));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.tauMinus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.tauMinus));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.APlus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.APlus));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.tauPlus")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.tauPlus));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.Exponent")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].ST.Exponent));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.Shift")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.Shift));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.History")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].ST.History));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.Table")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(DxheSynp[s].ST.Table));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.tableDt")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.tableDt));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.tableDgMin")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.tableDgMin));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.gMax")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.gMax));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.gMid")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.gMid));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.gSlope")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.gSlope));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.sigmoidTable")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(DxheSynp[s].ST.sigmoidTable));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.sigmoidTableDg")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.sigmoidTableDg));
+    APname.append(QString("DxheSynp[") + qs + QString("].ST.sigmoidTableMaxEntry")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ST.sigmoidTableMaxEntry));
+
+  // ODEPlast
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.InitialP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.InitialP));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.InitialD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.InitialD));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.betaP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.betaP));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.betaD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.betaD));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.gamma")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.gamma));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.eta")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].ODE.eta));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.highP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.highP));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.lowP")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.lowP));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.highD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.highD));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.lowD")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.lowD));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.gMax")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.gMax));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.gMid")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.gMid));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.gSlope")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.gSlope));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.sigmoidTable")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(DxheSynp[s].ODE.sigmoidTable));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.sigmoidTableDg")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.sigmoidTableDg));
+    APname.append(QString("DxheSynp[") + qs + QString("].ODE.sigmoidTableMaxEntry")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].ODE.sigmoidTableMaxEntry));
+
+    // main DxheSynp
+    APname.append(QString("DxheSynp[") + qs + QString("].active")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(DxheSynp[s].active));
+    APname.append(QString("DxheSynp[") + qs + QString("].LUTables")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(DxheSynp[s].LUTables));
+    APname.append(QString("DxheSynp[") + qs + QString("].PreSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].PreSynChannel));
+    APname.append(QString("DxheSynp[") + qs + QString("].PostSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].PostSynChannel));
+    APname.append(QString("DxheSynp[") + qs + QString("].OutSynChannel")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].OutSynChannel));
+    APname.append(QString("DxheSynp[") + qs + QString("].gSyn")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].gSyn));
+    APname.append(QString("DxheSynp[") + qs + QString("].Vpre")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].Vpre));
+    APname.append(QString("DxheSynp[") + qs + QString("].Vrev")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].Vrev));
+    APname.append(QString("DxheSynp[") + qs + QString("].trelease")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].trelease));
+    APname.append(QString("DxheSynp[") + qs + QString("].alpha")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].alpha));
+    APname.append(QString("DxheSynp[") + qs + QString("].beta")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].beta));
+    APname.append(QString("DxheSynp[") + qs + QString("].fixVpost")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].fixVpost));
+    APname.append(QString("DxheSynp[") + qs + QString("].Vpost"));  APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(DxheSynp[s].Vpost));
+    APname.append(QString("DxheSynp[") + qs + QString("].Plasticity")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(DxheSynp[s].Plasticity));
+  }
+
   for (int s= 0; s < MAX_SYN_NO; s++)
   {
     qs.setNum(s);
@@ -417,6 +630,19 @@ void MyMainWindow::setupAP()
     APname.append(QString("DigiDatap.syncIOMask")); APtype.append(SHORTINTTYPE); APindex.append(siAP.size());
     siAP.append(&(DigiDatap.syncIOMask));
   }    
+
+  // Attila's Sample-and-hold
+  APname.append(QString("SampleHoldp.active")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+  bAP.append(&(SampleHoldp.active));
+  APname.append(QString("SampleHoldp.threshV")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+  dAP.append(&(SampleHoldp.threshV));
+  APname.append(QString("SampleHoldp.trigChn")); APtype.append(INTTYPE); APindex.append(iAP.size());
+  iAP.append(&(SampleHoldp.trigChn));
+  // end of Attila's Sample-and-hold
+  //  QMessageBox::warning(this, tr("My Application"),
+  //                tr("end of setupAP"),
+  //               QMessageBox::Close);
+
  assert(APname.size() == dAP.size() + iAP.size() + bAP.size() + sAP.size() + siAP.size());
 
 }

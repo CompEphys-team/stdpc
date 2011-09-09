@@ -5,6 +5,7 @@ int synType[MAX_SYN_NO];
 CSynData CSynp[MAX_SYN_NO];
 abSynData abSynp[MAX_SYN_NO];
 GJunctData ESynp[MAX_SYN_NO];
+DestexheSynData DxheSynp[MAX_SYN_NO];
 
 int HHType[MAX_HH_NO];
 mhHHData mhHHp[MAX_HH_NO];
@@ -26,6 +27,9 @@ graphData Graphp[2];
 
 dataSavingParams dataSavingPs;
 elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
+
+// Attilas Sample-and-Hold
+SampleHoldData SampleHoldp;
 
 // LU tables
 tanhLUtable tanhLU;

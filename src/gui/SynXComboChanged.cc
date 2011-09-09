@@ -21,7 +21,10 @@ void MyMainWindow::Syn0ComboChanged()
   }
   if (index == 3) {
     connect(Syn0ParaBut, SIGNAL(clicked()), abSDlg[0], SLOT(show()));
-  }               
+  }
+  if (index == 4) {
+    connect(Syn0ParaBut, SIGNAL(clicked()), DxheSynDlg[0], SLOT(show()));
+  }
 }
 
 void MyMainWindow::Syn1ComboChanged()
@@ -47,7 +50,10 @@ void MyMainWindow::Syn1ComboChanged()
   }
   if (index == 3) {
     connect(Syn1ParaBut, SIGNAL(clicked()), abSDlg[1], SLOT(show()));
-  }               
+  }
+  if (index == 4) {
+    connect(Syn1ParaBut, SIGNAL(clicked()), DxheSynDlg[1], SLOT(show()));
+  }
 }
 
 void MyMainWindow::Syn2ComboChanged()
@@ -74,6 +80,9 @@ void MyMainWindow::Syn2ComboChanged()
   if (index == 3) {
     connect(Syn2ParaBut, SIGNAL(clicked()), abSDlg[2], SLOT(show()));
   }            
+  if (index == 4) {
+    connect(Syn2ParaBut, SIGNAL(clicked()), DxheSynDlg[2], SLOT(show()));
+  }
 }
 
 void MyMainWindow::Syn3ComboChanged()
@@ -100,6 +109,9 @@ void MyMainWindow::Syn3ComboChanged()
   if (index == 3) {
     connect(Syn3ParaBut, SIGNAL(clicked()), abSDlg[3], SLOT(show()));
   }            
+  if (index == 4) {
+    connect(Syn3ParaBut, SIGNAL(clicked()), DxheSynDlg[3], SLOT(show()));
+  }
 }
 
 void MyMainWindow::Syn4ComboChanged()
@@ -126,6 +138,9 @@ void MyMainWindow::Syn4ComboChanged()
   if (index == 3) {
     connect(Syn4ParaBut, SIGNAL(clicked()), abSDlg[4], SLOT(show()));
   }              
+  if (index == 4) {
+    connect(Syn4ParaBut, SIGNAL(clicked()), DxheSynDlg[4], SLOT(show()));
+  }
 }
 
 void MyMainWindow::Syn5ComboChanged()
@@ -152,4 +167,7 @@ void MyMainWindow::Syn5ComboChanged()
   if (index == 3) {
     connect(Syn5ParaBut, SIGNAL(clicked()), abSDlg[5], SLOT(show()));
   }        
+  if (index == 4) {
+    connect(Syn5ParaBut, SIGNAL(clicked()), DxheSynDlg[5], SLOT(show()));
+  }
 }

@@ -14,6 +14,7 @@
 #include "ChemSynDlg.h"
 #include "AbSynDlg.h"
 #include "GapJunctionDlg.h"
+#include "DestexheSynDlg.h"
 #include "HHDlg.h"
 #include "AlphaBetaHHDlg.h"
 #include "SpikeTimeDlg.h"
@@ -60,12 +61,12 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      InputChannelDlg *inChnDlg;
      OutputChannelDlg *outChnDlg;
 
-     
      ElectrodeCompDlg *ECDlg;
      DataSavingDlg *DSDlg;
      ChemSynDlg *CSynDlg[MAX_SYN_NO];
      abSynDlg *abSDlg[MAX_SYN_NO];
      GapJunctionDlg *GJunctDlg[MAX_SYN_NO];
+     DestexheSynDlg *DxheSynDlg[MAX_SYN_NO];
      HHDlg *nHHDlg[MAX_HH_NO];
      AlphaBetaHHDlg *abHHDlg[MAX_HH_NO];
      SpikeTimeDlg *SpkTDlg;

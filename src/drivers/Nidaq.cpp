@@ -232,6 +232,26 @@ void NIDAQ::get_scan(inChannel *in)
 }
 
 //---------------------------------------------------------------------------
+void NIDAQ::get_single_scan(inChannel *in, int which)
+{
+  static int i;
+  static int32 spr;
+//  QString temp;
+
+  DAQmxReadAnalogF64(inTask, 1, 1.0e-4, DAQmx_Val_GroupByScanNumber, inBuf, actInChnNo, &spr, NULL);
+//  temp.setNum(inBuf[0]);
+//  QMessageBox::warning(NULL, QString("My Application"),
+//                temp,
+//                QMessageBox::Ok);
+  for (i= 0; i < actInChnNo; i++) {
+      if (inIdx[i] == which) {
+          in[inIdx[i]].V= inGainFac[i]*inBuf[i];
+      }
+  }
+}
+
+
+//---------------------------------------------------------------------------
 void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
 {
    actOutChnNo= chnNo;

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StdpC 2010</string>
+   <string>StdpC 2011</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="DataBox">
@@ -843,6 +843,11 @@ p, li { white-space: pre-wrap; }
         <string>ab Synapse</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn0ParaBut">
       <property name="enabled">
@@ -937,6 +942,11 @@ p, li { white-space: pre-wrap; }
         <string>ab Synapse</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn1ParaBut">
       <property name="enabled">
@@ -1028,6 +1038,11 @@ p, li { white-space: pre-wrap; }
         <string>ab Synapse</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
+       </property>
+      </item>
      </widget>
      <widget class="QPushButton" name="Syn2ParaBut">
       <property name="enabled">
@@ -1117,6 +1132,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text">
         <string>ab Synapse</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
        </property>
       </item>
      </widget>
@@ -1226,6 +1246,11 @@ p, li { white-space: pre-wrap; }
         <string>ab Synapse</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QFrame" name="frame_10">
@@ -1315,6 +1340,11 @@ p, li { white-space: pre-wrap; }
       <item>
        <property name="text">
         <string>ab Synapse</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Destexhe</string>
        </property>
       </item>
      </widget>
@@ -2173,7 +2203,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1013</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

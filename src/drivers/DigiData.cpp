@@ -229,6 +229,21 @@ void DigiData::get_scan(inChannel *in)
    }
 }
 
+void DigiData::get_single_scan(inChannel *in, int which)
+{
+   short int i, scan;
+
+   for(i= 0; i < actInChnNo; i++) WriteWord(reset_control, ADCSTARTCONVERT);
+
+   for(i= 0; i < actInChnNo; i++){
+      scan= ReadWord(ADC_data);
+      if (inIdx[i] == which) {
+          in[inIdx[i]].V= inGainFac[i] * (double) scan;
+      }
+   }
+}
+
+
 //---------------------------------------------------------------------------
 void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 {

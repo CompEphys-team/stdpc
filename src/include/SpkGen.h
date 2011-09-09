@@ -50,7 +50,6 @@ class SpkGen: public QObject
     double VSpike(double);
 
     double V;
-    bool saveSG;
     
   signals:
     void message(QString message);

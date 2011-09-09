@@ -14,11 +14,13 @@ DCThread::DCThread()
   csyn= new ChemSyn[MAX_SYN_NO];
   absyn= new abSyn[MAX_SYN_NO];
   esyn= new GapJunction[MAX_SYN_NO];
+  dsyn= new DestexheSyn[MAX_SYN_NO];
   hh= new HH[MAX_HH_NO];
   abhh= new abHH[MAX_HH_NO];
   csIdx= new short int[MAX_SYN_NO];
   absIdx= new short int[MAX_SYN_NO];
   esIdx= new short int[MAX_SYN_NO];
+  dsIdx= new short int[MAX_SYN_NO];
   hhIdx= new short int[MAX_HH_NO];
   abhhIdx= new short int[MAX_HH_NO];
 
@@ -40,11 +42,13 @@ DCThread::~DCThread()
    delete[] csyn;
    delete[] absyn;
    delete[] esyn;
+   delete[] dsyn;
    delete[] hh;
    delete[] abhh;
    delete[] csIdx;
    delete[] absIdx;
    delete[] esIdx;
+   delete[] dsIdx;
    delete[] hhIdx;
    delete[] abhhIdx;
    
@@ -83,6 +87,9 @@ void DCThread::run()
 //   expSigmoidLU.reset();
    // collect the active channels
    //exit(1);
+   // for Attila's Sample-and-hold
+   bool SampleHoldOn= false;
+
    inNo= 0;  
    for (i= 0; i < board->inChnNo; i++) {  
      if (inChnp[i].active) {
@@ -149,6 +156,7 @@ void DCThread::run()
    csNo= 0;
    absNo= 0;
    esNo= 0;
+   dsNo= 0;
    for (i= 0; i < MAX_SYN_NO; i++) {
      if (CSynp[i].active) {
        csyn[i].init(&CSynp[i],inIdx,outIdx,inChn,outChn);
@@ -161,6 +169,10 @@ void DCThread::run()
      if (ESynp[i].active) {
        esyn[i].init(&ESynp[i],inIdx,outIdx,inChn,outChn);
        esIdx[esNo++]= i;
+     }
+     if (DxheSynp[i].active) {
+       dsyn[i].init(&DxheSynp[i],inIdx,outIdx,inChn,outChn);
+       dsIdx[dsNo++]= i;
      }
    }
    hhNo= 0;
@@ -175,15 +187,17 @@ void DCThread::run()
        abhhIdx[abhhNo++]= i;
      }
    }
-   QString cN, abN, eN, hN, aN;
+   QString cN, abN, eN, dN, hN, aN;
    cN.setNum(csNo);
    abN.setNum(absNo);
    eN.setNum(esNo);
+   dN.setNum(dsNo);
    hN.setNum(hhNo);
    aN.setNum(abhhNo);
    if (csNo > 0) message(QString("DynClamp: ")+cN+QString(" chemical synapse(s) "));
    if (absNo > 0) message(QString("DynClamp: ")+abN+QString(" ab synapse(s) "));
    if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
+   if (dsNo > 0) message(QString("DynClamp: ")+dN+QString(" Destexhe synapse(s) "));
    if (hhNo > 0) message(QString("DynClamp: ")+hN+QString(" HH conductance(s) "));
    if (abhhNo > 0) message(QString("DynClamp: ")+aN+QString(" abHH conductance(s) ..."));
 
@@ -249,16 +263,16 @@ void DCThread::run()
      savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
      // numOfAecChannels is only nonzero if TEST_VERSION is defined
-     data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SG.saveSG+numOfAecChannels); // time + in + out + SG (which can be 0)
+     data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SGp.saving+numOfAecChannels); // time + in + out + SG (which can be 0)
      QVector<QString> header = QVector<QString>(data.size()); // write file header
      header[0] = "Time";
      QString tmp;
      for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
-     if( SG.saveSG ) header[1+inChnsToSave.size()] = "SpikeGenerator";
-     for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SG.saveSG+i] = "I"+tmp.setNum(outChnsToSave[i]);
+     if( SGp.saving ) header[1+inChnsToSave.size()] = "SpikeGenerator";
+     for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SGp.saving+i] = "I"+tmp.setNum(outChnsToSave[i]);
 
      // numOfAecChannels is only nonzero if TEST_VERSION is defined
-     for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SG.saveSG+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
+     for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SGp.saving+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
 
      dataSaver->SaveHeader(header);
    }
@@ -282,43 +296,60 @@ void DCThread::run()
    // Dynamic clamp loop begins
    while (!stopped) {       
 
-     // --- Read --- //
-        board->get_scan(inChn);
-     // --- Read end --- //
 
+     if (!SampleHoldOn) {
+       // --- Read --- //
+          board->get_scan(inChn);
+       // --- Read end --- //
 
-     // --- Calculate --- //
+       // --- Calculate --- //
 
         // Adaptive time step
         dt = board->get_RTC();
         t += dt;
 
+        // AEC channel update part
+        for ( int k=0; k<aecChannels.size(); k++ )
+            if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);
 
-         // AEC channel update part
-         for ( int k=0; k<aecChannels.size(); k++ )
-             if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);                  
-
-         // AEC compensation
-         for ( int k=0; k<aecChannels.size(); k++ ){
+        // AEC compensation
+        for ( int k=0; k<aecChannels.size(); k++ ){
               if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum].V -= aecChannels[k]->v_e;
+        }
+     }
+     if (SampleHoldp.active) {
+         if (SampleHoldOn) {
+             board->get_single_scan(inChn, SampleHoldp.trigChn);
+             if (inChn[SampleHoldp.trigChn].V < SampleHoldp.threshV) {
+                 SampleHoldOn= false;
+             }
          }
+         else {
+             if (inChn[SampleHoldp.trigChn].V >= SampleHoldp.threshV) {
+                 SampleHoldOn= true;
+             }
+         }
+         // Adaptive time step
+         dt = board->get_RTC();
+         t += dt;
+     }
 
-         //--------------- Data saving ------------------------//
+     //--------------- Data saving ------------------------//
          if (dataSavingPs.enabled) {
            if ( t >= lastSave + savingPeriod )
            {
               data[0] = t;
 
               for (i= 0; i < inChnsToSave.size(); i++)   data[i+1] = inChn[inChnsToSave[i]].V;    // voltages
-              if ( SG.saveSG ) data[inChnsToSave.size()+1] = SG.V; // spike generator
-              for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SG.saveSG+i] = outChn[outChnsToSave[i]].I;    // currents
+              if ( SGp.saving ) data[inChnsToSave.size()+1] = SG.V; // spike generator
+              for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SGp.saving+i] = outChn[outChnsToSave[i]].I;    // currents
 
             #ifdef TEST_VERSION
               int aecChannelNum = 0;
               for ( int i=0; i<aecChannels.size(); i++ )
                   if ( aecChannels[i]->IsActive() )
                   {
-                      data[inChnsToSave.size()+1+SG.saveSG+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
+                      data[inChnsToSave.size()+1+SGp.saving+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
                       aecChannelNum++;
                   }
             #endif
@@ -346,6 +377,8 @@ void DCThread::run()
            absyn[absIdx[i]].currentUpdate(t, dt);
          for (i= 0; i < esNo; i++)
            esyn[esIdx[i]].currentUpdate(t, dt);
+         for (i= 0; i < dsNo; i++)
+           dsyn[dsIdx[i]].currentUpdate(t, dt);
          for (i= 0; i < hhNo; i++)
            hh[hhIdx[i]].currentUpdate(t, dt);
          for (i= 0; i < abhhNo; i++)

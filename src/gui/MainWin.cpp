@@ -38,7 +38,7 @@ void MyMainWindow::DAQSetup()
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2010"));
+  LoadMsg.setWindowTitle(tr("StdpC 2011"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
@@ -87,6 +87,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
        CSynDlg[i]= new ChemSynDlg(i, this);
        abSDlg[i]= new abSynDlg(i, this);
        GJunctDlg[i]= new GapJunctionDlg(i, this);
+       DxheSynDlg[i]= new DestexheSynDlg(i, this);
        nHHDlg[i]= new HHDlg(i, this);
        abHHDlg[i]= new AlphaBetaHHDlg(i, this);
      }
@@ -390,9 +391,11 @@ void MyMainWindow::exportData()
     CSynp[i].active= (synType[i] == 1);
     abSynp[i].active= (synType[i] == 3);
     ESynp[i].active= (synType[i] == 2);
+    DxheSynp[i].active= (synType[i] == 4);
     CSynDlg[i]->exportData(CSynp[i]);
     abSDlg[i]->exportData(abSynp[i]);
     GJunctDlg[i]->exportData(ESynp[i]);
+    DxheSynDlg[i]->exportData(DxheSynp[i]);
   }
   // collect data from the HH conductances
   HHType[0]= HH0Combo->currentIndex();
@@ -445,6 +448,7 @@ void MyMainWindow::importData()
     if (CSynp[i].active) synType[i]= 1;
     if (abSynp[i].active) synType[i]= 3;
     if (ESynp[i].active) synType[i]= 2;
+    if (DxheSynp[i].active) synType[i]= 4;
   }
   Syn0Combo->setCurrentIndex(synType[0]);
   Syn1Combo->setCurrentIndex(synType[1]);
@@ -457,6 +461,7 @@ void MyMainWindow::importData()
     CSynDlg[i]->importData(CSynp[i]);
     abSDlg[i]->importData(abSynp[i]);
     GJunctDlg[i]->importData(ESynp[i]);
+    DxheSynDlg[i]->importData(DxheSynp[i]);
   }
   
   // collect data from the HH conductances
@@ -489,7 +494,8 @@ void MyMainWindow::exportSGData()
   SGp.method= SGMethodCombo->currentIndex();
   SGp.active= (SGp.method > 0);
   SGp.LUTables= SGLUTableCombo->currentIndex();
-  SGp.saving= (SGSave->checkState() > 0);
+  if (SGp.active) SGp.saving= (SGSave->checkState() > 0);
+  else SGp.saving= false;
   SGp.VSpike= VSpikeE->text().toDouble()/1e3;
   SGp.spkTimeScaling= 5e3/WidthE->text().toDouble();
   SGp.VRest= VRestE->text().toDouble()/1e3;
@@ -589,6 +595,11 @@ void MyMainWindow::LoadConfig()
   else {
     DisplayMessage(QString("No valid config file found; reverting to standard settings"));
   }
+
+  // special Sample-and-Hold for Attila
+  SampleHoldp.active= false;
+  SampleHoldp.threshV= 0.0;
+  SampleHoldp.trigChn= 0;
 }
 
 

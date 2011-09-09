@@ -60,7 +60,7 @@ double SimulDAQ::get_RTC()
   dt= sysT-lastT;
   if (dt < 0.0) dt+= clock_cycle;
   t+= dt;
- 
+ os << t << endl;
   return dt;
 }
 
@@ -175,6 +175,7 @@ void SimulDAQ::get_scan(inChannel *in)
     idx= 0;
     for (i= 0; i < inChnNo; i++) {
       V= *inIter[i];
+      //os << idx << " " << actInChnNo << " " << i << " " << inIdx[idx] << " " << V << endl;
       if ((idx < actInChnNo) && (i == inIdx[idx])) {
         in[i].V= V*inGainFac[idx];
         idx++;
@@ -182,6 +183,39 @@ void SimulDAQ::get_scan(inChannel *in)
     }
   }
 }
+
+void SimulDAQ::get_single_scan(inChannel *in, int which)
+{
+   short int i;
+   short int idx;
+   static double V;
+
+   //os << t << endl;
+   if (t >= inT) {
+      intIter++;
+      for (i= 0; i < inChnNo; i++) {
+        inIter[i]++;
+      }
+      if (intIter == intq.end()) {
+        t-= dataT;
+        lastWrite-= dataT;
+        rewind();
+      }
+      inT= *intIter;
+
+      idx= 0;
+      for (i= 0; i < inChnNo; i++) {
+        V= *inIter[i];
+        if ((idx < actInChnNo) && (i == inIdx[idx])) {
+          if (i == which) {
+            in[i].V= V*inGainFac[idx];
+          }
+          idx++;
+        }
+     }
+   }
+ }
+
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
 {
