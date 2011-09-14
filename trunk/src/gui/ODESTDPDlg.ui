@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>ODESTDPDlg</class>
- <widget class="QDialog" name="ODESTDPDlg" >
-  <property name="geometry" >
+ <widget class="QDialog" name="ODESTDPDlg">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,11 +10,11 @@
     <height>444</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Dialog</string>
+  <property name="windowTitle">
+   <string>ODE STDP</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
     <rect>
      <x>201</x>
      <y>400</y>
@@ -21,21 +22,21 @@
      <height>32</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
+   <property name="standardButtons">
     <set>QDialogButtonBox::Close</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_5" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>100</y>
@@ -43,12 +44,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>InitialD</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="gammaE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="gammaE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>130</y>
@@ -56,18 +57,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="InitialPE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="InitialPE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>70</y>
@@ -75,18 +76,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_8" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_8">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>100</y>
@@ -94,12 +95,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>betaD</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_7" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>70</y>
@@ -107,12 +108,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>betaP</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>70</y>
@@ -120,12 +121,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>InitialP</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_6" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>130</y>
@@ -133,12 +134,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>gamma</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="betaDE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="betaDE">
+   <property name="geometry">
     <rect>
      <x>260</x>
      <y>100</y>
@@ -146,18 +147,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="InitialDE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="InitialDE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>100</y>
@@ -165,18 +166,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="betaPE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="betaPE">
+   <property name="geometry">
     <rect>
      <x>260</x>
      <y>70</y>
@@ -184,18 +185,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>-20.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="etaE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="etaE">
+   <property name="geometry">
     <rect>
      <x>260</x>
      <y>130</y>
@@ -203,18 +204,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_14" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_14">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>130</y>
@@ -222,12 +223,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>eta</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_15" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_15">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>40</y>
@@ -235,18 +236,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Differential Equation</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_16" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_16">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>170</y>
@@ -254,18 +255,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sigmoid Filter Function P&amp;D</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="highDE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="highDE">
+   <property name="geometry">
     <rect>
      <x>260</x>
      <y>200</y>
@@ -273,18 +274,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_9" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_9">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>200</y>
@@ -292,12 +293,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>highD</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lowPE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="lowPE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>230</y>
@@ -305,18 +306,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>10</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_17" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_17">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>230</y>
@@ -324,12 +325,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>lowD</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="highPE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="highPE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>200</y>
@@ -337,18 +338,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_10" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>230</y>
@@ -356,12 +357,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>lowP</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lowDE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="lowDE">
+   <property name="geometry">
     <rect>
      <x>260</x>
      <y>230</y>
@@ -369,18 +370,18 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>25.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_11" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_11">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>200</y>
@@ -388,12 +389,12 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>highP</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_18" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_18">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>270</y>
@@ -401,18 +402,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Sigmoid Filter Function gSyn</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_13" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_13">
+   <property name="geometry">
     <rect>
      <x>140</x>
      <y>330</y>
@@ -420,18 +421,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_23" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_23">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>360</y>
@@ -439,18 +440,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>gSlope</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="gMidE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="gMidE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>330</y>
@@ -458,27 +459,27 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>30.0</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="sigmoidTableMaxEntryE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="sigmoidTableMaxEntryE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>360</y>
@@ -486,24 +487,24 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>100</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_24" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_24">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>300</y>
@@ -511,21 +512,21 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>gMax</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="sigmoidTableDgE" >
-   <property name="enabled" >
+  <widget class="QLineEdit" name="sigmoidTableDgE">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>270</x>
      <y>330</y>
@@ -533,24 +534,24 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.1</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_12" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_12">
+   <property name="geometry">
     <rect>
      <x>20</x>
      <y>330</y>
@@ -558,18 +559,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>gMid</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="gSlopeE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="gSlopeE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>360</y>
@@ -577,24 +578,24 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.04</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="gMaxE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="gMaxE">
+   <property name="geometry">
     <rect>
      <x>70</x>
      <y>300</y>
@@ -602,27 +603,27 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0.02</string>
    </property>
-   <property name="maxLength" >
+   <property name="maxLength">
     <number>8</number>
    </property>
-   <property name="alignment" >
+   <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="sigmoidTableDgL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="sigmoidTableDgL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>330</y>
@@ -630,18 +631,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>table dg</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_25" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_25">
+   <property name="geometry">
     <rect>
      <x>140</x>
      <y>300</y>
@@ -649,18 +650,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_26" >
-   <property name="geometry" >
+  <widget class="QLabel" name="label_26">
+   <property name="geometry">
     <rect>
      <x>140</x>
      <y>360</y>
@@ -668,21 +669,21 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>1/nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="sigmoidTableMaxEntryL" >
-   <property name="enabled" >
+  <widget class="QLabel" name="sigmoidTableMaxEntryL">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>360</y>
@@ -690,21 +691,21 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>maxEntry</string>
    </property>
   </widget>
-  <widget class="QLabel" name="sigmoidTableMaxEntryU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="sigmoidTableMaxEntryU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>360</y>
@@ -712,18 +713,18 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="sigmoidTableCombo" >
-   <property name="geometry" >
+  <widget class="QComboBox" name="sigmoidTableCombo">
+   <property name="geometry">
     <rect>
      <x>210</x>
      <y>300</y>
@@ -731,28 +732,28 @@
      <height>22</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Direct Functions</string>
     </property>
    </item>
    <item>
-    <property name="text" >
+    <property name="text">
      <string>Lookup Table</string>
     </property>
    </item>
   </widget>
-  <widget class="QLabel" name="sigmoidTableDgU" >
-   <property name="enabled" >
+  <widget class="QLabel" name="sigmoidTableDgU">
+   <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>340</x>
      <y>330</y>
@@ -760,21 +761,21 @@
      <height>16</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <weight>50</weight>
      <bold>false</bold>
     </font>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>nS</string>
    </property>
   </widget>
-  <widget class="QLabel" name="synSTDPLabel" >
-   <property name="enabled" >
+  <widget class="QLabel" name="synSTDPLabel">
+   <property name="enabled">
     <bool>true</bool>
    </property>
-   <property name="geometry" >
+   <property name="geometry">
     <rect>
      <x>280</x>
      <y>20</y>
@@ -782,32 +783,32 @@
      <height>20</height>
     </rect>
    </property>
-   <property name="font" >
+   <property name="font">
     <font>
      <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>
    </property>
-   <property name="autoFillBackground" >
+   <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <property name="styleSheet" >
-    <string notr="true" />
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
-   <property name="frameShape" >
+   <property name="frameShape">
     <enum>QFrame::Panel</enum>
    </property>
-   <property name="frameShadow" >
+   <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <property name="lineWidth" >
+   <property name="lineWidth">
     <number>1</number>
    </property>
-   <property name="midLineWidth" >
+   <property name="midLineWidth">
     <number>0</number>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Synapse X</string>
    </property>
   </widget>
@@ -820,11 +821,11 @@
    <receiver>ODESTDPDlg</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -836,11 +837,11 @@
    <receiver>ODESTDPDlg</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>
