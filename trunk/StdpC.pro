@@ -16,8 +16,6 @@ INCLUDEPATH += . \
     src/models \
     src/include \
     lib
-INCLUDEPATH += "C:\\Program Files\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
-#INCLUDEPATH += "C:\Program Files (x86)\National Instruments\NI-DAQ\DAQmx ANSI C Dev\include"
 TEMPLATE = app
 CONFIG += qt \
     thread \
@@ -143,7 +141,8 @@ FORMS += NIDAQDlg.ui
 HEADERS += NIDAQDlg.h \
 NIDAQ.h
 
-INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+INCLUDEPATH += "C:\\Program Files\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+#INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
 INCLUDEPATH += src/nidaqmx
 
 LIBS += ../trunk/staticlib/nidaqmx.a
