@@ -19,7 +19,7 @@ INCLUDEPATH += . \
 TEMPLATE = app
 CONFIG += qt \
     thread \
-    release
+    debug_and_release
 
 # A directory to place intermediary build files.
 RCC_DIR = build
@@ -141,8 +141,8 @@ FORMS += NIDAQDlg.ui
 HEADERS += NIDAQDlg.h \
 NIDAQ.h
 
-INCLUDEPATH += "C:\\Program Files\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
-#INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+#INCLUDEPATH += "C:\\Program Files\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
 INCLUDEPATH += src/nidaqmx
 
 LIBS += ../trunk/staticlib/nidaqmx.a

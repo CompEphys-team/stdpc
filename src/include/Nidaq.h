@@ -44,8 +44,8 @@ class NIDAQ: public DAQ
     virtual void get_single_scan(inChannel *, int);
     virtual void write_analog_out(outChannel *);
     virtual void reset_board();
-    short int* inChnGain;
-    short int* DACEnable;
+    //short int* inChnGain;
+    //short int* DACEnable;
     
     // actually activated stuff
 };
