@@ -316,6 +316,15 @@ void DCThread::run()
         for ( int k=0; k<aecChannels.size(); k++ ){
               if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum].V -= aecChannels[k]->v_e;
         }
+        // Apply channel bias voltages
+        for (int k= 0; k < inNo; k++) {
+            inChn[k].V+= inChnp[inIdx[k]].bias;
+        }
+     }
+     else {
+         // Adaptive time step
+         dt = board->get_RTC();
+         t += dt;
      }
      if (SampleHoldp.active) {
          if (SampleHoldOn) {
@@ -329,9 +338,6 @@ void DCThread::run()
                  SampleHoldOn= true;
              }
          }
-         // Adaptive time step
-         dt = board->get_RTC();
-         t += dt;
      }
 
      //--------------- Data saving ------------------------//
@@ -411,7 +417,7 @@ void DCThread::run()
              case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
              case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
              case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
-	     case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
+             case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
            }
            scrIter++;
            if (scrIter == scriptq.end()) evt= 1e10;

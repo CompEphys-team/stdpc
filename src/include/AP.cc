@@ -376,6 +376,8 @@ void MyMainWindow::setupAP()
     dAP.append(&(ESynp[s].gSyn));
   }
 
+  // mhHH
+
   for (int s= 0; s < MAX_HH_NO; s++) {
     qs.setNum(s);
       
@@ -401,6 +403,8 @@ void MyMainWindow::setupAP()
     dAP.append(&(mhHHp[s].sm));
     APname.append(QString("mhHHp[") + qs + QString("].Cm")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(mhHHp[s].Cm));
+    APname.append(QString("mhHHp[") + qs + QString("].taumType")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(mhHHp[s].taumType));
     APname.append(QString("mhHHp[") + qs + QString("].taum")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(mhHHp[s].taum));
     APname.append(QString("mhHHp[") + qs + QString("].taumAmpl")); APtype.append(DBLTYPE); APindex.append(dAP.size());
@@ -415,6 +419,8 @@ void MyMainWindow::setupAP()
     dAP.append(&(mhHHp[s].sh));
     APname.append(QString("mhHHp[") + qs + QString("].Ch")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(mhHHp[s].Ch));
+    APname.append(QString("mhHHp[") + qs + QString("].tauhType")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(mhHHp[s].tauhType));
     APname.append(QString("mhHHp[") + qs + QString("].tauh")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(mhHHp[s].tauh));
     APname.append(QString("mhHHp[") + qs + QString("].tauhAmpl")); APtype.append(DBLTYPE); APindex.append(dAP.size());
@@ -533,6 +539,8 @@ void MyMainWindow::setupAP()
     bAP.append(&(inChnp[k].spkDetect)); 
     APname.append(QString("inChnp[")+ qs + QString("].spkDetectThresh")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(inChnp[k].spkDetectThresh)); 
+    APname.append(QString("inChnp[")+ qs + QString("].bias")); APtype.append(DBLTYPE); APindex.append(dAP.size());
+    dAP.append(&(inChnp[k].bias));
     APname.append(QString("inChnp[")+ qs + QString("].chnlSaving")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
     bAP.append(&(inChnp[k].chnlSaving));
   }

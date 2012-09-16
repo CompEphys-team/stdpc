@@ -1,6 +1,7 @@
 #ifndef HH_H
 #define HH_H
 
+#include <cmath>
 #include "ObjectDataTypes.h"
 #include "Channels.h"
 #include "LUtables.h"

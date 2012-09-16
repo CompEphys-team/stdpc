@@ -34,6 +34,7 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      QVector<QLabel *> allLabel;
      QVector<QCheckBox *> sDetect;
      QVector<QLineEdit *> SDThresh;
+     QVector<QLineEdit *> bias;
      QVector<QCheckBox *> saveChnl;
 
   public slots:

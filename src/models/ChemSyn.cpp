@@ -104,18 +104,23 @@ void ChemSyn::currentUpdate(double t, double dt)
   if (p->MgBlock) {
     gfac= 1.0/(1.0+p->Mgfac * exp(p->Mgexpo*V));
   }
-  I= p->gSyn * gfac * S * h * (p->VSyn - V);
-  out->I+= I;
+
 
   // if plastic, learn
   switch (p->Plasticity) {
+    case 0:
+      I= p->gSyn * gfac * S * h * (p->VSyn - V);
+      break;
     case 1:
+      I= g * gfac * S * h * (p->VSyn - V);
       STlearn(t);   
       break; 
     case 2:
+      I= g * gfac * S * h * (p->VSyn - V);
       ODElearn(dt);
       break; 
   }
+  out->I+= I;
 }
 
 void ChemSyn::STlearn(double t)

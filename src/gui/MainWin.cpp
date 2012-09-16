@@ -38,7 +38,7 @@ void MyMainWindow::DAQSetup()
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2011"));
+  LoadMsg.setWindowTitle(tr("StdpC 2012"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
   //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
@@ -155,6 +155,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
      connect(actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));    
+     connect(actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
      
      for (int i= 0; i < 6; i++) {
@@ -580,7 +581,7 @@ void MyMainWindow::LoadConfig()
   ifstream is("StdpC.conf");
   SDAQData tmpSDAQp;
   DigiDataData tmpDigiDatap;
-  
+
   
   if (is.good()) {
     is >> itmp;
@@ -663,5 +664,9 @@ void MyMainWindow::UnLoadScript()
   actionUnload_Script->setEnabled(false);
 }
 
+void MyMainWindow::DisplayAbout()
+{
+    QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC2012."));
+}
 
 #include "AP.cc"

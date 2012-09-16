@@ -40,6 +40,10 @@ void InputChannelDlg::clearAll()
     delete *factorIter;
   }
   SDThresh.clear();
+  for (factorIter= bias.begin(); factorIter != bias.end(); factorIter++) {
+    delete *factorIter;
+  }
+  bias.clear();
   for (saveIter= saveChnl.begin(); saveIter != saveChnl.end(); saveIter++) {
     delete *saveIter;
   }
@@ -58,6 +62,8 @@ void InputChannelDlg::init(DAQ *board)
   #define X5 480
   #define X6 555
   #define X7 600
+  #define X8 675
+  #define X9 700
 
   QCheckBox *cbtmp;
   QComboBox *qctmp;
@@ -99,6 +105,11 @@ void InputChannelDlg::init(DAQ *board)
 
   lb= new QLabel(this);
   lb->setGeometry(QRect(X7, Y0-45, 60, 36));
+  lb->setText(QString("Bias Voltage"));
+  allLabel.append(lb);
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X9, Y0-45, 60, 36));
   lb->setText(QString("  Save\nChannel"));
   allLabel.append(lb);
 
@@ -141,8 +152,18 @@ void InputChannelDlg::init(DAQ *board)
     lb->setGeometry(QRect(X6, Y0+i*DY, 40, 18));
     lb->setText(QString("mV"));
     allLabel.append(lb);
+    letmp= new QLineEdit(this);
+    letmp->setGeometry(QRect(X7, Y0+i*DY, 60, 18));
+    nm.setNum(0);
+    letmp->setText(nm);
+    letmp->setAlignment(Qt::AlignRight);
+    bias.append(letmp);
+    lb= new QLabel(this);
+    lb->setGeometry(QRect(X8, Y0+i*DY, 40, 18));
+    lb->setText(QString("mV"));
+    allLabel.append(lb);
     cbtmp= new QCheckBox(this);
-    cbtmp->setGeometry(QRect(X7+15, Y0+i*DY, 15, 18));
+    cbtmp->setGeometry(QRect(X9+15, Y0+i*DY, 15, 18));
     cbtmp->setObjectName(QString("Save Channel ")+nm);
     saveChnl.append(cbtmp);
   }
@@ -171,6 +192,7 @@ void InputChannelDlg::exportData()
     inChnp[i].gainFac= factor[i]->text().toDouble();
     inChnp[i].spkDetect= (sDetect[i]->checkState() > 0);
     inChnp[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
+    inChnp[i].bias= bias[i]->text().toDouble()*1e-3;
     inChnp[i].minVoltage = inLow[rng[i]->currentIndex()]*inChnp[i].gainFac;
     inChnp[i].maxVoltage = inHigh[rng[i]->currentIndex()]*inChnp[i].gainFac;
     inChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
@@ -191,6 +213,8 @@ void InputChannelDlg::importData()
     else sDetect[i]->setCheckState(Qt::Unchecked);
     lb.setNum(inChnp[i].spkDetectThresh*1e3);
     SDThresh[i]->setText(lb);
+    lb.setNum(inChnp[i].bias*1e3);
+    bias[i]->setText(lb);
     if (inChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
     else saveChnl[i]->setCheckState(Qt::Unchecked);
   }
