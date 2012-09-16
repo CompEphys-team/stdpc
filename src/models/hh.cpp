@@ -2,6 +2,7 @@
 
 HH::HH()
 {
+  // hello
 }
 
 void HH::init(mhHHData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
