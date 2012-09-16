@@ -2,7 +2,6 @@
 
 HH::HH()
 {
-  // hello
 }
 
 void HH::init(mhHHData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
@@ -31,7 +30,7 @@ void HH::init(mhHHData *inp, short int *inIdx, short int *outIdx, inChannel *inC
 void HH::currentUpdate(double t, double dt) 
 {
   static double powm, powh;
-  static double V;
+  static double V, tmp;
   static int i;
     
   if (p->active) {
@@ -42,7 +41,13 @@ void HH::currentUpdate(double t, double dt)
       // exponential Euler:
       m= minf + (m - minf)*(*theExp)(-dt/taum);
       minf= (1.0-p->Cm)*(*theExpSigmoid)((V-p->Vm)/p->sm)+p->Cm;
-      taum= p->taum - p->taumAmpl*(*theExpSigmoid)((V-p->Vtaum)/p->staum);
+      if (p->taumType == 0) {
+          taum= p->taum - p->taumAmpl*(*theExpSigmoid)((V-p->Vtaum)/p->staum);
+      }
+      if (p->taumType == 1) {
+          tmp= tanh((V-p->Vtaum)/p->staum);
+          taum= p->taum+p->taumAmpl*(1.0-tmp*tmp);
+      }
    
       powm = m;
       for(i= 0; i < p->mExpo-1; i++) powm*= m;
@@ -55,7 +60,13 @@ void HH::currentUpdate(double t, double dt)
       // exponential Euler:
       h= hinf + (h - hinf)*(*theExp)(-dt/tauh);
       hinf= (1.0-p->Ch)*(*theExpSigmoid)((V-p->Vh)/p->sh)+p->Ch;
-      tauh= p->tauh - p->tauhAmpl*(*theExpSigmoid)((V-p->Vtauh)/p->stauh);
+      if (p->tauhType == 0) {
+          tauh= p->tauh - p->tauhAmpl*(*theExpSigmoid)((V-p->Vtauh)/p->stauh);
+      }
+      if (p->tauhType == 1) {
+          tmp= tanh((V-p->Vtauh)/p->stauh);
+          tauh= p->tauh+p->tauhAmpl*(1.0-tmp*tmp);
+      }
 
       powh= h;
       for(i= 0; i < p->hExpo-1; i++) powh*= h;   

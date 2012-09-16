@@ -89,6 +89,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      void DAQSetup();
      void updateSGInChn(int, int*);
      void CloseToLimitWarning(QString, int, double, double, double);
+     void DisplayAbout();
                  
   private slots:
      void SGMethodChanged();

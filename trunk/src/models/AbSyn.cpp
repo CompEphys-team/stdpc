@@ -83,19 +83,25 @@ void abSyn::currentUpdate(double t, double dt)
   if (R > 1.0) R= 1.0;
   if (R < 0.0) R= 0.0;
   
-  if(p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-  else I= g * S * (p->Vrev - post->V);
-  out->I+= I;
 
   // if plastic, learn
   switch (p->Plasticity) {
+    case 0:
+      if (p->fixVpost) I= p->gSyn * S * (p->Vrev - p->Vpost);
+      else I= p->gSyn * S * (p->Vrev - post->V);
+      break;
     case 1:
+      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
+      else I= g * S * (p->Vrev - post->V);
       STlearn(t);   
       break; 
     case 2:
+      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
+      else I= g * S * (p->Vrev - post->V);
       ODElearn(dt);
       break; 
   }
+  out->I+= I;
 }
 
 void abSyn::STlearn(double t)

@@ -136,6 +136,7 @@ typedef struct {
   double Vm;
   double sm;
   double Cm;
+  int taumType;
   double taum;
   double taumAmpl;
   double Vtaum;
@@ -143,6 +144,7 @@ typedef struct {
   double Vh;
   double sh;
   double Ch;
+  int tauhType;
   double tauh;
   double tauhAmpl;
   double Vtauh;
@@ -236,6 +238,7 @@ typedef struct {
   double gainFac;
   bool spkDetect;
   double spkDetectThresh;
+  double bias;
   double minVoltage;
   double maxVoltage;
   bool chnlSaving;

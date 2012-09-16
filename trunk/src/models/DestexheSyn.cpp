@@ -92,20 +92,25 @@ void DestexheSyn::currentUpdate(double t, double dt)
   S+= dS*dt;
   if (S > 1.0) S= 1.0;
   if (S < 0.0) S= 0.0;
-  
-  if(p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-  else I= g * S * (p->Vrev - post->V);
-  out->I+= I;
 
   // if plastic, learn
   switch (p->Plasticity) {
+    case 0:
+      if (p->fixVpost) I= p->gSyn * S * (p->Vrev - p->Vpost);
+      else I= p->gSyn * S * (p->Vrev - post->V);
+      break;
     case 1:
+      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
+      else I= g * S * (p->Vrev - post->V);
       STlearn(t);   
       break; 
     case 2:
+      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
+      else I= g * S * (p->Vrev - post->V);
       ODElearn(dt);
       break; 
   }
+  out->I+= I;
 }
 
 void DestexheSyn::STlearn(double t)

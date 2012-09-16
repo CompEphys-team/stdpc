@@ -25,6 +25,7 @@ void HHDlg::exportData(mhHHData &p)
   p.Vm= VmE->text().toDouble()*1e-3;
   p.sm= smE->text().toDouble()*1e-3;
   p.Cm= CmE->text().toDouble();
+  p.taumType= taumTypeCombo->currentIndex();
   p.taum= taumE->text().toDouble()*1e-3;
   p.taumAmpl= taumAmplE->text().toDouble()*1e-3;
   p.Vtaum= VtaumE->text().toDouble()*1e-3;
@@ -32,6 +33,7 @@ void HHDlg::exportData(mhHHData &p)
   p.Vh= VhE->text().toDouble()*1e-3;
   p.sh= shE->text().toDouble()*1e-3;
   p.Ch= ChE->text().toDouble();
+  p.tauhType= tauhTypeCombo->currentIndex();
   p.tauh= tauhE->text().toDouble()*1e-3;
   p.tauhAmpl= tauhAmplE->text().toDouble()*1e-3;
   p.Vtauh= VtauhE->text().toDouble()*1e-3;
@@ -61,6 +63,7 @@ void HHDlg::importData(mhHHData p)
   smE->setText(num);
   num.setNum(p.Cm);
   CmE->setText(num);
+  taumTypeCombo->setCurrentIndex(p.taumType);
   num.setNum(p.taum*1e3);
   taumE->setText(num);
   num.setNum(p.taumAmpl*1e3);
@@ -75,6 +78,7 @@ void HHDlg::importData(mhHHData p)
   shE->setText(num);
   num.setNum(p.Ch);
   ChE->setText(num);
+  tauhTypeCombo->setCurrentIndex(p.tauhType);
   num.setNum(p.tauh*1e3);
   tauhE->setText(num);
   num.setNum(p.tauhAmpl*1e3);
