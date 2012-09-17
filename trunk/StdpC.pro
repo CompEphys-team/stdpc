@@ -130,7 +130,7 @@ SOURCES += Main.cpp \
     DataSavingDlg.cpp \
     DestexheSynDlg.cpp \
     DestexheSyn.cpp
-LIBS += ../trunk/staticlib/pt_ioctl_tn.a
+LIBS += ../stdpc-code/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)
 DEPENDPATH += src/nidaqmx
@@ -145,4 +145,4 @@ NIDAQ.h
 INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
 INCLUDEPATH += src/nidaqmx
 
-LIBS += ../trunk/staticlib/nidaqmx.a
+LIBS += ../stdpc-code/staticlib/nidaqmx.a
