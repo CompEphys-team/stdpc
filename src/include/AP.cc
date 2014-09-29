@@ -657,7 +657,7 @@ void MyMainWindow::setupAP()
 
 void MyMainWindow::doSaveProtocol(QString &fname)
 {
-  ofstream os(fname.toAscii());
+  ofstream os(fname.toLatin1());
   
   exportData();
 
@@ -685,7 +685,7 @@ void MyMainWindow::doSaveProtocol(QString &fname)
 
 void MyMainWindow::doLoadProtocol(QString &fname)
 {
-  ifstream is(fname.toAscii());
+  ifstream is(fname.toLatin1());
   char name[80];
   char buf[255];
   int i= 0, itmp;

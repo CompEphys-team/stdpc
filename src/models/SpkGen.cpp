@@ -51,7 +51,7 @@ void SpkGen::init(SGData *inp, short int inNo, short int *inIdx, inChannel *inCh
     if (lastRead != p->STInFName) {
       if (is.is_open()) is.close();
       is.clear();
-      is.open(p->STInFName.toAscii());
+      is.open(p->STInFName.toLatin1());
       if (!is.good()) {
         p->active= false;    
         lastRead= QString("");
@@ -76,7 +76,7 @@ void SpkGen::init(SGData *inp, short int inNo, short int *inIdx, inChannel *inCh
   if (p->method == FILESG) {
     if (is.is_open()) is.close();
     is.clear();
-    is.open(p->STInFName.toAscii());
+    is.open(p->STInFName.toLatin1());
     if (!is.good()) {
       p->active= false;    
     }

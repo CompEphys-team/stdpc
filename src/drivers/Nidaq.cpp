@@ -20,7 +20,7 @@ NIDAQ::NIDAQ()
   char cbuf;
   
   devName= new char[80];
-  strcpy(devName, (const char *) NIDAQp.deviceName.toAscii());
+  strcpy(devName, (const char *) NIDAQp.deviceName.toLatin1());
   
   DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
   //if (!DevicePresent)
