@@ -1,7 +1,7 @@
 #ifndef ElectrodeCompDlg_H
 #define ElectrodeCompDlg_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #include <QVector>
 #include <QMessageBox>
 #include "ui_ElectrodeCompDlg.h"

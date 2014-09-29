@@ -507,7 +507,7 @@ bool DCThread::LoadScript(QString &fname)
   scriptInstruction inst;
   char buf[80];
   
-  ifstream is(fname.toAscii());
+  ifstream is(fname.toLatin1());
      
   is >> et;
   done= false;

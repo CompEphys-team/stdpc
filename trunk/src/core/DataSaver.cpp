@@ -12,8 +12,8 @@ void DataSaver::InitDataSaving(QString filename, bool isBnry)
     if(os != NULL)  (*os).close();
 
     isBinary = isBnry;
-    if( isBinary == 0 ) os = new ofstream(filename.toAscii());  // ascii write
-    else                os = new ofstream(filename.toAscii(), ios::out | ios::binary);    // binary write
+    if( isBinary == 0 ) os = new ofstream(filename.toLatin1());  // ascii write
+    else                os = new ofstream(filename.toLatin1(), ios::out | ios::binary);    // binary write
 }
 
 
@@ -54,7 +54,7 @@ void DataSaver::SaveHeader(QVector<QString> header)
 
       for ( int i= 0; i < header.size(); i++ ){
           for ( int j= 0; j<header[i].size(); j++ )
-              (*os) << header[i][j].toAscii();
+              (*os) << header[i][j].toLatin1();
           (*os) << " ";
 
       }
@@ -66,7 +66,7 @@ void DataSaver::SaveHeader(QVector<QString> header)
       float data;
       for ( int i= 0; i < header.size(); i++ ) {
           for ( int j= 0; j<header[i].size(); j++ ) {
-              data = (char) header[i][j].toAscii();
+              data = (char) header[i][j].toLatin1();
               os->write( reinterpret_cast<char*>( &data ), sizeof data );
           }
       }

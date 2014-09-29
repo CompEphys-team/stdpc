@@ -616,7 +616,7 @@ void MyMainWindow::ExportLog()
 
 void MyMainWindow::doExportLog(QString &fname)
 {
-  ofstream os(fname.toAscii());
+  ofstream os(fname.toLatin1());
   int i= 0, done= 0;
   QListWidgetItem *it;
   

@@ -651,7 +651,7 @@ void Calibrator::SetChannelActivation(int elecNum, bool state)
 // For testing and checking purposes
 void Calibrator::saveData(QString &fname, QVector<double> data)
 {
-  ofstream os(fname.toAscii());
+  ofstream os(fname.toLatin1());
 
   for (int i= 0; i < data.size(); i++) {
     os << data[i] << "\n";

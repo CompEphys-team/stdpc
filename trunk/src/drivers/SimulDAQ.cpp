@@ -86,7 +86,7 @@ bool SimulDAQ::initialize_board(QString &name)
 //  for (int i= 0; i < inChnNo; i++) inq[i].clear();
 //  delete[] inq;
 //  delete[] inIter;
-  is.open(SDAQp.inFileName.toAscii());
+  is.open(SDAQp.inFileName.toLatin1());
   is >> t;
   t0= t;
 //  inChnNo= SDAQp.inChnNo;
@@ -126,7 +126,7 @@ bool SimulDAQ::initialize_board(QString &name)
 //  outChnNo= SDAQp.outChnNo;
 //  outq= new QList<double>[outChnNo];
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toAscii());
+  os.open(SDAQp.outFileName.toLatin1());
   if (!os.good()) {
     name=QString("SimulDAQ output files ");
     success= false;
@@ -226,7 +226,7 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     outGainFac[i]= outChnp[outIdx[i]].gainFac*1.0e9;  // write nA
   }
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toAscii());
+  os.open(SDAQp.outFileName.toLatin1());
   lastWrite= 0.0;
 }
 
