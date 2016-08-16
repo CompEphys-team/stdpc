@@ -26,7 +26,7 @@ CONFIG += qt \
 RCC_DIR = build
 MOC_DIR = build
 OBJECTS_DIR = build
-UI_DIR = $$PWD/src/gui/ui
+#UI_DIR = $$PWD/src/gui/ui
 
 # the sources
 FORMS += $$PWD/src/gui/MainWin.ui \
@@ -142,8 +142,8 @@ FORMS += $$PWD/src/gui/NIDAQDlg.ui
 HEADERS += $$PWD/src/include/NIDAQDlg.h \
 $$PWD/src/include/NIDAQ.h
 
-#INCLUDEPATH += "C:\\Program Files\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
-INCLUDEPATH += "C:\\Users\\tn41\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
+#INCLUDEPATH += "C:\\Users\\tn41\\NI-DAQ\\DAQmx ANSI C Dev\\include"
 INCLUDEPATH += $$PWD/src/nidaqmx
 
 LIBS += $$PWD/staticlib/nidaqmx.a
