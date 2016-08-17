@@ -393,7 +393,7 @@ void DCThread::run()
          // outChn[1].I= inChn[inIdx[inNo]].V;
 
          // Updated display
-         if (Graphp[0].active) {
+         if ( grpNo[0] ) {
              if (t-lastWrite[0] > Graphp[0].dt) {
                lastWrite[0]= t;
                for (i= 0; i < grpNo[0]; i++) {
@@ -401,7 +401,7 @@ void DCThread::run()
                }
              }
          }
-         if (Graphp[1].active) {
+         if ( grpNo[1] ) {
              if (t-lastWrite[1] > Graphp[1].dt) {
                lastWrite[1]= t;
                for (i= 0; i < grpNo[1]; i++) {
