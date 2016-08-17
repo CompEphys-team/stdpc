@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>384</width>
-    <height>481</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="font">
@@ -23,7 +23,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>211</x>
+     <x>210</x>
      <y>440</y>
      <width>160</width>
      <height>32</height>
@@ -405,7 +405,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>taum</string>
+    <string>taum0</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="mExpoE">
@@ -790,7 +790,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>tauh</string>
+    <string>tauh0</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_31">
@@ -1079,6 +1079,11 @@
      <string>tanh^2</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>exp2/(1+exp1)</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="taumTypeL">
    <property name="geometry">
@@ -1144,6 +1149,37 @@
      <string>tanh^2</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>exp2/(1+exp1)</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_16">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>340</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ms</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_36">
+   <property name="geometry">
+    <rect>
+     <x>350</x>
+     <y>340</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>ms</string>
+   </property>
   </widget>
  </widget>
  <resources/>

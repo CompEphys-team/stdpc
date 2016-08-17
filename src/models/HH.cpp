@@ -48,7 +48,11 @@ void HH::currentUpdate(double t, double dt)
           tmp= tanh((V-p->Vtaum)/p->staum);
           taum= p->taum+p->taumAmpl*(1.0-tmp*tmp);
       }
-   
+      if (p->taumType == 2) {
+          tmp= exp((V-p->Vtaum)/p->staum);
+          taum= p->taum + p->taumAmpl*tmp*minf;
+      }
+
       powm = m;
       for(i= 0; i < p->mExpo-1; i++) powm*= m;
     }
@@ -67,7 +71,10 @@ void HH::currentUpdate(double t, double dt)
           tmp= tanh((V-p->Vtauh)/p->stauh);
           tauh= p->tauh+p->tauhAmpl*(1.0-tmp*tmp);
       }
-
+      if (p->tauhType == 2) {
+          tmp= exp((V-p->Vtauh)/p->stauh);
+          tauh= p->tauh + p->tauhAmpl*tmp*hinf;
+      }
       powh= h;
       for(i= 0; i < p->hExpo-1; i++) powh*= h;   
     }
