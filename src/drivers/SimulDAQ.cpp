@@ -26,9 +26,6 @@ SimulDAQ::SimulDAQ()
   outLow[0] = -1e10;
   outHigh = QVector<double>(outChnNo);
   outHigh[0] = +1e10;
-  QueryPerformanceFrequency(&intClock_frequency);
-  clock_frequency= (double) intClock_frequency.LowPart;
-  clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
   inq= new QList<double>[inChnNo];
   outq= new QList<double>[outChnNo];
   inIter= new QList<double>::const_iterator[inChnNo];
@@ -49,29 +46,10 @@ SimulDAQ::~SimulDAQ()
   delete[] inIter;
 }
 
-double SimulDAQ::get_RTC()
-{
-  static LARGE_INTEGER inT;
-  static double dt, lastT;
-  
-  QueryPerformanceCounter(&inT);
-  lastT= sysT;
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  dt= sysT-lastT;
-  if (dt < 0.0) dt+= clock_cycle;
-  t+= dt;
- os << t << endl;
-  return dt;
-}
-
 void SimulDAQ::reset_RTC() {
-  static LARGE_INTEGER inT;
-   
-  QueryPerformanceCounter(&inT);
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  t= 0.0;
   lastWrite= 0.0;
   rewind();
+  DAQ::reset_RTC();
 }
 
 bool SimulDAQ::initialize_board(QString &name)
@@ -233,9 +211,9 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
 void SimulDAQ::write_analog_out(outChannel *out)
 {
 //  short int idx;
-  double dt;
+//  double dt;
   
-  dt= get_RTC();
+//  dt= get_RTC();
   if (t > lastWrite+SDAQp.outDt) {
     lastWrite= t;
     outtq.append(t);

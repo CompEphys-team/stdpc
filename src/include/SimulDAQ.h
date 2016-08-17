@@ -3,7 +3,6 @@
 
 using namespace std;
 
-#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <QList>
@@ -16,7 +15,6 @@ class SimulDAQ: public DAQ
     virtual ~SimulDAQ();
     virtual bool initialize_board(QString &);
     virtual void reset_RTC();
-    virtual double get_RTC();
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
     virtual void get_scan(inChannel *);
@@ -38,10 +36,7 @@ class SimulDAQ: public DAQ
   private:
     void rewind();
     
-    LARGE_INTEGER intClock_frequency;
     double dataT;
-    double sysT;
-    double t;
     double inT;
     double lastWrite;
     

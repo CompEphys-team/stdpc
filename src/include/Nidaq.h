@@ -7,7 +7,6 @@ using namespace std;
 #include "DAQ.h"
 
 #include <NIDAQmx.h>
-#include <windows.h>
 
 #define MAXRANGES 64
 #define MAXCHANNELS 64
@@ -15,9 +14,6 @@ using namespace std;
 class NIDAQ: public DAQ
 {
   private:
-   LARGE_INTEGER intClock_frequency;
-   double sysT;
-   double t;
    char *devName;
    char *iChnNm[MAXCHANNELS];
    char *oChnNm[MAXCHANNELS];
@@ -36,7 +32,6 @@ class NIDAQ: public DAQ
     void init();
     virtual bool initialize_board(QString &);
     virtual void reset_RTC();
-    virtual double get_RTC();
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);

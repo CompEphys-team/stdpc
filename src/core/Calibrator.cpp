@@ -465,18 +465,39 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
 }
 
 
+/*
 // Completes the sampling cycle by waiting till the end of the sampling period
 double Calibrator::WaitTillNextSampling(double time)
 {
     double t = 0.0;
-
+    // it appears that in (at least) the release version, this function is
+    // churning so fast that it gets confused about the actual time that
+    // has elapsed. In debug mode it seems slow enough not to encounter this.
+    // (alternatively it could also be a question of unknown optimisations in
+    // ther release version causing this).
+    // As a fix, we slow down the churning by doing some (useless) math.
+    // 20 iterations appeared to be the sweet spot where the repeats were slow enough
+    // to get maeningful readings from the windows high precision counter and yet not be too coarse
+    // with the precision of achieved update time steps.
+    // (TN 2015-08-06)
+#ifdef QT_NO_DEBUG
+    double y= 2.0;
+    double z= 0.0;
+#endif
     do
     {
         t += board->get_RTC();
+#ifdef QT_NO_DEBUG
+        for (int i= 0; i < 20; i++) {
+            z= sqrt(y);
+            y= z*z;
+        }
+#endif
     } while (t < time);
 
     return t;
 }
+*/
 
 
 // Injects the current and records the voltage
@@ -517,7 +538,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
 
             // --- Wait --- //
-            t += WaitTillNextSampling(samplingPeriod);
+            t += board->wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
@@ -540,7 +561,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
 
             // --- Wait --- //
-            t += WaitTillNextSampling(samplingPeriod);
+            t += board->wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
@@ -589,7 +610,7 @@ double Calibrator::VoltageOffsetMeasurement()
         // Save voltage
         vOffset += inChn[inputChannelNumber].V;
 
-        WaitTillNextSampling(samplingPeriod);
+        board->wait_till_elapsed(samplingPeriod);
     }
     vOffset /= offsetSamplingNum;
 

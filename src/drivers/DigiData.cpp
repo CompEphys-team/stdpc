@@ -53,10 +53,6 @@ DigiData::DigiData()
   DACEnable= new short int[outChnNo];  
   DACEnable[0]= DACCHANNEL0ENABLE;
   DACEnable[1]= DACCHANNEL1ENABLE;
-  
-  clock_frequency= 4000000.0; // 4MHz clock
-  clock_cycle= ((double) USHRT_MAX + 1.0)/clock_frequency;
-  
   portsOpen= false;
   init();
 };
@@ -141,55 +137,6 @@ bool DigiData::initialize_board(QString &name)
    return success;
 }
 
-//---------------------------------------------------------------------------
-void DigiData::reset_RTC()
-{
-   WriteByte(real_time_control,C0MODE2);
-   WriteByte(real_time_data_0,ZEROBYTE);
-   WriteByte(real_time_data_0,ZEROBYTE);
-
-   WriteByte(real_time_control,C1MODE2);
-   WriteByte(real_time_data_1,FASTBYTE);  // very fast to generate clock to
-   WriteByte(real_time_data_1,ZEROBYTE); // counter 2 soon --> reset C2
-
-   WriteByte(real_time_control,C2MODE2);
-   WriteByte(real_time_data_2,ZEROBYTE);
-   WriteByte(real_time_data_2,ZEROBYTE);
-
-   do{                                       // wait for counter 2 reset
-      WriteByte(real_time_control,READCOUNT2);
-   }while((ReadByte(real_time_data_2) & ReadByte(real_time_data_2)) != 0xff);
-
-   WriteByte(real_time_control,C1MODE2);
-   WriteByte(real_time_data_1,ZEROBYTE);
-   WriteByte(real_time_data_1,ZEROBYTE);
-}
-
-//---------------------------------------------------------------------------
-double DigiData::get_RTC(void)
-{
-//     short unsigned int hi, med;
-   static short unsigned int lo;
-   static double dt, lastT;
-   /* I'm returning only the 16 bit low order register which makes the program
-run more fast but put some limitation in the time required to make a cycle R-W
-of ADC/DAC operations. The maximum time of the cycle should not be larger than
-16 ms. One should use the program runing in realtime.
-*/
-
-   WriteByte(real_time_control,READALLCOUNTERS);
-
-//   hi= ~(ReadByte(real_time_data_2)+(256*ReadByte(real_time_data_2)));
-//   med= ~(ReadByte(real_time_data_1)+(256*ReadByte(real_time_data_1))-2);
-   lo= ~(ReadByte(real_time_data_0)+(256*ReadByte(real_time_data_0))-2);
-//   t= (double)lo + 65536.0*(double)med + 4294967296.0*(double)hi;
-   lastT= t;
-   t= ((double)lo)/clock_frequency;
-   dt= t-lastT;
-   if (dt < 0.0) dt+= clock_cycle;
-   
-   return dt;
-}
 
 //---------------------------------------------------------------------------
 void DigiData::digital_out(unsigned char outbyte)

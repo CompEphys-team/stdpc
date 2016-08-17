@@ -98,10 +98,6 @@ NIDAQ::NIDAQ()
   inTaskActive= 0;
   outTaskActive= 0;  
   
-  // setup of the system clock
-  QueryPerformanceFrequency(&intClock_frequency);
-  clock_frequency= (double) intClock_frequency.LowPart;
-  clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
   
 //   QMessageBox::warning(NULL, QString("My Application"),
 //                QString("Finished scanning ouput ranges, exiting NIDAQ constructor"),
@@ -157,36 +153,14 @@ bool NIDAQ::initialize_board(QString &name)
   return success;
 }
 
-//---------------------------------------------------------------------------
 void NIDAQ::reset_RTC()
 {
   // this is called when the dynamic clamp starts ... start tasks
-  static LARGE_INTEGER inT;
-   
   if (DevicePresent) {
     DAQmxStartTask(inTask);
     DAQmxStartTask(outTask);
   }
-
-  QueryPerformanceCounter(&inT);
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  t= 0.0;
-}
-
-//---------------------------------------------------------------------------
-double NIDAQ::get_RTC(void)
-{
-  static LARGE_INTEGER inT;
-  static double dt, lastT;
-  
-  QueryPerformanceCounter(&inT);
-  lastT= sysT;
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  dt= sysT-lastT;
-  if (dt < 0.0) dt+= clock_cycle;
-  t+= dt;
- 
-  return dt;
+  DAQ::reset_RTC();
 }
 
 //---------------------------------------------------------------------------

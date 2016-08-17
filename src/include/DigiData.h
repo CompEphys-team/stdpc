@@ -102,8 +102,6 @@ class DigiData: public DAQ
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
-    virtual void reset_RTC();
-    virtual double get_RTC();
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
