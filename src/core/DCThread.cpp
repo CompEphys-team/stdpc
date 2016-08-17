@@ -454,6 +454,11 @@ void DCThread::run()
 
      // --- Calculate end --- //
 
+     // copy AEC compensated input values to output channels if desired
+     for ( int k=0; k<aecChannels.size(); k++ ){
+         if ( aecChannels[k]->IsActive() && elecCalibPs[k].copyChnOn)
+             outChn[elecCalibPs[k].copyChn].I= inChn[aecChannels[k]->inChnNum].V;
+     }
 
      // --- Write --- //
          board->write_analog_out(outChn);

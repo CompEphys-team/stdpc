@@ -575,6 +575,10 @@ void MyMainWindow::setupAP()
   {
     qs.setNum(e);
 
+    APname.append(QString("elecCalibPs[") + qs +QString("].copyChnOn")); APtype.append(BOOLTYPE); APindex.append(bAP.size());
+    bAP.append(&(elecCalibPs[e].copyChnOn));
+    APname.append(QString("elecCalibPs[") + qs + QString("].copyChn")); APtype.append(INTTYPE); APindex.append(iAP.size());
+    iAP.append(&(elecCalibPs[e].copyChn));
     APname.append(QString("elecCalibPs[") + qs + QString("].samplingRate")); APtype.append(DBLTYPE); APindex.append(dAP.size());
     dAP.append(&(elecCalibPs[e].samplingRate));
     APname.append(QString("elecCalibPs[") + qs + QString("].inputChannelNumber")); APtype.append(INTTYPE); APindex.append(iAP.size());

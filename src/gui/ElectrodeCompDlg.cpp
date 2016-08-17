@@ -24,6 +24,9 @@ ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
         // Compensation toggler checkbox
         cbCompOn[elecNum] = electrodeTabs->widget(elecNum)->findChild<QCheckBox *>(QString("cbCompOn_")+QString::number(elecNum));
 
+        // compensated voltage checkbox
+        compVCopyOn[elecNum]= electrodeTabs->widget(elecNum)->findChild<QCheckBox *>(QString("CopyChannelCheckBox_")+QString::number(elecNum+1));
+        compVCopyChannel[elecNum]= electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenCopyChannelNum_")+QString::number(elecNum+1));
         // General group box
         leGenSamplingRate[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenSamplingRate_")+QString::number(elecNum+1));
         leGenInChannelNum[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenInChannelNum_")+QString::number(elecNum+1));
@@ -103,6 +106,9 @@ void ElectrodeCompDlg::exportData()
 {
     for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
+        // copy channel
+        elecCalibPs[i].copyChnOn           = compVCopyOn[i]->isChecked();
+        elecCalibPs[i].copyChn             = compVCopyChannel[i]->text().toInt();
         // General params
         elecCalibPs[i].samplingRate        = leGenSamplingRate[i]->text().toDouble() * 1e3; // kHz -> Hz
         elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->text().toInt();
@@ -136,6 +142,10 @@ void ElectrodeCompDlg::importData()
 
   for( int i=0; i<MAX_ELECTRODE_NO; i++ ) {
 
+    // copy channel
+    compVCopyOn[i]->setChecked(elecCalibPs[i].copyChnOn);
+    num.setNum(elecCalibPs[i].copyChn);
+    compVCopyChannel[i]->setText(num);
     // General params
     num.setNum(elecCalibPs[i].samplingRate / 1e3);  // Hz -> kHz
     leGenSamplingRate[i]->setText(num);

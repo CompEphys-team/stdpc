@@ -180,6 +180,9 @@ typedef struct {
 
 typedef struct {
 
+  // channel copy parameters
+  bool copyChnOn;
+  int copyChn;
   // General params
   double samplingRate;
   int inputChannelNumber;

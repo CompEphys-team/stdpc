@@ -33,6 +33,9 @@ class ElectrodeCompDlg : public QDialog, private Ui::ElectrodeCompDlg
             QLabel *lInfo[MAX_ELECTRODE_NO];
             QCheckBox *cbCompOn[MAX_ELECTRODE_NO];
 
+            // copy channel
+            QCheckBox *compVCopyOn[MAX_ELECTRODE_NO];
+            QLineEdit *compVCopyChannel[MAX_ELECTRODE_NO];
             // General group box
             QLineEdit *leGenSamplingRate[MAX_ELECTRODE_NO];
             QLineEdit *leGenInChannelNum[MAX_ELECTRODE_NO];
