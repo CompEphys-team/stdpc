@@ -2,6 +2,7 @@
 #define DCTHREAD_H
 
 #include <QThread>
+#include <functional>
 #include "Global.h"
 #include "ChemSyn.h"
 #include "AbSyn.h"
@@ -11,7 +12,6 @@
 #include "AbHH.h"
 #include "SpkGen.h"
 #include "DigiData.h"
-#include "Scripting.h"
 #include "AECChannel.h"
 #include "DataSaver.h"
 
@@ -88,8 +88,8 @@ private:
      double *grp[2][4];
 
 
-     QList<scriptInstruction> scriptq;
-     QList<scriptInstruction>::iterator scrIter;
+     QList<QPair<double, std::function<void()>>> scriptq;
+     QList<QPair<double, std::function<void()>>>::iterator scrIter;
     
  signals:
      void error(QString message);

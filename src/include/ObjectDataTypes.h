@@ -216,7 +216,7 @@ typedef struct {
 
 } dataSavingParams;
 
-typedef struct {
+struct SGData {
   bool active;
   int method;
   bool saving;
@@ -232,8 +232,10 @@ typedef struct {
   double period;
   int SpikeNo;
   QString STInFName;
-  double SpikeT[10];
-} SGData;
+  std::vector<double> SpikeT;
+public:
+  SGData() : SpikeT(10) {}
+};
  
 typedef struct {
   bool active;

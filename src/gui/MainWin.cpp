@@ -1,6 +1,7 @@
 #include "Main.h"
 #include "MainWin.h"
 #include "LUtables.h"
+#include "AP.h"
 #include <windows.h>
 
 void MyMainWindow::DAQSetup()
@@ -53,18 +54,13 @@ void MyMainWindow::DAQSetup()
     StartBut->setEnabled(false);
   }
 
-  if (inChnp != NULL) delete[] inChnp;
-  inChnp= new inChnData[board->inChnNo];
+  inChnp.resize(board->inChnNo);
   inChnDlg->init(board); // already exports to inChnp ...
 
-  if (outChnp != NULL) delete[] outChnp;
-  outChnp= new outChnData[board->outChnNo];
+  outChnp.resize(board->outChnNo);
   outChnDlg->init(board); // already exports to outChnp ...
 
   DCT->init(board);
-
-  // set up the adjustable parameters that they reflect the right channel numbers ...
-  setupAP();
 
   LoadMsg.hide();
 }
@@ -113,10 +109,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DigiDatap.syncIOMask= 0x0000;  
          
      DCT= new DCThread();
-   
-     inChnp= NULL;
-     outChnp= NULL;
 
+     initAP();
      LoadConfig();
 
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
@@ -607,6 +601,78 @@ void MyMainWindow::LoadConfig()
   SampleHoldp.trigChn= 0;
 }
 
+void MyMainWindow::doSaveProtocol(QString &fname)
+{
+  ofstream os(fname.toLatin1());
+
+  exportData();
+
+  os << DAQComboBox->currentIndex() << endl;
+  os << SDAQp << endl;
+  os << DigiDatap << endl;
+#ifdef NATIONAL_INSTRUMENTS
+  os << NIDAQp << endl;
+#endif
+  os << endl;
+
+  for ( auto const& ap : params ) {
+      ap->write(os);
+  }
+
+  os.close();
+}
+
+
+void MyMainWindow::doLoadProtocol(QString &fname)
+{
+  ifstream is(fname.toLatin1());
+  char name[80];
+  int itmp;
+
+  if (!is.good()) {
+    DisplayMessage(QString("Error opening Protocol file"));
+    return;
+  }
+
+  is >> itmp;
+  is >> SDAQp;
+  is >> DigiDatap;
+#ifdef NATIONAL_INSTRUMENTS
+  is >> NIDAQp;
+#endif
+  if (!is.good()) {
+    DisplayMessage(QString("Protocol file truncated ... error"));
+    return;
+  }
+  SDAQDlg->importData(SDAQp);
+  DDataDlg->importData(DigiDatap);
+#ifdef NATIONAL_INSTRUMENTS
+  NDQDlg->importData(NIDAQp);
+#endif
+  DAQComboBox->setCurrentIndex(itmp);
+
+  // comment this?!?
+  DAQSetup();
+
+  is >> name;
+  while ( is.good() ) {
+    QString rawname(name), truename(rawname);
+    bool ok = false;
+    truename.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
+    std::unique_ptr<AP> const& it = *std::find_if(
+                params.begin(), params.end(),
+                [&](std::unique_ptr<AP> &a){return !truename.compare(a->name);});
+    if ( it != *params.end() )
+      it->readNow(rawname, is, &ok);
+    if ( !ok )
+      DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
+    is >> name;
+  }
+
+  is.close();
+  importData();
+}
+
 
 void MyMainWindow::ExportLog()
 {
@@ -668,5 +734,3 @@ void MyMainWindow::DisplayAbout()
 {
     QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC2012."));
 }
-
-#include "AP.cc"

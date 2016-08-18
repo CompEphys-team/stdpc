@@ -3,6 +3,7 @@
 
 #include "Main.h"
 #include <QVector>
+#include <vector>
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
 
@@ -15,17 +16,17 @@
 
 
 extern int synType[MAX_SYN_NO];
-extern CSynData CSynp[MAX_SYN_NO];
-extern abSynData abSynp[MAX_SYN_NO];
-extern GJunctData ESynp[MAX_SYN_NO];
-extern DestexheSynData DxheSynp[MAX_SYN_NO];
+extern std::vector<CSynData> CSynp;
+extern std::vector<abSynData> abSynp;
+extern std::vector<GJunctData> ESynp;
+extern std::vector<DestexheSynData> DxheSynp;
 
 extern int HHType[MAX_HH_NO];
-extern mhHHData mhHHp[MAX_HH_NO];
-extern abHHData abHHp[MAX_HH_NO];
+extern std::vector<mhHHData> mhHHp;
+extern std::vector<abHHData> abHHp;
 
-extern inChnData *inChnp;
-extern outChnData *outChnp;
+extern std::vector<inChnData> inChnp;
+extern std::vector<outChnData> outChnp;
 extern inChnData inSpkGenChnp;
 extern outChnData outSpkGenChnp;
 
@@ -37,10 +38,10 @@ extern NIDAQData NIDAQp;
 extern SGData SGp;
 
 extern dataSavingParams dataSavingPs;
-extern elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
+extern std::vector<elecCalibParams> elecCalibPs;
 
 
-extern graphData Graphp[2];
+extern std::vector<graphData> Graphp;
 
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;
@@ -49,19 +50,6 @@ extern SampleHoldData SampleHoldp;
 extern tanhLUtable tanhLU;
 extern expLUtable expLU;
 extern expSigmoidLUtable expSigmoidLU;
-
-// adjustable parameters
-
-enum APTYPE {DBLTYPE,INTTYPE,BOOLTYPE,STRTYPE,SHORTINTTYPE};
-
-extern QVector<double *> dAP;
-extern QVector<int *> iAP;
-extern QVector<bool *> bAP;
-extern QVector<QString *> sAP;
-extern QVector<short int *> siAP;
-extern QVector<QString> APname;
-extern QVector<int> APindex;
-extern QVector<APTYPE> APtype;
 
 
 #endif

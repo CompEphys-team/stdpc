@@ -130,7 +130,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
     
     // adjustable parameter stuff
 
-    void setupAP();
     void doLoadProtocol(QString &);
     void doSaveProtocol(QString &);
 

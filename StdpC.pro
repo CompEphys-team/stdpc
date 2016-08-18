@@ -75,8 +75,6 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/Graph.h \
     $$PWD/src/include/GraphDlg.h \
     $$PWD/src/include/DAQDlg.h \
-    $$PWD/src/include/AP.cc \
-    $$PWD/src/include/Scripting.h \
     $$PWD/src/include/AbSynDlg.h \
     $$PWD/src/include/ElectrodeCompDlg.h \
     $$PWD/src/include/AbSyn.h \
@@ -88,7 +86,8 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/ObjectDataTypes.h \
     $$PWD/src/include/Global.h \
     $$PWD/src/include/DestexheSynDlg.h \
-    $$PWD/src/include/DestexheSyn.h
+    $$PWD/src/include/DestexheSyn.h \
+    $$PWD/src/include/AP.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -120,7 +119,6 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/GraphDlg.cpp \
     $$PWD/src/gui/DAQDlg.cpp \
     $$PWD/src/core/ObjectDataTypes.cpp \
-    $$PWD/src/core/Scripting.cpp \
     $$PWD/src/gui/AbSynDlg.cpp \
     $$PWD/src/gui/ElectrodeCompDlg.cpp \
     $$PWD/src/models/AbSyn.cpp \
@@ -130,7 +128,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Datasaver.cpp \
     $$PWD/src/gui/DataSavingDlg.cpp \
     $$PWD/src/gui/DestexheSynDlg.cpp \
-    $$PWD/src/models/DestexheSyn.cpp
+    $$PWD/src/models/DestexheSyn.cpp \
+    $$PWD/src/core/AP.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)

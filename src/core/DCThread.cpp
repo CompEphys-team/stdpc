@@ -288,7 +288,7 @@ void DCThread::run()
    // init scripting
    if (scripting) {
      scrIter= scriptq.begin();
-     evt= scrIter->t;
+     evt= scrIter->first;
    }
    else evt= 1e10;
    board->reset_RTC();
@@ -412,17 +412,11 @@ void DCThread::run()
 
          // Scripting
          if (t >= evt) { // event needs doing
-           switch (scrIter->type) {
-             case DBLTYPE: *dAP[scrIter->index]= *((double *) scrIter->value); break;
-             case INTTYPE: *iAP[scrIter->index]= *((int *) scrIter->value); break;
-             case BOOLTYPE: *bAP[scrIter->index]= *((bool *) scrIter->value); break;
-             case STRTYPE: *sAP[scrIter->index]= *((QString *) scrIter->value); break;
-             case SHORTINTTYPE: *siAP[scrIter->index]= *((short int *) scrIter->value); break;
-           }
+           scrIter->second();
            scrIter++;
            if (scrIter == scriptq.end()) evt= 1e10;
            else {
-             evt= scrIter->t;
+             evt= scrIter->first;
            }
          }
 
@@ -503,13 +497,9 @@ double DCThread::WaitTillNextSampling(double time)
 bool DCThread::LoadScript(QString &fname)
 {
   double et; 
-  QString pname;
-  double dvalue;
-  int ivalue, index;
-  short int sivalue;
-  bool bvalue, done, success;
-  QString svalue, qn, vn;
-  scriptInstruction inst;
+  QString rawname, truename;
+  bool done, success;
+  QString qn;
   char buf[80];
   
   ifstream is(fname.toLatin1());
@@ -520,30 +510,16 @@ bool DCThread::LoadScript(QString &fname)
   while (!done)
   {
     is >> buf;
-    pname= QString(buf);
-    index= APname.indexOf(pname);
-    if (index == -1) { 
-      success= false;
-    }
-    else {
-      switch (APtype[index]) {
-        case DBLTYPE: is >> dvalue; break;
-        case INTTYPE: is >> ivalue; break;
-        case BOOLTYPE: is >> bvalue; break;
-        case STRTYPE: is >> buf; svalue= QString(buf); break;
-        case SHORTINTTYPE: is >> sivalue; break;
-      }
-      if (is.good()) {
-        switch (APtype[index]) {
-          case DBLTYPE: inst.set(et, APtype[index], APindex[index], &dvalue); break;
-          case INTTYPE: inst.set(et, APtype[index], APindex[index], &ivalue); break;
-          case BOOLTYPE: inst.set(et, APtype[index], APindex[index], &bvalue); break;
-          case STRTYPE: inst.set(et, APtype[index], APindex[index], &svalue); break;
-          case SHORTINTTYPE: inst.set(et, APtype[index], APindex[index], &sivalue); break;
-         }
-        scriptq.append(inst);
-      }
-      else success= false;
+    rawname= QString(buf);
+    truename = rawname;
+    truename.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
+    std::unique_ptr<AP> const& it = *std::find_if(
+                params.begin(), params.end(),
+                [&](std::unique_ptr<AP> &a){return !truename.compare(a->name);});
+    if ( it != *params.end() ) {
+        scriptq.append(qMakePair(et, it->readLater(rawname, is, &success)));
+    } else {
+        success = false;
     }
     is >> et;
     if ((!is.good()) || (!success)) done= true;
@@ -552,19 +528,14 @@ bool DCThread::LoadScript(QString &fname)
     scriptq.clear();
     scripting= false;
     qn.setNum(et);
-    message(QString("error in script file at instruction \"")+qn+QString(" ")+pname+QString("\""));
+    message(QString("error in script file at instruction \"")+qn+QString(" ")+rawname+QString("\""));
     message(QString("script not loaded"));
   }
   else {
     qn.setNum(scriptq.size());
     message(QString("script read with ")+qn+QString(" instructions"));
     scripting= true;
-/*    for (scrIter= scriptq.begin(); scrIter != scriptq.end(); scrIter++) {
-      qn.setNum((*scrIter).t);
-      vn.setNum(*((double *) ((*scrIter).value)));
-      message(QString("t= ")+qn+QString(" something with value ")+vn);
-    }
-*/  }
+  }
   return success;
 }
 
