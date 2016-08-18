@@ -13,9 +13,9 @@ class abHH
     abHHData *p;
     inChannel *pre;
     outChannel *out;
-    function *theExp;
-    function *theExpSigmoid;
-    function *theTanh;
+    stdpc::function *theExp;
+    stdpc::function *theExpSigmoid;
+    stdpc::function *theTanh;
     
   protected:
     double m, h;

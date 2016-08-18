@@ -11,8 +11,8 @@ class HH
 {
   private:
     mhHHData *p;
-    function *theExp;
-    function *theExpSigmoid;
+    stdpc::function *theExp;
+    stdpc::function *theExpSigmoid;
     
   protected:
     double m, h;

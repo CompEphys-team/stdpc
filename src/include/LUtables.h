@@ -8,14 +8,17 @@
 #define LUVMAX 100.0
 #define LUDV 0.1
 
+namespace stdpc {
+
 class function {
   public:
     function() { }
     virtual double operator()(double)= 0;
 };  
 
+}
 
-class LUtable: public function {
+class LUtable: public stdpc::function {
   protected: 
     double *data;
     double xmin;
@@ -53,19 +56,19 @@ class expSigmoidLUtable: public LUtable {
     int generate();         
 };
     
-class tanhFunction: public function {
+class tanhFunction: public stdpc::function {
   public:
     tanhFunction() { }
     virtual double operator()(double);
 };
 
-class expFunction: public function {
+class expFunction: public stdpc::function {
   public:
     expFunction() { }
     virtual double operator()(double);
 };
 
-class expSigmoidFunction: public function {
+class expSigmoidFunction: public stdpc::function {
   public:
     expSigmoidFunction() { }
     virtual double operator()(double);

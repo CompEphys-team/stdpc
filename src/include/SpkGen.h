@@ -16,8 +16,8 @@ class SpkGen: public QObject
       
   private:
     SGData *p;
-    function *theExp;
-    function *theTanh;
+    stdpc::function *theExp;
+    stdpc::function *theTanh;
     inChannel *VChn;
     inChannel *bdChn;
     bool SGactive;

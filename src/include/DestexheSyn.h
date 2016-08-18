@@ -7,9 +7,9 @@
 class DestexheSyn {
   private:
     DestexheSynData *p;
-    function *theExp;
-    function *theTanh;
-    function *theExpSigmoid;
+    stdpc::function *theExp;
+    stdpc::function *theTanh;
+    stdpc::function *theExpSigmoid;
     void learn();
     inChannel *pre;
     inChannel *post;
