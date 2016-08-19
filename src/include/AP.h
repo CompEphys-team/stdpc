@@ -80,6 +80,7 @@ template <typename T, class S>              class AP_struct_vector;
 template <typename T, class subS, class S>  class AP_struct_struct_vector;
 template <typename T, class S>              class AP_vector_struct_vector;
 template <typename T, int N, class S>       class AP_array_struct_vector;
+template <typename T, class subS, class S>  class AP_struct_vector_struct_vector;
 
 
 extern std::vector<std::unique_ptr<AP>> params;
@@ -114,6 +115,11 @@ inline void addAP(QString name, std::vector<S> *vec, std::vector<T> S::* sub) {
 template <typename T, int N, class S>
 inline void addAP(QString name, std::vector<S> *vec, T (S::* arr)[N]) {
     params.push_back(std::unique_ptr<AP>(new AP_array_struct_vector<T,N,S>(name, vec, arr)));
+}
+
+template <typename T, class subS, class S>
+inline void addAP(QString name, std::vector<S> * vec, std::vector<subS> S::* sub, T subS::* m) {
+    params.push_back(std::unique_ptr<AP>(new AP_struct_vector_struct_vector<T,subS,S>(name, vec, sub, m)));
 }
 
 std::istream &operator>>(std::istream &is, QString &str);
@@ -360,6 +366,54 @@ public:
 
     std::vector<S> *vec;
     T (S::* arr)[N];
+};
+
+// For members T in a struct vector<subS> nested within the top-level struct S in a global vector
+// E.g. `mhHHp[#].assign[#].active`
+template <typename T, class subS, class S>
+class AP_struct_vector_struct_vector : public AP
+{
+public:
+    AP_struct_vector_struct_vector(QString name, std::vector<S> *vec, std::vector<subS> S::* sub, T subS::* m) :
+        AP(name),
+        vec(vec),
+        sub(sub),
+        m(m)
+    {}
+
+    virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
+    {
+        QRegularExpressionMatch match = matchName(rawName);
+        int vec_idx = getIndexAndResize(match, 1, vec);
+        int sub_idx = getIndexAndResize(match, 2, &((*vec)[vec_idx].*sub));
+        bool good = is.good() && vec_idx >= 0 && sub_idx >= 0;
+        if ( ok )
+            *ok = good;
+        if ( !good )
+            return []{};
+        T val;
+        is >> val;
+        return [=](){((*vec)[vec_idx].*sub)[sub_idx].*m = val;};
+    }
+
+    virtual void write(std::ostream &os)
+    {
+        int i = 0, first = name.indexOf('#');
+        for ( S const &s : *vec ) {
+            QString n = name;
+            n.replace(first, 1, QString::number(i++));
+            int j = 0;
+            for ( subS const &ss : s.*sub ) {
+                QString nj = n;
+                nj.replace('#', QString::number(j++));
+                os << nj.toStdString() << " " << ss.*m << std::endl;
+            }
+        }
+    }
+
+    std::vector<S> *vec;
+    std::vector<subS> S::* sub;
+    T subS::* m;
 };
 
 #endif // AP_H
