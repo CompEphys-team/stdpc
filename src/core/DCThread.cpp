@@ -15,13 +15,11 @@ DCThread::DCThread()
   absyn= new abSyn[MAX_SYN_NO];
   esyn= new GapJunction[MAX_SYN_NO];
   dsyn= new DestexheSyn[MAX_SYN_NO];
-  hh= new HH[MAX_HH_NO];
   abhh= new abHH[MAX_HH_NO];
   csIdx= new short int[MAX_SYN_NO];
   absIdx= new short int[MAX_SYN_NO];
   esIdx= new short int[MAX_SYN_NO];
   dsIdx= new short int[MAX_SYN_NO];
-  hhIdx= new short int[MAX_HH_NO];
   abhhIdx= new short int[MAX_HH_NO];
 
   inChn= NULL;
@@ -43,13 +41,11 @@ DCThread::~DCThread()
    delete[] absyn;
    delete[] esyn;
    delete[] dsyn;
-   delete[] hh;
    delete[] abhh;
    delete[] csIdx;
    delete[] absIdx;
    delete[] esIdx;
    delete[] dsIdx;
-   delete[] hhIdx;
    delete[] abhhIdx;
    
    if (inChn != NULL) delete[] inChn;
@@ -175,30 +171,37 @@ void DCThread::run()
        dsIdx[dsNo++]= i;
      }
    }
-   hhNo= 0;
+   hh.clear();
+   for ( mhHHData &p : mhHHp ) {
+       if ( p.active ) {
+           int i = 0;
+           if ( !p.noLegacyAssign ) {
+               hh.push_back(HH(&p, this));
+           }
+           for ( CurrentAssignment &a : p.assign ) {
+               if ( a.active )
+                   hh.push_back(HH(&p, this, &a));
+           }
+       }
+   }
    abhhNo= 0;
    for (i= 0; i < MAX_HH_NO; i++) {
-     if (mhHHp[i].active) {
-       hh[i].init(&mhHHp[i],inIdx,outIdx,inChn,outChn);
-       hhIdx[hhNo++]= i;
-     }
      if (abHHp[i].active) {
        abhh[i].init(&abHHp[i],inIdx,outIdx,inChn,outChn);
        abhhIdx[abhhNo++]= i;
      }
    }
-   QString cN, abN, eN, dN, hN, aN;
+   QString cN, abN, eN, dN, aN;
    cN.setNum(csNo);
    abN.setNum(absNo);
    eN.setNum(esNo);
    dN.setNum(dsNo);
-   hN.setNum(hhNo);
    aN.setNum(abhhNo);
    if (csNo > 0) message(QString("DynClamp: ")+cN+QString(" chemical synapse(s) "));
    if (absNo > 0) message(QString("DynClamp: ")+abN+QString(" ab synapse(s) "));
    if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
    if (dsNo > 0) message(QString("DynClamp: ")+dN+QString(" Destexhe synapse(s) "));
-   if (hhNo > 0) message(QString("DynClamp: ")+hN+QString(" HH conductance(s) "));
+   if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
    if (abhhNo > 0) message(QString("DynClamp: ")+aN+QString(" abHH conductance(s) ..."));
 
    int sz;   
@@ -385,8 +388,8 @@ void DCThread::run()
            esyn[esIdx[i]].currentUpdate(t, dt);
          for (i= 0; i < dsNo; i++)
            dsyn[dsIdx[i]].currentUpdate(t, dt);
-         for (i= 0; i < hhNo; i++)
-           hh[hhIdx[i]].currentUpdate(t, dt);
+         for ( HH &obj : hh )
+             obj.currentUpdate(t, dt);
          for (i= 0; i < abhhNo; i++)
            abhh[abhhIdx[i]].currentUpdate(t, dt);
          // spike generator ... write stuff to DAQ
@@ -489,6 +492,30 @@ double DCThread::WaitTillNextSampling(double time)
     } while (t < time);
 
     return t;
+}
+
+inChannel *DCThread::getInChan(int idx)
+{
+    if ( idx >= CHAN_VIRTUAL ) {
+        // TODO
+    } else if ( idx == CHAN_SG ) {
+        return &inChn[inIdx[inNo]];
+    } else if ( idx >= 0 ) {
+        return &inChn[inIdx[idx]];
+    }
+    return nullptr;
+}
+
+outChannel *DCThread::getOutChan(int idx)
+{
+    if ( idx >= CHAN_VIRTUAL ) {
+        // TODO
+    } else if ( idx >= 0 ) {
+        return &outChn[outIdx[idx]];
+    } else if ( idx == CHAN_NONE ) {
+        return &outChn[outIdx[outNo]];
+    }
+    return nullptr;
 }
 
 

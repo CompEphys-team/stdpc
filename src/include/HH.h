@@ -11,6 +11,7 @@ class HH
 {
   private:
     mhHHData *p;
+    CurrentAssignment legacy, *a;
     stdpc::function *theExp;
     stdpc::function *theExpSigmoid;
     
@@ -22,8 +23,7 @@ class HH
     outChannel *out;
     
   public:
-    HH();
-    void init(mhHHData *, short int *, short int *, inChannel *, outChannel *);
+    HH(mhHHData *p, DCThread *t, CurrentAssignment *a = nullptr);
     void currentUpdate(double, double);
 };
 

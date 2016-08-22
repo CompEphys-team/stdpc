@@ -3,13 +3,13 @@
 
 #include "ui_HHDlg.h"
 #include "ObjectDataTypes.h"
+#include "CurrentAssignmentDlg.h"
 
 class HHDlg : public QDialog, private Ui::HHDlg
 {
      Q_OBJECT
 
   public:
-     int x;
      HHDlg(int, QWidget *parent= 0);
      void exportData(mhHHData &);
      void importData(mhHHData);
@@ -17,6 +17,12 @@ class HHDlg : public QDialog, private Ui::HHDlg
   public slots:
     void updateOutChn(int, int*);
     void updateInChn(int, int*);
+
+signals:
+    void chnsChanged();
+
+private:
+    CurrentAssignmentDlg ca;
          
 }; 
 

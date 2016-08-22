@@ -213,6 +213,10 @@ void initAP()
     addAP("mhHHp[#].tauhAmpl", &mhHHp, &mhHHData::tauhAmpl);
     addAP("mhHHp[#].Vtauh", &mhHHp, &mhHHData::Vtauh);
     addAP("mhHHp[#].stauh", &mhHHp, &mhHHData::stauh);
+    addAP("mhHHp[#].assign[#].active", &mhHHp, &mhHHData::assign, &CurrentAssignment::active);
+    addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
+    addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
+    addAP("mhHHp[#].noLegacyAssignment", &mhHHp, &mhHHData::noLegacyAssign);
 
 
     // abHH

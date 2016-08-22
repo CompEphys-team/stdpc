@@ -14,6 +14,10 @@
 #define VTHRESH -30
 #define MAX_ELECTRODE_NO 4
 
+#define CHAN_NONE (-1)
+#define CHAN_SG 1000
+#define CHAN_VIRTUAL 10000
+
 
 extern int synType[MAX_SYN_NO];
 extern std::vector<CSynData> CSynp;

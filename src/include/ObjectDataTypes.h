@@ -7,6 +7,30 @@ using namespace std;
 #include <QString>
 #include <iostream>
 
+// Forward
+class DCThread;
+
+struct SynapseAssignment {
+    bool active;
+    int PreSynChannel;
+    int PostSynChannel;
+    int OutSynChannel;
+};
+
+struct GapJunctionAssigment {
+    bool active;
+    int preInChannel;
+    int postInChannel;
+    int preOutChannel;
+    int postOutChannel;
+};
+
+struct CurrentAssignment {
+    bool active;
+    int VChannel;
+    int IChannel;
+};
+
 typedef struct {
   double AMinus;
   double tauMinus;
@@ -149,7 +173,9 @@ typedef struct {
   double tauhAmpl;
   double Vtauh;
   double stauh;
-} mhHHData;        
+  std::vector<CurrentAssignment> assign;
+  bool noLegacyAssign;
+} mhHHData;
 
 typedef struct {
   bool active;

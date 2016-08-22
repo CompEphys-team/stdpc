@@ -36,6 +36,9 @@ private:
      void UnloadScript();
      double WaitTillNextSampling(double);
 
+     inChannel *getInChan(int idx);
+     outChannel *getOutChan(int idx);
+
      // List of AEC channels (io-channels pairs, kernels and current buffers)
      QVector<AECChannel*> aecChannels;
 
@@ -52,7 +55,7 @@ private:
      abSyn *absyn;
      GapJunction *esyn;
      DestexheSyn *dsyn;
-     HH *hh;
+     std::vector<HH> hh;
      abHH *abhh;
      DAQ *board;
      inChannel *inChn;
@@ -66,14 +69,12 @@ private:
      short int absNo;
      short int esNo;
      short int dsNo;
-     short int hhNo;
      short int abhhNo;
      
      short int *csIdx;
      short int *absIdx;
      short int *esIdx;
      short int *dsIdx;
-     short int *hhIdx;
      short int *abhhIdx;
      
  private:

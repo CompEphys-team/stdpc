@@ -1,30 +1,35 @@
 #include "HH.h"
+#include "DCThread.h"
 
-HH::HH()
+HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *ina) :
+    p(inp),
+    a(ina),
+    m(0.0),
+    h(0.9),
+    minf(0.0),
+    taum(p->taum),
+    hinf(0.9),
+    tauh(p->tauh)
 {
-}
+    if ( !a ) {
+        legacy.active = !p->noLegacyAssign;
+        legacy.VChannel = p->VChannel;
+        legacy.IChannel = p->IChannel;
+        a =& legacy;
+    }
+    pre = t->getInChan(a->VChannel);
+    out = t->getOutChan(a->IChannel);
 
-void HH::init(mhHHData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->VChannel]];
-  out= &outChn[outIdx[p->IChannel]];
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-1.0, 0.0, 0.001);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-  }
-  m= 0.0;
-  minf= 0.0;
-  taum= p->taum;
-  h= 0.9;
-  hinf= 0.9;
-  tauh= p->tauh;
+    if (p->LUTables) {
+      theExp= &expLU;
+      expLU.require(-1.0, 0.0, 0.001);
+      theExpSigmoid= &expSigmoidLU;
+      expSigmoidLU.require(-50.0, 50.0, 0.02);
+    }
+    else {
+      theExp= &expFunc;
+      theExpSigmoid= &expSigmoidFunc;
+    }
 }
 
 void HH::currentUpdate(double t, double dt) 
@@ -33,7 +38,7 @@ void HH::currentUpdate(double t, double dt)
   static double V, tmp;
   static int i;
     
-  if (p->active) {
+  if (p->active && a->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // linear Euler:
