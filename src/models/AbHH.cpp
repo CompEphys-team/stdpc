@@ -1,35 +1,38 @@
 #include "AbHH.h"
+#include "DCThread.h"
 
-abHH::abHH()
+abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *ina) :
+    p(inp),
+    a(ina),
+    m(0.0),
+    h(1.0),
+    ma(0.0),
+    mb(1.0),
+    ha(0.0),
+    hb(0.0)
 {
-  initial= 1;
-}
+    if ( !a ) {
+        legacy.active = !p->noLegacyAssign;
+        legacy.VChannel = p->VChannel;
+        legacy.IChannel = p->IChannel;
+        a =& legacy;
+    }
+    pre = t->getInChan(a->VChannel);
+    out = t->getOutChan(a->IChannel);
 
-void abHH::init(abHHData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->VChannel]];
-  out= &outChn[outIdx[p->IChannel]];
-  
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  m= 0.0;
-  ma= 0.0;
-  mb= 1.0;
-  h= 1.0;
-  ha= 0.0;
-  hb= 0.0;
+    if (p->LUTables) {
+        theExp= &expLU;
+        expLU.require(-50.0, 50.0, 0.02);
+        theExpSigmoid= &expSigmoidLU;
+        expSigmoidLU.require(-50.0, 50.0, 0.02);
+        theTanh= &tanhLU;
+        tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+        theExp= &expFunc;
+        theExpSigmoid= &expSigmoidFunc;
+        theTanh= &tanhFunc;
+    }
 }
 
 inline double abHH::mhFunc(double x, int thetype)
@@ -54,7 +57,7 @@ void abHH::currentUpdate(double t, double dt)
   static double V;
   static int i;
   
-  if (p->active) {
+  if (p->active && a->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // Linear Euler:

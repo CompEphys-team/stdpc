@@ -9,8 +9,8 @@
 class abHH
 {
   private:
-    int initial;
     abHHData *p;
+    CurrentAssignment legacy, *a;
     inChannel *pre;
     outChannel *out;
     stdpc::function *theExp;
@@ -23,8 +23,7 @@ class abHH
     double I;
     
   public:
-    abHH();
-    void init(abHHData *, short int *, short int*, inChannel *, outChannel *);
+    abHH(abHHData *p, DCThread *t, CurrentAssignment *a = nullptr);
     void currentUpdate(double, double);
     double mhFunc(double, int);
 };

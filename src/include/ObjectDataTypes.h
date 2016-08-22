@@ -202,6 +202,8 @@ typedef struct {
   double hkb;
   double hVb;
   double hsb;
+  std::vector<CurrentAssignment> assign;
+  bool noLegacyAssign;
 } abHHData;
 
 typedef struct {

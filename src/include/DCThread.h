@@ -56,7 +56,7 @@ private:
      GapJunction *esyn;
      DestexheSyn *dsyn;
      std::vector<HH> hh;
-     abHH *abhh;
+     std::vector<abHH> abhh;
      DAQ *board;
      inChannel *inChn;
      outChannel *outChn;
@@ -69,13 +69,11 @@ private:
      short int absNo;
      short int esNo;
      short int dsNo;
-     short int abhhNo;
      
      short int *csIdx;
      short int *absIdx;
      short int *esIdx;
      short int *dsIdx;
-     short int *abhhIdx;
      
  private:
      bool initial;   

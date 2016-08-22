@@ -4,6 +4,7 @@
 
 #include "ui_AlphaBetaHHDlg.h"
 #include "ObjectDataTypes.h"
+#include "CurrentAssignmentDlg.h"
 
 class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
 {
@@ -19,6 +20,7 @@ class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
     void updateInChn(int, int*);
 
   private:
+    CurrentAssignmentDlg ca;
    
 }; 
 

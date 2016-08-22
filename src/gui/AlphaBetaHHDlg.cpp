@@ -3,13 +3,19 @@
 #include <QMessageBox>
 
 AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : QDialog(parent),
+       ca(this)
  {
   setupUi(this);
   QString lb;
   lb.setNum(no);
   lb= "HH "+lb;
   HHDlgLabel->setText(lb);
+  connect(btnAssign, SIGNAL(clicked(bool)), &ca, SLOT(open()));
+  connect(cbUseLegacy, &QCheckBox::stateChanged, this, [=](){
+      VChannelCombo->setEnabled(cbUseLegacy->isChecked());
+      IChannelCombo->setEnabled(cbUseLegacy->isChecked());
+  });
 }
 
 void AlphaBetaHHDlg::exportData(abHHData &p)
@@ -38,6 +44,9 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   p.hkb= hkbE->text().toDouble()*1e3;
   p.hVb= hVbE->text().toDouble()*1e-3;
   p.hsb= hsbE->text().toDouble()*1e-3;
+  p.noLegacyAssign = !cbUseLegacy->isChecked();
+
+  ca.exportData(p.assign);
 }
 
 void AlphaBetaHHDlg::importData(abHHData p)
@@ -85,6 +94,9 @@ void AlphaBetaHHDlg::importData(abHHData p)
   hVbE->setText(num);
   num.setNum(p.hsb*1e3);
   hsbE->setText(num);
+  cbUseLegacy->setChecked(!p.noLegacyAssign);
+
+  ca.importData(p.assign);
 }
   
 void AlphaBetaHHDlg::updateOutChn(int chN, int *chns) 
@@ -104,6 +116,8 @@ void AlphaBetaHHDlg::updateOutChn(int chN, int *chns)
   newInd= IChannelCombo->findText(current);
   if (newInd >= 0) IChannelCombo->setCurrentIndex(newInd);
   else IChannelCombo->setCurrentIndex(0);
+
+  ca.updateChns();
 }
 
 void AlphaBetaHHDlg::updateInChn(int chN, int *chns) 
@@ -125,4 +139,6 @@ void AlphaBetaHHDlg::updateInChn(int chN, int *chns)
   newInd= VChannelCombo->findText(current);
   if (newInd >= 0) VChannelCombo->setCurrentIndex(newInd);
   else VChannelCombo->setCurrentIndex(0);
+
+  ca.updateChns();
 }

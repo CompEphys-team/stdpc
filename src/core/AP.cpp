@@ -244,6 +244,10 @@ void initAP()
     addAP("abHHp[#].hkb", &abHHp, &abHHData::hkb);
     addAP("abHHp[#].hVb", &abHHp, &abHHData::hVb);
     addAP("abHHp[#].hsb", &abHHp, &abHHData::hsb);
+    addAP("abHHp[#].assign[#].active", &abHHp, &abHHData::assign, &CurrentAssignment::active);
+    addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
+    addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
+    addAP("abHHp[#].noLegacyAssignment", &abHHp, &abHHData::noLegacyAssign);
 
 
     // SG
