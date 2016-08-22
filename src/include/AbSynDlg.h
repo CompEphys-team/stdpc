@@ -7,6 +7,7 @@
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
+#include "SynapseAssignmentDlg.h"
 
 class abSynDlg : public QDialog, private Ui::abSynDlg
 {
@@ -28,6 +29,7 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
      void updateInChn(int, int*);
      
   private:
+     SynapseAssignmentDlg sa;
 }; 
 
 #endif

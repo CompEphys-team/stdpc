@@ -3,7 +3,8 @@
 #include <QMessageBox>
 
 abSynDlg::abSynDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : QDialog(parent),
+       sa(this)
  {
      QString lb;
      setupUi(this);
@@ -17,6 +18,12 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
+     connect(btnAssign, SIGNAL(clicked(bool)), &sa, SLOT(open()));
+     connect(cbUseLegacy, &QCheckBox::stateChanged, this, [=](){
+         PreSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         PostSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         OutSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+     });
 }
 
 void abSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -72,6 +79,9 @@ void abSynDlg::exportData(abSynData &p)
   STDP->exportData(p.ST);
   // ODE plasticity
   ODESTDP->exportData(p.ODE);
+
+  p.noLegacyAssign = !cbUseLegacy->isChecked();
+  sa.exportData(p.assign);
 }
 
 void abSynDlg::importData(abSynData p)
@@ -106,6 +116,9 @@ void abSynDlg::importData(abSynData p)
   STDP->importData(p.ST);
   // ODE plasticity
   ODESTDP->importData(p.ODE);
+
+  cbUseLegacy->setChecked(!p.noLegacyAssign);
+  sa.importData(p.assign);
 }
 
 
@@ -126,6 +139,8 @@ void abSynDlg::updateOutChn(int chN, int *chns)
   newInd= OutSynChannelCombo->findText(current);
   if (newInd >= 0) OutSynChannelCombo->setCurrentIndex(newInd);
   else OutSynChannelCombo->setCurrentIndex(0);
+
+  sa.updateChns();
 }
 
 void abSynDlg::updateInChn(int chN, int *chns) 
@@ -157,4 +172,6 @@ void abSynDlg::updateInChn(int chN, int *chns)
   newInd= PostSynChannelCombo->findText(currentPost);
   if (newInd >= 0) PostSynChannelCombo->setCurrentIndex(newInd);
   else PostSynChannelCombo->setCurrentIndex(0);
+
+  sa.updateChns();
 }

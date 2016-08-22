@@ -3,7 +3,8 @@
 #include <QMessageBox>
 
 ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : QDialog(parent),
+       sa(this)
  {
      QString lb;
      setupUi(this);
@@ -17,7 +18,13 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
-     connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));                   
+     connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));
+     connect(btnAssign, SIGNAL(clicked(bool)), &sa, SLOT(open()));
+     connect(cbUseLegacy, &QCheckBox::stateChanged, this, [=](){
+         PreSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         PostSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         OutSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
+     });
 }
 
 void ChemSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -110,6 +117,9 @@ void ChemSynDlg::exportData(CSynData &p)
   STDP->exportData(p.ST);
   // ODE plasticity
   ODESTDP->exportData(p.ODE);
+
+  p.noLegacyAssign = !cbUseLegacy->isChecked();
+  sa.exportData(p.assign);
 }
 
 void ChemSynDlg::importData(CSynData p)
@@ -159,6 +169,9 @@ void ChemSynDlg::importData(CSynData p)
   STDP->importData(p.ST);
   // ODE plasticity
   ODESTDP->importData(p.ODE);
+
+  cbUseLegacy->setChecked(!p.noLegacyAssign);
+  sa.importData(p.assign);
 }
 
 
@@ -179,6 +192,8 @@ void ChemSynDlg::updateOutChn(int chN, int *chns)
   newInd= OutSynChannelCombo->findText(current);
   if (newInd >= 0) OutSynChannelCombo->setCurrentIndex(newInd);
   else OutSynChannelCombo->setCurrentIndex(0);
+
+  sa.updateChns();
 }
 
 void ChemSynDlg::updateInChn(int chN, int *chns) 
@@ -210,4 +225,6 @@ void ChemSynDlg::updateInChn(int chN, int *chns)
   newInd= PostSynChannelCombo->findText(currentPost);
   if (newInd >= 0) PostSynChannelCombo->setCurrentIndex(newInd);
   else PostSynChannelCombo->setCurrentIndex(0);
+
+  sa.updateChns();
 }

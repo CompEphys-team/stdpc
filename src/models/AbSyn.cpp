@@ -1,9 +1,47 @@
 
 #include "AbSyn.h"
 #include <cmath>
+#include "DCThread.h"
     
-abSyn::abSyn() 
+abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *ina) :
+    p(inp),
+    a(ina),
+    S(0.0),
+    R(0.0),
+    g(p->gSyn)
 {
+    if ( !a ) {
+        legacy.active = !p->noLegacyAssign;
+        legacy.PreSynChannel = p->PreSynChannel;
+        legacy.PostSynChannel = p->PostSynChannel;
+        legacy.OutSynChannel = p->OutSynChannel;
+        a =& legacy;
+    }
+    pre = t->getInChan(a->PreSynChannel);
+    post = t->getInChan(a->PostSynChannel);
+    out = t->getOutChan(a->OutSynChannel);
+
+    if (p->LUTables) {
+      theExp= &expLU;
+      expLU.require(-50.0, 50.0, 0.02);
+      theExpSigmoid= &expSigmoidLU;
+      expSigmoidLU.require(-50.0, 50.0, 0.02);
+      theTanh= &tanhLU;
+      tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+      theExp= &expFunc;
+      theExpSigmoid= &expSigmoidFunc;
+      theTanh= &tanhFunc;
+    }
+
+    graw= invGFilter(g);
+    if (p->Plasticity == 2) {
+      P= p->ODE.InitialP;
+      D= p->ODE.InitialD;
+      Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
+      Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
 }
 
 double abSyn::invGFilter(double ing)
@@ -34,38 +72,6 @@ double abSyn::gFilter(double ingr)
       break;
   }
   return ng;
-}
-
-void abSyn::init(abSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->PreSynChannel]];
-  post= &inChn[inIdx[p->PostSynChannel]];
-  out= &outChn[outIdx[p->OutSynChannel]];
-
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  S= 0.0;
-  R= 0.0;
-  g= p->gSyn;
-  graw= invGFilter(g);
-  if (p->Plasticity == 2) {
-    P= p->ODE.InitialP;
-    D= p->ODE.InitialD;
-    Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
-    Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
-  }
 }
 
 void abSyn::currentUpdate(double t, double dt)

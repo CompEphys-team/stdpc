@@ -7,6 +7,7 @@
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
+#include "SynapseAssignmentDlg.h"
 
 class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
 {
@@ -28,6 +29,7 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
      void updateInChn(int, int*);
 
   private:
+     SynapseAssignmentDlg sa;
 };
 
 #endif

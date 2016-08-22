@@ -51,10 +51,10 @@ private:
      bool finished;
      bool scripting;
      SpkGen SG;
-     ChemSyn *csyn;
-     abSyn *absyn;
+     std::vector<ChemSyn> csyn;
+     std::vector<abSyn> absyn;
      GapJunction *esyn;
-     DestexheSyn *dsyn;
+     std::vector<DestexheSyn> dsyn;
      std::vector<HH> hh;
      std::vector<abHH> abhh;
      DAQ *board;
@@ -64,16 +64,10 @@ private:
      short int *outIdx;
      short int inNo;
      short int outNo;
-     
-     short int csNo;
-     short int absNo;
+
      short int esNo;
-     short int dsNo;
-     
-     short int *csIdx;
-     short int *absIdx;
+
      short int *esIdx;
-     short int *dsIdx;
      
  private:
      bool initial;   

@@ -11,14 +11,8 @@ DCThread::DCThread()
 {
   stopped= true;
   finished= true;
-  csyn= new ChemSyn[MAX_SYN_NO];
-  absyn= new abSyn[MAX_SYN_NO];
   esyn= new GapJunction[MAX_SYN_NO];
-  dsyn= new DestexheSyn[MAX_SYN_NO];
-  csIdx= new short int[MAX_SYN_NO];
-  absIdx= new short int[MAX_SYN_NO];
   esIdx= new short int[MAX_SYN_NO];
-  dsIdx= new short int[MAX_SYN_NO];
 
   inChn= NULL;
   outChn= NULL;
@@ -35,14 +29,8 @@ DCThread::DCThread()
 
 DCThread::~DCThread() 
 {
-   delete[] csyn;
-   delete[] absyn;
    delete[] esyn;
-   delete[] dsyn;
-   delete[] csIdx;
-   delete[] absIdx;
    delete[] esIdx;
-   delete[] dsIdx;
    
    if (inChn != NULL) delete[] inChn;
    if (outChn != NULL) delete[] outChn;
@@ -144,27 +132,42 @@ void DCThread::run()
      lb.setNum(grpNo[i]);
      message(QString("Added ")+lb+QString(" channels for Display"));
    }
-                 
-   csNo= 0;
-   absNo= 0;
+
+   csyn.clear();
+   for ( CSynData &p : CSynp ) {
+       if ( p.active ) {
+           if ( !p.noLegacyAssign )
+               csyn.push_back(ChemSyn(&p, this));
+           for ( SynapseAssignment &a : p.assign )
+               if ( a.active )
+                   csyn.push_back(ChemSyn(&p, this, &a));
+       }
+   }
+   absyn.clear();
+   for ( abSynData &p : abSynp ) {
+       if ( p.active ) {
+           if ( !p.noLegacyAssign )
+               absyn.push_back(abSyn(&p, this));
+           for ( SynapseAssignment &a : p.assign )
+               if ( a.active )
+                   absyn.push_back(abSyn(&p, this, &a));
+       }
+   }
+   dsyn.clear();
+   for ( DestexheSynData &p : DxheSynp ) {
+       if ( p.active ) {
+           if ( !p.noLegacyAssign )
+               dsyn.push_back(DestexheSyn(&p, this));
+           for ( SynapseAssignment &a : p.assign )
+               if ( a.active )
+                   dsyn.push_back(DestexheSyn(&p, this, &a));
+       }
+   }
    esNo= 0;
-   dsNo= 0;
    for (i= 0; i < MAX_SYN_NO; i++) {
-     if (CSynp[i].active) {
-       csyn[i].init(&CSynp[i],inIdx,outIdx,inChn,outChn);
-       csIdx[csNo++]= i;
-     }
-     if (abSynp[i].active) {
-       absyn[i].init(&abSynp[i],inIdx,outIdx,inChn,outChn);
-       absIdx[absNo++]= i;
-     }
      if (ESynp[i].active) {
        esyn[i].init(&ESynp[i],inIdx,outIdx,inChn,outChn);
        esIdx[esNo++]= i;
-     }
-     if (DxheSynp[i].active) {
-       dsyn[i].init(&DxheSynp[i],inIdx,outIdx,inChn,outChn);
-       dsIdx[dsNo++]= i;
      }
    }
    hh.clear();
@@ -191,15 +194,12 @@ void DCThread::run()
            }
        }
    }
-   QString cN, abN, eN, dN;
-   cN.setNum(csNo);
-   abN.setNum(absNo);
+   QString eN;
    eN.setNum(esNo);
-   dN.setNum(dsNo);
-   if (csNo > 0) message(QString("DynClamp: ")+cN+QString(" chemical synapse(s) "));
-   if (absNo > 0) message(QString("DynClamp: ")+abN+QString(" ab synapse(s) "));
+   if (csyn.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) ").arg(csyn.size()));
+   if (absyn.size() > 0) message(QString("DynClamp: %1 ab synapse(s) ").arg(absyn.size()));
    if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
-   if (dsNo > 0) message(QString("DynClamp: ")+dN+QString(" Destexhe synapse(s) "));
+   if (dsyn.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) ").arg(dsyn.size()));
    if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
    if (abhh.size() > 0) message(QString("DynClamp: %1 abHH conductance(s) ...").arg(abhh.size()));
 
@@ -379,14 +379,14 @@ void DCThread::run()
          for (i= 0; i <= outNo; i++) {
            outChn[outIdx[i]].I= outChnp[outIdx[i]].bias;
          }
-         for (i= 0; i < csNo; i++)
-           csyn[csIdx[i]].currentUpdate(t, dt);
-         for (i= 0; i < absNo; i++)
-           absyn[absIdx[i]].currentUpdate(t, dt);
+         for ( ChemSyn &obj : csyn )
+             obj.currentUpdate(t, dt);
+         for ( abSyn &obj : absyn )
+             obj.currentUpdate(t, dt);
+         for ( DestexheSyn &obj : dsyn )
+             obj.currentUpdate(t, dt);
          for (i= 0; i < esNo; i++)
            esyn[esIdx[i]].currentUpdate(t, dt);
-         for (i= 0; i < dsNo; i++)
-           dsyn[dsIdx[i]].currentUpdate(t, dt);
          for ( HH &obj : hh )
              obj.currentUpdate(t, dt);
          for ( abHH &obj : abhh )

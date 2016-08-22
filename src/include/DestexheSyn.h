@@ -14,6 +14,7 @@ class DestexheSyn {
     inChannel *pre;
     inChannel *post;
     outChannel *out;
+    SynapseAssignment legacy, *a;
 
     double P_f(double);
     double D_f(double);
@@ -32,8 +33,7 @@ class DestexheSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    DestexheSyn();
-    void init(DestexheSynData *, short int *, short int *, inChannel *, outChannel *);
+    DestexheSyn(DestexheSynData *, DCThread *, SynapseAssignment * = nullptr);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

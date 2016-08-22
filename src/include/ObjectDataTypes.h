@@ -96,6 +96,8 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
+  bool noLegacyAssign;
 } CSynData;
 
 typedef struct {
@@ -117,6 +119,8 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
+  bool noLegacyAssign;
 } abSynData;
 
 typedef struct {
@@ -136,6 +140,8 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
+  bool noLegacyAssign;
 } DestexheSynData;
 
 typedef struct {

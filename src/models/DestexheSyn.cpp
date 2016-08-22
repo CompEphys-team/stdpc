@@ -1,9 +1,47 @@
 
 #include "DestexheSyn.h"
 #include <cmath>
+#include "DCThread.h"
     
-DestexheSyn::DestexheSyn()
+DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *ina) :
+    p(inp),
+    a(ina),
+    S(0.0),
+    tlast(-1.0e10),
+    g(p->gSyn)
 {
+    if ( !a ) {
+        legacy.active = !p->noLegacyAssign;
+        legacy.PreSynChannel = p->PreSynChannel;
+        legacy.PostSynChannel = p->PostSynChannel;
+        legacy.OutSynChannel = p->OutSynChannel;
+        a =& legacy;
+    }
+    pre = t->getInChan(a->PreSynChannel);
+    post = t->getInChan(a->PostSynChannel);
+    out = t->getOutChan(a->OutSynChannel);
+
+    if (p->LUTables) {
+        theExp= &expLU;
+        expLU.require(-50.0, 50.0, 0.02);
+        theExpSigmoid= &expSigmoidLU;
+        expSigmoidLU.require(-50.0, 50.0, 0.02);
+        theTanh= &tanhLU;
+        tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+        theExp= &expFunc;
+        theExpSigmoid= &expSigmoidFunc;
+        theTanh= &tanhFunc;
+    }
+
+    graw= invGFilter(g);
+    if (p->Plasticity == 2) {
+        P= p->ODE.InitialP;
+        D= p->ODE.InitialD;
+        Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
+        Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
 }
 
 double DestexheSyn::invGFilter(double ing)
@@ -34,38 +72,6 @@ double DestexheSyn::gFilter(double ingr)
       break;
   }
   return ng;
-}
-
-void DestexheSyn::init(DestexheSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->PreSynChannel]];
-  post= &inChn[inIdx[p->PostSynChannel]];
-  out= &outChn[outIdx[p->OutSynChannel]];
-
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  S= 0.0;
-  tlast= -1.0e10;
-  g= p->gSyn;
-  graw= invGFilter(g);
-  if (p->Plasticity == 2) {
-    P= p->ODE.InitialP;
-    D= p->ODE.InitialD;
-    Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
-    Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
-  }
 }
 
 void DestexheSyn::currentUpdate(double t, double dt)

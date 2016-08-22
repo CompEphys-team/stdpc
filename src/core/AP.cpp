@@ -68,6 +68,11 @@ void initAP()
     addAP("CSynp[#].Mgfac", &CSynp, &CSynData::Mgfac);
     addAP("CSynp[#].Mgexpo", &CSynp, &CSynData::Mgexpo);
     addAP("CSynp[#].Plasticity", &CSynp, &CSynData::Plasticity);
+    addAP("CSynp[#].assign[#].active", &CSynp, &CSynData::assign, &SynapseAssignment::active);
+    addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("CSynp[#].noLegacyAssignment", &CSynp, &CSynData::noLegacyAssign);
 
 
     // abSynp STPlast
@@ -123,6 +128,11 @@ void initAP()
     addAP("abSynp[#].fixVpost", &abSynp, &abSynData::fixVpost);
     addAP("abSynp[#].Vpost", &abSynp, &abSynData::Vpost);
     addAP("abSynp[#].Plasticity", &abSynp, &abSynData::Plasticity);
+    addAP("abSynp[#].assign[#].active", &abSynp, &abSynData::assign, &SynapseAssignment::active);
+    addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("abSynp[#].noLegacyAssignment", &abSynp, &abSynData::noLegacyAssign);
 
 
     // DxheSynp STPlast
@@ -176,6 +186,11 @@ void initAP()
     addAP("DxheSynp[#].fixVpost", &DxheSynp, &DestexheSynData::fixVpost);
     addAP("DxheSynp[#].Vpost", &DxheSynp, &DestexheSynData::Vpost);
     addAP("DxheSynp[#].Plasticity", &DxheSynp, &DestexheSynData::Plasticity);
+    addAP("DxheSynp[#].assign[#].active", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::active);
+    addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("DxheSynp[#].noLegacyAssignment", &DxheSynp, &DestexheSynData::noLegacyAssign);
 
 
     // ESynp

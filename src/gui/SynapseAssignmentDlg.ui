@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CurrentAssignmentDlg</class>
- <widget class="QDialog" name="CurrentAssignmentDlg">
+ <class>SynapseAssignmentDlg</class>
+ <widget class="QDialog" name="SynapseAssignmentDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>550</width>
     <height>300</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
       <bool>false</bool>
      </property>
      <property name="columnCount">
-      <number>3</number>
+      <number>4</number>
      </property>
      <attribute name="horizontalHeaderHighlightSections">
       <bool>false</bool>
@@ -37,6 +37,7 @@
      <attribute name="verticalHeaderVisible">
       <bool>false</bool>
      </attribute>
+     <column/>
      <column/>
      <column/>
      <column/>
@@ -59,7 +60,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>CurrentAssignmentDlg</receiver>
+   <receiver>SynapseAssignmentDlg</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -75,7 +76,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>CurrentAssignmentDlg</receiver>
+   <receiver>SynapseAssignmentDlg</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
