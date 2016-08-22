@@ -18,9 +18,6 @@ class HHDlg : public QDialog, private Ui::HHDlg
     void updateOutChn(int, int*);
     void updateInChn(int, int*);
 
-signals:
-    void chnsChanged();
-
 private:
     CurrentAssignmentDlg ca;
          

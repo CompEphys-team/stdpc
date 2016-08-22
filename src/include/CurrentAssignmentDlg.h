@@ -18,11 +18,12 @@ class CurrentAssignmentDlg : public QDialog
 public:
     explicit CurrentAssignmentDlg(QWidget *parent = 0);
     ~CurrentAssignmentDlg();
-    void exportData(mhHHData &);
-    void importData(mhHHData const&);
+    void exportData(std::vector<CurrentAssignment> &);
+    void importData(std::vector<CurrentAssignment> const&);
 
-signals:
-    void chnsChanged();
+public slots:
+    virtual void open() override;
+    void updateChns();
 
 private:
     Ui::CurrentAssignmentDlg *ui;
@@ -30,6 +31,8 @@ private:
     ChannelListModel inm, outm;
     QVector<QCheckBox*> boxes;
     QVector<QComboBox*> ins, outs;
+
+    bool reloadChns;
 
     void addRow(int row, QCheckBox *box, QComboBox *in, QComboBox *out);
 

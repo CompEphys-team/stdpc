@@ -12,7 +12,6 @@ HHDlg::HHDlg(int no, QWidget *parent)
      lb= "HH "+lb;
      HHDlgLabel->setText(lb);
      connect(btnAssign, SIGNAL(clicked(bool)), &ca, SLOT(open()));
-     connect(this, SIGNAL(chnsChanged()), &ca, SIGNAL(chnsChanged()));
      connect(cbUseLegacy, &QCheckBox::stateChanged, this, [=](){
          VChannelCombo->setEnabled(cbUseLegacy->isChecked());
          IChannelCombo->setEnabled(cbUseLegacy->isChecked());
@@ -47,7 +46,7 @@ void HHDlg::exportData(mhHHData &p)
   p.stauh= stauhE->text().toDouble()*1e-3;
   p.noLegacyAssign = !cbUseLegacy->isChecked();
 
-  ca.exportData(p);
+  ca.exportData(p.assign);
 }
 
 void HHDlg::importData(mhHHData p)
@@ -99,7 +98,7 @@ void HHDlg::importData(mhHHData p)
   stauhE->setText(num);
   cbUseLegacy->setChecked(!p.noLegacyAssign);
 
-  ca.importData(p);
+  ca.importData(p.assign);
 }
 
 void HHDlg::updateOutChn(int chN, int *chns) 
@@ -121,7 +120,7 @@ void HHDlg::updateOutChn(int chN, int *chns)
   if (newInd >= 0) IChannelCombo->setCurrentIndex(newInd);
   else IChannelCombo->setCurrentIndex(0);
 
-  emit chnsChanged();
+  ca.updateChns();
 }
 
 void HHDlg::updateInChn(int chN, int *chns) 
@@ -145,5 +144,5 @@ void HHDlg::updateInChn(int chN, int *chns)
   if (newInd >= 0) VChannelCombo->setCurrentIndex(newInd);
   else VChannelCombo->setCurrentIndex(0);
 
-  emit chnsChanged();
+  ca.updateChns();
 }

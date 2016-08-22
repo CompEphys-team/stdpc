@@ -174,7 +174,6 @@ void DCThread::run()
    hh.clear();
    for ( mhHHData &p : mhHHp ) {
        if ( p.active ) {
-           int i = 0;
            if ( !p.noLegacyAssign ) {
                hh.push_back(HH(&p, this));
            }

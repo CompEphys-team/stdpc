@@ -6,7 +6,8 @@ CurrentAssignmentDlg::CurrentAssignmentDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CurrentAssignmentDlg),
     inm(ChannelListModel::In | ChannelListModel::Blank, this),
-    outm(ChannelListModel::Out | ChannelListModel::Blank, this)
+    outm(ChannelListModel::Out | ChannelListModel::Blank, this),
+    reloadChns(true)
 {
     ui->setupUi(this);
     ui->table->setHorizontalHeaderLabels(QStringList({"Active",
@@ -16,9 +17,6 @@ CurrentAssignmentDlg::CurrentAssignmentDlg(QWidget *parent) :
     ui->table->setColumnWidth(1, 150);
     ui->table->setColumnWidth(2, 150);
     growTable();
-
-    connect(this, SIGNAL(chnsChanged()), &inm, SLOT(updateChns()));
-    connect(this, SIGNAL(chnsChanged()), &outm, SLOT(updateChns()));
 }
 
 CurrentAssignmentDlg::~CurrentAssignmentDlg()
@@ -26,26 +24,27 @@ CurrentAssignmentDlg::~CurrentAssignmentDlg()
     delete ui;
 }
 
-void CurrentAssignmentDlg::exportData(mhHHData & p)
+void CurrentAssignmentDlg::exportData(std::vector<CurrentAssignment> &p)
 {
     CurrentAssignment a;
     QPoint in, out;
-    p.assign.clear();
+    p.clear();
+    inm.updateChns();
+    outm.updateChns();
     for ( int i = 0; i < ui->table->rowCount() - 1; i++ ) {
         in = ins[i]->currentData().toPoint();
         out = outs[i]->currentData().toPoint();
-        if ( in.y() == ChannelListModel::Blank || out.y() == ChannelListModel::Blank )
+        if ( in.y() <= ChannelListModel::None || out.y() <= ChannelListModel::None )
             continue;
         a.active = boxes[i]->isChecked();
         a.VChannel = in.x();
         a.IChannel = out.x();
-        p.assign.push_back(a);
+        p.push_back(a);
     }
 }
 
-void CurrentAssignmentDlg::importData(mhHHData const& p)
+void CurrentAssignmentDlg::importData(const std::vector<CurrentAssignment> &p)
 {
-    int rows = (int)p.assign.size();
     QCheckBox *box;
     QComboBox *in, *out;
 
@@ -53,18 +52,36 @@ void CurrentAssignmentDlg::importData(mhHHData const& p)
     ins.clear();
     outs.clear();
     ui->table->setRowCount(0);
+    inm.updateChns();
+    outm.updateChns();
 
-    for ( int i = 0; i < rows; i++ ) {
+    int i = 0;
+    for ( CurrentAssignment const& a : p ) {
         box = new QCheckBox();
         in = new QComboBox();
         out = new QComboBox();
-        addRow(i, box, in, out);
-        box->setChecked(p.assign[i].active);
-        in->setCurrentIndex(inm.index(p.assign[i].VChannel));
-        out->setCurrentIndex(outm.index(p.assign[i].IChannel));
+        addRow(i++, box, in, out);
+        box->setChecked(a.active);
+        in->setCurrentIndex(inm.index(a.VChannel));
+        out->setCurrentIndex(outm.index(a.IChannel));
     }
 
     growTable();
+}
+
+void CurrentAssignmentDlg::open()
+{
+    if ( reloadChns ) {
+        inm.updateChns();
+        outm.updateChns();
+        reloadChns = false;
+    }
+    QDialog::open();
+}
+
+void CurrentAssignmentDlg::updateChns()
+{
+    reloadChns = true;
 }
 
 void CurrentAssignmentDlg::addRow(int row, QCheckBox *box, QComboBox *in, QComboBox *out)
