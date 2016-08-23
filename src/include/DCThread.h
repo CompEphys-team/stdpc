@@ -53,7 +53,7 @@ private:
      SpkGen SG;
      std::vector<ChemSyn> csyn;
      std::vector<abSyn> absyn;
-     GapJunction *esyn;
+     std::vector<GapJunction> esyn;
      std::vector<DestexheSyn> dsyn;
      std::vector<HH> hh;
      std::vector<abHH> abhh;
@@ -64,10 +64,6 @@ private:
      short int *outIdx;
      short int inNo;
      short int outNo;
-
-     short int esNo;
-
-     short int *esIdx;
      
  private:
      bool initial;   

@@ -11,8 +11,6 @@ DCThread::DCThread()
 {
   stopped= true;
   finished= true;
-  esyn= new GapJunction[MAX_SYN_NO];
-  esIdx= new short int[MAX_SYN_NO];
 
   inChn= NULL;
   outChn= NULL;
@@ -29,9 +27,6 @@ DCThread::DCThread()
 
 DCThread::~DCThread() 
 {
-   delete[] esyn;
-   delete[] esIdx;
-   
    if (inChn != NULL) delete[] inChn;
    if (outChn != NULL) delete[] outChn;
    if (inIdx != NULL) delete[] inIdx;
@@ -163,12 +158,15 @@ void DCThread::run()
                    dsyn.push_back(DestexheSyn(&p, this, &a));
        }
    }
-   esNo= 0;
-   for (i= 0; i < MAX_SYN_NO; i++) {
-     if (ESynp[i].active) {
-       esyn[i].init(&ESynp[i],inIdx,outIdx,inChn,outChn);
-       esIdx[esNo++]= i;
-     }
+   esyn.clear();
+   for ( GJunctData &p : ESynp ) {
+       if ( p.active ) {
+           if ( !p.noLegacyAssign )
+               esyn.push_back(GapJunction(&p, this));
+           for ( GapJunctionAssignment &a : p.assign )
+               if ( a.active )
+                   esyn.push_back(GapJunction(&p, this, &a));
+       }
    }
    hh.clear();
    for ( mhHHData &p : mhHHp ) {
@@ -194,11 +192,9 @@ void DCThread::run()
            }
        }
    }
-   QString eN;
-   eN.setNum(esNo);
    if (csyn.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) ").arg(csyn.size()));
    if (absyn.size() > 0) message(QString("DynClamp: %1 ab synapse(s) ").arg(absyn.size()));
-   if (esNo > 0) message(QString("DynClamp: ")+eN+QString(" gap junction(s) "));
+   if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
    if (dsyn.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) ").arg(dsyn.size()));
    if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
    if (abhh.size() > 0) message(QString("DynClamp: %1 abHH conductance(s) ...").arg(abhh.size()));
@@ -385,8 +381,8 @@ void DCThread::run()
              obj.currentUpdate(t, dt);
          for ( DestexheSyn &obj : dsyn )
              obj.currentUpdate(t, dt);
-         for (i= 0; i < esNo; i++)
-           esyn[esIdx[i]].currentUpdate(t, dt);
+         for ( GapJunction &obj : esyn )
+             obj.currentUpdate(t, dt);
          for ( HH &obj : hh )
              obj.currentUpdate(t, dt);
          for ( abHH &obj : abhh )

@@ -2,7 +2,8 @@
 #include "GapJunctionDlg.h"
 
 GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : QDialog(parent),
+       gja(this)
  {
      QString lb;
      setupUi(this);
@@ -10,6 +11,14 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
      No= no;
      lb.setNum(No);
      gapJunctDlgLabel->setText(QString("Synapse ")+lb);
+
+     connect(btnAssign, SIGNAL(clicked(bool)), &gja, SLOT(open()));
+     connect(cbUseLegacy, &QCheckBox::stateChanged, this, [=](){
+         preInChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         postInChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         preOutChannelCombo->setEnabled(cbUseLegacy->isChecked());
+         postOutChannelCombo->setEnabled(cbUseLegacy->isChecked());
+     });
 }
 
 void GapJunctionDlg::exportData(GJunctData &p) 
@@ -20,6 +29,8 @@ void GapJunctionDlg::exportData(GJunctData &p)
   p.postOutChannel= postOutChannelCombo->currentIndex();
   p.type= typeCombo->currentIndex();
   p.gSyn= gSynE->text().toDouble()*1e-9;
+  p.noLegacyAssign = !cbUseLegacy->isChecked();
+  gja.exportData(p.assign);
 }
 
 void GapJunctionDlg::importData(GJunctData p) 
@@ -33,6 +44,8 @@ void GapJunctionDlg::importData(GJunctData p)
   typeCombo->setCurrentIndex(p.type);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
+  cbUseLegacy->setChecked(!p.noLegacyAssign);
+  gja.importData(p.assign);
 }
 
 void GapJunctionDlg::updateOutChn(int chN, int *chns) 
@@ -64,6 +77,8 @@ void GapJunctionDlg::updateOutChn(int chN, int *chns)
   newInd= postOutChannelCombo->findText(currentPost);
   if (newInd >= 0) postOutChannelCombo->setCurrentIndex(newInd);
   else postOutChannelCombo->setCurrentIndex(0);
+
+  gja.updateChns();
 }
 
 void GapJunctionDlg::updateInChn(int chN, int *chns) 
@@ -95,4 +110,6 @@ void GapJunctionDlg::updateInChn(int chN, int *chns)
   newInd= postInChannelCombo->findText(currentPost);
   if (newInd >= 0) postInChannelCombo->setCurrentIndex(newInd);
   else postInChannelCombo->setCurrentIndex(0);
+
+  gja.updateChns();
 }

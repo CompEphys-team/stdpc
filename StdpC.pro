@@ -47,7 +47,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DataSavingDlg.ui \
     $$PWD/src/gui/DestexheSynDlg.ui \
     $$PWD/src/gui/CurrentAssignmentDlg.ui \
-    src/gui/SynapseAssignmentDlg.ui
+    $$PWD/src/gui/SynapseAssignmentDlg.ui \
+    $$PWD/src/gui/GapJunctionAssignmentDlg.ui
 HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -92,7 +93,8 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/AP.h \
     $$PWD/src/include/CurrentAssignmentDlg.h \
     $$PWD/src/include/ChannelListModel.h \
-    src/include/SynapseAssignmentDlg.h
+    $$PWD/src/include/SynapseAssignmentDlg.h \
+    $$PWD/src/include/GapJunctionAssignmentDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -137,7 +139,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/AP.cpp \
     $$PWD/src/gui/CurrentAssignmentDlg.cpp \
     $$PWD/src/gui/ChannelListModel.cpp \
-    src/gui/SynapseAssignmentDlg.cpp
+    $$PWD/src/gui/SynapseAssignmentDlg.cpp \
+    $$PWD/src/gui/GapJunctionAssignmentDlg.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)

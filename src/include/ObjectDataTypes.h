@@ -17,7 +17,7 @@ struct SynapseAssignment {
     int OutSynChannel;
 };
 
-struct GapJunctionAssigment {
+struct GapJunctionAssignment {
     bool active;
     int preInChannel;
     int postInChannel;
@@ -152,6 +152,8 @@ typedef struct {
   int postOutChannel;
   int type;
   double gSyn;
+  std::vector<GapJunctionAssignment> assign;
+  bool noLegacyAssign;
 } GJunctData;
 
 typedef struct {

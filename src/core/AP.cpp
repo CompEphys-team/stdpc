@@ -201,6 +201,12 @@ void initAP()
     addAP("ESynp[#].postOutChannel", &ESynp, &GJunctData::postOutChannel);
     addAP("ESynp[#].type", &ESynp, &GJunctData::type);
     addAP("ESynp[#].gSyn", &ESynp, &GJunctData::gSyn);
+    addAP("ESynp[#].assign[#].active", &ESynp, &GJunctData::assign, &GapJunctionAssignment::active);
+    addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
+    addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
+    addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
+    addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
+    addAP("ESynp[#].noLegacyAssignment", &ESynp, &GJunctData::noLegacyAssign);
 
 
     // mhHH

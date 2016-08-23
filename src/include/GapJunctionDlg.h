@@ -4,6 +4,7 @@
 
 #include "ui_GapJunctionDlg.h"
 #include "ObjectDataTypes.h"
+#include "GapJunctionAssignmentDlg.h"
 
 class GapJunctionDlg : public QDialog, private Ui::GapJunctionDlg
 {
@@ -19,7 +20,9 @@ class GapJunctionDlg : public QDialog, private Ui::GapJunctionDlg
   public slots:
     void updateOutChn(int, int*);
     void updateInChn(int, int*);
-         
+
+private:
+    GapJunctionAssignmentDlg gja;
 }; 
 
 #endif
