@@ -132,7 +132,7 @@ std::function<void(T&)> getReadFunc(QString &name, int offset, std::istream &is,
                                     T &head, S T::* index, Tail... tail)
 {
     QRegularExpressionMatch structIndex
-            = QRegularExpression("\\.[a-zA-Z_][a-zA-Z0-9_]+").match(name, offset);
+            = QRegularExpression("\\.[a-zA-Z_][a-zA-Z0-9_]*").match(name, offset);
     if ( structIndex.hasMatch() ) {
         offset = structIndex.capturedEnd(0);
         std::function<void(S&)> func = getReadFunc(name, offset, is, ok, head.*index, tail...);
