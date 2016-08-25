@@ -656,12 +656,9 @@ void MyMainWindow::doLoadProtocol(QString &fname)
 
   is >> name;
   while ( is.good() ) {
-    QString rawname(name), truename(rawname);
+    QString rawname(name);
     bool ok = false;
-    truename.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
-    std::unique_ptr<AP> const& it = *std::find_if(
-                params.begin(), params.end(),
-                [&](std::unique_ptr<AP> &a){return !truename.compare(a->name);});
+    auto const& it = AP::find(rawname);
     if ( it != *params.end() )
       it->readNow(rawname, is, &ok);
     if ( !ok )

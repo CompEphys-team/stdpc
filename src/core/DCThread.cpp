@@ -519,7 +519,7 @@ outChannel *DCThread::getOutChan(int idx)
 bool DCThread::LoadScript(QString &fname)
 {
   double et; 
-  QString rawname, truename;
+  QString rawname;
   bool done, success;
   QString qn;
   char buf[80];
@@ -533,11 +533,7 @@ bool DCThread::LoadScript(QString &fname)
   {
     is >> buf;
     rawname= QString(buf);
-    truename = rawname;
-    truename.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
-    std::unique_ptr<AP> const& it = *std::find_if(
-                params.begin(), params.end(),
-                [&](std::unique_ptr<AP> &a){return !truename.compare(a->name);});
+    auto const& it = AP::find(rawname);
     if ( it != *params.end() ) {
         scriptq.append(qMakePair(et, it->readLater(rawname, is, &success)));
     } else {

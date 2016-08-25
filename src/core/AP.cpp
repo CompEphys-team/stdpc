@@ -359,36 +359,6 @@ void initAP()
 
 }
 
-QRegularExpressionMatch AP::matchName(QString &rawName)
-{
-    QString n = QString("^") + QRegularExpression::escape(name) + QString("$");
-    n.replace("\\#", "(\\d+)");
-    QRegularExpression re(n);
-    return re.match(rawName);
-}
-
-int AP::getArrayIndex(QRegularExpressionMatch &match, int i, int arraysize)
-{
-    int idx = getIndex(match, i);
-    if ( idx < 0 )
-        return idx;
-    if ( idx >= arraysize )
-        return -1;
-    return idx;
-}
-
-
-int AP::getIndex(QRegularExpressionMatch &match, int i)
-{
-    if ( match.lastCapturedIndex() < i )
-        return -1;
-    bool ok = true;
-    uint idx = match.captured(i).toUInt(&ok);
-    if ( !ok || idx > INT_MAX )
-        return -1;
-    return (int) idx;
-}
-
 std::istream &operator>>(std::istream &is, QString &str)
 {
     std::string tmp;
