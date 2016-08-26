@@ -100,6 +100,11 @@ void DCThread::run()
    else {
      inChn[inIdx[inNo]].V= 0.0;
    }
+
+   hhNeuron.clear();
+   for ( HHNeuronData &p : HHNeuronp ) {
+       hhNeuron.push_back(HHNeuronModel(&p));
+   }
    
    // set up the graphic display channels
    int idx;
@@ -176,7 +181,7 @@ void DCThread::run()
            }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   hh.push_back(HH(&p, this, &a));
+                   HH::instantiate(hh, &p, this, &a);
            }
        }
    }
@@ -188,7 +193,7 @@ void DCThread::run()
            }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   abhh.push_back(abHH(&p, this, &a));
+                   abHH::instantiate(abhh, &p, this, &a);
            }
        }
    }
@@ -198,6 +203,15 @@ void DCThread::run()
    if (dsyn.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) ").arg(dsyn.size()));
    if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
    if (abhh.size() > 0) message(QString("DynClamp: %1 abHH conductance(s) ...").arg(abhh.size()));
+   if (hhNeuron.size() > 0) {
+       int nModels = 0, nInst = 0;
+       for ( HHNeuronModel &model : hhNeuron ) {
+           auto rep = model.numActiveInst();
+           nModels += rep.first;
+           nInst += rep.second;
+       }
+       message(QString("DynClamp: %1 HH neuron model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
+   }
 
    int sz;   
    sz= tanhLU.generate();
@@ -271,6 +285,13 @@ void DCThread::run()
 
      // numOfAecChannels is only nonzero if TEST_VERSION is defined
      for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SGp.saving+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
+
+     // Add virtual neuron channels as needed
+     int modelNum = 0;
+     for ( HHNeuronModel &model : hhNeuron ) {
+         header.append(model.labels(modelNum++));
+     }
+     data.resize(header.size());
 
      dataSaver->SaveHeader(header);
    }
@@ -348,6 +369,8 @@ void DCThread::run()
               if ( SGp.saving ) data[inChnsToSave.size()+1] = SG.V; // spike generator
               for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SGp.saving+i] = outChn[outChnsToSave[i]].I;    // currents
 
+              QVector<double>::iterator it = data.begin();
+              it += inChnsToSave.size()+1+SGp.saving+outChnsToSave.size();
             #ifdef TEST_VERSION
               int aecChannelNum = 0;
               for ( int i=0; i<aecChannels.size(); i++ )
@@ -356,7 +379,11 @@ void DCThread::run()
                       data[inChnsToSave.size()+1+SGp.saving+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
                       aecChannelNum++;
                   }
+              it += aecChannelNum;
             #endif
+
+              for ( HHNeuronModel &model : hhNeuron )
+                  model.putData(it);
 
               dataSaver->SaveLine(data);
               lastSave = t;
@@ -375,6 +402,10 @@ void DCThread::run()
          for (i= 0; i <= outNo; i++) {
            outChn[outIdx[i]].I= outChnp[outIdx[i]].bias;
          }
+
+         for ( HHNeuronModel &model : hhNeuron )
+             model.updateChannels(t);
+
          for ( ChemSyn &obj : csyn )
              obj.currentUpdate(t, dt);
          for ( abSyn &obj : absyn )
@@ -387,6 +418,10 @@ void DCThread::run()
              obj.currentUpdate(t, dt);
          for ( abHH &obj : abhh )
              obj.currentUpdate(t, dt);
+
+         for ( HHNeuronModel &model : hhNeuron )
+             model.updateNeurons(t, dt);
+
          // spike generator ... write stuff to DAQ
          // outChn[1].I= inChn[inIdx[inNo]].V;
 
@@ -491,8 +526,13 @@ double DCThread::WaitTillNextSampling(double time)
 
 inChannel *DCThread::getInChan(int idx)
 {
-    if ( idx >= CHAN_VIRTUAL ) {
-        // TODO
+    if ( idx >= VPROTOTYPE ) {
+        return nullptr;
+    } else if ( idx >= VMODELOFFSET ) {
+        switch ( VCLASS(idx) ) {
+        case VCLASS_HH:
+            return &(hhNeuron[VMODEL(idx)].inst[VINST(idx)].in);
+        }
     } else if ( idx == CHAN_SG ) {
         return &inChn[inIdx[inNo]];
     } else if ( idx >= 0 ) {
@@ -503,14 +543,39 @@ inChannel *DCThread::getInChan(int idx)
 
 outChannel *DCThread::getOutChan(int idx)
 {
-    if ( idx >= CHAN_VIRTUAL ) {
-        // TODO
+    if ( idx >= VPROTOTYPE ) {
+        return nullptr;
+    } else if ( idx >= VMODELOFFSET ) {
+        switch ( VCLASS(idx) ) {
+        case VCLASS_HH:
+            return &(hhNeuron[VMODEL(idx)].inst[VINST(idx)].out);
+        }
     } else if ( idx >= 0 ) {
         return &outChn[outIdx[idx]];
     } else if ( idx == CHAN_NONE ) {
         return &outChn[outIdx[outNo]];
     }
     return nullptr;
+}
+
+std::vector<std::pair<size_t, bool> > DCThread::getChanIndices(size_t index)
+{
+    if ( index >= VPROTOTYPE ) {
+        index -= VPROTOTYPE + VINST(index); // Retain only class/model identification
+        std::vector<std::pair<size_t, bool>> ret;
+        size_t i = 0;
+        switch ( VCLASS(index) ) {
+        case VCLASS_HH:
+            for ( vInstData &vc : HHNeuronp[VMODEL(index)].inst ) {
+                ret.push_back(make_pair(index + i, vc.active));
+                i++;
+            }
+            break;
+        }
+        return ret;
+    } else {
+        return std::vector<std::pair<size_t, bool>>(1, make_pair(index, true));
+    }
 }
 
 

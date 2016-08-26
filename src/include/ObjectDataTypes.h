@@ -340,6 +340,20 @@ typedef struct {
   int trigChn;
 } SampleHoldData;
 
+struct vInstData {
+    bool active;
+    inChnData inChn;
+    outChnData outChn;
+};
+
+struct HHNeuronData {
+    bool active;
+    double C;
+    double gLeak;
+    double ELeak;
+    std::vector<vInstData> inst;
+};
+
 ostream &operator<<(ostream &os, SDAQData &p);
 istream &operator>>(istream &is, SDAQData &p); 
 ostream &operator<<(ostream &os, DigiDataData &p);

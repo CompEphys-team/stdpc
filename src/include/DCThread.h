@@ -14,6 +14,7 @@
 #include "DigiData.h"
 #include "AECChannel.h"
 #include "DataSaver.h"
+#include "HHNeuron.h"
 
 
 class DCThread : public QThread 
@@ -38,6 +39,7 @@ private:
 
      inChannel *getInChan(int idx);
      outChannel *getOutChan(int idx);
+     std::vector<std::pair<size_t, bool>> getChanIndices(size_t index);
 
      // List of AEC channels (io-channels pairs, kernels and current buffers)
      QVector<AECChannel*> aecChannels;
@@ -64,6 +66,8 @@ private:
      short int *outIdx;
      short int inNo;
      short int outNo;
+
+     std::vector<HHNeuronModel> hhNeuron;
      
  private:
      bool initial;   

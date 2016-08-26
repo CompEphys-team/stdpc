@@ -25,6 +25,8 @@ class HH
   public:
     HH(mhHHData *p, DCThread *t, CurrentAssignment *a = nullptr);
     void currentUpdate(double, double);
+
+    static void instantiate(std::vector<HH> &, mhHHData *, DCThread *, CurrentAssignment *);
 };
 
 #endif

@@ -16,6 +16,8 @@ std::vector<outChnData> outChnp;
 inChnData inSpkGenChnp;
 outChnData outSpkGenChnp;
 
+std::vector<HHNeuronData> HHNeuronp;
+
 DigiDataData DigiDatap;
 SDAQData SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
