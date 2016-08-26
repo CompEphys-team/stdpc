@@ -38,7 +38,7 @@ void HH::instantiate(std::vector<HH> &instances, mhHHData *inp, DCThread *t, Cur
     tmp.active = true;
     if ( ina->VChannel == ina->IChannel ) {
         // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
-        for ( std::pair<size_t, bool> VIChan : t->getChanIndices(ina->VChannel) ) {
+        for ( std::pair<int, bool> VIChan : t->getChanIndices(ina->VChannel) ) {
             if ( !VIChan.second )
                 continue;
             tmp.VChannel = VIChan.first;
@@ -46,11 +46,11 @@ void HH::instantiate(std::vector<HH> &instances, mhHHData *inp, DCThread *t, Cur
             instances.push_back(HH(inp, t, &tmp));
         }
     } else {
-        for ( std::pair<size_t, bool> VChan : t->getChanIndices(ina->VChannel) ) {
+        for ( std::pair<int, bool> VChan : t->getChanIndices(ina->VChannel) ) {
             if ( !VChan.second )
                 continue;
             tmp.VChannel = VChan.first;
-            for ( std::pair<size_t, bool> IChan : t->getChanIndices(ina->IChannel) ) {
+            for ( std::pair<int, bool> IChan : t->getChanIndices(ina->IChannel) ) {
                 if ( !IChan.second )
                     continue;
                 tmp.IChannel = IChan.first;

@@ -1,5 +1,6 @@
 #include "ChannelListModel.h"
 #include "Global.h"
+#include "ChannelIndex.h"
 
 ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
     : QAbstractListModel(parent),
@@ -166,21 +167,20 @@ int ChannelListModel::index(int channel) const
 QModelIndex ChannelListModel::index(const QPoint &p) const
 {
     int chan = p.x(), type = p.y(), row = 0;
+    ChannelIndex dex(chan, type==In);
 
     // Resolve aggregate types
     if ( type == In ) {
-        if ( chan >= CHAN_VIRTUAL ) {
+        if ( dex.isVirtual ) {
             type = Virtual;
-            chan -= CHAN_VIRTUAL;
-        } else if ( chan == CHAN_SG ) {
+        } else if ( dex.isSG ) {
             type = SpikeGen;
         } else {
             type = AnalogIn;
         }
     } else if ( type == Out ) {
-        if ( chan >= CHAN_VIRTUAL ) {
+        if ( dex.isVirtual ) {
             type = Virtual;
-            chan -= CHAN_VIRTUAL;
         } else {
             type = AnalogOut;
         }

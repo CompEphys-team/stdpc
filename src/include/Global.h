@@ -14,22 +14,6 @@
 #define VTHRESH -30
 #define MAX_ELECTRODE_NO 4
 
-#define CHAN_NONE (-1)
-#define CHAN_SG 1000
-
-#define CHAN_VIRTUAL 10000 /* Deprecate */
-
-/* Needs more transparent interface */
-#define VPROTOTYPE  1000000000
-#define VCLASSOFFSET 100000000
-#define VMODELOFFSET    100000
-
-#define VCLASS(x) ((x) - (x)%VCLASSOFFSET)                  /* Just the class - compare to VCLASS_* */
-#define VMODEL(x) (((x)%VCLASSOFFSET) / VMODELOFFSET - 1)   /* Model number, use as index to *Neuronp */
-#define VINST(x) ((x) % VMODELOFFSET)                       /* Instance number */
-
-#define VCLASS_HH    100000000
-
 
 extern int synType[MAX_SYN_NO];
 extern std::vector<CSynData> CSynp;

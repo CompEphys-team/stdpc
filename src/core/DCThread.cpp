@@ -3,6 +3,7 @@
 #include "Global.h"
 #include <cmath>
 #include <climits>
+#include "ChannelIndex.h"
 
   
 #include "SimulDAQ.h" // for debugging only ...
@@ -526,14 +527,15 @@ double DCThread::WaitTillNextSampling(double time)
 
 inChannel *DCThread::getInChan(int idx)
 {
-    if ( idx >= VPROTOTYPE ) {
+    ChannelIndex dex(idx, true);
+    if ( dex.isPrototype ) {
         return nullptr;
-    } else if ( idx >= VMODELOFFSET ) {
-        switch ( VCLASS(idx) ) {
-        case VCLASS_HH:
-            return &(hhNeuron[VMODEL(idx)].inst[VINST(idx)].in);
+    } else if ( dex.isVirtual ) {
+        switch ( dex.modelClass ) {
+        case ChannelIndex::HH:
+            return &(hhNeuron[dex.modelID].inst[dex.instID].in);
         }
-    } else if ( idx == CHAN_SG ) {
+    } else if ( dex.isSG ) {
         return &inChn[inIdx[inNo]];
     } else if ( idx >= 0 ) {
         return &inChn[inIdx[idx]];
@@ -543,38 +545,38 @@ inChannel *DCThread::getInChan(int idx)
 
 outChannel *DCThread::getOutChan(int idx)
 {
-    if ( idx >= VPROTOTYPE ) {
+    ChannelIndex dex(idx, false);
+    if ( dex.isPrototype ) {
         return nullptr;
-    } else if ( idx >= VMODELOFFSET ) {
-        switch ( VCLASS(idx) ) {
-        case VCLASS_HH:
-            return &(hhNeuron[VMODEL(idx)].inst[VINST(idx)].out);
+    } else if ( dex.isVirtual ) {
+        switch ( dex.modelClass ) {
+        case ChannelIndex::HH:
+            return &(hhNeuron[dex.modelID].inst[dex.instID].out);
         }
+    } else if ( dex.isNone ) {
+        return &outChn[outIdx[outNo]];
     } else if ( idx >= 0 ) {
         return &outChn[outIdx[idx]];
-    } else if ( idx == CHAN_NONE ) {
-        return &outChn[outIdx[outNo]];
     }
     return nullptr;
 }
 
-std::vector<std::pair<size_t, bool> > DCThread::getChanIndices(size_t index)
+std::vector<std::pair<int, bool>> DCThread::getChanIndices(int index)
 {
-    if ( index >= VPROTOTYPE ) {
-        index -= VPROTOTYPE + VINST(index); // Retain only class/model identification
-        std::vector<std::pair<size_t, bool>> ret;
+    ChannelIndex dex(index);
+    if ( dex.isPrototype ) {
+        std::vector<std::pair<int, bool>> ret;
         size_t i = 0;
-        switch ( VCLASS(index) ) {
-        case VCLASS_HH:
-            for ( vInstData &vc : HHNeuronp[VMODEL(index)].inst ) {
-                ret.push_back(make_pair(index + i, vc.active));
-                i++;
+        switch ( dex.modelClass ) {
+        case ChannelIndex::HH:
+            for ( vInstData &vc : HHNeuronp[dex.modelID].inst ) {
+                ret.push_back(make_pair(dex.toInstance(i++), vc.active));
             }
             break;
         }
         return ret;
     } else {
-        return std::vector<std::pair<size_t, bool>>(1, make_pair(index, true));
+        return std::vector<std::pair<int, bool>>(1, make_pair(index, true));
     }
 }
 

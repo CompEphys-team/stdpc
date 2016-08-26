@@ -39,7 +39,7 @@ private:
 
      inChannel *getInChan(int idx);
      outChannel *getOutChan(int idx);
-     std::vector<std::pair<size_t, bool>> getChanIndices(size_t index);
+     std::vector<std::pair<int, bool> > getChanIndices(int index);
 
      // List of AEC channels (io-channels pairs, kernels and current buffers)
      QVector<AECChannel*> aecChannels;
