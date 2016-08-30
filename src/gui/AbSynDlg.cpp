@@ -24,6 +24,7 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
          PostSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
          OutSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
      });
+     connect(parent, SIGNAL(channelsChanged()), &sa, SLOT(updateChns()));
 }
 
 void abSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -139,8 +140,6 @@ void abSynDlg::updateOutChn(int chN, int *chns)
   newInd= OutSynChannelCombo->findText(current);
   if (newInd >= 0) OutSynChannelCombo->setCurrentIndex(newInd);
   else OutSynChannelCombo->setCurrentIndex(0);
-
-  sa.updateChns();
 }
 
 void abSynDlg::updateInChn(int chN, int *chns) 
@@ -172,6 +171,4 @@ void abSynDlg::updateInChn(int chN, int *chns)
   newInd= PostSynChannelCombo->findText(currentPost);
   if (newInd >= 0) PostSynChannelCombo->setCurrentIndex(newInd);
   else PostSynChannelCombo->setCurrentIndex(0);
-
-  sa.updateChns();
 }

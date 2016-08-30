@@ -154,6 +154,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
      
+     connect(outChnDlg, SIGNAL(updateOutChn(int,int*)), this, SIGNAL(channelsChanged()));
+     connect(inChnDlg, SIGNAL(updateInChn(int,int*)), this, SIGNAL(channelsChanged()));
+     connect(hhModelDlg, SIGNAL(accepted()), this, SIGNAL(channelsChanged()));
+
      for (int i= 0; i < 6; i++) {
        connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), CSynDlg[i], SLOT(updateOutChn(int, int*)));
        connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), abSDlg[i], SLOT(updateOutChn(int, int*)));

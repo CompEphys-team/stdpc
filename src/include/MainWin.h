@@ -92,6 +92,9 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      void updateSGInChn(int, int*);
      void CloseToLimitWarning(QString, int, double, double, double);
      void DisplayAbout();
+
+  signals:
+     void channelsChanged();
                  
   private slots:
      void SGMethodChanged();

@@ -16,6 +16,7 @@ HHDlg::HHDlg(int no, QWidget *parent)
          VChannelCombo->setEnabled(cbUseLegacy->isChecked());
          IChannelCombo->setEnabled(cbUseLegacy->isChecked());
      });
+     connect(parent, SIGNAL(channelsChanged()), &ca, SLOT(updateChns()));
 }
 
 void HHDlg::exportData(mhHHData &p)
@@ -119,8 +120,6 @@ void HHDlg::updateOutChn(int chN, int *chns)
   newInd= IChannelCombo->findText(current);
   if (newInd >= 0) IChannelCombo->setCurrentIndex(newInd);
   else IChannelCombo->setCurrentIndex(0);
-
-  ca.updateChns();
 }
 
 void HHDlg::updateInChn(int chN, int *chns) 
@@ -143,6 +142,4 @@ void HHDlg::updateInChn(int chN, int *chns)
   newInd= VChannelCombo->findText(current);
   if (newInd >= 0) VChannelCombo->setCurrentIndex(newInd);
   else VChannelCombo->setCurrentIndex(0);
-
-  ca.updateChns();
 }

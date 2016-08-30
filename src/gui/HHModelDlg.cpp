@@ -75,6 +75,18 @@ void HHModelDlg::exportData()
     }
 }
 
+void HHModelDlg::accept()
+{
+    exportData();
+    QDialog::accept();
+}
+
+void HHModelDlg::reject()
+{
+    importData();
+    QDialog::reject();
+}
+
 void HHModelDlg::addRow(int row, QCheckBox *box, QDoubleSpinBox *C, QDoubleSpinBox *gLeak, QDoubleSpinBox *ELeak, QPushButton *btn)
 {
     ui->table->insertRow(row);

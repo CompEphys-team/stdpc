@@ -19,6 +19,7 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
          preOutChannelCombo->setEnabled(cbUseLegacy->isChecked());
          postOutChannelCombo->setEnabled(cbUseLegacy->isChecked());
      });
+     connect(parent, SIGNAL(channelsChanged()), &gja, SLOT(updateChns()));
 }
 
 void GapJunctionDlg::exportData(GJunctData &p) 
@@ -77,8 +78,6 @@ void GapJunctionDlg::updateOutChn(int chN, int *chns)
   newInd= postOutChannelCombo->findText(currentPost);
   if (newInd >= 0) postOutChannelCombo->setCurrentIndex(newInd);
   else postOutChannelCombo->setCurrentIndex(0);
-
-  gja.updateChns();
 }
 
 void GapJunctionDlg::updateInChn(int chN, int *chns) 
@@ -110,6 +109,4 @@ void GapJunctionDlg::updateInChn(int chN, int *chns)
   newInd= postInChannelCombo->findText(currentPost);
   if (newInd >= 0) postInChannelCombo->setCurrentIndex(newInd);
   else postInChannelCombo->setCurrentIndex(0);
-
-  gja.updateChns();
 }

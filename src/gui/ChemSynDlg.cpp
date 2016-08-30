@@ -25,6 +25,7 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
          PostSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
          OutSynChannelCombo->setEnabled(cbUseLegacy->isChecked());
      });
+     connect(parent, SIGNAL(channelsChanged()), &sa, SLOT(updateChns()));
 }
 
 void ChemSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -192,8 +193,6 @@ void ChemSynDlg::updateOutChn(int chN, int *chns)
   newInd= OutSynChannelCombo->findText(current);
   if (newInd >= 0) OutSynChannelCombo->setCurrentIndex(newInd);
   else OutSynChannelCombo->setCurrentIndex(0);
-
-  sa.updateChns();
 }
 
 void ChemSynDlg::updateInChn(int chN, int *chns) 
@@ -225,6 +224,4 @@ void ChemSynDlg::updateInChn(int chN, int *chns)
   newInd= PostSynChannelCombo->findText(currentPost);
   if (newInd >= 0) PostSynChannelCombo->setCurrentIndex(newInd);
   else PostSynChannelCombo->setCurrentIndex(0);
-
-  sa.updateChns();
 }

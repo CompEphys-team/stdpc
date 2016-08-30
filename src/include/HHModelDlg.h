@@ -22,6 +22,10 @@ public:
     void importData();
     void exportData();
 
+public slots:
+    void accept();
+    void reject();
+
 private:
     Ui::HHModelDlg *ui;
     QVector<QCheckBox*> boxes;
