@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 #include <QPoint>
+#include <QComboBox>
 
 class ChannelListModel : public QAbstractListModel
 {
@@ -31,6 +32,8 @@ public:
 
     int index(int channel) const;
     QModelIndex index(const QPoint &p) const;
+
+    static void fixComboBoxWidth(QComboBox *cb);
 
 public slots:
     void updateChns();

@@ -98,9 +98,11 @@ void CurrentAssignmentDlg::addRow(int row, QCheckBox *box, QComboBox *in, QCombo
     ui->table->setCellWidget(row, 0, widget);
 
     in->setModel(&inm);
+    connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(in);});
     ui->table->setCellWidget(row, 1, in);
 
     out->setModel(&outm);
+    connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(out);});
     ui->table->setCellWidget(row, 2, out);
 
     boxes.insert(row, box);

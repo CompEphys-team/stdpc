@@ -116,15 +116,19 @@ void GapJunctionAssignmentDlg::addRow(int row, QCheckBox *box,
     ui->table->setCellWidget(row, 0, widget);
 
     prein->setModel(&inm);
+    connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(prein);});
     ui->table->setCellWidget(row, 1, prein);
 
     postin->setModel(&inm);
+    connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(postin);});
     ui->table->setCellWidget(row, 2, postin);
 
     preout->setModel(&outm);
+    connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(preout);});
     ui->table->setCellWidget(row, 3, preout);
 
     postout->setModel(&outm);
+    connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(postout);});
     ui->table->setCellWidget(row, 4, postout);
 
     boxes.insert(row, box);

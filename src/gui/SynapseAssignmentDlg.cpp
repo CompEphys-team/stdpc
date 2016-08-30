@@ -107,12 +107,15 @@ void SynapseAssignmentDlg::addRow(int row, QCheckBox *box, QComboBox *pre, QComb
     ui->table->setCellWidget(row, 0, widget);
 
     pre->setModel(&inm);
+    connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(pre);});
     ui->table->setCellWidget(row, 1, pre);
 
     post->setModel(&inm);
+    connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(post);});
     ui->table->setCellWidget(row, 2, post);
 
     out->setModel(&outm);
+    connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(out);});
     ui->table->setCellWidget(row, 3, out);
 
     boxes.insert(row, box);

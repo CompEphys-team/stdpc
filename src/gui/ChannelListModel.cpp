@@ -1,6 +1,8 @@
 #include "ChannelListModel.h"
 #include "Global.h"
 #include "ChannelIndex.h"
+#include <QAbstractItemView>
+#include <QApplication>
 
 ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
     : QAbstractListModel(parent),
@@ -222,4 +224,22 @@ QModelIndex ChannelListModel::index(const QPoint &p) const
         }
     }
     return QModelIndex();
+}
+
+void ChannelListModel::fixComboBoxWidth(QComboBox *cb)
+{
+    cb->view()->setTextElideMode(Qt::ElideNone);
+    int scroll = cb->count() <= cb->maxVisibleItems() ? 0 :
+        QApplication::style()->pixelMetric(QStyle::PixelMetric::PM_ScrollBarExtent);
+
+    int max = 0;
+
+    for (int i = 0; i < cb->count(); i++)
+    {
+        int width = cb->view()->fontMetrics().width(cb->itemText(i));
+        if (max < width)
+            max = width;
+    }
+
+    cb->view()->setMinimumWidth(scroll + max + 10);
 }
