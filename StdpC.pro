@@ -48,7 +48,9 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DestexheSynDlg.ui \
     $$PWD/src/gui/CurrentAssignmentDlg.ui \
     $$PWD/src/gui/SynapseAssignmentDlg.ui \
-    $$PWD/src/gui/GapJunctionAssignmentDlg.ui
+    $$PWD/src/gui/GapJunctionAssignmentDlg.ui \
+    $$PWD/src/gui/HHModelDlg.ui \
+    $$PWD/src/gui/ModelInstDlg.ui
 HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -96,7 +98,9 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/SynapseAssignmentDlg.h \
     $$PWD/src/include/GapJunctionAssignmentDlg.h \
     $$PWD/src/include/HHNeuron.h \
-    $$PWD/src/include/ChannelIndex.h
+    $$PWD/src/include/HHModelDlg.h \
+    $$PWD/src/include/ChannelIndex.h \
+    $$PWD/src/include/ModelInstDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -144,7 +148,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/SynapseAssignmentDlg.cpp \
     $$PWD/src/gui/GapJunctionAssignmentDlg.cpp \
     $$PWD/src/models/HHNeuron.cpp \
-    $$PWD/src/core/ChannelIndex.cpp
+    $$PWD/src/gui/HHModelDlg.cpp \
+    $$PWD/src/core/ChannelIndex.cpp \
+    $$PWD/src/gui/ModelInstDlg.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)

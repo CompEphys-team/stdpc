@@ -90,6 +90,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
      graphDlg[1]= new GraphDlg(1, this);
+     hhModelDlg = new HHModelDlg(this);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
                QString("*.log"));
@@ -138,6 +139,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(appear()));
      connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(show()));
      connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(show()));
+     connect(actionHH_models, SIGNAL(triggered()), hhModelDlg, SLOT(show()));
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
@@ -218,6 +220,7 @@ MyMainWindow::~MyMainWindow()
   delete outChnDlg;
   delete DDataDlg;
   delete SDAQDlg;
+  delete hhModelDlg;
 
 #ifdef NATIONAL_INSTRUMENTS
   delete NDQDlg;
@@ -424,7 +427,8 @@ void MyMainWindow::exportData()
 
   DSDlg->exportData();
   ECDlg->exportData();
-      
+
+  hhModelDlg->exportData();
 }
  
 void MyMainWindow::importData()
@@ -486,6 +490,8 @@ void MyMainWindow::importData()
 
   DSDlg->importData();
   ECDlg->importData();
+
+  hhModelDlg->importData();
 }
 
 void MyMainWindow::exportSGData() 

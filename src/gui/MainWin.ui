@@ -2222,11 +2222,18 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Config</string>
     </property>
+    <widget class="QMenu" name="menuSimulated_neurons">
+     <property name="title">
+      <string>Simulated neurons</string>
+     </property>
+     <addaction name="actionHH_models"/>
+    </widget>
     <addaction name="actionDAQ"/>
     <addaction name="actionInput_channels"/>
     <addaction name="actionOutput_channels"/>
     <addaction name="actionElectrode_setup"/>
     <addaction name="actionData_saving"/>
+    <addaction name="menuSimulated_neurons"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -2318,6 +2325,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionData_saving">
    <property name="text">
     <string>Data saving</string>
+   </property>
+  </action>
+  <action name="actionHH_models">
+   <property name="text">
+    <string>Hodgkin-Huxley models</string>
    </property>
   </action>
  </widget>

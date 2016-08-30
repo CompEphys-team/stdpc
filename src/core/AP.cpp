@@ -314,12 +314,10 @@ void initAP()
     addAP("HHNeuronp[#].gLeak", &HHNeuronp, &HHNeuronData::gLeak);
     addAP("HHNeuronp[#].ELeak", &HHNeuronp, &HHNeuronData::ELeak);
     addAP("HHNeuronp[#].inst[#].active", &HHNeuronp, &HHNeuronData::inst, &vInstData::active);
-    addAP("HHNeuronp[#].inst[#].inChn.active", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::active);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
     addAP("HHNeuronp[#].inst[#].inChn.bias", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::bias);
     addAP("HHNeuronp[#].inst[#].inChn.chnlSaving", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::chnlSaving);
-    addAP("HHNeuronp[#].inst[#].outChn.active", &HHNeuronp, &HHNeuronData::inst, &vInstData::outChn, &outChnData::active);
     addAP("HHNeuronp[#].inst[#].outChn.bias", &HHNeuronp, &HHNeuronData::inst, &vInstData::outChn, &outChnData::bias);
     addAP("HHNeuronp[#].inst[#].outChn.chnlSaving", &HHNeuronp, &HHNeuronData::inst, &vInstData::outChn, &outChnData::chnlSaving);
 

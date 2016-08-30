@@ -23,6 +23,7 @@
 #include "ElectrodeCompDlg.h"
 #include "DataSavingDlg.h"
 #include "AECChannel.h"
+#include "HHModelDlg.h"
 
 
 #ifdef NATIONAL_INSTRUMENTS
@@ -77,6 +78,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      DAQ *board;
      DigiDataDlg *DDataDlg;
      SimulDAQDlg *SDAQDlg;
+     HHModelDlg *hhModelDlg;
 
 #ifdef NATIONAL_INSTRUMENTS     
      NIDAQDlg *NDQDlg;
