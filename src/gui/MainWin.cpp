@@ -664,6 +664,21 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   // comment this?!?
   DAQSetup();
 
+  // Resize param sizing to defaults before loading
+  CSynp.clear();
+  CSynp.resize(MAX_SYN_NO);
+  abSynp.clear();
+  abSynp.resize(MAX_SYN_NO);
+  ESynp.clear();
+  ESynp.resize(MAX_SYN_NO);
+  DxheSynp.clear();
+  DxheSynp.resize(MAX_SYN_NO);
+  mhHHp.clear();
+  mhHHp.resize(MAX_HH_NO);
+  abHHp.clear();
+  abHHp.resize(MAX_HH_NO);
+  HHNeuronp.clear();
+
   is >> name;
   while ( is.good() ) {
     QString rawname(name);

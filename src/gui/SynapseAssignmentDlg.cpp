@@ -59,8 +59,8 @@ void SynapseAssignmentDlg::importData(const std::vector<SynapseAssignment> &p)
     posts.clear();
     outs.clear();
     ui->table->setRowCount(0);
-    inm.updateChns();
-    outm.updateChns();
+    inm.disconnect();
+    outm.disconnect();
 
     int i = 0;
     for ( SynapseAssignment const& a : p ) {
@@ -73,6 +73,9 @@ void SynapseAssignmentDlg::importData(const std::vector<SynapseAssignment> &p)
         pre->setCurrentIndex(inm.index(a.PreSynChannel));
         post->setCurrentIndex(inm.index(a.PostSynChannel));
         out->setCurrentIndex(outm.index(a.OutSynChannel));
+        ChannelListModel::fixComboBoxWidth(pre);
+        ChannelListModel::fixComboBoxWidth(post);
+        ChannelListModel::fixComboBoxWidth(out);
     }
 
     growTable();
@@ -109,14 +112,17 @@ void SynapseAssignmentDlg::addRow(int row, QCheckBox *box, QComboBox *pre, QComb
     pre->setModel(&inm);
     connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(pre);});
     ui->table->setCellWidget(row, 1, pre);
+    ChannelListModel::fixComboBoxWidth(pre);
 
     post->setModel(&inm);
     connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(post);});
     ui->table->setCellWidget(row, 2, post);
+    ChannelListModel::fixComboBoxWidth(post);
 
     out->setModel(&outm);
     connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(out);});
     ui->table->setCellWidget(row, 3, out);
+    ChannelListModel::fixComboBoxWidth(out);
 
     boxes.insert(row, box);
     pres.insert(row, pre);

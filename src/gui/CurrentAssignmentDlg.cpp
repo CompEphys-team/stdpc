@@ -52,8 +52,8 @@ void CurrentAssignmentDlg::importData(const std::vector<CurrentAssignment> &p)
     ins.clear();
     outs.clear();
     ui->table->setRowCount(0);
-    inm.updateChns();
-    outm.updateChns();
+    inm.disconnect();
+    outm.disconnect();
 
     int i = 0;
     for ( CurrentAssignment const& a : p ) {
@@ -64,6 +64,8 @@ void CurrentAssignmentDlg::importData(const std::vector<CurrentAssignment> &p)
         box->setChecked(a.active);
         in->setCurrentIndex(inm.index(a.VChannel));
         out->setCurrentIndex(outm.index(a.IChannel));
+        ChannelListModel::fixComboBoxWidth(in);
+        ChannelListModel::fixComboBoxWidth(out);
     }
 
     growTable();
@@ -100,10 +102,12 @@ void CurrentAssignmentDlg::addRow(int row, QCheckBox *box, QComboBox *in, QCombo
     in->setModel(&inm);
     connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(in);});
     ui->table->setCellWidget(row, 1, in);
+    ChannelListModel::fixComboBoxWidth(in);
 
     out->setModel(&outm);
     connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(out);});
     ui->table->setCellWidget(row, 2, out);
+    ChannelListModel::fixComboBoxWidth(out);
 
     boxes.insert(row, box);
     ins.insert(row, in);

@@ -64,8 +64,8 @@ void GapJunctionAssignmentDlg::importData(const std::vector<GapJunctionAssignmen
     preouts.clear();
     postouts.clear();
     ui->table->setRowCount(0);
-    inm.updateChns();
-    outm.updateChns();
+    inm.disconnect();
+    outm.disconnect();
 
     int i = 0;
     for ( GapJunctionAssignment const& a : p ) {
@@ -80,6 +80,10 @@ void GapJunctionAssignmentDlg::importData(const std::vector<GapJunctionAssignmen
         postin->setCurrentIndex(inm.index(a.postInChannel));
         preout->setCurrentIndex(outm.index(a.preOutChannel));
         postout->setCurrentIndex(outm.index(a.postOutChannel));
+        ChannelListModel::fixComboBoxWidth(prein);
+        ChannelListModel::fixComboBoxWidth(postin);
+        ChannelListModel::fixComboBoxWidth(preout);
+        ChannelListModel::fixComboBoxWidth(postout);
     }
 
     growTable();
@@ -118,18 +122,22 @@ void GapJunctionAssignmentDlg::addRow(int row, QCheckBox *box,
     prein->setModel(&inm);
     connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(prein);});
     ui->table->setCellWidget(row, 1, prein);
+    ChannelListModel::fixComboBoxWidth(prein);
 
     postin->setModel(&inm);
     connect(&inm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(postin);});
     ui->table->setCellWidget(row, 2, postin);
+    ChannelListModel::fixComboBoxWidth(postin);
 
     preout->setModel(&outm);
     connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(preout);});
     ui->table->setCellWidget(row, 3, preout);
+    ChannelListModel::fixComboBoxWidth(preout);
 
     postout->setModel(&outm);
     connect(&outm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(postout);});
     ui->table->setCellWidget(row, 4, postout);
+    ChannelListModel::fixComboBoxWidth(postout);
 
     boxes.insert(row, box);
     preins.insert(row, prein);
