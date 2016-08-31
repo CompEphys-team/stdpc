@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 #include <QPoint>
 #include <QComboBox>
+#include "ChannelIndex.h"
 
 class ChannelListModel : public QAbstractListModel
 {
@@ -16,12 +17,13 @@ public:
         Blank =      1,
         None =       2,
         SpikeGen =   4,
-        Virtual   =  8,
+        Virtual   =  8, // Model instances
         AnalogIn =   16,
         AnalogOut =  32,
+        Prototype =  64, // Model prototypes, applies multiplexed over all instances
 
-        In = AnalogIn | SpikeGen | Virtual,
-        Out = AnalogOut | Virtual
+        In = AnalogIn | SpikeGen | Virtual | Prototype,
+        Out = AnalogOut | Virtual | Prototype
     };
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -32,6 +34,7 @@ public:
 
     int index(int channel) const;
     QModelIndex index(const QPoint &p) const;
+    QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
 
     static void fixComboBoxWidth(QComboBox *cb);
 
@@ -41,7 +44,8 @@ public slots:
 private:
     const int displayFlags;
     int size;
-    int nAI, nAO, nV;
+    int nAI, nAO, nPHH;
+    QVector<int> nVHH;
 };
 
 #endif // CHANNELLISTMODEL_H

@@ -32,12 +32,12 @@ void ChannelIndex::fromInt(int idx, bool in)
 {
     index = idx;
     inChn = in;
-    if ( idx == CHAN_SG || (idx == inChnp.size() && inChn) ) {
+    if ( idx == CHAN_SG || (idx == (int)inChnp.size() && inChn) ) {
         isPrototype = false;
         isVirtual = false;
         isSG = true;
         isNone = false;
-    } else if ( idx == CHAN_NONE || (idx == inChnp.size() && !inChn) ) {
+    } else if ( idx == CHAN_NONE || (idx == (int)inChnp.size() && !inChn) ) {
         isPrototype = false;
         isVirtual = false;
         isSG = false;
@@ -70,15 +70,12 @@ int ChannelIndex::toInt()
         return index = CHAN_SG;
     } else if ( isNone ) {
         return index = CHAN_NONE;
-    } else if ( !isVirtual ) {
-        return index;
+    } else if ( isPrototype ) {
+        return index = PROTOTYPE + (int)modelClass + (modelID+1)*MODELOFFSET;
+    } else if ( isVirtual ) {
+        return index = (int)modelClass + (modelID+1)*MODELOFFSET + instID;
     } else {
-        int idx = (int)modelClass + (modelID+1)*MODELOFFSET;
-        if ( isPrototype ) {
-            return index = idx + PROTOTYPE;
-        } else {
-            return index = idx + instID;
-        }
+        return index;
     }
 }
 
