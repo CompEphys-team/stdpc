@@ -3,6 +3,8 @@
 
 #define CHAN_NONE -1
 #define CHAN_SG 1000
+#define OUTCHN_OFFSET 20000
+#define INCHN_OFFSET  10000
 
 class ChannelIndex
 {
