@@ -6,7 +6,12 @@
 #define MAXV 60
 
 GraphDlg::GraphDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : QDialog(parent),
+       clm(new ChannelListModel(ChannelListModel::AnalogIn
+                                | ChannelListModel::AnalogOut
+                                | ChannelListModel::None
+                                | ChannelListModel::SpikeGen
+                                | ChannelListModel::Virtual, this))
  {
    QColor clr;
    QString lb;
@@ -27,10 +32,9 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
      ChannelCombo[i] = new QComboBox(this);
      ChannelCombo[i]->setObjectName(QString("ChannelCombo")+QString(i));
      ChannelCombo[i]->setGeometry(QRect(40, 40+30*i, 69, 22));
-     lb= QString("None");
-     ChannelCombo[i]->addItem(lb);
-     lb= QString("SG");
-     ChannelCombo[i]->addItem(lb);
+     ChannelCombo[i]->setModel(clm);
+     ChannelCombo[i]->setCurrentIndex(0);
+     connect(clm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(ChannelCombo[i]);});
      MinE[i] = new QLineEdit(this);
      MinE[i]->setObjectName(QString("MinE")+QString(i));
      MinE[i]->setGeometry(QRect(140, 40+30*i, 48, 20));
@@ -49,6 +53,8 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
    }
    inChnNo= 0;
    outChnNo= 0;
+
+   connect(parent, SIGNAL(channelsChanged()), clm, SLOT(updateChns()));
 }
 
 void GraphDlg::exportData(graphData &p)
@@ -56,9 +62,14 @@ void GraphDlg::exportData(graphData &p)
   double yfac[2]= { 1e3, 1e9 };
   for (int i= 0; i < 4; i++) {
     p.color[i]= clrCombo[i]->currentText();
-    p.chn[i]= ChannelCombo[i]->currentIndex();
-    if (p.chn[i] > 0) p.active[i]= true;
-    else p.active[i]= false;
+    QPoint chn(ChannelCombo[i]->currentData().toPoint());
+    if ( !chn.y() || chn.y() == ChannelListModel::None || chn.y() == ChannelListModel::Blank ) {
+        p.chn[i] = CHAN_NONE;
+        p.active[i] = false;
+    } else {
+        p.chn[i] = chn.x();
+        p.active[i] = true;
+    }
     p.yfac[i]= yfac[UnitCombo[i]->currentIndex()];
     p.miny[i]= MinE[i]->text().toDouble()/p.yfac[i];
     p.maxy[i]= MaxE[i]->text().toDouble()/p.yfac[i];
@@ -74,7 +85,7 @@ void GraphDlg::importData(graphData p)
   QString num;
   
   for (int i= 0; i < 4; i++) {
-    ChannelCombo[i]->setCurrentIndex(p.chn[i]);
+    ChannelCombo[i]->setCurrentIndex(clm->index(p.chn[i]));
     if (p.yfac[i] == 1e3) UnitCombo[i]->setCurrentIndex(0);
     else UnitCombo[i]->setCurrentIndex(1);
     num.setNum(p.miny[i]*p.yfac[i]);
@@ -90,48 +101,4 @@ void GraphDlg::importData(graphData p)
   xTicksE->setText(num);
   num.setNum(p.ytNo);
   yTicksE->setText(num);
-}
-  
-void GraphDlg::updateOutChn(int chN, int *chns) 
-{
-  QString current;
-  QString lb;
-  int newInd;
-
-  for (int j= 0; j < 4; j++) {
-    current= ChannelCombo[j]->currentText();
-    for (int i= 0; i < outChnNo; i++) {
-      ChannelCombo[j]->removeItem(inChnNo+1);
-    }
-    for (int i= chN-1; i >=0; i--) {
-      lb.setNum(chns[i]);
-      ChannelCombo[j]->insertItem(inChnNo+1, QString("out")+lb);
-    }
-    newInd= ChannelCombo[j]->findText(current);
-    if (newInd >= 0) ChannelCombo[j]->setCurrentIndex(newInd);
-    else ChannelCombo[j]->setCurrentIndex(0);
-  }
-  outChnNo= chN;
-}
-
-void GraphDlg::updateInChn(int chN, int *chns) 
-{
-  QString current;
-  QString lb;
-  int newInd;
-  
-  for (int j= 0; j < 4; j++) {
-    current= ChannelCombo[j]->currentText();
-    for (int i= 0; i < inChnNo; i++) {
-      ChannelCombo[j]->removeItem(1);
-    }
-    for (int i= chN-1; i >= 0; i--) {
-      lb.setNum(chns[i]);
-      ChannelCombo[j]->insertItem(1, QString("in")+lb);
-    }
-    newInd= ChannelCombo[j]->findText(current);
-    if (newInd >= 0) ChannelCombo[j]->setCurrentIndex(newInd);
-    else ChannelCombo[j]->setCurrentIndex(0);
-  }
-  inChnNo= chN;
 }

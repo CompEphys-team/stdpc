@@ -4,6 +4,7 @@
 #include <QComboBox>
 #include "ui_GraphDlg.h"
 #include "ObjectDataTypes.h"
+#include "ChannelListModel.h"
 
 class GraphDlg : public QDialog, private Ui::GraphDlg
 {
@@ -18,18 +19,12 @@ class GraphDlg : public QDialog, private Ui::GraphDlg
     QLineEdit *MinE[4];
     QLineEdit *MaxE[4];
     QComboBox *UnitCombo[4];
+    ChannelListModel *clm;
 
   public:
      GraphDlg(int, QWidget *parent= 0);
      void exportData(graphData &);
      void importData(graphData);
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
-
-  private:
-   
 }; 
 
 #endif

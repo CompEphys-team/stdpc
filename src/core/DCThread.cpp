@@ -108,26 +108,27 @@ void DCThread::run()
    }
    
    // set up the graphic display channels
-   int idx;
    QString lb;
    for (i= 0; i < 2; i++) {
      grpNo[i]= 0;
      for (int j= 0; j < 4; j++) {
        if (Graphp[i].active[j]) {
-         idx= Graphp[i].chn[j];
-         if (idx == inNo+outNo+1) { // SG
-           grp[i][grpNo[i]]= &(SG.V);
-           pen[i][grpNo[i]++]= j;
+         ChannelIndex dex(Graphp[i].chn[j]);
+         if ( dex.isSG ) {
+             grp[i][grpNo[i]]= &(SG.V);
+         } else if ( dex.isVirtual ) {
+             // Use inchan for mV units, outchan for nA units
+             grp[i][grpNo[i]] = Graphp[i].yfac[j]==1e3
+                     ? &hhNeuron[dex.modelID].inst[dex.instID].in.V
+                     : &hhNeuron[dex.modelID].inst[dex.instID].out.I;
+         } else if ( dex.index >= OUTCHN_OFFSET ) {
+             grp[i][grpNo[i]] = &(outChn[outIdx[dex.index - OUTCHN_OFFSET]].I);
+         } else if ( dex.index >= INCHN_OFFSET ) {
+             grp[i][grpNo[i]] = &(inChn[inIdx[dex.index - INCHN_OFFSET]].V);
          } else {
-           if (idx > inNo) { // we are doing an out channel
-             grp[i][grpNo[i]]= &(outChn[outIdx[idx-inNo-1]].I);
-             pen[i][grpNo[i]++]= j;
-           }
-           else { // we are doing an in channel  
-             grp[i][grpNo[i]]= &(inChn[inIdx[idx-1]].V);
-             pen[i][grpNo[i]++]= j;
-           }
+             continue; // Oughtn't happen
          }
+         pen[i][grpNo[i]++] = j;
        }             
      }
      lb.setNum(grpNo[i]);

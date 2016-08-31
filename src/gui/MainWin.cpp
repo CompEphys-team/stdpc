@@ -173,11 +173,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
        connect(inChnDlg, SIGNAL(updateInChn(int, int*)), abHHDlg[i], SLOT(updateInChn(int, int*)));
        connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
      }
-     
-     for (int i= 0; i < 2; i++) {
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), graphDlg[i], SLOT(updateOutChn(int, int *)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), graphDlg[i], SLOT(updateInChn(int, int *)));
-     }
+
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
      connect(SDAQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
