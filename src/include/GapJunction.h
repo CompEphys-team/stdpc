@@ -18,6 +18,8 @@ class GapJunction {
   public:
     GapJunction(GJunctData *, DCThread *, GapJunctionAssignment * = nullptr);
     void currentUpdate(double, double);
+
+    typedef GJunctData param_type;
 };
 
 #endif

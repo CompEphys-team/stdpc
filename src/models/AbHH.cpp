@@ -33,34 +33,6 @@ abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *a) :
     }
 }
 
-void abHH::instantiate(std::vector<abHH> &instances, abHHData *inp, DCThread *t, CurrentAssignment *ina)
-{
-    CurrentAssignment tmp;
-    tmp.active = true;
-    if ( ina->VChannel == ina->IChannel ) {
-        // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
-        for ( std::pair<int, bool> VIChan : t->getChanIndices(ina->VChannel) ) {
-            if ( !VIChan.second )
-                continue;
-            tmp.VChannel = VIChan.first;
-            tmp.IChannel = VIChan.first;
-            instances.push_back(abHH(inp, t, &tmp));
-        }
-    } else {
-        for ( std::pair<int, bool> VChan : t->getChanIndices(ina->VChannel) ) {
-            if ( !VChan.second )
-                continue;
-            tmp.VChannel = VChan.first;
-            for ( std::pair<int, bool> IChan : t->getChanIndices(ina->IChannel) ) {
-                if ( !IChan.second )
-                    continue;
-                tmp.IChannel = IChan.first;
-                instances.push_back(abHH(inp, t, &tmp));
-            }
-        }
-    }
-}
-
 inline double abHH::mhFunc(double x, int thetype)
 {
    switch (thetype) {

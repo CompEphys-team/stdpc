@@ -40,6 +40,8 @@ class ChemSyn {
     void STlearn(double);
     double STDPFunc(double);
     void ODElearn(double);
+
+    typedef CSynData param_type;
 };
 
 #endif

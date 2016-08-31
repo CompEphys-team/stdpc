@@ -141,7 +141,7 @@ void DCThread::run()
                csyn.push_back(ChemSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   csyn.push_back(ChemSyn(&p, this, &a));
+                   instantiate(csyn, p, a);
        }
    }
    absyn.clear();
@@ -151,7 +151,7 @@ void DCThread::run()
                absyn.push_back(abSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   absyn.push_back(abSyn(&p, this, &a));
+                   instantiate(absyn, p, a);
        }
    }
    dsyn.clear();
@@ -161,7 +161,7 @@ void DCThread::run()
                dsyn.push_back(DestexheSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   dsyn.push_back(DestexheSyn(&p, this, &a));
+                   instantiate(dsyn, p, a);
        }
    }
    esyn.clear();
@@ -171,7 +171,7 @@ void DCThread::run()
                esyn.push_back(GapJunction(&p, this));
            for ( GapJunctionAssignment &a : p.assign )
                if ( a.active )
-                   esyn.push_back(GapJunction(&p, this, &a));
+                   instantiate(esyn, p, a);
        }
    }
    hh.clear();
@@ -182,7 +182,7 @@ void DCThread::run()
            }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   HH::instantiate(hh, &p, this, &a);
+                   instantiate(hh, p, a);
            }
        }
    }
@@ -194,7 +194,7 @@ void DCThread::run()
            }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   abHH::instantiate(abhh, &p, this, &a);
+                   instantiate(abhh, p, a);
            }
        }
    }
@@ -525,6 +525,7 @@ double DCThread::WaitTillNextSampling(double time)
     return t;
 }
 
+
 inChannel *DCThread::getInChan(int idx)
 {
     ChannelIndex dex(idx, true);
@@ -577,6 +578,128 @@ std::vector<std::pair<int, bool>> DCThread::getChanIndices(int index)
         return ret;
     } else {
         return std::vector<std::pair<int, bool>>(1, make_pair(index, true));
+    }
+}
+
+template <class T>
+void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, CurrentAssignment &a)
+{
+    CurrentAssignment tmp;
+    tmp.active = true;
+    if ( a.VChannel == a.IChannel ) {
+        // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
+        for ( std::pair<int, bool> VIChan : getChanIndices(a.VChannel) ) {
+            if ( !VIChan.second )
+                continue;
+            tmp.VChannel = VIChan.first;
+            tmp.IChannel = VIChan.first;
+            inst.push_back(T(&p, this, &tmp));
+        }
+    } else {
+        for ( std::pair<int, bool> VChan : getChanIndices(a.VChannel) ) {
+            if ( !VChan.second )
+                continue;
+            tmp.VChannel = VChan.first;
+            for ( std::pair<int, bool> IChan : getChanIndices(a.IChannel) ) {
+                if ( !IChan.second )
+                    continue;
+                tmp.IChannel = IChan.first;
+                inst.push_back(T(&p, this, &tmp));
+            }
+        }
+    }
+}
+
+template <typename T>
+void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, SynapseAssignment &a)
+{
+    SynapseAssignment tmp;
+    tmp.active = true;
+    if ( a.PostSynChannel == a.OutSynChannel ) {
+        for ( std::pair<int, bool> post : getChanIndices(a.PostSynChannel) ) {
+            if ( !post.second )
+                continue;
+            tmp.PostSynChannel = post.first;
+            tmp.OutSynChannel = post.first;
+            for ( std::pair<int, bool> pre : getChanIndices(a.PreSynChannel) ) {
+                if ( !pre.second )
+                    continue;
+                tmp.PreSynChannel = pre.first;
+                inst.push_back(T(&p, this, &tmp));
+            }
+        }
+    } else {
+        for ( std::pair<int, bool> post : getChanIndices(a.PostSynChannel) ) {
+            if ( !post.second )
+                continue;
+            tmp.PostSynChannel = post.first;
+            for ( std::pair<int, bool> out : getChanIndices(a.OutSynChannel) ) {
+                if ( !out.second )
+                    continue;
+                tmp.OutSynChannel = out.first;
+                for ( std::pair<int, bool> pre : getChanIndices(a.PreSynChannel) ) {
+                    if ( !pre.second )
+                        continue;
+                    tmp.PreSynChannel = pre.first;
+                    inst.push_back(T(&p, this, &tmp));
+                }
+            }
+        }
+    }
+}
+
+template <typename T>
+void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJunctionAssignment &a)
+{
+    std::vector<GapJunctionAssignment> vec;
+    GapJunctionAssignment tmp;
+    tmp.active = true;
+    if ( a.postInChannel == a.postOutChannel ) {
+        for ( std::pair<int, bool> post : getChanIndices(a.postInChannel) ) {
+            if ( !post.second )
+                continue;
+            tmp.postInChannel = post.first;
+            tmp.postOutChannel = post.first;
+            vec.push_back(tmp);
+        }
+    } else {
+        for ( std::pair<int, bool> in : getChanIndices(a.postInChannel) ) {
+            if ( !in.second )
+                continue;
+            tmp.postInChannel = in.first;
+            for ( std::pair<int, bool> out : getChanIndices(a.postOutChannel) ) {
+                if ( !out.second )
+                    continue;
+                tmp.postOutChannel = out.first;
+                vec.push_back(tmp);
+            }
+        }
+    }
+
+    if ( a.preInChannel == a.preOutChannel ) {
+        for ( std::pair<int, bool> pre : getChanIndices(a.preInChannel) ) {
+            if ( !pre.second )
+                continue;
+            for ( GapJunctionAssignment &tmp : vec ) {
+                tmp.preInChannel = pre.first;
+                tmp.preOutChannel = pre.first;
+                inst.push_back(T(&p, this, &tmp));
+            }
+        }
+    } else {
+        for ( std::pair<int, bool> in : getChanIndices(a.preInChannel) ) {
+            if ( !in.second )
+                continue;
+            for ( std::pair<int, bool> out : getChanIndices(a.preOutChannel) ) {
+                if ( !out.second )
+                    continue;
+                for ( GapJunctionAssignment &tmp : vec ) {
+                    tmp.preInChannel = in.first;
+                    tmp.preOutChannel = out.first;
+                    inst.push_back(T(&p, this, &tmp));
+                }
+            }
+        }
     }
 }
 

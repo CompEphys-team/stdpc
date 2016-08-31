@@ -26,7 +26,7 @@ class abHH
     void currentUpdate(double, double);
     double mhFunc(double, int);
 
-    static void instantiate(std::vector<abHH> &, abHHData *, DCThread *, CurrentAssignment *);
+    typedef abHHData param_type;
 };
 
 #endif

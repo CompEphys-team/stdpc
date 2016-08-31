@@ -41,6 +41,13 @@ private:
      outChannel *getOutChan(int idx);
      std::vector<std::pair<int, bool> > getChanIndices(int index);
 
+     template <typename T>
+     void instantiate(std::vector<T> &, typename T::param_type &, CurrentAssignment &);
+     template <typename T>
+     void instantiate(std::vector<T> &, typename T::param_type &, SynapseAssignment &);
+     template <typename T>
+     void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
+
      // List of AEC channels (io-channels pairs, kernels and current buffers)
      QVector<AECChannel*> aecChannels;
 

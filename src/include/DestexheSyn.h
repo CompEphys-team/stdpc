@@ -37,6 +37,8 @@ class DestexheSyn {
     void STlearn(double);
     double STDPFunc(double);
     void ODElearn(double);
+
+    typedef DestexheSynData param_type;
 };
 
 #endif

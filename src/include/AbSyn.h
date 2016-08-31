@@ -37,6 +37,8 @@ class abSyn {
     void STlearn(double);
     double STDPFunc(double);
     void ODElearn(double);
+
+    typedef abSynData param_type;
 };
 
 #endif
