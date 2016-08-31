@@ -12,7 +12,7 @@ GapJunctionAssignmentDlg::GapJunctionAssignmentDlg(QWidget *parent) :
     ui->table->setHorizontalHeaderLabels(QStringList({"Active",
                                                       "Presynaptic voltage",
                                                       "Postsynaptic voltage",
-                                                      "Preynaptic output channel",
+                                                      "Presynaptic output channel",
                                                       "Postsynaptic output channel"}));
     ui->table->setColumnWidth(0, 49);
     ui->table->setColumnWidth(1, 150);
