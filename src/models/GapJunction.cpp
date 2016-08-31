@@ -2,22 +2,20 @@
 #include "GapJunction.h"
 #include "DCThread.h"
 
-GapJunction::GapJunction(GJunctData *inp, DCThread *t, GapJunctionAssignment *ina) :
-    p(inp),
-    a(ina)
+GapJunction::GapJunction(GJunctData *inp, DCThread *t, GapJunctionAssignment *a) :
+    p(inp)
 {
     if ( !a ) {
-        legacy.active = !p->noLegacyAssign;
-        legacy.preInChannel = p->preInChannel;
-        legacy.postInChannel = p->postInChannel;
-        legacy.preOutChannel = p->preOutChannel;
-        legacy.postOutChannel = p->postOutChannel;
-        a =& legacy;
+        pre = t->getInChan(p->preInChannel);
+        post = t->getInChan(p->postInChannel);
+        outpre = t->getOutChan(p->preOutChannel);
+        outpost = t->getOutChan(p->postOutChannel);
+    } else {
+        pre = t->getInChan(a->preInChannel);
+        post = t->getInChan(a->postInChannel);
+        outpre = t->getOutChan(a->preOutChannel);
+        outpost = t->getOutChan(a->postOutChannel);
     }
-    pre = t->getInChan(a->preInChannel);
-    post = t->getInChan(a->postInChannel);
-    outpre = t->getOutChan(a->preOutChannel);
-    outpost = t->getOutChan(a->postOutChannel);
 }
 
 void GapJunction::currentUpdate(double t, double dt)

@@ -11,7 +11,6 @@ class HH
 {
   private:
     mhHHData *p;
-    CurrentAssignment legacy, *a;
     stdpc::function *theExp;
     stdpc::function *theExpSigmoid;
     

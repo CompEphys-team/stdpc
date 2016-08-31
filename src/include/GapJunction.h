@@ -14,7 +14,6 @@ class GapJunction {
     inChannel *post;
     outChannel *outpre;
     outChannel *outpost;
-    GapJunctionAssignment legacy, *a;
         
   public:
     GapJunction(GJunctData *, DCThread *, GapJunctionAssignment * = nullptr);

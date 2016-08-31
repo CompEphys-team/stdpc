@@ -10,7 +10,6 @@ class abHH
 {
   private:
     abHHData *p;
-    CurrentAssignment legacy, *a;
     inChannel *pre;
     outChannel *out;
     stdpc::function *theExp;

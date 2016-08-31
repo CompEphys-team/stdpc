@@ -14,7 +14,6 @@ class ChemSyn {
     inChannel *pre;
     inChannel *post;
     outChannel *out;
-    SynapseAssignment legacy, *a;
 
     double P_f(double);
     double D_f(double);

@@ -1,9 +1,8 @@
 #include "AbHH.h"
 #include "DCThread.h"
 
-abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *ina) :
+abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *a) :
     p(inp),
-    a(ina),
     m(0.0),
     h(1.0),
     ma(0.0),
@@ -12,13 +11,12 @@ abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *ina) :
     hb(0.0)
 {
     if ( !a ) {
-        legacy.active = !p->noLegacyAssign;
-        legacy.VChannel = p->VChannel;
-        legacy.IChannel = p->IChannel;
-        a =& legacy;
+        pre = t->getInChan(p->VChannel);
+        out = t->getOutChan(p->IChannel);
+    } else {
+        pre = t->getInChan(a->VChannel);
+        out = t->getOutChan(a->IChannel);
     }
-    pre = t->getInChan(a->VChannel);
-    out = t->getOutChan(a->IChannel);
 
     if (p->LUTables) {
         theExp= &expLU;
@@ -85,7 +83,7 @@ void abHH::currentUpdate(double t, double dt)
   static double V;
   static int i;
   
-  if (p->active && a->active) {
+  if (p->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // Linear Euler:

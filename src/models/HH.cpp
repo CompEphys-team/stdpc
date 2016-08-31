@@ -1,9 +1,8 @@
 #include "HH.h"
 #include "DCThread.h"
 
-HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *ina) :
+HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *a) :
     p(inp),
-    a(ina),
     m(0.0),
     h(0.9),
     minf(0.0),
@@ -12,13 +11,12 @@ HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *ina) :
     tauh(p->tauh)
 {
     if ( !a ) {
-        legacy.active = !p->noLegacyAssign;
-        legacy.VChannel = p->VChannel;
-        legacy.IChannel = p->IChannel;
-        a =& legacy;
+        pre = t->getInChan(p->VChannel);
+        out = t->getOutChan(p->IChannel);
+    } else {
+        pre = t->getInChan(a->VChannel);
+        out = t->getOutChan(a->IChannel);
     }
-    pre = t->getInChan(a->VChannel);
-    out = t->getOutChan(a->IChannel);
 
     if (p->LUTables) {
       theExp= &expLU;
@@ -66,7 +64,7 @@ void HH::currentUpdate(double t, double dt)
   static double V, tmp;
   static int i;
     
-  if (p->active && a->active) {
+  if (p->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // linear Euler:
