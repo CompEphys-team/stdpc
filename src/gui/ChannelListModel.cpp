@@ -225,9 +225,10 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
             if ( row-offset < nVHH[i] ) {
                 dex.modelClass = ChannelIndex::HH;
                 dex.modelID = i;
+                dex.instID = row-offset;
                 switch ( role ) {
                 case Qt::DisplayRole:   return QString("HH model %1, instance %2").arg(i+1).arg(row-offset+1);
-                case Qt::UserRole:      return QPoint(dex.toInstance(row-offset), Virtual);
+                case Qt::UserRole:      return QPoint(dex.toInt(), Virtual);
                 case Qt::UserRole + 1:  return QVariant(HHNeuronp[i].inst[row-offset].active);
                 }
             }
