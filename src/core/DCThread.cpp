@@ -255,12 +255,12 @@ void DCThread::run()
    double upTolFac = 0.99;   // upper tolerance factor
    double loTolFac = 0.01;   // lower  tolerance factor
    for ( int i=0; i<outNo; i++ ){
-     iHiLim[i] = outChnp[i].minCurrent + upTolFac*(outChnp[i].maxCurrent-outChnp[i].minCurrent);
-     iLoLim[i] = outChnp[i].minCurrent + loTolFac*(outChnp[i].maxCurrent-outChnp[i].minCurrent);
+     iHiLim[i] = outChnp[outIdx[i]].minCurrent + upTolFac*(outChnp[outIdx[i]].maxCurrent-outChnp[outIdx[i]].minCurrent);
+     iLoLim[i] = outChnp[outIdx[i]].minCurrent + loTolFac*(outChnp[outIdx[i]].maxCurrent-outChnp[outIdx[i]].minCurrent);
    }
    for ( int i=0; i<inNo; i++ ){
-     vHiLim[i] = inChnp[i].minVoltage + upTolFac*(inChnp[i].maxVoltage-inChnp[i].minVoltage);
-     vLoLim[i] = inChnp[i].minVoltage + loTolFac*(inChnp[i].maxVoltage-inChnp[i].minVoltage);
+     vHiLim[i] = inChnp[inIdx[i]].minVoltage + upTolFac*(inChnp[inIdx[i]].maxVoltage-inChnp[inIdx[i]].minVoltage);
+     vLoLim[i] = inChnp[inIdx[i]].minVoltage + loTolFac*(inChnp[inIdx[i]].maxVoltage-inChnp[inIdx[i]].minVoltage);
    }
 
    // Generate the index vector of in and out channels to be saved
