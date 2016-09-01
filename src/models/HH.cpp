@@ -46,14 +46,14 @@ void HH::currentUpdate(double t, double dt)
       minf= (1.0-p->Cm)*(*theExpSigmoid)((V-p->Vm)/p->sm)+p->Cm;
       if (p->taumType == 0) {
           taum= p->taum - p->taumAmpl*(*theExpSigmoid)((V-p->Vtaum)/p->staum);
-      }
-      if (p->taumType == 1) {
+      } else if (p->taumType == 1) {
           tmp= tanh((V-p->Vtaum)/p->staum);
           taum= p->taum+p->taumAmpl*(1.0-tmp*tmp);
-      }
-      if (p->taumType == 2) {
+      } else if (p->taumType == 2) {
           tmp= exp((V-p->Vtaum)/p->staum);
           taum= p->taum + p->taumAmpl*tmp*minf;
+      } else if (p->taumType == 3) {
+          taum = p->taum + p->taumAmpl*V*1e3;
       }
 
       powm = m;
@@ -69,14 +69,14 @@ void HH::currentUpdate(double t, double dt)
       hinf= (1.0-p->Ch)*(*theExpSigmoid)((V-p->Vh)/p->sh)+p->Ch;
       if (p->tauhType == 0) {
           tauh= p->tauh - p->tauhAmpl*(*theExpSigmoid)((V-p->Vtauh)/p->stauh);
-      }
-      if (p->tauhType == 1) {
+      } else if (p->tauhType == 1) {
           tmp= tanh((V-p->Vtauh)/p->stauh);
           tauh= p->tauh+p->tauhAmpl*(1.0-tmp*tmp);
-      }
-      if (p->tauhType == 2) {
+      } else if (p->tauhType == 2) {
           tmp= exp((V-p->Vtauh)/p->stauh);
           tauh= p->tauh + p->tauhAmpl*tmp*hinf;
+      } else if (p->tauhType == 3) {
+          tauh = p->tauh + p->tauhAmpl*V*1e3;
       }
       powh= h;
       for(i= 0; i < p->hExpo-1; i++) powh*= h;   

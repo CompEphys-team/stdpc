@@ -1084,6 +1084,11 @@
      <string>exp2/(1+exp1)</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Linear</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="taumTypeL">
    <property name="geometry">
@@ -1152,6 +1157,11 @@
    <item>
     <property name="text">
      <string>exp2/(1+exp1)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Linear</string>
     </property>
    </item>
   </widget>
