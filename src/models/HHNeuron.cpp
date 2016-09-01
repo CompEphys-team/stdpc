@@ -38,7 +38,7 @@ void HHNeuronModel::updateChannels(double t)
     if ( !p->active )
         return;
     for ( HHNeuron &neuron : inst ) {
-        neuron.in.V = neuron.instp->inChn.bias;
+        neuron.in.V = neuron.V + neuron.instp->inChn.bias;
         neuron.out.I = neuron.instp->outChn.bias;
         neuron.in.spike_detect(t);
     }
