@@ -61,6 +61,8 @@ void SynapseAssignmentDlg::importData(const std::vector<SynapseAssignment> &p)
     ui->table->setRowCount(0);
     inm.disconnect();
     outm.disconnect();
+    inm.updateChns();
+    outm.updateChns();
 
     int i = 0;
     for ( SynapseAssignment const& a : p ) {

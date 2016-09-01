@@ -54,6 +54,8 @@ void CurrentAssignmentDlg::importData(const std::vector<CurrentAssignment> &p)
     ui->table->setRowCount(0);
     inm.disconnect();
     outm.disconnect();
+    inm.updateChns();
+    outm.updateChns();
 
     int i = 0;
     for ( CurrentAssignment const& a : p ) {
