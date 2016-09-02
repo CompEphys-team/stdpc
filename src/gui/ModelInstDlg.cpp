@@ -59,7 +59,7 @@ void ModelInstDlg::importData(const std::vector<vInstData> &insts)
         spkThr = new QDoubleSpinBox();
         iSave = new QCheckBox();
         iBias = new QDoubleSpinBox();
-        addRow(row, active, vSave, vBias, spkD, spkThr, iSave, iBias);
+        addRow(row++, active, vSave, vBias, spkD, spkThr, iSave, iBias);
         active->setChecked(inst.active);
         vSave->setChecked(inst.inChn.chnlSaving);
         vBias->setValue(inst.inChn.bias * 1e3);
