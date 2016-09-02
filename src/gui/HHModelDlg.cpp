@@ -12,7 +12,7 @@ HHModelDlg::HHModelDlg(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->table->setHorizontalHeaderLabels(QStringList({"Active",
-                                                      "Capacitance (pF)",
+                                                      "Capacitance (nF)",
                                                       "g Leak (nS)",
                                                       "E Leak (mV)",
                                                       "Instances"}));
@@ -53,7 +53,7 @@ void HHModelDlg::importData()
         btn = new QPushButton(BTNSTRING);
         addRow(row, box, C, gLeak, ELeak, btn);
         box->setChecked(model.active);
-        C->setValue(model.C * 1e12);
+        C->setValue(model.C * 1e9);
         gLeak->setValue(model.gLeak * 1e9);
         ELeak->setValue(model.ELeak * 1e3);
         instDlg[row++]->importData(model.inst);
@@ -67,7 +67,7 @@ void HHModelDlg::exportData()
     HHNeuronp.clear();
     for ( int i = 0; i < ui->table->rowCount() - 1; i++ ) {
         p.active = boxes[i]->isChecked();
-        p.C = Cs[i]->value() * 1e-12;
+        p.C = Cs[i]->value() * 1e-9;
         p.gLeak = gLeaks[i]->value() * 1e-9;
         p.ELeak = ELeaks[i]->value() * 1e-3;
         instDlg[i]->exportData(p.inst);
@@ -105,8 +105,8 @@ void HHModelDlg::addRow(int row, QCheckBox *box, QDoubleSpinBox *C, QDoubleSpinB
     ui->table->setCellWidget(row, 3, ELeak);
     ui->table->setCellWidget(row, 4, btn);
 
-    C->setRange(0,1e9);
-    C->setDecimals(3);
+    C->setRange(0,1e6);
+    C->setDecimals(6);
     gLeak->setRange(0, 1e9);
     ELeak->setRange(-1000, 1000);
 
@@ -138,7 +138,7 @@ void HHModelDlg::growTable()
 
     addRow(ui->table->rowCount(), box, C, gLeak, ELeak, btn);
 
-    C->setValue(1000);
+    C->setValue(2.5);
     gLeak->setValue(20);
     ELeak->setValue(-20);
 
