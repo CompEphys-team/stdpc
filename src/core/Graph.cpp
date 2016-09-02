@@ -42,11 +42,14 @@ void Graph::init(graphData *inp)
   }
   xoff= 0;
   drawFrame();
+  nItems = 0.00096 * p->xrange / p->dt;
+  nClear = 0.00001 * p->xrange / p->dt;
   for (int i= 0; i < 4; i++) {
     initial[i]= true;
+    itemIdx[i] = 0;
+    Items[i].clear();
+    Items[i].resize(nItems);
   }
-  ItemList.clear();
-  ItemsTime.clear();
 }
 
 void Graph::drawFrame()
@@ -101,25 +104,15 @@ void Graph::drawFrame()
 void Graph::addPoint(double t, double data, int pn)
 {
   static qreal x, y, gx, gy;
-  static QGraphicsItem *theDelItem;
-  static qreal rx, nt;
-  static bool done;
+  static qreal rx;
 
   rx= t*1000.0;
-  done= false;
-  while (!done) {
-    if (ItemsTime.size() > 0) {
-      nt= ItemsTime.front();
-      if ((rx - nt) > 0.98*p->xrange) {
-        theDelItem= ItemList.front();
-        ItemList.pop_front();
-        ItemsTime.pop_front();
-        Scene.removeItem(theDelItem);
-      }
-      else done= true;
-    }
-    else done= true;
-  } 
+
+  int idx = itemIdx[pn] % nItems;
+  if ( Items[pn][idx] && !(itemIdx[pn] % nClear) )
+    for ( int i = 0; i < nClear; i++ )
+        Scene.removeItem(Items[pn][(itemIdx[pn]+i)%nItems]);
+  itemIdx[pn]++;
 
   x= rx-xoff;
   if (x > p->xrange) {
@@ -137,8 +130,7 @@ void Graph::addPoint(double t, double data, int pn)
     ylast[pn]= gy;
     initial[pn]= false;
   }
-  ItemList.append(Scene.addLine(xlast, ylast[pn], gx, gy, pen[pn]));
-  ItemsTime.append(rx);
+  Items[pn][idx] = Scene.addLine(xlast, ylast[pn], gx, gy, pen[pn]);
   ylast[pn]= gy;
   xlast= gx;
 }

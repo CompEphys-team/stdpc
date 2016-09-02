@@ -27,9 +27,10 @@ class Graph : public QObject
     
     double yrange[4];
     QPen pen[4];
-    
-    QList<QGraphicsItem *> ItemList;
-    QList<qreal> ItemsTime;
+
+    int nItems, nClear;
+    int itemIdx[4];
+    QVector<QGraphicsItem *> Items[4];
   
   protected:
     graphData *p;
