@@ -138,6 +138,10 @@ void HHModelDlg::growTable()
 
     addRow(ui->table->rowCount(), box, C, gLeak, ELeak, btn);
 
+    C->setValue(1000);
+    gLeak->setValue(20);
+    ELeak->setValue(-20);
+
     boxc = connect(box, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
     Cc = connect(C, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
     gLc = connect(gLeak, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
