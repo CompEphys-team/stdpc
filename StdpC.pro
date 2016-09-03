@@ -100,7 +100,8 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/HHNeuron.h \
     $$PWD/src/include/HHModelDlg.h \
     $$PWD/src/include/ChannelIndex.h \
-    $$PWD/src/include/ModelInstDlg.h
+    $$PWD/src/include/ModelInstDlg.h \
+    $$PWD/src/include/AssignmentWidget.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -150,7 +151,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/HHNeuron.cpp \
     $$PWD/src/gui/HHModelDlg.cpp \
     $$PWD/src/core/ChannelIndex.cpp \
-    $$PWD/src/gui/ModelInstDlg.cpp
+    $$PWD/src/gui/ModelInstDlg.cpp \
+    $$PWD/src/gui/AssignmentWidget.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)
