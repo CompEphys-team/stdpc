@@ -14,10 +14,6 @@ class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
      AlphaBetaHHDlg(int, QWidget *parent= 0);
      void exportData(abHHData &);
      void importData(abHHData);
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
 
   private:
     CurrentAssignmentDlg ca;

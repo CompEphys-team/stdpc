@@ -16,7 +16,7 @@ class GapJunction {
     outChannel *outpost;
         
   public:
-    GapJunction(GJunctData *, DCThread *, GapJunctionAssignment * = nullptr);
+    GapJunction(GJunctData *, DCThread *, GapJunctionAssignment *);
     void currentUpdate(double, double);
 
     typedef GJunctData param_type;

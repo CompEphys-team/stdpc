@@ -25,8 +25,6 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
      
   private:
      SynapseAssignmentDlg sa;

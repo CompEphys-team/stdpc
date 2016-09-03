@@ -22,7 +22,7 @@ class abHH
     double I;
     
   public:
-    abHH(abHHData *p, DCThread *t, CurrentAssignment *a = nullptr);
+    abHH(abHHData *p, DCThread *t, CurrentAssignment *a);
     void currentUpdate(double, double);
     double mhFunc(double, int);
 

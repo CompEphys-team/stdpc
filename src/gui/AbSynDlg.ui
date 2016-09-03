@@ -76,85 +76,6 @@
     <string>Synapse X</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>60</y>
-     <width>98</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Presynaptic Channel</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="PreSynChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>60</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SG</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>90</y>
-     <width>98</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Postynaptic Channel</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="PostSynChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>90</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SG</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QLabel" name="gSynL">
    <property name="geometry">
     <rect>
@@ -653,42 +574,6 @@
     <string>Parameters</string>
    </property>
   </widget>
-  <widget class="QLabel" name="OutSynChannelL">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>120</y>
-     <width>98</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Output Channel</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="OutSynChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>120</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>0</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-  </widget>
   <widget class="QComboBox" name="LUCombo">
    <property name="geometry">
     <rect>
@@ -788,22 +673,6 @@
    </property>
    <property name="text">
     <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="cbUseLegacy">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>30</y>
-     <width>121</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Use these channels:</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
    </property>
   </widget>
   <widget class="QPushButton" name="btnAssign">

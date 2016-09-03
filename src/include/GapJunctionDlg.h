@@ -16,10 +16,6 @@ class GapJunctionDlg : public QDialog, private Ui::GapJunctionDlg
      void importData(GJunctData);
      
      int No;
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
 
 private:
     GapJunctionAssignmentDlg gja;

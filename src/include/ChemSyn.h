@@ -35,7 +35,7 @@ class ChemSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    ChemSyn(CSynData *, DCThread *, SynapseAssignment * = nullptr);
+    ChemSyn(CSynData *, DCThread *, SynapseAssignment *);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

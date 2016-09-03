@@ -148,8 +148,6 @@ void DCThread::run()
    absyn.clear();
    for ( abSynData &p : abSynp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign )
-               absyn.push_back(abSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
                    instantiate(absyn, p, a);
@@ -158,8 +156,6 @@ void DCThread::run()
    dsyn.clear();
    for ( DestexheSynData &p : DxheSynp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign )
-               dsyn.push_back(DestexheSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
                    instantiate(dsyn, p, a);
@@ -168,8 +164,6 @@ void DCThread::run()
    esyn.clear();
    for ( GJunctData &p : ESynp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign )
-               esyn.push_back(GapJunction(&p, this));
            for ( GapJunctionAssignment &a : p.assign )
                if ( a.active )
                    instantiate(esyn, p, a);
@@ -178,9 +172,6 @@ void DCThread::run()
    hh.clear();
    for ( mhHHData &p : mhHHp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign ) {
-               hh.push_back(HH(&p, this));
-           }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
                    instantiate(hh, p, a);
@@ -190,9 +181,6 @@ void DCThread::run()
    abhh.clear();
    for ( abHHData &p : abHHp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign ) {
-               abhh.push_back(abHH(&p, this));
-           }
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
                    instantiate(abhh, p, a);

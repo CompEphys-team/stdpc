@@ -3,6 +3,8 @@
 
 abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *a) :
     p(inp),
+    pre(t->getInChan(a->VChannel)),
+    post(t->getOutChan(a->IChannel)),
     m(0.0),
     h(1.0),
     ma(0.0),
@@ -10,14 +12,6 @@ abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *a) :
     ha(0.0),
     hb(0.0)
 {
-    if ( !a ) {
-        pre = t->getInChan(p->VChannel);
-        out = t->getOutChan(p->IChannel);
-    } else {
-        pre = t->getInChan(a->VChannel);
-        out = t->getOutChan(a->IChannel);
-    }
-
     if (p->LUTables) {
         theExp= &expLU;
         expLU.require(-50.0, 50.0, 0.02);

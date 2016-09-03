@@ -32,7 +32,7 @@ class abSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    abSyn(abSynData *, DCThread *, SynapseAssignment * = nullptr);
+    abSyn(abSynData *, DCThread *, SynapseAssignment *);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

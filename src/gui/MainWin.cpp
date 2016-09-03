@@ -156,23 +156,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(outChnDlg, SIGNAL(updateOutChn(int,int*)), this, SIGNAL(channelsChanged()));
      connect(inChnDlg, SIGNAL(updateInChn(int,int*)), this, SIGNAL(channelsChanged()));
+     connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
      connect(hhModelDlg, SIGNAL(accepted()), this, SIGNAL(channelsChanged()));
-
-     for (int i= 0; i < 6; i++) {
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), CSynDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), abSDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), DxheSynDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), GJunctDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), nHHDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), abHHDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), CSynDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), GJunctDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), abSDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), DxheSynDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), nHHDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), abHHDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
-     }
 
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));

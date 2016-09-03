@@ -26,8 +26,6 @@ class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
      void PlastMethodChange();
      void STDComboChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
      
   private:
      SynapseAssignmentDlg sa;

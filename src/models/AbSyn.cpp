@@ -5,20 +5,13 @@
     
 abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *a) :
     p(inp),
+    pre(t->getInChan(a->PreSynChannel)),
+    post(t->getInChan(a->PostSynChannel)),
+    out(t->getOutChan(a->OutSynChannel)),
     S(0.0),
     R(0.0),
     g(p->gSyn)
 {
-    if ( !a ) {
-        pre = t->getInChan(p->PreSynChannel);
-        post = t->getInChan(p->PostSynChannel);
-        out = t->getOutChan(p->OutSynChannel);
-    } else {
-        pre = t->getInChan(a->PreSynChannel);
-        post = t->getInChan(a->PostSynChannel);
-        out = t->getOutChan(a->OutSynChannel);
-    }
-
     if (p->LUTables) {
       theExp= &expLU;
       expLU.require(-50.0, 50.0, 0.02);

@@ -3,6 +3,8 @@
 
 HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *a) :
     p(inp),
+    pre(t->getInChan(a->VChannel)),
+    post(t->getOutChan(a->IChannel)),
     m(0.0),
     h(0.9),
     minf(0.0),
@@ -10,13 +12,6 @@ HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *a) :
     hinf(0.9),
     tauh(p->tauh)
 {
-    if ( !a ) {
-        pre = t->getInChan(p->VChannel);
-        out = t->getOutChan(p->IChannel);
-    } else {
-        pre = t->getInChan(a->VChannel);
-        out = t->getOutChan(a->IChannel);
-    }
 
     if (p->LUTables) {
       theExp= &expLU;

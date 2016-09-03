@@ -22,7 +22,7 @@ class HH
     outChannel *out;
     
   public:
-    HH(mhHHData *p, DCThread *t, CurrentAssignment *a = nullptr);
+    HH(mhHHData *p, DCThread *t, CurrentAssignment *a);
     void currentUpdate(double, double);
 
     typedef mhHHData param_type;

@@ -32,7 +32,7 @@ class DestexheSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    DestexheSyn(DestexheSynData *, DCThread *, SynapseAssignment * = nullptr);
+    DestexheSyn(DestexheSynData *, DCThread *, SynapseAssignment *);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

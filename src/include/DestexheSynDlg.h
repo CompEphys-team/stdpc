@@ -25,8 +25,6 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
 
   private:
      SynapseAssignmentDlg sa;

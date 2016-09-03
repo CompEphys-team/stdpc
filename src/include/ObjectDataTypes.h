@@ -73,9 +73,6 @@ typedef struct {
   bool active;
   bool LUTables;
   bool MgBlock;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double VSyn;
   double tauSyn;
@@ -97,15 +94,11 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  bool noLegacyAssign;
 } CSynData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double Vrev;
   double aS;
@@ -120,15 +113,11 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  bool noLegacyAssign;
 } abSynData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double Vpre;
   double Vrev;
@@ -141,26 +130,18 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  bool noLegacyAssign;
 } DestexheSynData;
 
 typedef struct {
   bool active;
-  int preInChannel;
-  int postInChannel;
-  int preOutChannel;
-  int postOutChannel;
   int type;
   double gSyn;
   std::vector<GapJunctionAssignment> assign;
-  bool noLegacyAssign;
 } GJunctData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int VChannel;
-  int IChannel;
   double gMax;
   double Vrev;
   int mExpo;
@@ -182,14 +163,11 @@ typedef struct {
   double Vtauh;
   double stauh;
   std::vector<CurrentAssignment> assign;
-  bool noLegacyAssign;
 } mhHHData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int VChannel;
-  int IChannel;
   double gMax;
   double Vrev;
   int mExpo;
@@ -211,7 +189,6 @@ typedef struct {
   double hVb;
   double hsb;
   std::vector<CurrentAssignment> assign;
-  bool noLegacyAssign;
 } abHHData;
 
 typedef struct {

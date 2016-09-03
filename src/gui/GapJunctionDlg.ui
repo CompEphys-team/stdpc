@@ -35,47 +35,6 @@
     <set>QDialogButtonBox::Close</set>
    </property>
   </widget>
-  <widget class="QComboBox" name="postInChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>80</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SG</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>80</y>
-     <width>129</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Postynaptic input Channel</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="gapJunctDlgLabel">
    <property name="enabled">
     <bool>true</bool>
@@ -115,44 +74,6 @@
    </property>
    <property name="text">
     <string>Synapse X</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="preInChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>50</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>SG</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>50</y>
-     <width>125</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Presynaptic input Channel</string>
    </property>
   </widget>
   <widget class="QComboBox" name="typeCombo">
@@ -220,85 +141,6 @@
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QComboBox" name="preOutChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>110</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>None</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>110</y>
-     <width>133</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Presynaptic output Channel</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="postOutChannelCombo">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>140</y>
-     <width>40</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="currentIndex">
-    <number>1</number>
-   </property>
-   <item>
-    <property name="text">
-     <string>0</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>1</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>none</string>
-    </property>
-   </item>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>140</y>
-     <width>133</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Postynaptic output Channel</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="btnAssign">
    <property name="geometry">
     <rect>
@@ -310,22 +152,6 @@
    </property>
    <property name="text">
     <string>More channel assignments...</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="cbUseLegacy">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>121</width>
-     <height>17</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Use these channels:</string>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
    </property>
   </widget>
  </widget>

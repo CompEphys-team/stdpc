@@ -5,6 +5,9 @@
     
 ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment *a) :
     p(inp),
+    pre(t->getInChan(a->PreSynChannel)),
+    post(t->getInChan(a->PostSynChannel)),
+    out(t->getOutChan(a->OutSynChannel)),
     Sinf(0.0),
     S(0.0),
     hinf(1.0),
@@ -14,16 +17,6 @@ ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment *a) :
     gfac(1.0)
 
 {
-    if ( !a ) {
-        pre = t->getInChan(p->PreSynChannel);
-        post = t->getInChan(p->PostSynChannel);
-        out = t->getOutChan(p->OutSynChannel);
-    } else {
-        pre = t->getInChan(a->PreSynChannel);
-        post = t->getInChan(a->PostSynChannel);
-        out = t->getOutChan(a->OutSynChannel);
-    }
-
     if (p->LUTables) {
         theExp= &expLU;
         expLU.require(-50.0, 50.0, 0.02);

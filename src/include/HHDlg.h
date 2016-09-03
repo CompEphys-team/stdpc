@@ -13,10 +13,6 @@ class HHDlg : public QDialog, private Ui::HHDlg
      HHDlg(int, QWidget *parent= 0);
      void exportData(mhHHData &);
      void importData(mhHHData);
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
 
 private:
     CurrentAssignmentDlg ca;
