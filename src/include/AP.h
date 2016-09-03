@@ -10,7 +10,7 @@
 
 class AP;
 extern std::vector<std::unique_ptr<AP>> params;
-void initAP();
+std::unique_ptr<AP> const& initAP();
 
 /**
  * @brief Add a parameter to the global registry. See @fn initAP() for examples.
@@ -58,9 +58,20 @@ public:
                              [&](std::unique_ptr<AP> &a){return !rawName.compare(a->name);});
     }
 
+    /**
+     * @brief Mark this AP deprecated, delegating reading to target and disabling @fn write.
+     *
+     * Indices in the target name are matched in order, defaulting to 0 if self has fewer indices than target.
+     */
+    void deprecate(std::unique_ptr<AP> const& target)
+    {
+        deprecated = target.get();
+    }
+
 protected:
-    AP(QString &name) : name(name) {}
+    AP(QString &name) : name(name), deprecated(nullptr) {}
     QString name;
+    AP *deprecated;
 };
 
 
@@ -208,12 +219,29 @@ public:
 
     virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
     {
-        return getReadFunc(rawName, is, ok, APFunc::gen_seq<sizeof...(Tail)>{});
+        if ( deprecated ) {
+            // Replace existing indices in order
+            QString target(deprecated->name);
+            QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
+            int offset;
+            while ( it.hasNext() && (offset = target.indexOf('#')) ) {
+                target.replace(offset, 1, it.next().captured(1));
+            }
+
+            // Replace remaining indices with 0
+            target.replace('#', '0');
+
+            // Read to target
+            return deprecated->readLater(target, is, ok);
+        } else {
+            return getReadFunc(rawName, is, ok, APFunc::gen_seq<sizeof...(Tail)>{});
+        }
     }
 
     virtual void write(std::ostream &os)
     {
-        return write(os, APFunc::gen_seq<sizeof...(Tail)>{});
+        if ( !deprecated )
+            write(os, APFunc::gen_seq<sizeof...(Tail)>{});
     }
 
 private:
@@ -239,8 +267,9 @@ private:
 
 
 template <typename T, typename... Tail>
-inline void addAP(QString name, T *head, Tail... tail) {
+inline std::unique_ptr<AP> const& addAP(QString name, T *head, Tail... tail) {
     params.push_back(std::unique_ptr<AP>(new APInst<T, Tail...>(name, head, tail...)));
+    return params.back();
 }
 
 #endif // AP_H
