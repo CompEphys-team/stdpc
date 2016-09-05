@@ -7,14 +7,13 @@
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
-#include "SynapseAssignmentDlg.h"
 
 class abSynDlg : public QDialog, private Ui::abSynDlg
 {
      Q_OBJECT
 
   public:
-     abSynDlg(int, QWidget *parent= 0);
+     abSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(abSynData &);
      void importData(abSynData);
 
@@ -25,9 +24,6 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-     
-  private:
-     SynapseAssignmentDlg sa;
 }; 
 
 #endif

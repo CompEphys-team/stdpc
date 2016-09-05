@@ -2,17 +2,19 @@
 #include "HHDlg.h"
 #include <QMessageBox>
 
-HHDlg::HHDlg(int no, QWidget *parent)
-     : QDialog(parent),
-       ca(this)
+HHDlg::HHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+     : QDialog(parent)
  {
      setupUi(this);
      QString lb;
      lb.setNum(no);
      lb= "HH "+lb;
      HHDlgLabel->setText(lb);
-     connect(btnAssign, SIGNAL(clicked(bool)), &ca, SLOT(open()));
-     connect(parent, SIGNAL(channelsChanged()), &ca, SLOT(updateChns()));
+
+     QVector<Dropdown<CurrentAssignment>> vec;
+     vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::VChannel, in, "V in", 95));
+     vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::IChannel, out, "I out", 95));
+     assignments->init(vec);
 }
 
 void HHDlg::exportData(mhHHData &p)
@@ -40,7 +42,7 @@ void HHDlg::exportData(mhHHData &p)
   p.Vtauh= VtauhE->text().toDouble()*1e-3;
   p.stauh= stauhE->text().toDouble()*1e-3;
 
-  ca.exportData(p.assign);
+  assignments->exportData(p.assign);
 }
 
 void HHDlg::importData(mhHHData p)
@@ -89,5 +91,5 @@ void HHDlg::importData(mhHHData p)
   num.setNum(p.stauh*1e3);
   stauhE->setText(num);
 
-  ca.importData(p.assign);
+  assignments->importData(p.assign);
 }

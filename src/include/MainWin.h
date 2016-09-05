@@ -80,6 +80,8 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      SimulDAQDlg *SDAQDlg;
      HHModelDlg *hhModelDlg;
 
+     ChannelListModel *inChnModel, *outChnModel;
+
 #ifdef NATIONAL_INSTRUMENTS     
      NIDAQDlg *NDQDlg;
 #endif

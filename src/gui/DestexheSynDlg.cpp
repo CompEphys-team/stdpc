@@ -2,9 +2,8 @@
 #include "DestexheSynDlg.h"
 #include <QMessageBox>
 
-DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
-     : QDialog(parent),
-       sa(this)
+DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+     : QDialog(parent)
  {
      QString lb;
      setupUi(this);
@@ -18,8 +17,12 @@ DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
 
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
-     connect(btnAssign, SIGNAL(clicked(bool)), &sa, SLOT(open()));
-     connect(parent, SIGNAL(channelsChanged()), &sa, SLOT(updateChns()));
+
+     QVector<Dropdown<SynapseAssignment>> vec;
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PreSynChannel, in, "Presyn V", 95));
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
+     assignments->init(vec);
 }
 
 void DestexheSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -71,7 +74,7 @@ void DestexheSynDlg::exportData(DestexheSynData &p)
   // ODE plasticity
   ODESTDP->exportData(p.ODE);
 
-  sa.exportData(p.assign);
+  assignments->exportData(p.assign);
 }
 
 void DestexheSynDlg::importData(DestexheSynData p)
@@ -100,5 +103,5 @@ void DestexheSynDlg::importData(DestexheSynData p)
   // ODE plasticity
   ODESTDP->importData(p.ODE);
 
-  sa.importData(p.assign);
+  assignments->importData(p.assign);
 }

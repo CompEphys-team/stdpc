@@ -7,14 +7,13 @@
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
-#include "SynapseAssignmentDlg.h"
 
 class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
 {
      Q_OBJECT
 
   public:
-     ChemSynDlg(int, QWidget *parent= 0);
+     ChemSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(CSynData &);
      void importData(CSynData);
 
@@ -26,9 +25,6 @@ class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
      void PlastMethodChange();
      void STDComboChange();
      void ResCloseClicked(QAbstractButton *);
-     
-  private:
-     SynapseAssignmentDlg sa;
 }; 
 
 #endif

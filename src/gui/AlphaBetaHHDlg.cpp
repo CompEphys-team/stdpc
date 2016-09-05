@@ -2,17 +2,19 @@
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
-AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
-     : QDialog(parent),
-       ca(this)
+AlphaBetaHHDlg::AlphaBetaHHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+     : QDialog(parent)
  {
   setupUi(this);
   QString lb;
   lb.setNum(no);
   lb= "HH "+lb;
   HHDlgLabel->setText(lb);
-  connect(btnAssign, SIGNAL(clicked(bool)), &ca, SLOT(open()));
-  connect(parent, SIGNAL(channelsChanged()), &ca, SLOT(updateChns()));
+
+  QVector<Dropdown<CurrentAssignment>> vec;
+  vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::VChannel, in, "V in", 95));
+  vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::IChannel, out, "I out", 95));
+  assignments->init(vec);
 }
 
 void AlphaBetaHHDlg::exportData(abHHData &p)
@@ -40,7 +42,7 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   p.hVb= hVbE->text().toDouble()*1e-3;
   p.hsb= hsbE->text().toDouble()*1e-3;
 
-  ca.exportData(p.assign);
+  assignments->exportData(p.assign);
 }
 
 void AlphaBetaHHDlg::importData(abHHData p)
@@ -87,5 +89,5 @@ void AlphaBetaHHDlg::importData(abHHData p)
   num.setNum(p.hsb*1e3);
   hsbE->setText(num);
 
-  ca.importData(p.assign);
+  assignments->importData(p.assign);
 }

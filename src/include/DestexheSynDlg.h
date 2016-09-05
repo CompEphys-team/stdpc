@@ -7,14 +7,13 @@
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
-#include "SynapseAssignmentDlg.h"
 
 class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
 {
      Q_OBJECT
 
   public:
-     DestexheSynDlg(int, QWidget *parent= 0);
+     DestexheSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(DestexheSynData &);
      void importData(DestexheSynData);
 
@@ -25,9 +24,6 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-
-  private:
-     SynapseAssignmentDlg sa;
 };
 
 #endif

@@ -69,6 +69,10 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      : QMainWindow(parent)
  {
      setupUi(this);
+
+     inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
+     outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
+
      DDataDlg= new DigiDataDlg(this);
      SDAQDlg= new SimulDAQDlg(this);
 #ifdef NATIONAL_INSTRUMENTS
@@ -80,12 +84,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      inChnDlg= new InputChannelDlg(this);
      outChnDlg= new OutputChannelDlg(this);
      for (int i= 0; i < 6; i++) {
-       CSynDlg[i]= new ChemSynDlg(i, this);
-       abSDlg[i]= new abSynDlg(i, this);
-       GJunctDlg[i]= new GapJunctionDlg(i, this);
-       DxheSynDlg[i]= new DestexheSynDlg(i, this);
-       nHHDlg[i]= new HHDlg(i, this);
-       abHHDlg[i]= new AlphaBetaHHDlg(i, this);
+       CSynDlg[i]= new ChemSynDlg(i, inChnModel, outChnModel, this);
+       abSDlg[i]= new abSynDlg(i, inChnModel, outChnModel, this);
+       GJunctDlg[i]= new GapJunctionDlg(i, inChnModel, outChnModel, this);
+       DxheSynDlg[i]= new DestexheSynDlg(i, inChnModel, outChnModel, this);
+       nHHDlg[i]= new HHDlg(i, inChnModel, outChnModel, this);
+       abHHDlg[i]= new AlphaBetaHHDlg(i, inChnModel, outChnModel, this);
      }
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
@@ -159,6 +163,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
      connect(hhModelDlg, SIGNAL(accepted()), this, SIGNAL(channelsChanged()));
 
+     connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
+     connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
+
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
      connect(SDAQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
@@ -198,6 +205,7 @@ MyMainWindow::~MyMainWindow()
     delete CSynDlg[i];
     delete abSDlg[i]; 
     delete GJunctDlg[i];
+    delete DxheSynDlg[i];
     delete nHHDlg[i];
     delete abHHDlg[i];
   }
@@ -206,6 +214,9 @@ MyMainWindow::~MyMainWindow()
   delete DDataDlg;
   delete SDAQDlg;
   delete hhModelDlg;
+
+  delete inChnModel;
+  delete outChnModel;
 
 #ifdef NATIONAL_INSTRUMENTS
   delete NDQDlg;

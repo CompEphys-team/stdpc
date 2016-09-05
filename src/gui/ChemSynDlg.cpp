@@ -2,9 +2,8 @@
 #include "ChemSynDlg.h"
 #include <QMessageBox>
 
-ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
-     : QDialog(parent),
-       sa(this)
+ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+     : QDialog(parent)
  {
      QString lb;
      setupUi(this);
@@ -19,8 +18,12 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
      connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));
-     connect(btnAssign, SIGNAL(clicked(bool)), &sa, SLOT(open()));
-     connect(parent, SIGNAL(channelsChanged()), &sa, SLOT(updateChns()));
+
+     QVector<Dropdown<SynapseAssignment>> vec;
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PreSynChannel, in, "Presyn V", 95));
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
+     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
+     assignments->init(vec);
 }
 
 void ChemSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -111,7 +114,7 @@ void ChemSynDlg::exportData(CSynData &p)
   // ODE plasticity
   ODESTDP->exportData(p.ODE);
 
-  sa.exportData(p.assign);
+  assignments->exportData(p.assign);
 }
 
 void ChemSynDlg::importData(CSynData p)
@@ -159,5 +162,5 @@ void ChemSynDlg::importData(CSynData p)
   // ODE plasticity
   ODESTDP->importData(p.ODE);
 
-  sa.importData(p.assign);
+  assignments->importData(p.assign);
 }
