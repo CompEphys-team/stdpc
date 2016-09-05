@@ -23,6 +23,13 @@ void initAP();
 template <typename T, typename... Tail>
 inline std::unique_ptr<AP> const& addAP(QString name, T *head, Tail... tail);
 
+/**
+ * @brief Add a deprecated AP, which delegates reading to @arg target and disables @fn write.
+ * @param name: @see addAP. Indices in the target name are matched in order, defaulting to 0
+ * if name has fewer indices than target->name.
+ */
+inline std::unique_ptr<AP> const& addDeprecatedAP(QString name, std::unique_ptr<AP> const& target);
+
 class AP
 {
 public:
@@ -58,22 +65,11 @@ public:
                              [&](std::unique_ptr<AP> &a){return !rawName.compare(a->name());});
     }
 
-    /**
-     * @brief Mark this AP deprecated, delegating reading to target and disabling @fn write.
-     *
-     * Indices in the target name are matched in order, defaulting to 0 if self has fewer indices than target.
-     */
-    void deprecate(std::unique_ptr<AP> const& target)
-    {
-        deprecated = target.get();
-    }
-
     inline QString const& name() { return _name; }
 
 protected:
-    AP(QString &name) : _name(name), deprecated(nullptr) {}
+    AP(QString &name) : _name(name) {}
     QString _name;
-    AP *deprecated;
 };
 
 
@@ -90,8 +86,7 @@ std::function<void(std::vector<T>&)> getReadFunc(QString &name, int offset, std:
                                                  std::vector<T> &head, Tail... tail);
 
 template <typename T>
-auto getReadFunc(QString &, int, std::istream &is, bool *ok, T& obj)
-    -> decltype(is >> obj, std::function<void(T&)>())
+std::function<void(T&)> getReadFunc(QString &, int, std::istream &is, bool *ok, T&)
 {
     bool good = is.good();
     if ( ok )
@@ -101,16 +96,6 @@ auto getReadFunc(QString &, int, std::istream &is, bool *ok, T& obj)
     T val;
     is >> val;
     return [=](T& v){ v = val; };
-}
-
-template <typename T>
-auto getReadFunc(QString &, long, std::istream &, bool *ok, T&)
-    -> decltype(std::function<void(T&)>())
-    // Used only where no operator<<(std::istream&, T) exists; disambiguated from the above by arg 2 (long vs int)
-{
-    if ( ok )
-        *ok = false;
-    return [](T&){};
 }
 
 template <typename T, typename... Tail>
@@ -169,54 +154,46 @@ std::function<void(T&)> getReadFunc(QString &name, int offset, std::istream &is,
 
 
 template <typename T, typename... Tail>
-void write(QString &name, int, std::ostream &os, std::vector<T> &head, Tail... tail);
+void write(QString &name, std::ostream &os, std::vector<T> &head, Tail... tail);
 
 template <typename T, size_t SZ, typename... Tail>
-void write(QString &name, int, std::ostream &os, T (&head)[SZ], Tail... tail);
+void write(QString &name, std::ostream &os, T (&head)[SZ], Tail... tail);
 
 template <typename T, typename S, typename... Tail>
-void write(QString &name, int, std::ostream &os, T &head, S T::* index, Tail... tail);
+void write(QString &name, std::ostream &os, T &head, S T::* index, Tail... tail);
 
 template <typename T>
-auto write(QString &name, int, std::ostream &os, T &head)
-    -> decltype(os << head, void())
+void write(QString &name, std::ostream &os, T &head)
 {
     os << name.toStdString() << " " << head << std::endl;
 }
 
-template <typename T>
-auto write(QString &name, long, std::ostream &os, T &)
-    -> decltype(void())
-{
-    os << name.toStdString() << "___stream_failure" << std::endl;
-}
-
 template <typename T, typename... Tail>
-void write(QString &name, int, std::ostream &os, std::vector<T> &head, Tail... tail)
+void write(QString &name, std::ostream &os, std::vector<T> &head, Tail... tail)
 {
     int pos = name.indexOf('#');
     for ( size_t i = 0; i < head.size(); i++ ) {
         QString indexedName(name);
         indexedName.replace(pos, 1, QString::number(i));
-        write(indexedName, 0, os, head[i], tail...);
+        write(indexedName, os, head[i], tail...);
     }
 }
 
 template <typename T, size_t SZ, typename... Tail>
-void write(QString &name, int, std::ostream &os, T (&head)[SZ], Tail... tail)
+void write(QString &name, std::ostream &os, T (&head)[SZ], Tail... tail)
 {
     int pos = name.indexOf('#');
     for ( size_t i = 0; i < SZ; i++ ) {
         QString indexedName(name);
         indexedName.replace(pos, 1, QString::number(i));
-        write(indexedName, 0, os, head[i], tail...);
+        write(indexedName, os, head[i], tail...);
     }
 }
 
 template <typename T, typename S, typename... Tail>
-void write(QString &name, int, std::ostream &os, T &head, S T::* index, Tail... tail)
+void write(QString &name, std::ostream &os, T &head, S T::* index, Tail... tail)
 {
-    write(name, 0, os, head.*index, tail...);
+    write(name, os, head.*index, tail...);
 }
 
 
@@ -240,29 +217,12 @@ public:
 
     virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
     {
-        if ( deprecated ) {
-            // Replace existing indices in order
-            QString target(deprecated->name());
-            QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
-            int offset;
-            while ( it.hasNext() && (offset = target.indexOf('#')) ) {
-                target.replace(offset, 1, it.next().captured(1));
-            }
-
-            // Replace remaining indices with 0
-            target.replace('#', '0');
-
-            // Read to target
-            return deprecated->readLater(target, is, ok);
-        } else {
-            return getReadFunc(rawName, is, ok, APFunc::gen_seq<sizeof...(Tail)>{});
-        }
+        return getReadFunc(rawName, is, ok, APFunc::gen_seq<sizeof...(Tail)>{});
     }
 
     virtual void write(std::ostream &os)
     {
-        if ( !deprecated )
-            write(os, APFunc::gen_seq<sizeof...(Tail)>{});
+        write(os, APFunc::gen_seq<sizeof...(Tail)>{});
     }
 
 private:
@@ -282,14 +242,47 @@ private:
     template <int... Is>
     void write(std::ostream &os, APFunc::index<Is...>)
     {
-        APFunc::write(_name, 0, os, *head, std::get<Is>(tail)...);
+        APFunc::write(_name, os, *head, std::get<Is>(tail)...);
     }
+};
+
+
+class APDeprec : public AP
+{
+public:
+    APDeprec(QString name, AP *target) : AP(name), target(target) {}
+    virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
+    {
+        // Replace existing indices in order
+        QString tName(target->name());
+        QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
+        int offset;
+        while ( it.hasNext() && (offset = tName.indexOf('#')) ) {
+            tName.replace(offset, 1, it.next().captured(1));
+        }
+
+        // Replace remaining indices with 0
+        tName.replace('#', '0');
+
+        // Read to target
+        return target->readLater(tName, is, ok);
+    }
+
+    virtual void write(std::ostream &) {}
+
+private:
+    AP *target;
 };
 
 
 template <typename T, typename... Tail>
 inline std::unique_ptr<AP> const& addAP(QString name, T *head, Tail... tail) {
     params.push_back(std::unique_ptr<AP>(new APInst<T, Tail...>(name, head, tail...)));
+    return params.back();
+}
+
+inline std::unique_ptr<AP> const& addDeprecatedAP(QString name, const std::unique_ptr<AP> &target) {
+    params.push_back(std::unique_ptr<AP>(new APDeprec(name, target.get())));
     return params.back();
 }
 
