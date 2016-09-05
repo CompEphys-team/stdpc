@@ -5,10 +5,16 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include "ChannelListModel.h"
+#include "ObjectDataTypes.h"
 
 template <class Assignment>
 struct Dropdown
 {
+    Dropdown(){}
+    Dropdown(int Assignment::* c, ChannelListModel *m, QString const& l, int w) :
+        channel(c), model(m), label(l), columnWidth(w)
+    {}
+
     int Assignment::* channel;
     ChannelListModel *model;
     QString label;
@@ -41,8 +47,10 @@ template <class Assignment>
 class AssignmentWidget : public AssignmentWidgetQ
 {
 public:
-    AssignmentWidget(QVector<Dropdown<Assignment>>, QWidget *parent = 0);
+    AssignmentWidget(QWidget *parent = 0) : AssignmentWidgetQ(parent) {}
     ~AssignmentWidget() {}
+
+    void init(QVector<Dropdown<Assignment>> &);
 
     void importData(std::vector<Assignment> const&);
     void exportData(std::vector<Assignment> &);

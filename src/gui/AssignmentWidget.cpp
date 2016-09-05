@@ -1,5 +1,4 @@
 #include "AssignmentWidget.h"
-#include "ObjectDataTypes.h"
 #include <QHBoxLayout>
 #include <functional>
 
@@ -8,10 +7,9 @@ template class AssignmentWidget<SynapseAssignment>;
 template class AssignmentWidget<GapJunctionAssignment>;
 
 template <class A>
-AssignmentWidget<A>::AssignmentWidget(QVector<Dropdown<A>> drops, QWidget *parent) :
-    AssignmentWidgetQ(parent),
-    drops(drops)
+void AssignmentWidget<A>::init(QVector<Dropdown<A>> &drops)
 {
+    this->drops = drops;
     QStringList labels("Active");
     int i = 1;
     setColumnCount(drops.size() + 1);
@@ -92,14 +90,13 @@ void AssignmentWidget<A>::addRow(int row, QCheckBox *box)
 template <class A>
 void AssignmentWidget<A>::grow()
 {
+    disconnect(boxc);
     QCheckBox *box = new QCheckBox();
     if ( !boxes.empty() )
         boxes.last()->setChecked(true);
+    boxc = connect(box, SIGNAL(stateChanged(int)), this, SLOT(grow()));
 
     addRow(rowCount(), box);
-
-    disconnect(boxc);
-    boxc = connect(box, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
 
     for ( Dropdown<A> &d : drops ) {
         disconnect(d.connection);
