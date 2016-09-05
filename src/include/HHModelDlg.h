@@ -37,7 +37,7 @@ private:
                 QPushButton *btn);
 
 private slots:
-    void growTable();
+    void growTable(bool reactive = true);
 };
 
 #endif // HHMODELDLG_H

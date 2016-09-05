@@ -39,7 +39,7 @@ protected:
     }
 
 protected slots:
-    virtual void grow() {}
+    virtual void grow(bool = true) {}
 };
 
 
@@ -64,7 +64,7 @@ private:
     void addRow(int row, QCheckBox *box);
 
 protected:
-    void grow();
+    void grow(bool reactive = true);
 };
 
 #endif // ASSIGNMENTWIDGET_H

@@ -13,13 +13,13 @@ void AssignmentWidget<A>::init(QVector<Dropdown<A>> &drops)
     QStringList labels("Active");
     int i = 1;
     setColumnCount(drops.size() + 1);
-    setColumnWidth(0, 50);
+    setColumnWidth(0, 47);
     for ( Dropdown<A> &d : drops ) {
         setColumnWidth(i++, d.columnWidth);
         labels.append(d.label);
     }
     setHorizontalHeaderLabels(labels);
-    grow();
+    grow(false);
 }
 
 template <class A>
@@ -59,7 +59,7 @@ void AssignmentWidget<A>::importData(std::vector<A> const& p)
         ++i;
     }
 
-    grow();
+    grow(false);
 }
 
 template <class A>
@@ -88,11 +88,11 @@ void AssignmentWidget<A>::addRow(int row, QCheckBox *box)
 }
 
 template <class A>
-void AssignmentWidget<A>::grow()
+void AssignmentWidget<A>::grow(bool reactive)
 {
     disconnect(boxc);
     QCheckBox *box = new QCheckBox();
-    if ( !boxes.empty() )
+    if ( reactive && !boxes.empty() )
         boxes.last()->setChecked(true);
     boxc = connect(box, SIGNAL(stateChanged(int)), this, SLOT(grow()));
 

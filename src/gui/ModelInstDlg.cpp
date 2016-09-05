@@ -26,7 +26,7 @@ ModelInstDlg::ModelInstDlg(QWidget *parent) :
     ui->table->setColumnWidth(6, 10);
     ui->table->setColumnWidth(7, 80);
     ui->table->setColumnWidth(8, 80);
-    growTable();
+    growTable(false);
 
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addMultiple()));
 }
@@ -68,7 +68,7 @@ void ModelInstDlg::importData(const std::vector<vInstData> &insts)
         iSave->setChecked(inst.outChn.chnlSaving);
         iBias->setValue(inst.outChn.bias * 1e9);
     }
-    growTable();
+    growTable(false);
 }
 
 void ModelInstDlg::exportData(std::vector<vInstData> &insts)
@@ -128,19 +128,17 @@ void ModelInstDlg::setCellCheckBox(int row, int column, QCheckBox *box)
     ui->table->setCellWidget(row, column, widget);
 }
 
-void ModelInstDlg::growTable(bool doConnections)
+void ModelInstDlg::growTable(bool reactive)
 {
-    if ( doConnections ) {
-        disconnect(activec);
-        disconnect(vSavec);
-        disconnect(vBiasc);
-        disconnect(spkDc);
-        disconnect(spkThrc);
-        disconnect(iSavec);
-        disconnect(iBiasc);
-    }
+    disconnect(activec);
+    disconnect(vSavec);
+    disconnect(vBiasc);
+    disconnect(spkDc);
+    disconnect(spkThrc);
+    disconnect(iSavec);
+    disconnect(iBiasc);
 
-    if ( !actives.empty() )
+    if ( reactive && !actives.empty() )
         actives.last()->setChecked(true);
 
     QCheckBox *active = new QCheckBox();
@@ -153,15 +151,13 @@ void ModelInstDlg::growTable(bool doConnections)
 
     addRow(ui->table->rowCount(), active, vSave, vBias, spkD, spkThr, iSave, iBias);
 
-    if ( doConnections ) {
-        activec = connect(active, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
-        vSavec = connect(vSave, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
-        vBiasc = connect(vBias, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
-        spkDc = connect(spkD, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
-        spkThrc = connect(spkThr, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
-        iSavec = connect(iSave, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
-        iBiasc = connect(iBias, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
-    }
+    activec = connect(active, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
+    vSavec = connect(vSave, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
+    vBiasc = connect(vBias, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
+    spkDc = connect(spkD, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
+    spkThrc = connect(spkThr, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
+    iSavec = connect(iSave, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
+    iBiasc = connect(iBias, SIGNAL(valueChanged(double)), this, SLOT(growTable()));
 }
 
 void ModelInstDlg::addMultiple()

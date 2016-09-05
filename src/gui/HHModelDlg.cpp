@@ -21,7 +21,7 @@ HHModelDlg::HHModelDlg(QWidget *parent) :
     ui->table->setColumnWidth(2, 100);
     ui->table->setColumnWidth(3, 100);
     ui->table->setColumnWidth(4, 120);
-    growTable();
+    growTable(false);
 }
 
 HHModelDlg::~HHModelDlg()
@@ -58,7 +58,7 @@ void HHModelDlg::importData()
         ELeak->setValue(model.ELeak * 1e3);
         instDlg[row++]->importData(model.inst);
     }
-    growTable();
+    growTable(false);
 }
 
 void HHModelDlg::exportData()
@@ -119,7 +119,7 @@ void HHModelDlg::addRow(int row, QCheckBox *box, QDoubleSpinBox *C, QDoubleSpinB
     connect(btn, SIGNAL(clicked(bool)), instDlg[row], SLOT(open()));
 }
 
-void HHModelDlg::growTable()
+void HHModelDlg::growTable(bool reactive)
 {
     disconnect(boxc);
     disconnect(Cc);
@@ -127,7 +127,7 @@ void HHModelDlg::growTable()
     disconnect(ELc);
     disconnect(btnc);
 
-    if ( !boxes.empty() )
+    if ( reactive && !boxes.empty() )
         boxes.last()->setChecked(true);
 
     QCheckBox *box = new QCheckBox();

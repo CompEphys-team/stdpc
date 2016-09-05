@@ -33,7 +33,7 @@ private:
     void setCellCheckBox(int row, int column, QCheckBox *box);
 
 private slots:
-    void growTable(bool doConnections = true);
+    void growTable(bool reactive = true);
     void addMultiple();
 };
 
