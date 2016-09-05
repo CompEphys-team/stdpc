@@ -18,14 +18,34 @@ struct Dropdown
     QVector<QComboBox *> combo;
 };
 
+
+class AssignmentWidgetQ : public QTableWidget
+{
+    Q_OBJECT
+public:
+    explicit AssignmentWidgetQ(QWidget *parent = 0) : QTableWidget(parent) {}
+    ~AssignmentWidgetQ() {}
+
+protected:
+    void fixWidth(QComboBox *box, ChannelListModel *model) {
+        connect(model, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(box);});
+        ChannelListModel::fixComboBoxWidth(box);
+    }
+
+protected slots:
+    virtual void grow() {}
+};
+
+
 template <class Assignment>
-class AssignmentWidget : public QTableWidget
+class AssignmentWidget : public AssignmentWidgetQ
 {
 public:
     AssignmentWidget(QVector<Dropdown<Assignment>>, QWidget *parent = 0);
+    ~AssignmentWidget() {}
 
-    void importData(std::vector<Assignment> &);
-    void exportData(std::vector<Assignment> const&);
+    void importData(std::vector<Assignment> const&);
+    void exportData(std::vector<Assignment> &);
 
 private:
     QMetaObject::Connection boxc;
@@ -35,7 +55,7 @@ private:
 
     void addRow(int row, QCheckBox *box);
 
-private slots:
+protected:
     void grow();
 };
 

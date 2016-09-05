@@ -1,14 +1,16 @@
 #include "AssignmentWidget.h"
 #include "ObjectDataTypes.h"
+#include <QHBoxLayout>
+#include <functional>
 
 template class AssignmentWidget<CurrentAssignment>;
 template class AssignmentWidget<SynapseAssignment>;
 template class AssignmentWidget<GapJunctionAssignment>;
 
 template <class A>
-AssignmentWidget<A>::AssignmentWidget(QVector<Dropdown<A>> drops, QWidget *parent = 0) :
-    QComboBox(parent),
-    drops(d)
+AssignmentWidget<A>::AssignmentWidget(QVector<Dropdown<A>> drops, QWidget *parent) :
+    AssignmentWidgetQ(parent),
+    drops(drops)
 {
     QStringList labels("Active");
     int i = 1;
@@ -19,7 +21,7 @@ AssignmentWidget<A>::AssignmentWidget(QVector<Dropdown<A>> drops, QWidget *paren
         labels.append(d.label);
     }
     setHorizontalHeaderLabels(labels);
-    growTable();
+    grow();
 }
 
 template <class A>
@@ -36,14 +38,14 @@ void AssignmentWidget<A>::exportData(std::vector<A> &p)
 }
 
 template <class A>
-void AssignmentWidget<A>::importData(std::vector<A> &p)
+void AssignmentWidget<A>::importData(std::vector<A> const& p)
 {
     QCheckBox *box;
 
     boxes.clear();
     for ( Dropdown<A> &d : drops ) {
         d.combo.clear();
-        d.connection.disconnect();
+        disconnect(d.connection);
     }
     setRowCount(0);
 
@@ -59,7 +61,7 @@ void AssignmentWidget<A>::importData(std::vector<A> &p)
         ++i;
     }
 
-    growTable();
+    grow();
 }
 
 template <class A>
@@ -81,9 +83,8 @@ void AssignmentWidget<A>::addRow(int row, QCheckBox *box)
     for ( Dropdown<A> &d : drops ) {
         QComboBox *combo = new QComboBox(this);
         combo->setModel(d.model);
-        connect(d, ChannelListModel::layoutChanged(), [=](){ChannelListModel::fixComboBoxWidth(d.model)});
         setCellWidget(row, i++, combo);
-        ChannelListModel::fixComboBoxWidth(combo);
+        fixWidth(combo, d.model);
         d.combo.insert(row, combo);
     }
 }

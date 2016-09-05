@@ -138,8 +138,6 @@ void DCThread::run()
    csyn.clear();
    for ( CSynData &p : CSynp ) {
        if ( p.active ) {
-           if ( !p.noLegacyAssign )
-               csyn.push_back(ChemSyn(&p, this));
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
                    instantiate(csyn, p, a);
