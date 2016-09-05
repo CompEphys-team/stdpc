@@ -43,7 +43,7 @@ void AssignmentWidget<A>::importData(std::vector<A> const& p)
     boxes.clear();
     for ( Dropdown<A> &d : drops ) {
         d.combo.clear();
-        disconnect(d.connection);
+        d.model->disconnect();
     }
     setRowCount(0);
 
