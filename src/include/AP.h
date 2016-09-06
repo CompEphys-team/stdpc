@@ -172,10 +172,10 @@ template <typename T, typename... Tail>
 void write(QString &name, std::ostream &os, std::vector<T> &head, Tail... tail)
 {
     int pos = name.indexOf('#');
-    for ( size_t i = 0; i < head.size(); i++ ) {
+    for ( size_t i = head.size(); i > 0; i-- ) {
         QString indexedName(name);
-        indexedName.replace(pos, 1, QString::number(i));
-        write(indexedName, os, head[i], tail...);
+        indexedName.replace(pos, 1, QString::number(i-1));
+        write(indexedName, os, head[i-1], tail...);
     }
 }
 
@@ -183,10 +183,10 @@ template <typename T, size_t SZ, typename... Tail>
 void write(QString &name, std::ostream &os, T (&head)[SZ], Tail... tail)
 {
     int pos = name.indexOf('#');
-    for ( size_t i = 0; i < SZ; i++ ) {
+    for ( size_t i = SZ; i > 0; i-- ) {
         QString indexedName(name);
-        indexedName.replace(pos, 1, QString::number(i));
-        write(indexedName, os, head[i], tail...);
+        indexedName.replace(pos, 1, QString::number(i-1));
+        write(indexedName, os, head[i-1], tail...);
     }
 }
 
