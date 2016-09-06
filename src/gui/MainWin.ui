@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StdpC 2012</string>
+   <string>StdpC 2016 RC1</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="DataBox">
@@ -1006,7 +1006,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>400</x>
       <y>20</y>
-      <width>121</width>
+      <width>131</width>
       <height>22</height>
      </rect>
     </property>
