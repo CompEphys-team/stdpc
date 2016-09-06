@@ -47,7 +47,9 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DataSavingDlg.ui \
     $$PWD/src/gui/DestexheSynDlg.ui \
     $$PWD/src/gui/HHModelDlg.ui \
-    $$PWD/src/gui/ModelInstDlg.ui
+    $$PWD/src/gui/ModelInstDlg.ui \
+    $$PWD/src/gui/ComponentWidget.ui \
+    $$PWD/src/gui/ComponentFactoryWidget.ui
 HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -95,7 +97,9 @@ HEADERS += $$PWD/src/include/Main.h \
     $$PWD/src/include/HHModelDlg.h \
     $$PWD/src/include/ChannelIndex.h \
     $$PWD/src/include/ModelInstDlg.h \
-    $$PWD/src/include/AssignmentWidget.h
+    $$PWD/src/include/AssignmentWidget.h \
+    $$PWD/src/include/ComponentTable.h \
+    $$PWD/src/include/ComponentWidget.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -143,7 +147,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/HHModelDlg.cpp \
     $$PWD/src/core/ChannelIndex.cpp \
     $$PWD/src/gui/ModelInstDlg.cpp \
-    $$PWD/src/gui/AssignmentWidget.cpp
+    $$PWD/src/gui/AssignmentWidget.cpp \
+    $$PWD/src/gui/ComponentTable.cpp \
+    $$PWD/src/gui/ComponentWidget.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 # uncomment to compile with NIDAQmx support (needs NIDAQmx)
