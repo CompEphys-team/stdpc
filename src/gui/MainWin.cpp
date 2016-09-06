@@ -3,6 +3,7 @@
 #include "LUtables.h"
 #include "AP.h"
 #include <windows.h>
+#include "ComponentTable.h"
 
 void MyMainWindow::DAQSetup()
 {
@@ -83,18 +84,22 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DSDlg= new DataSavingDlg(this);
      inChnDlg= new InputChannelDlg(this);
      outChnDlg= new OutputChannelDlg(this);
-     for (int i= 0; i < 6; i++) {
-       CSynDlg[i]= new ChemSynDlg(i, inChnModel, outChnModel, this);
-       abSDlg[i]= new abSynDlg(i, inChnModel, outChnModel, this);
-       GJunctDlg[i]= new GapJunctionDlg(i, inChnModel, outChnModel, this);
-       DxheSynDlg[i]= new DestexheSynDlg(i, inChnModel, outChnModel, this);
-       nHHDlg[i]= new HHDlg(i, inChnModel, outChnModel, this);
-       abHHDlg[i]= new AlphaBetaHHDlg(i, inChnModel, outChnModel, this);
-     }
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
      graphDlg[1]= new GraphDlg(1, this);
      hhModelDlg = new HHModelDlg(this);
+
+     QVector<GenericComponent *> prototypes;
+     prototypes.push_back(new Component<HHDlg>("m/h/tau HH", &mhHHp));
+     prototypes.push_back(new Component<AlphaBetaHHDlg>("a/b HH", &abHHp));
+     currentTable->init(prototypes, inChnModel, outChnModel);
+
+     prototypes.clear();
+     prototypes.push_back(new Component<ChemSynDlg>("ChemSyn", &CSynp));
+     prototypes.push_back(new Component<abSynDlg>("a/b Syn", &abSynp));
+     prototypes.push_back(new Component<GapJunctionDlg>("Gap Junction", &ESynp));
+     prototypes.push_back(new Component<DestexheSynDlg>("DestexheSyn", &DxheSynp));
+     synapseTable->init(prototypes, inChnModel, outChnModel);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
                QString("*.log"));
@@ -120,18 +125,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
-     connect(Syn0Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn0ComboChanged()));
-     connect(Syn1Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn1ComboChanged()));
-     connect(Syn2Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn2ComboChanged()));
-     connect(Syn3Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn3ComboChanged()));
-     connect(Syn4Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn4ComboChanged()));
-     connect(Syn5Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn5ComboChanged()));
-     connect(HH0Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH0ComboChanged()));
-     connect(HH1Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH1ComboChanged()));
-     connect(HH2Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH2ComboChanged()));
-     connect(HH3Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH3ComboChanged()));
-     connect(HH4Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH4ComboChanged()));
-     connect(HH5Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH5ComboChanged()));
      
      connect(SpikeTimesBut, SIGNAL(clicked()), SpkTDlg, SLOT(show()));
      connect(StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
@@ -201,14 +194,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
 MyMainWindow::~MyMainWindow()
 {
-  for (int i= 0; i < 6; i++) {
-    delete CSynDlg[i];
-    delete abSDlg[i]; 
-    delete GJunctDlg[i];
-    delete DxheSynDlg[i];
-    delete nHHDlg[i];
-    delete abHHDlg[i];
-  }
   delete inChnDlg;
   delete outChnDlg;
   delete DDataDlg;
@@ -225,8 +210,6 @@ MyMainWindow::~MyMainWindow()
   delete ExportLogFileDlg;
   delete LoadProtocolFileDlg;
   delete SaveProtocolFileDlg;
-//  delete[] inChnp;
-//  delete[] outChnp;
 }
 
 void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowLimit, double highLimit, double value)
@@ -319,11 +302,7 @@ void MyMainWindow::SGMethodChanged()
       STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
     }
   }
-}       
-
-
-#include "SynXComboChanged.cc"
-#include "HHXComboChanged.cc"
+}
 
 void MyMainWindow::StartButClicked() 
 { 
@@ -377,38 +356,8 @@ void MyMainWindow::StopButClicked()
 
 void MyMainWindow::exportData()
 {
-  // collect data from the synapses
-  synType[0]= Syn0Combo->currentIndex();
-  synType[1]= Syn1Combo->currentIndex();
-  synType[2]= Syn2Combo->currentIndex();
-  synType[3]= Syn3Combo->currentIndex();
-  synType[4]= Syn4Combo->currentIndex();
-  synType[5]= Syn5Combo->currentIndex();
-
-  for (int i= 0; i < 6; i++) {
-    CSynp[i].active= (synType[i] == 1);
-    abSynp[i].active= (synType[i] == 3);
-    ESynp[i].active= (synType[i] == 2);
-    DxheSynp[i].active= (synType[i] == 4);
-    CSynDlg[i]->exportData(CSynp[i]);
-    abSDlg[i]->exportData(abSynp[i]);
-    GJunctDlg[i]->exportData(ESynp[i]);
-    DxheSynDlg[i]->exportData(DxheSynp[i]);
-  }
-  // collect data from the HH conductances
-  HHType[0]= HH0Combo->currentIndex();
-  HHType[1]= HH1Combo->currentIndex();
-  HHType[2]= HH2Combo->currentIndex();
-  HHType[3]= HH3Combo->currentIndex();
-  HHType[4]= HH4Combo->currentIndex();
-  HHType[5]= HH5Combo->currentIndex();
-  
-  for (int i= 0; i < 6; i++) {
-    mhHHp[i].active= (HHType[i] == 1);
-    abHHp[i].active= (HHType[i] == 2);
-    nHHDlg[i]->exportData(mhHHp[i]);
-    abHHDlg[i]->exportData(abHHp[i]);
-  }
+  synapseTable->exportData();
+  currentTable->exportData();
   
   inChnDlg->exportData();
   outChnDlg->exportData();
@@ -441,45 +390,8 @@ void MyMainWindow::importData()
   outChnDlg->importData();
   outChnDlg->accept();
 
-  // collect data from the synapses
-  for (int i= 0; i < MAX_SYN_NO; i++) {
-    synType[i]= 0;
-    if (CSynp[i].active) synType[i]= 1;
-    if (abSynp[i].active) synType[i]= 3;
-    if (ESynp[i].active) synType[i]= 2;
-    if (DxheSynp[i].active) synType[i]= 4;
-  }
-  Syn0Combo->setCurrentIndex(synType[0]);
-  Syn1Combo->setCurrentIndex(synType[1]);
-  Syn2Combo->setCurrentIndex(synType[2]);
-  Syn3Combo->setCurrentIndex(synType[3]);
-  Syn4Combo->setCurrentIndex(synType[4]);
-  Syn5Combo->setCurrentIndex(synType[5]);
-
-  for (int i= 0; i < 6; i++) {
-    CSynDlg[i]->importData(CSynp[i]);
-    abSDlg[i]->importData(abSynp[i]);
-    GJunctDlg[i]->importData(ESynp[i]);
-    DxheSynDlg[i]->importData(DxheSynp[i]);
-  }
-  
-  // collect data from the HH conductances
-  for (int i= 0; i < MAX_HH_NO; i++) {
-    HHType[i]= 0;
-    if (mhHHp[i].active) HHType[i]= 1;
-    if (abHHp[i].active) HHType[i]= 2;
-  }
-  HH0Combo->setCurrentIndex(HHType[0]);
-  HH1Combo->setCurrentIndex(HHType[1]);
-  HH2Combo->setCurrentIndex(HHType[2]);
-  HH3Combo->setCurrentIndex(HHType[3]);
-  HH4Combo->setCurrentIndex(HHType[4]);
-  HH5Combo->setCurrentIndex(HHType[5]);
-  
-  for (int i= 0; i < 6; i++) {
-    nHHDlg[i]->importData(mhHHp[i]);
-    abHHDlg[i]->importData(abHHp[i]);
-  }
+  synapseTable->importData();
+  currentTable->importData();
   importSGData();
   SpkTDlg->importData();
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
@@ -656,19 +568,13 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   // comment this?!?
   DAQSetup();
 
-  // Resize param sizing to defaults before loading
+  // Clear params before loading
   CSynp.clear();
-  CSynp.resize(MAX_SYN_NO);
   abSynp.clear();
-  abSynp.resize(MAX_SYN_NO);
   ESynp.clear();
-  ESynp.resize(MAX_SYN_NO);
   DxheSynp.clear();
-  DxheSynp.resize(MAX_SYN_NO);
   mhHHp.clear();
-  mhHHp.resize(MAX_HH_NO);
   abHHp.clear();
-  abHHp.resize(MAX_HH_NO);
   HHNeuronp.clear();
 
   is >> name;

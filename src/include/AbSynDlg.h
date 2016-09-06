@@ -20,6 +20,8 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
      int No;   
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+
+     typedef abSynData param_type;
      
   public slots:
      void PlastMethodChange();

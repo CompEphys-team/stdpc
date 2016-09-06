@@ -21,6 +21,8 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
 
+     typedef DestexheSynData param_type;
+
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);

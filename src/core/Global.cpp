@@ -1,15 +1,13 @@
 #include "Main.h"
 #include "Global.h"
 
-int synType[MAX_SYN_NO];
-std::vector<CSynData> CSynp(MAX_SYN_NO);
-std::vector<abSynData> abSynp(MAX_SYN_NO);
-std::vector<GJunctData> ESynp(MAX_SYN_NO);
-std::vector<DestexheSynData> DxheSynp(MAX_SYN_NO);
+std::vector<CSynData> CSynp;
+std::vector<abSynData> abSynp;
+std::vector<GJunctData> ESynp;
+std::vector<DestexheSynData> DxheSynp;
 
-int HHType[MAX_HH_NO];
-std::vector<mhHHData> mhHHp(MAX_HH_NO);
-std::vector<abHHData> abHHp(MAX_HH_NO);
+std::vector<mhHHData> mhHHp;
+std::vector<abHHData> abHHp;
 
 std::vector<inChnData> inChnp;
 std::vector<outChnData> outChnp;

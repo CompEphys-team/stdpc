@@ -20,6 +20,8 @@ class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
      int No;   
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+
+     typedef CSynData param_type;
      
   public slots:
      void PlastMethodChange();

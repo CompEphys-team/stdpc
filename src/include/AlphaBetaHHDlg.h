@@ -13,6 +13,7 @@ class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
      AlphaBetaHHDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(abHHData &);
      void importData(abHHData);
+     typedef abHHData param_type;
 }; 
 
 #endif

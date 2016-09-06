@@ -8,20 +8,16 @@
 #include "LUtables.h"
 
 #define MAX_ST_HISTORY 20
-#define MAX_SYN_NO 6
-#define MAX_HH_NO 6
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
 #define MAX_ELECTRODE_NO 4
 
 
-extern int synType[MAX_SYN_NO];
 extern std::vector<CSynData> CSynp;
 extern std::vector<abSynData> abSynp;
 extern std::vector<GJunctData> ESynp;
 extern std::vector<DestexheSynData> DxheSynp;
 
-extern int HHType[MAX_HH_NO];
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
