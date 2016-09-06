@@ -41,9 +41,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>280</x>
+     <x>205</x>
      <y>20</y>
-     <width>76</width>
+     <width>151</width>
      <height>20</height>
     </rect>
    </property>
@@ -73,7 +73,10 @@
     <number>0</number>
    </property>
    <property name="text">
-    <string>Synapse X</string>
+    <string>Chemical Synapse %1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">

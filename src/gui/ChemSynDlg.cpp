@@ -5,12 +5,10 @@
 ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
      
      No= no;
-     lb.setNum(No);
-     ChemSynDlgLabel->setText(QString("Synapse ")+lb);
+     ChemSynDlgLabel->setText(ChemSynDlgLabel->text().arg(no));
      
      STDP= new STDPDlg(this, No);
      ODESTDP= new ODESTDPDlg(this, No);

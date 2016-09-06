@@ -48,9 +48,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>260</x>
      <y>20</y>
-     <width>51</width>
+     <width>141</width>
      <height>20</height>
     </rect>
    </property>
@@ -80,7 +80,10 @@
     <number>0</number>
    </property>
    <property name="text">
-    <string>HH X</string>
+    <string>Alpha - Beta HH %1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
   <widget class="QLabel" name="label_4">

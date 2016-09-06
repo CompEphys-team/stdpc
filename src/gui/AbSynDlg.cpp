@@ -5,12 +5,10 @@
 abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
      
      No= no;
-     lb.setNum(No);
-     abSynDlgLabel->setText(QString("Synapse ")+lb);
+     abSynDlgLabel->setText(abSynDlgLabel->text().arg(no));
      
      STDP= new STDPDlg(this, No);
      ODESTDP= new ODESTDPDlg(this, No);

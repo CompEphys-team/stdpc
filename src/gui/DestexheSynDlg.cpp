@@ -5,12 +5,10 @@
 DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
 
      No= no;
-     lb.setNum(No);
-     DestexheSynDlgLabel->setText(QString("Synapse ")+lb);
+     DestexheSynDlgLabel->setText(DestexheSynDlgLabel->text().arg(no));
 
      STDP= new STDPDlg(this, No);
      ODESTDP= new ODESTDPDlg(this, No);

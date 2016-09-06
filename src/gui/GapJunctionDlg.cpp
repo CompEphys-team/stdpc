@@ -4,12 +4,10 @@
 GapJunctionDlg::GapJunctionDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
      
      No= no;
-     lb.setNum(No);
-     gapJunctDlgLabel->setText(QString("Synapse ")+lb);
+     gapJunctDlgLabel->setText(gapJunctDlgLabel->text().arg(no));
 
      QVector<Dropdown<GapJunctionAssignment>> vec;
      vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::preInChannel, in, "Presyn V", 95));
