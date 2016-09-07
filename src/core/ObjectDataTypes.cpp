@@ -1,4 +1,3 @@
-#include "Main.h"
 #include "ObjectDataTypes.h"
 
 ostream &operator<<(ostream &os, SDAQData &p) 

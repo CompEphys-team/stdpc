@@ -1,7 +1,6 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "Main.h"
 #include <QVector>
 #include <vector>
 #include "ObjectDataTypes.h"

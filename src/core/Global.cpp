@@ -1,4 +1,3 @@
-#include "Main.h"
 #include "Global.h"
 
 std::vector<CSynData> CSynp;

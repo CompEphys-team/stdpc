@@ -1,4 +1,3 @@
-#include "Main.h"
 #include "MainWin.h"
 #include "LUtables.h"
 #include "AP.h"

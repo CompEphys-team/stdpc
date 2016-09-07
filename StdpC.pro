@@ -54,7 +54,7 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/ModelInstDlg.ui \
     $$PWD/src/gui/ComponentWidget.ui \
     $$PWD/src/gui/ComponentFactoryWidget.ui
-HEADERS += $$PWD/src/include/Main.h \
+HEADERS += \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
     $$PWD/src/include/GapJunctionDlg.h \
@@ -156,15 +156,17 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/ComponentWidget.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
+nidaqmx {
+    # NIDAQmx static build based on NI DAQmx 15.5.1
+    DEPENDPATH += $$PWD/src/nidaqmx
+    SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
+    $$PWD/src/drivers/NIDAQ.cpp
+    FORMS += $$PWD/src/gui/NIDAQDlg.ui
 
-# NIDAQmx static build based on NI DAQmx 15.5.1
-DEPENDPATH += $$PWD/src/nidaqmx
-SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
-$$PWD/src/drivers/NIDAQ.cpp
-FORMS += $$PWD/src/gui/NIDAQDlg.ui
+    HEADERS += $$PWD/src/include/NIDAQDlg.h \
+    $$PWD/src/include/NIDAQ.h
 
-HEADERS += $$PWD/src/include/NIDAQDlg.h \
-$$PWD/src/include/NIDAQ.h
-
-INCLUDEPATH += $$PWD/src/nidaqmx
-LIBS += $$PWD/src/nidaqmx/nidaqmx.a
+    INCLUDEPATH += $$PWD/src/nidaqmx
+    LIBS += $$PWD/src/nidaqmx/nidaqmx.a
+    DEFINES += NATIONAL_INSTRUMENTS
+}

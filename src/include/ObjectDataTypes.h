@@ -3,7 +3,6 @@
 
 using namespace std;
 
-#include "Main.h"
 #include <QString>
 #include <iostream>
 
