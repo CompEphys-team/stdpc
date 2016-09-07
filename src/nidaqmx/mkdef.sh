@@ -53,10 +53,10 @@ sed -n '/^\?.*/p' $EXP
 #	and strip off leading spaces and/or underscores
 # sort | head : limit the output to 1 line (the 1st, in alphanumerical order)
 
-for i in `cat $EXP`
+for i in `cat $EXP | tr -d '\r'`
 do
 	# reject lines that start with the '?' character
-	if [ $i[1] != '?' ]
+	if [ `echo $i | cut -c 1` != '?' ]
 	then
 		sed -n "s/\(^[ _]\{1,26\}\)\($i\)/\2/p" $DUMP | sort | head -1
 	fi

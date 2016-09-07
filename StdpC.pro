@@ -22,6 +22,10 @@ CONFIG += qt \
     thread \
     debug_and_release
 
+static {
+    QMAKE_LFLAGS += -static
+}
+
 # A directory to place intermediary build files.
 RCC_DIR = build
 MOC_DIR = build
@@ -152,7 +156,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/ComponentWidget.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
-# uncomment to compile with NIDAQmx support (needs NIDAQmx)
+
+# NIDAQmx static build based on NI DAQmx 15.5.1
 DEPENDPATH += $$PWD/src/nidaqmx
 SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
 $$PWD/src/drivers/NIDAQ.cpp
@@ -161,8 +166,5 @@ FORMS += $$PWD/src/gui/NIDAQDlg.ui
 HEADERS += $$PWD/src/include/NIDAQDlg.h \
 $$PWD/src/include/NIDAQ.h
 
-INCLUDEPATH += "C:\\Program Files (x86)\\National Instruments\\NI-DAQ\\DAQmx ANSI C Dev\\include"
-#INCLUDEPATH += "C:\\Users\\tn41\\NI-DAQ\\DAQmx ANSI C Dev\\include"
 INCLUDEPATH += $$PWD/src/nidaqmx
-
-LIBS += $$PWD/staticlib/nidaqmx.a
+LIBS += $$PWD/src/nidaqmx/nidaqmx.a
