@@ -14,6 +14,7 @@ class abSyn {
     inChannel *pre;
     inChannel *post;
     outChannel *out;
+    SynapseAssignment a;
 
     double P_f(double);
     double D_f(double);
@@ -32,7 +33,7 @@ class abSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    abSyn(abSynData *, DCThread *, SynapseAssignment *);
+    abSyn(abSynData *, DCThread *, SynapseAssignment);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

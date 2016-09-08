@@ -1,10 +1,11 @@
 #include "AbHH.h"
 #include "DCThread.h"
 
-abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment *a) :
+abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment a) :
     p(inp),
-    pre(t->getInChan(a->VChannel)),
-    out(t->getOutChan(a->IChannel)),
+    pre(t->getInChan(a.VChannel)),
+    out(t->getOutChan(a.IChannel)),
+    a(a),
     m(0.0),
     h(1.0),
     ma(0.0),
@@ -49,7 +50,7 @@ void abHH::currentUpdate(double t, double dt)
   static double V;
   static int i;
   
-  if (p->active) {
+  if (p->active && *a.actP) {
     V= pre->V;
     if (p->mExpo > 0) {
       // Linear Euler:

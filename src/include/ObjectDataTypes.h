@@ -11,6 +11,7 @@ class DCThread;
 
 struct SynapseAssignment {
     bool active;
+    bool *actP;
     int PreSynChannel;
     int PostSynChannel;
     int OutSynChannel;
@@ -18,6 +19,7 @@ struct SynapseAssignment {
 
 struct GapJunctionAssignment {
     bool active;
+    bool *actP;
     int preInChannel;
     int postInChannel;
     int preOutChannel;
@@ -26,6 +28,7 @@ struct GapJunctionAssignment {
 
 struct CurrentAssignment {
     bool active;
+    bool *actP;
     int VChannel;
     int IChannel;
 };

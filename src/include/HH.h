@@ -20,9 +20,10 @@ class HH
     double I;
     inChannel *pre;
     outChannel *out;
+    CurrentAssignment a;
     
   public:
-    HH(mhHHData *p, DCThread *t, CurrentAssignment *a);
+    HH(mhHHData *p, DCThread *t, CurrentAssignment a);
     void currentUpdate(double, double);
 
     typedef mhHHData param_type;

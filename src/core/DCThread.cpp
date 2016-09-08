@@ -572,7 +572,7 @@ template <class T>
 void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, CurrentAssignment &a)
 {
     CurrentAssignment tmp;
-    tmp.active = true;
+    tmp.actP = &a.active;
     if ( a.VChannel == a.IChannel ) {
         // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
         for ( std::pair<int, bool> VIChan : getChanIndices(a.VChannel) ) {
@@ -580,7 +580,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Curr
                 continue;
             tmp.VChannel = VIChan.first;
             tmp.IChannel = VIChan.first;
-            inst.push_back(T(&p, this, &tmp));
+            inst.push_back(T(&p, this, tmp));
         }
     } else {
         for ( std::pair<int, bool> VChan : getChanIndices(a.VChannel) ) {
@@ -591,7 +591,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Curr
                 if ( !IChan.second )
                     continue;
                 tmp.IChannel = IChan.first;
-                inst.push_back(T(&p, this, &tmp));
+                inst.push_back(T(&p, this, tmp));
             }
         }
     }
@@ -601,7 +601,7 @@ template <typename T>
 void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, SynapseAssignment &a)
 {
     SynapseAssignment tmp;
-    tmp.active = true;
+    tmp.actP = &a.active;
     if ( a.PostSynChannel == a.OutSynChannel ) {
         for ( std::pair<int, bool> post : getChanIndices(a.PostSynChannel) ) {
             if ( !post.second )
@@ -612,7 +612,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Syna
                 if ( !pre.second )
                     continue;
                 tmp.PreSynChannel = pre.first;
-                inst.push_back(T(&p, this, &tmp));
+                inst.push_back(T(&p, this, tmp));
             }
         }
     } else {
@@ -628,7 +628,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Syna
                     if ( !pre.second )
                         continue;
                     tmp.PreSynChannel = pre.first;
-                    inst.push_back(T(&p, this, &tmp));
+                    inst.push_back(T(&p, this, tmp));
                 }
             }
         }
@@ -640,7 +640,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
 {
     std::vector<GapJunctionAssignment> vec;
     GapJunctionAssignment tmp;
-    tmp.active = true;
+    tmp.actP = &a.active;
     if ( a.postInChannel == a.postOutChannel ) {
         for ( std::pair<int, bool> post : getChanIndices(a.postInChannel) ) {
             if ( !post.second )
@@ -670,7 +670,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
             for ( GapJunctionAssignment &tmp : vec ) {
                 tmp.preInChannel = pre.first;
                 tmp.preOutChannel = pre.first;
-                inst.push_back(T(&p, this, &tmp));
+                inst.push_back(T(&p, this, tmp));
             }
         }
     } else {
@@ -683,7 +683,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
                 for ( GapJunctionAssignment &tmp : vec ) {
                     tmp.preInChannel = in.first;
                     tmp.preOutChannel = out.first;
-                    inst.push_back(T(&p, this, &tmp));
+                    inst.push_back(T(&p, this, tmp));
                 }
             }
         }

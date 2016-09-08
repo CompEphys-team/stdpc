@@ -3,11 +3,12 @@
 #include <cmath>
 #include "DCThread.h"
     
-DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *a) :
+DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment a) :
     p(inp),
-    pre(t->getInChan(a->PreSynChannel)),
-    post(t->getInChan(a->PostSynChannel)),
-    out(t->getOutChan(a->OutSynChannel)),
+    pre(t->getInChan(a.PreSynChannel)),
+    post(t->getInChan(a.PostSynChannel)),
+    out(t->getOutChan(a.OutSynChannel)),
+    a(a),
     S(0.0),
     tlast(-1.0e10),
     g(p->gSyn)
@@ -68,6 +69,9 @@ double DestexheSyn::gFilter(double ingr)
 void DestexheSyn::currentUpdate(double t, double dt)
 {
   static double rt, dS;
+
+  if ( !p->active || !*a.actP )
+      return;
   
   // calculate synaptic current
   rt= t - tlast;

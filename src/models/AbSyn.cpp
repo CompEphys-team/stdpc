@@ -3,11 +3,12 @@
 #include <cmath>
 #include "DCThread.h"
     
-abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *a) :
+abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment a) :
     p(inp),
-    pre(t->getInChan(a->PreSynChannel)),
-    post(t->getInChan(a->PostSynChannel)),
-    out(t->getOutChan(a->OutSynChannel)),
+    pre(t->getInChan(a.PreSynChannel)),
+    post(t->getInChan(a.PostSynChannel)),
+    out(t->getOutChan(a.OutSynChannel)),
+    a(a),
     S(0.0),
     R(0.0),
     g(p->gSyn)
@@ -68,6 +69,9 @@ double abSyn::gFilter(double ingr)
 void abSyn::currentUpdate(double t, double dt)
 {
   static double dS, dR;
+
+  if ( !p->active || !*a.actP )
+      return;
   
   // calculate synaptic current
   dS= (1.0 - S)*p->aS*R - S*p->bS;

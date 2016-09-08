@@ -3,11 +3,12 @@
 #include <cmath>
 #include "DCThread.h"
     
-ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment *a) :
+ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment a) :
     p(inp),
-    pre(t->getInChan(a->PreSynChannel)),
-    post(t->getInChan(a->PostSynChannel)),
-    out(t->getOutChan(a->OutSynChannel)),
+    pre(t->getInChan(a.PreSynChannel)),
+    post(t->getInChan(a.PostSynChannel)),
+    out(t->getOutChan(a.OutSynChannel)),
+    a(a),
     Sinf(0.0),
     S(0.0),
     hinf(1.0),
@@ -74,6 +75,9 @@ void ChemSyn::currentUpdate(double t, double dt)
 {
   static double tmp, V;
   
+  if ( !p->active || !*a.actP )
+      return;
+
   // calculate synaptic current
   tmp= (1.0 - Sinf)*p->tauSyn;
   //  if (tmp < 1e-8) tmp= 1e-8;

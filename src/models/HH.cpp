@@ -1,7 +1,7 @@
 #include "HH.h"
 #include "DCThread.h"
 
-HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *a) :
+HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment a) :
     p(inp),
     m(0.0),
     h(0.9),
@@ -9,10 +9,10 @@ HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment *a) :
     taum(p->taum),
     hinf(0.9),
     tauh(p->tauh),
-    pre(t->getInChan(a->VChannel)),
-    out(t->getOutChan(a->IChannel))
+    pre(t->getInChan(a.VChannel)),
+    out(t->getOutChan(a.IChannel)),
+    a(a)
 {
-
     if (p->LUTables) {
       theExp= &expLU;
       expLU.require(-1.0, 0.0, 0.001);
@@ -31,7 +31,7 @@ void HH::currentUpdate(double t, double dt)
   static double V, tmp;
   static int i;
     
-  if (p->active) {
+  if (p->active && *a.actP) {
     V= pre->V;
     if (p->mExpo > 0) {
       // linear Euler:
