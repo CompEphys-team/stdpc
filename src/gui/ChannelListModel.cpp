@@ -216,7 +216,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     if ( displayFlags & SpikeGen ) {
         if ( row == offset ) {
             switch ( role ) {
-            case Qt::DisplayRole:   return QString("SG");
+            case Qt::DisplayRole:   return QString("Spike generator");
             case Qt::UserRole:      return (int) CHAN_SG;
             case Qt::UserRole + 1:  return QVariant(true);
             }
