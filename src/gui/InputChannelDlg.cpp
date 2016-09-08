@@ -222,14 +222,7 @@ void InputChannelDlg::importData()
 
 void InputChannelDlg::accept()
 {
-  int chns[ChnNo];
-  int chN= 0;
-  
   exportData();
-  for (int i= 0; i < ChnNo; i++) {
-    if (act[i]->checkState() > 0) chns[chN++]= i;
-  }
-  emit updateInChn(chN, chns);
   QDialog::accept();
 }
 

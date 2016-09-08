@@ -44,9 +44,6 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
   private:
      bool initial;
      void clearAll();
-     
-  signals:
-     void updateInChn(int, int*);
 }; 
 
 #endif

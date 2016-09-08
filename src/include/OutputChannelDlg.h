@@ -42,9 +42,6 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
   private:
      bool initial;
      void clearAll();
-
-  signals:       
-     void updateOutChn(int, int *);
 }; 
 
 #endif
