@@ -48,7 +48,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>330</y>
+             <y>340</y>
              <width>301</width>
              <height>161</height>
             </rect>
@@ -225,7 +225,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>510</y>
+             <y>520</y>
              <width>221</width>
              <height>231</height>
             </rect>
@@ -402,7 +402,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>510</y>
+             <y>520</y>
              <width>301</width>
              <height>231</height>
             </rect>
@@ -589,7 +589,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>130</y>
+             <y>140</y>
              <width>301</width>
              <height>181</height>
             </rect>
@@ -765,7 +765,7 @@
              <x>10</x>
              <y>50</y>
              <width>541</width>
-             <height>71</height>
+             <height>81</height>
             </rect>
            </property>
            <property name="title">
@@ -784,22 +784,6 @@
              <string>Output channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenInChannelNum_1">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>20</y>
-              <width>31</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>0</string>
-            </property>
-           </widget>
            <widget class="QLabel" name="label_5">
             <property name="geometry">
              <rect>
@@ -811,22 +795,6 @@
             </property>
             <property name="text">
              <string>Input channel</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="leGenOutChannelNum_1">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>20</y>
-              <width>31</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>0</string>
             </property>
            </widget>
            <widget class="QLabel" name="label_4">
@@ -862,29 +830,43 @@
             <property name="geometry">
              <rect>
               <x>30</x>
-              <y>40</y>
-              <width>231</width>
-              <height>17</height>
+              <y>50</y>
+              <width>221</width>
+              <height>21</height>
              </rect>
             </property>
             <property name="text">
-             <string>Output Compensated Voltage to Channel</string>
+             <string>Output compensated voltage to channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenCopyChannelNum_1">
+           <widget class="QComboBox" name="leGenInChannelNum_1">
             <property name="geometry">
              <rect>
-              <x>260</x>
-              <y>40</y>
-              <width>31</width>
-              <height>20</height>
+              <x>100</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
              </rect>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+           </widget>
+           <widget class="QComboBox" name="leGenOutChannelNum_1">
+            <property name="geometry">
+             <rect>
+              <x>250</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
-            <property name="text">
-             <string>0</string>
+           </widget>
+           <widget class="QComboBox" name="leGenCopyChannelNum_1">
+            <property name="geometry">
+             <rect>
+              <x>250</x>
+              <y>50</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
            </widget>
           </widget>
@@ -895,7 +877,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>330</y>
+             <y>340</y>
              <width>221</width>
              <height>161</height>
             </rect>
@@ -1061,7 +1043,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>130</y>
+             <y>140</y>
              <width>221</width>
              <height>181</height>
             </rect>
@@ -1118,7 +1100,7 @@
             <property name="geometry">
              <rect>
               <x>100</x>
-              <y>29</y>
+              <y>30</y>
               <width>31</width>
               <height>21</height>
              </rect>
@@ -1270,7 +1252,7 @@
              <x>10</x>
              <y>50</y>
              <width>541</width>
-             <height>71</height>
+             <height>81</height>
             </rect>
            </property>
            <property name="title">
@@ -1289,22 +1271,6 @@
              <string>Output channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenInChannelNum_2">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>20</y>
-              <width>31</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>1</string>
-            </property>
-           </widget>
            <widget class="QLabel" name="label_9">
             <property name="geometry">
              <rect>
@@ -1316,22 +1282,6 @@
             </property>
             <property name="text">
              <string>Input channel</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="leGenOutChannelNum_2">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>20</y>
-              <width>31</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>1</string>
             </property>
            </widget>
            <widget class="QLabel" name="label_10">
@@ -1367,29 +1317,43 @@
             <property name="geometry">
              <rect>
               <x>30</x>
-              <y>40</y>
-              <width>231</width>
-              <height>17</height>
+              <y>50</y>
+              <width>221</width>
+              <height>21</height>
              </rect>
             </property>
             <property name="text">
-             <string>Output Compensated Voltage to Channel</string>
+             <string>Output compensated voltage to channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenCopyChannelNum_2">
+           <widget class="QComboBox" name="leGenCopyChannelNum_2">
             <property name="geometry">
              <rect>
-              <x>260</x>
-              <y>40</y>
-              <width>31</width>
-              <height>20</height>
+              <x>250</x>
+              <y>50</y>
+              <width>61</width>
+              <height>22</height>
              </rect>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+           </widget>
+           <widget class="QComboBox" name="leGenOutChannelNum_2">
+            <property name="geometry">
+             <rect>
+              <x>250</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
-            <property name="text">
-             <string>0</string>
+           </widget>
+           <widget class="QComboBox" name="leGenInChannelNum_2">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
            </widget>
           </widget>
@@ -1397,7 +1361,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>130</y>
+             <y>140</y>
              <width>301</width>
              <height>181</height>
             </rect>
@@ -1571,7 +1535,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>510</y>
+             <y>520</y>
              <width>301</width>
              <height>231</height>
             </rect>
@@ -1761,7 +1725,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>510</y>
+             <y>520</y>
              <width>221</width>
              <height>231</height>
             </rect>
@@ -1941,7 +1905,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>130</y>
+             <y>140</y>
              <width>221</width>
              <height>181</height>
             </rect>
@@ -2096,7 +2060,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>330</y>
+             <y>340</y>
              <width>301</width>
              <height>161</height>
             </rect>
@@ -2273,7 +2237,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>330</y>
+             <y>340</y>
              <width>221</width>
              <height>161</height>
             </rect>
@@ -2440,7 +2404,7 @@
              <x>10</x>
              <y>50</y>
              <width>541</width>
-             <height>71</height>
+             <height>81</height>
             </rect>
            </property>
            <property name="title">
@@ -2459,22 +2423,6 @@
              <string>Output channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenInChannelNum_3">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>20</y>
-              <width>31</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>2</string>
-            </property>
-           </widget>
            <widget class="QLabel" name="label_57">
             <property name="geometry">
              <rect>
@@ -2486,22 +2434,6 @@
             </property>
             <property name="text">
              <string>Input channel</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="leGenOutChannelNum_3">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>20</y>
-              <width>31</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>2</string>
             </property>
            </widget>
            <widget class="QLabel" name="label_58">
@@ -2537,29 +2469,43 @@
             <property name="geometry">
              <rect>
               <x>30</x>
-              <y>40</y>
-              <width>231</width>
-              <height>17</height>
+              <y>50</y>
+              <width>221</width>
+              <height>21</height>
              </rect>
             </property>
             <property name="text">
-             <string>Output Compensated Voltage to Channel</string>
+             <string>Output compensated voltage to channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenCopyChannelNum_3">
+           <widget class="QComboBox" name="leGenCopyChannelNum_3">
             <property name="geometry">
              <rect>
-              <x>260</x>
-              <y>40</y>
-              <width>31</width>
-              <height>20</height>
+              <x>250</x>
+              <y>50</y>
+              <width>61</width>
+              <height>22</height>
              </rect>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+           </widget>
+           <widget class="QComboBox" name="leGenOutChannelNum_3">
+            <property name="geometry">
+             <rect>
+              <x>250</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
-            <property name="text">
-             <string>0</string>
+           </widget>
+           <widget class="QComboBox" name="leGenInChannelNum_3">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
            </widget>
           </widget>
@@ -2567,7 +2513,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>130</y>
+             <y>140</y>
              <width>301</width>
              <height>181</height>
             </rect>
@@ -2741,7 +2687,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>510</y>
+             <y>520</y>
              <width>301</width>
              <height>231</height>
             </rect>
@@ -2931,7 +2877,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>510</y>
+             <y>520</y>
              <width>221</width>
              <height>231</height>
             </rect>
@@ -3108,7 +3054,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>330</y>
+             <y>340</y>
              <width>301</width>
              <height>161</height>
             </rect>
@@ -3285,7 +3231,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>330</y>
+             <y>340</y>
              <width>221</width>
              <height>161</height>
             </rect>
@@ -3401,7 +3347,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>130</y>
+             <y>140</y>
              <width>221</width>
              <height>181</height>
             </rect>
@@ -3525,32 +3471,32 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
-          </widget>
-          <widget class="QLabel" name="label_77">
-           <property name="geometry">
-            <rect>
-             <x>110</x>
-             <y>190</y>
-             <width>41</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>I_min</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_78">
-           <property name="geometry">
-            <rect>
-             <x>110</x>
-             <y>160</y>
-             <width>31</width>
-             <height>20</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>I_max</string>
-           </property>
+           <widget class="QLabel" name="label_77">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>60</y>
+              <width>41</width>
+              <height>16</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>I_min</string>
+            </property>
+           </widget>
+           <widget class="QLabel" name="label_78">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>30</y>
+              <width>31</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>I_max</string>
+            </property>
+           </widget>
           </widget>
          </widget>
          <widget class="QWidget" name="electrode4">
@@ -3610,7 +3556,7 @@
              <x>10</x>
              <y>50</y>
              <width>541</width>
-             <height>71</height>
+             <height>81</height>
             </rect>
            </property>
            <property name="title">
@@ -3629,22 +3575,6 @@
              <string>Output channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenInChannelNum_4">
-            <property name="geometry">
-             <rect>
-              <x>110</x>
-              <y>20</y>
-              <width>31</width>
-              <height>21</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>3</string>
-            </property>
-           </widget>
            <widget class="QLabel" name="label_90">
             <property name="geometry">
              <rect>
@@ -3656,22 +3586,6 @@
             </property>
             <property name="text">
              <string>Input channel</string>
-            </property>
-           </widget>
-           <widget class="QLineEdit" name="leGenOutChannelNum_4">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>20</y>
-              <width>31</width>
-              <height>20</height>
-             </rect>
-            </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>3</string>
             </property>
            </widget>
            <widget class="QLabel" name="label_91">
@@ -3707,29 +3621,43 @@
             <property name="geometry">
              <rect>
               <x>30</x>
-              <y>40</y>
-              <width>231</width>
-              <height>17</height>
+              <y>50</y>
+              <width>221</width>
+              <height>21</height>
              </rect>
             </property>
             <property name="text">
-             <string>Output Compensated Voltage to Channel</string>
+             <string>Output compensated voltage to channel</string>
             </property>
            </widget>
-           <widget class="QLineEdit" name="leGenCopyChannelNum_4">
+           <widget class="QComboBox" name="leGenCopyChannelNum_4">
             <property name="geometry">
              <rect>
-              <x>260</x>
-              <y>40</y>
-              <width>31</width>
-              <height>20</height>
+              <x>250</x>
+              <y>50</y>
+              <width>61</width>
+              <height>22</height>
              </rect>
             </property>
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
+           </widget>
+           <widget class="QComboBox" name="leGenOutChannelNum_4">
+            <property name="geometry">
+             <rect>
+              <x>250</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
-            <property name="text">
-             <string>0</string>
+           </widget>
+           <widget class="QComboBox" name="leGenInChannelNum_4">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>20</y>
+              <width>61</width>
+              <height>22</height>
+             </rect>
             </property>
            </widget>
           </widget>
@@ -3737,7 +3665,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>130</y>
+             <y>140</y>
              <width>301</width>
              <height>181</height>
             </rect>
@@ -3911,7 +3839,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>510</y>
+             <y>520</y>
              <width>301</width>
              <height>231</height>
             </rect>
@@ -4101,7 +4029,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>510</y>
+             <y>520</y>
              <width>221</width>
              <height>231</height>
             </rect>
@@ -4278,7 +4206,7 @@
            <property name="geometry">
             <rect>
              <x>250</x>
-             <y>330</y>
+             <y>340</y>
              <width>301</width>
              <height>161</height>
             </rect>
@@ -4455,7 +4383,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>330</y>
+             <y>340</y>
              <width>221</width>
              <height>161</height>
             </rect>
@@ -4571,7 +4499,7 @@
            <property name="geometry">
             <rect>
              <x>10</x>
-             <y>130</y>
+             <y>140</y>
              <width>221</width>
              <height>181</height>
             </rect>
@@ -4708,19 +4636,19 @@
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
-          </widget>
-          <widget class="QLabel" name="label_107">
-           <property name="geometry">
-            <rect>
-             <x>110</x>
-             <y>160</y>
-             <width>31</width>
-             <height>20</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>I_max</string>
-           </property>
+           <widget class="QLabel" name="label_107">
+            <property name="geometry">
+             <rect>
+              <x>100</x>
+              <y>30</y>
+              <width>31</width>
+              <height>20</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>I_max</string>
+            </property>
+           </widget>
           </widget>
          </widget>
         </widget>

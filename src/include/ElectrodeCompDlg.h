@@ -7,6 +7,7 @@
 #include "ui_ElectrodeCompDlg.h"
 #include "ObjectDataTypes.h"
 #include "Calibrator.h"
+#include "ChannelListModel.h"
 
 
 namespace Ui {
@@ -20,6 +21,8 @@ class ElectrodeCompDlg : public QDialog, private Ui::ElectrodeCompDlg
 
     private:
         int elecNum;
+
+        ChannelListModel *inChnModel, *outChnModel;
 
         //------------------------------------------------------//
         // Objects to store the GUI elements of the tabs
@@ -35,11 +38,11 @@ class ElectrodeCompDlg : public QDialog, private Ui::ElectrodeCompDlg
 
             // copy channel
             QCheckBox *compVCopyOn[MAX_ELECTRODE_NO];
-            QLineEdit *compVCopyChannel[MAX_ELECTRODE_NO];
+            QComboBox *compVCopyChannel[MAX_ELECTRODE_NO];
             // General group box
             QLineEdit *leGenSamplingRate[MAX_ELECTRODE_NO];
-            QLineEdit *leGenInChannelNum[MAX_ELECTRODE_NO];
-            QLineEdit *leGenOutChannelNum[MAX_ELECTRODE_NO];
+            QComboBox *leGenInChannelNum[MAX_ELECTRODE_NO];
+            QComboBox *leGenOutChannelNum[MAX_ELECTRODE_NO];
 
             // Electrode measurement group box
             QLineEdit *leElecMaxCurrent[MAX_ELECTRODE_NO];

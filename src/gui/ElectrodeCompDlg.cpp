@@ -9,9 +9,14 @@
 
 
 ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
-    QDialog(parent)
+    QDialog(parent),
+    inChnModel(new ChannelListModel(ChannelListModel::AnalogIn, this)),
+    outChnModel(new ChannelListModel(ChannelListModel::AnalogOut, this))
 {
     setupUi(this);
+
+    connect(parent, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
+    connect(parent, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
 
     calibrator = new Calibrator();
 
@@ -26,11 +31,15 @@ ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
 
         // compensated voltage checkbox
         compVCopyOn[elecNum]= electrodeTabs->widget(elecNum)->findChild<QCheckBox *>(QString("CopyChannelCheckBox_")+QString::number(elecNum+1));
-        compVCopyChannel[elecNum]= electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenCopyChannelNum_")+QString::number(elecNum+1));
+        compVCopyChannel[elecNum]= electrodeTabs->widget(elecNum)->findChild<QComboBox *>(QString("leGenCopyChannelNum_")+QString::number(elecNum+1));
+        outChnModel->subordinate(compVCopyChannel[elecNum]);
+
         // General group box
         leGenSamplingRate[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenSamplingRate_")+QString::number(elecNum+1));
-        leGenInChannelNum[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenInChannelNum_")+QString::number(elecNum+1));
-        leGenOutChannelNum[elecNum] = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leGenOutChannelNum_")+QString::number(elecNum+1));
+        leGenInChannelNum[elecNum]  = electrodeTabs->widget(elecNum)->findChild<QComboBox *>(QString("leGenInChannelNum_")+QString::number(elecNum+1));
+        leGenOutChannelNum[elecNum] = electrodeTabs->widget(elecNum)->findChild<QComboBox *>(QString("leGenOutChannelNum_")+QString::number(elecNum+1));
+        inChnModel->subordinate(leGenInChannelNum[elecNum]);
+        outChnModel->subordinate(leGenOutChannelNum[elecNum]);
 
         // Electrode measurement group box
         leElecMaxCurrent[elecNum]   = electrodeTabs->widget(elecNum)->findChild<QLineEdit *>(QString("leElecMaxCurrent_")+QString::number(elecNum+1));
@@ -108,11 +117,11 @@ void ElectrodeCompDlg::exportData()
 
         // copy channel
         elecCalibPs[i].copyChnOn           = compVCopyOn[i]->isChecked();
-        elecCalibPs[i].copyChn             = compVCopyChannel[i]->text().toInt();
+        elecCalibPs[i].copyChn             = compVCopyChannel[i]->currentData().toInt();
         // General params
         elecCalibPs[i].samplingRate        = leGenSamplingRate[i]->text().toDouble() * 1e3; // kHz -> Hz
-        elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->text().toInt();
-        elecCalibPs[i].outputChannelNumber = leGenOutChannelNum[i]->text().toInt();
+        elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->currentData().toInt();
+        elecCalibPs[i].outputChannelNumber = leGenOutChannelNum[i]->currentData().toInt();
 
         // Calibration params
         elecCalibPs[i].hyperpolCurr       = leHyperpolCurr[i]->text().toDouble() * 1e-9; // nA -> A
@@ -144,15 +153,12 @@ void ElectrodeCompDlg::importData()
 
     // copy channel
     compVCopyOn[i]->setChecked(elecCalibPs[i].copyChnOn);
-    num.setNum(elecCalibPs[i].copyChn);
-    compVCopyChannel[i]->setText(num);
+    compVCopyChannel[i]->setCurrentIndex(outChnModel->index(elecCalibPs[i].copyChn));
     // General params
     num.setNum(elecCalibPs[i].samplingRate / 1e3);  // Hz -> kHz
     leGenSamplingRate[i]->setText(num);
-    num.setNum(elecCalibPs[i].inputChannelNumber);
-    leGenInChannelNum[i]->setText(num);
-    num.setNum(elecCalibPs[i].outputChannelNumber);
-    leGenOutChannelNum[i]->setText(num);
+    leGenInChannelNum[i]->setCurrentIndex(inChnModel->index(elecCalibPs[i].inputChannelNumber));
+    leGenOutChannelNum[i]->setCurrentIndex(outChnModel->index(elecCalibPs[i].outputChannelNumber));
 
     // Calibration params
     num.setNum(elecCalibPs[i].hyperpolCurr * 1e9);  // A -> nA

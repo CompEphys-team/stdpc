@@ -122,7 +122,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      initAP();
      LoadConfig();
 
-     SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual);
+     SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual, this);
      SGbdChannelModel->subordinate(SGbdChannelCombo);
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
