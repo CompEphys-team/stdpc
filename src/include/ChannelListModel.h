@@ -37,6 +37,7 @@ public:
 
     inline bool areAnalogsOffset() const { return offsetAnalogs; }
 
+    void subordinate(QComboBox *cb);
     static void fixComboBoxWidth(QComboBox *cb);
 
 public slots:

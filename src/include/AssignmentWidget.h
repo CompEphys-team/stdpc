@@ -32,12 +32,6 @@ public:
     explicit AssignmentWidgetQ(QWidget *parent = 0) : QTableWidget(parent) {}
     ~AssignmentWidgetQ() {}
 
-protected:
-    void fixWidth(QComboBox *box, ChannelListModel *model) {
-        connect(model, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(box);});
-        ChannelListModel::fixComboBoxWidth(box);
-    }
-
 protected slots:
     virtual void grow(bool = true) {}
 };

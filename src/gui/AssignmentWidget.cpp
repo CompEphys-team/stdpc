@@ -30,7 +30,7 @@ void AssignmentWidget<A>::exportData(std::vector<A> &p)
     for ( int i = 0; i < rowCount() - 1; i++ ) {
         a.active = boxes[i]->isChecked();
         for ( Dropdown<A> &d : drops )
-            a.*(d.channel) = d.combo[i]->currentData().toPoint().x();
+            a.*(d.channel) = d.combo[i]->currentData().toInt();
         p.push_back(a);
     }
 }
@@ -54,7 +54,6 @@ void AssignmentWidget<A>::importData(std::vector<A> const& p)
         addRow(i, box);
         for ( Dropdown<A> &d : drops ) {
             d.combo[i]->setCurrentIndex(d.model->index(a.*(d.channel)));
-            ChannelListModel::fixComboBoxWidth(d.combo[i]);
         }
         ++i;
     }
@@ -80,9 +79,8 @@ void AssignmentWidget<A>::addRow(int row, QCheckBox *box)
     int i = 1;
     for ( Dropdown<A> &d : drops ) {
         QComboBox *combo = new QComboBox(this);
-        combo->setModel(d.model);
+        d.model->subordinate(combo);
         setCellWidget(row, i++, combo);
-        fixWidth(combo, d.model);
         d.combo.insert(row, combo);
     }
 }

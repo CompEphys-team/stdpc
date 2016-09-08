@@ -189,6 +189,8 @@ int ChannelListModel::rowCount(const QModelIndex &) const
 QVariant ChannelListModel::data(const QModelIndex &index, int role) const
 {
     ChannelIndex dex;
+    if ( !index.isValid() && role == Qt::UserRole )
+        return (int) CHAN_NONE;
     if (!index.isValid() || !(role==Qt::DisplayRole || role>=Qt::UserRole))
         return QVariant();
 
@@ -197,7 +199,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( row == offset )
             switch ( role ) {
             case Qt::DisplayRole:   return QString();
-            case Qt::UserRole:      return QPoint(CHAN_NONE, Blank);
+            case Qt::UserRole:      return (int) CHAN_NONE;
             case Qt::UserRole + 1:  return QVariant(true);
             }
         offset++;
@@ -206,7 +208,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( row == offset )
             switch ( role ) {
             case Qt::DisplayRole:   return QString("None");
-            case Qt::UserRole:      return QPoint(CHAN_NONE, None);
+            case Qt::UserRole:      return (int) CHAN_NONE;
             case Qt::UserRole + 1:  return QVariant(true);
             }
         offset++;
@@ -215,7 +217,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( row == offset ) {
             switch ( role ) {
             case Qt::DisplayRole:   return QString("SG");
-            case Qt::UserRole:      return QPoint(CHAN_SG, SpikeGen);
+            case Qt::UserRole:      return (int) CHAN_SG;
             case Qt::UserRole + 1:  return QVariant(true);
             }
         }
@@ -229,7 +231,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
             dex.modelID = row-offset;
             switch ( role ) {
             case Qt::DisplayRole:   return QString("HH %1:all (model %1, all instances)").arg(row-offset+1);
-            case Qt::UserRole:      return QPoint(dex.toInt(), Prototype);
+            case Qt::UserRole:      return dex.toInt();
             case Qt::UserRole + 1:  return QVariant(HHNeuronp[row-offset].active);
             }
         }
@@ -245,7 +247,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
                 dex.instID = row-offset;
                 switch ( role ) {
                 case Qt::DisplayRole:   return QString("HH %1:%2 (model %1, instance %2)").arg(i+1).arg(row-offset+1);
-                case Qt::UserRole:      return QPoint(dex.toInt(), Virtual);
+                case Qt::UserRole:      return dex.toInt();
                 case Qt::UserRole + 1:  return QVariant(HHNeuronp[i].inst[row-offset].active);
                 }
             }
@@ -256,7 +258,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( row-offset < nAI )
             switch ( role ) {
             case Qt::DisplayRole:   return QString("AI %1").arg(row-offset);
-            case Qt::UserRole:      return QPoint(row-offset + offsetAnalogs*INCHN_OFFSET, AnalogIn);
+            case Qt::UserRole:      return row-offset + offsetAnalogs*INCHN_OFFSET;
             case Qt::UserRole + 1:  return QVariant(inChnp[row-offset].active);
             }
         offset += nAI;
@@ -265,13 +267,16 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( row-offset < nAO )
             switch ( role ) {
             case Qt::DisplayRole:   return QString("AO %1").arg(row-offset);
-            case Qt::UserRole:      return QPoint(row-offset + offsetAnalogs*OUTCHN_OFFSET, AnalogOut);
+            case Qt::UserRole:      return row-offset + offsetAnalogs*OUTCHN_OFFSET;
             case Qt::UserRole + 1:  return QVariant(outChnp[row-offset].active);
             }
         offset += nAO;
     }
 
-    return QVariant();
+    if ( role == Qt::UserRole )
+        return (int) CHAN_NONE;
+    else
+        return QVariant();
 }
 
 Qt::ItemFlags ChannelListModel::flags(const QModelIndex &index) const
@@ -352,8 +357,16 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
     return QModelIndex();
 }
 
+void ChannelListModel::subordinate(QComboBox *cb)
+{
+    cb->setModel(this);
+    connect(this, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(cb);});
+    fixComboBoxWidth(cb);
+}
+
 void ChannelListModel::fixComboBoxWidth(QComboBox *cb)
 {
+    Qt::TextElideMode old = cb->view()->textElideMode();
     cb->view()->setTextElideMode(Qt::ElideNone);
     int scroll = cb->count() <= cb->maxVisibleItems() ? 0 :
         QApplication::style()->pixelMetric(QStyle::PixelMetric::PM_ScrollBarExtent);
@@ -368,4 +381,5 @@ void ChannelListModel::fixComboBoxWidth(QComboBox *cb)
     }
 
     cb->view()->setMinimumWidth(scroll + max + 10);
+    cb->view()->setTextElideMode(old);
 }

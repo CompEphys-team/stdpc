@@ -123,8 +123,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadConfig();
 
      SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual);
-     SGbdChannelCombo->setModel(SGbdChannelModel);
-     connect(SGbdChannelModel, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(SGbdChannelCombo);});
+     SGbdChannelModel->subordinate(SGbdChannelCombo);
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      
@@ -408,7 +407,7 @@ void MyMainWindow::exportSGData()
   SGp.VRest= VRestE->text().toDouble()/1e3;
   
   SGp.bdType= BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= SGbdChannelCombo->currentData().toPoint().x();
+  SGp.bdChannel= SGbdChannelCombo->currentData().toInt();
   SGp.bdThresh= ThresholdE->text().toDouble()/1e3;
   SGp.bdNUnder= NUnderE->text().toInt();
   SGp.bdNOver= NOverE->text().toInt();

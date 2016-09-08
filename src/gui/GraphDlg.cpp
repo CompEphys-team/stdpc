@@ -32,9 +32,8 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
      ChannelCombo[i] = new QComboBox(this);
      ChannelCombo[i]->setObjectName(QString("ChannelCombo")+QString(i));
      ChannelCombo[i]->setGeometry(QRect(40, 40+30*i, 69, 22));
-     ChannelCombo[i]->setModel(clm);
+     clm->subordinate(ChannelCombo[i]);
      ChannelCombo[i]->setCurrentIndex(0);
-     connect(clm, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(ChannelCombo[i]);});
      MinE[i] = new QLineEdit(this);
      MinE[i]->setObjectName(QString("MinE")+QString(i));
      MinE[i]->setGeometry(QRect(140, 40+30*i, 48, 20));
@@ -62,14 +61,8 @@ void GraphDlg::exportData(graphData &p)
   double yfac[2]= { 1e3, 1e9 };
   for (int i= 0; i < 4; i++) {
     p.color[i]= clrCombo[i]->currentText();
-    QPoint chn(ChannelCombo[i]->currentData().toPoint());
-    if ( !chn.y() || chn.y() == ChannelListModel::None || chn.y() == ChannelListModel::Blank ) {
-        p.chn[i] = CHAN_NONE;
-        p.active[i] = false;
-    } else {
-        p.chn[i] = chn.x();
-        p.active[i] = true;
-    }
+    p.chn[i] = ChannelCombo[i]->currentData().toInt();
+    p.active[i] = p.chn[i]!=CHAN_NONE;
     p.yfac[i]= yfac[UnitCombo[i]->currentIndex()];
     p.miny[i]= MinE[i]->text().toDouble()/p.yfac[i];
     p.maxy[i]= MaxE[i]->text().toDouble()/p.yfac[i];
