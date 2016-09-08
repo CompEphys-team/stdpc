@@ -19,7 +19,6 @@ class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
   public slots:
      void accept();
      void reject();
-     void appear();
 
 }; 
 

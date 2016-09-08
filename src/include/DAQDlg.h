@@ -9,9 +9,6 @@ class DAQDlg : public QDialog
 
   public:
      DAQDlg(QWidget *parent= 0);
-          
-  public slots:
-    virtual void appear()= 0;
     
   signals:
     void reinitDAQ();

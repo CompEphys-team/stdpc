@@ -29,21 +29,12 @@ void DigiDataDlg::accept()
 {
   bool change= exportData(DigiDatap);
   if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  QDialog::accept();
 }
 
 void DigiDataDlg::reject()
 {
-//  importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
-}
-
-void DigiDataDlg::appear()
-{
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+  importData(DigiDatap);
+  QDialog::reject();
 }
 

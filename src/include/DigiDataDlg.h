@@ -19,7 +19,6 @@ class DigiDataDlg : public DAQDlg, private Ui::DigiDataDlg
   public slots:
     void accept();
     void reject();
-    void appear();
     
 }; 
 

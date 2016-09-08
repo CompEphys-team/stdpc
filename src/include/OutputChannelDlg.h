@@ -38,7 +38,6 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
   public slots:
      void accept();
      void reject();
-     void appear();
      
   private:
      bool initial;

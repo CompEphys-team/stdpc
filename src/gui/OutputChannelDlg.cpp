@@ -132,7 +132,7 @@ void OutputChannelDlg::init(DAQ *board)
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
-  this->setGeometry(geo);
+  this->resize(geo.size());
   geo= buttonBox->geometry();
   geo.moveBottom(Y0+ChnNo*DY+50);
   buttonBox->setGeometry(geo);
@@ -183,21 +183,12 @@ void OutputChannelDlg::accept()
   for (int i= 0; i < ChnNo; i++) {
     if (act[i]->checkState() > 0) chns[chN++]= i;
   }
-  updateOutChn(chN, chns);
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  emit updateOutChn(chN, chns);
+  QDialog::accept();
 }
 
 void OutputChannelDlg::reject()
 {
   importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
-}
-
-void OutputChannelDlg::appear()
-{
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+  QDialog::reject();
 }

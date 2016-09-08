@@ -37,21 +37,12 @@ void SimulDAQDlg::accept()
 {
   bool change= exportData(SDAQp);
   if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  QDialog::accept();
 }
 
 void SimulDAQDlg::reject()
 {
   importData(SDAQp);
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
-}
-
-void SimulDAQDlg::appear()
-{
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+  QDialog::reject();
 }
 

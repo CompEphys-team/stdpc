@@ -22,21 +22,12 @@ void NIDAQDlg::accept()
 {
   bool change= exportData(NIDAQp);
   if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  QDialog::accept();
 }
 
 void NIDAQDlg::reject()
 {
-//  importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
-}
-
-void NIDAQDlg::appear()
-{
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+  importData(NIDAQp);
+  QDialog::reject();
 }
 

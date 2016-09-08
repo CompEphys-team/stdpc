@@ -131,11 +131,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(actionExit, SIGNAL(triggered()), SLOT(close()));
      connect(actionDAQ, SIGNAL(triggered()), SLOT(showDAQDlg()));
-     connect(actionInput_channels, SIGNAL(triggered()), inChnDlg, SLOT(appear()));
-     connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(appear()));
-     connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(show()));
-     connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(show()));
-     connect(actionHH_models, SIGNAL(triggered()), hhModelDlg, SLOT(show()));
+     connect(actionInput_channels, SIGNAL(triggered()), inChnDlg, SLOT(open()));
+     connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(open()));
+     connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(open()));
+     connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
+     connect(actionHH_models, SIGNAL(triggered()), hhModelDlg, SLOT(open()));
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
@@ -311,12 +311,8 @@ void MyMainWindow::StartButClicked()
   actionUnload_Script->setEnabled(false);
   actionExport_Log->setEnabled(false);
   actionExit->setEnabled(false);
-  actionInput_channels->setEnabled(false);
-  actionOutput_channels->setEnabled(false);
-  actionDAQ->setEnabled(false);
   actionSave_config->setEnabled(false);
-  actionElectrode_setup->setEnabled(false);
-  actionData_saving->setEnabled(false);
+  menuConfig->setEnabled(false);
   DAQComboBox->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -340,12 +336,8 @@ void MyMainWindow::StopButClicked()
   actionUnload_Script->setEnabled(DCT->scripting);
   actionExport_Log->setEnabled(true);
   actionExit->setEnabled(true);
-  actionInput_channels->setEnabled(true);
-  actionOutput_channels->setEnabled(true);
-  actionDAQ->setEnabled(true);
   actionSave_config->setEnabled(true);
-  actionElectrode_setup->setEnabled(true);
-  actionData_saving->setEnabled(true);
+  menuConfig->setEnabled(true);
   DAQComboBox->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -469,7 +461,7 @@ void MyMainWindow::updateSGInChn(int chN, int *chns)
 
 void MyMainWindow::showDAQDlg()
 {
-  theDAQDlg->appear();
+  theDAQDlg->open();
 }
 
 void MyMainWindow::SaveConfig()

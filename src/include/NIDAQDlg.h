@@ -19,7 +19,6 @@ class NIDAQDlg : public DAQDlg, private Ui::NIDAQDlg
   public slots:
     void accept();
     void reject();
-    void appear();
     
 }; 
 

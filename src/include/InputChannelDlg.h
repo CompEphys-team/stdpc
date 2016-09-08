@@ -40,7 +40,6 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
   public slots:
     void accept();
     void reject();
-    void appear();
       
   private:
      bool initial;
