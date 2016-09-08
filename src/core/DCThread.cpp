@@ -385,6 +385,7 @@ void DCThread::run()
          if (SGp.active) { // SpkGen active
            SG.VUpdate(t, dt);
          }
+         inChn[inIdx[inNo]].active = SGp.active;
          for (i= 0; i <= inNo; i++) {
            inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
          }
