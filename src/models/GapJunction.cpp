@@ -14,7 +14,8 @@ GapJunction::GapJunction(GJunctData *inp, DCThread *t, GapJunctionAssignment a) 
 
 void GapJunction::currentUpdate(double t, double dt)
 {
-  if ( p->active && *a.actP ) {
+  // Ignore !outpre->active, as this channel is optional
+  if ( p->active && *a.actP && pre->active && post->active /*&& outpre->active*/ && outpost->active ) {
       // calculate synaptic current
       I= p->gSyn * (pre->V - post->V);
       if ((p->type == 1) && (I < 0.0)) {

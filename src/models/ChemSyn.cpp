@@ -75,7 +75,7 @@ void ChemSyn::currentUpdate(double t, double dt)
 {
   static double tmp, V;
   
-  if ( !p->active || !*a.actP )
+  if ( !p->active || !*a.actP || !pre->active || !post->active || !out->active )
       return;
 
   // calculate synaptic current

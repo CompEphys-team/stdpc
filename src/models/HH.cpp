@@ -31,7 +31,7 @@ void HH::currentUpdate(double t, double dt)
   static double V, tmp;
   static int i;
     
-  if (p->active && *a.actP) {
+  if (p->active && *a.actP && pre->active && out->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // linear Euler:

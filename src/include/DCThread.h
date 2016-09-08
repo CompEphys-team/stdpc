@@ -39,7 +39,7 @@ private:
 
      inChannel *getInChan(int idx);
      outChannel *getOutChan(int idx);
-     std::vector<std::pair<int, bool> > getChanIndices(int index);
+     std::vector<int> getChanIndices(int index);
 
      template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, CurrentAssignment &);

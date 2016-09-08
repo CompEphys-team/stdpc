@@ -12,16 +12,15 @@ HHNeuron::HHNeuron(HHNeuronData *inp, vInstData *inst) :
 
 void HHNeuron::update(double t, double dt)
 {
-    if ( instp->active ) {
-        double I = out.I + p->gLeak * (p->ELeak - V);
-        V += I * dt / p->C;
-    }
+    double I = out.I + p->gLeak * (p->ELeak - V);
+    V += I * dt / p->C;
     in.V = V;
 }
 
 HHNeuronModel::HHNeuronModel(HHNeuronData *p) :
     p(p)
 {
+    inst.reserve(p->inst.size());
     for ( vInstData &a : p->inst )
         inst.push_back(HHNeuron(p, &a));
 }
@@ -30,17 +29,18 @@ void HHNeuronModel::updateNeurons(double t, double dt)
 {
     if ( p->active )
         for ( HHNeuron &n : inst )
-            n.update(t, dt);
+            if ( n.instp->active)
+                n.update(t, dt);
 }
 
 void HHNeuronModel::updateChannels(double t)
 {
-    if ( !p->active )
-        return;
     for ( HHNeuron &neuron : inst ) {
-        neuron.in.V = neuron.V + neuron.instp->inChn.bias;
-        neuron.out.I = neuron.instp->outChn.bias;
-        neuron.in.spike_detect(t);
+        if ( (neuron.in.active = neuron.out.active = p->active && neuron.instp->active) ) {
+            neuron.in.V = neuron.V + neuron.instp->inChn.bias;
+            neuron.out.I = neuron.instp->outChn.bias;
+            neuron.in.spike_detect(t);
+        }
     }
 }
 

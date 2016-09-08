@@ -1,6 +1,6 @@
 #include "Channels.h"
 
-inChannel::inChannel() { 
+inChannel::inChannel() : active(true) {
 }
 
 void inChannel::init(inChnData *inp)
@@ -32,7 +32,7 @@ void inChannel::spike_detect(double t)
   }
 }
 
-outChannel::outChannel() 
+outChannel::outChannel() : active(true)
 {
   I= 0.0;
 }
