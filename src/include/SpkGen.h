@@ -45,7 +45,7 @@ class SpkGen: public QObject
   public:
     SpkGen();
     virtual ~SpkGen();
-    void init(SGData *, short int, short int *, inChannel *);
+    void init(SGData *, inChannel *VChn, DCThread *);
     void VUpdate(double, double);
     double VSpike(double);
 

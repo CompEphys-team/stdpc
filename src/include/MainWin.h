@@ -67,7 +67,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      SimulDAQDlg *SDAQDlg;
      HHModelDlg *hhModelDlg;
 
-     ChannelListModel *inChnModel, *outChnModel;
+     ChannelListModel *inChnModel, *outChnModel, *SGbdChannelModel;
 
 #ifdef NATIONAL_INSTRUMENTS     
      NIDAQDlg *NDQDlg;
@@ -78,7 +78,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      
   public slots:
      void DAQSetup();
-     void updateSGInChn(int, int*);
      void CloseToLimitWarning(QString, int, double, double, double);
      void DisplayAbout();
 

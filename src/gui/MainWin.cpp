@@ -122,6 +122,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      initAP();
      LoadConfig();
 
+     SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual);
+     SGbdChannelCombo->setModel(SGbdChannelModel);
+     connect(SGbdChannelModel, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(SGbdChannelCombo);});
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      
@@ -152,11 +155,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(outChnDlg, SIGNAL(updateOutChn(int,int*)), this, SIGNAL(channelsChanged()));
      connect(inChnDlg, SIGNAL(updateInChn(int,int*)), this, SIGNAL(channelsChanged()));
-     connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
      connect(hhModelDlg, SIGNAL(accepted()), this, SIGNAL(channelsChanged()));
 
      connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
+     connect(this, SIGNAL(channelsChanged()), SGbdChannelModel, SLOT(updateChns()));
 
      connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
      connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
@@ -253,7 +256,7 @@ void MyMainWindow::SGMethodChanged()
   int index2= BurstDetectionCombo->currentIndex();
 
   SGSave->setEnabled(false);
-  SGLUTableCombo->setEditable(false);
+  SGLUTableCombo->setEnabled(false);
   SpikesL->setEnabled(false);              
   VSpikeE->setEnabled(false); VSpikeL->setEnabled(false); VSpikeU->setEnabled(false);
   WidthE->setEnabled(false); WidthL->setEnabled(false); WidthU->setEnabled(false);
@@ -277,7 +280,7 @@ void MyMainWindow::SGMethodChanged()
   else {
     if (index > 0) {
       SGSave->setEnabled(true);
-      SGLUTableCombo->setEditable(true);
+      SGLUTableCombo->setEnabled(true);
       SpikesL->setEnabled(true);              
       VSpikeE->setEnabled(true); VSpikeL->setEnabled(true); VSpikeU->setEnabled(true);
       WidthE->setEnabled(true); WidthL->setEnabled(true); WidthU->setEnabled(true);
@@ -405,7 +408,7 @@ void MyMainWindow::exportSGData()
   SGp.VRest= VRestE->text().toDouble()/1e3;
   
   SGp.bdType= BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= SGbdChannelCombo->currentIndex();
+  SGp.bdChannel= SGbdChannelCombo->currentData().toPoint().x();
   SGp.bdThresh= ThresholdE->text().toDouble()/1e3;
   SGp.bdNUnder= NUnderE->text().toInt();
   SGp.bdNOver= NOverE->text().toInt();
@@ -430,7 +433,7 @@ void MyMainWindow::importSGData()
   VRestE->setText(num);
   
   BurstDetectionCombo->setCurrentIndex(SGp.bdType);
-  SGbdChannelCombo->setCurrentIndex(SGp.bdChannel);
+  SGbdChannelCombo->setCurrentIndex(SGbdChannelModel->index(SGp.bdChannel));
   num.setNum(SGp.bdThresh*1e3);
   ThresholdE->setText(num);
   num.setNum(SGp.bdNUnder);
@@ -444,19 +447,6 @@ void MyMainWindow::importSGData()
   NumberE->setText(num);
   
   STInputFileE->setText(SGp.STInFName);
-}
-
-void MyMainWindow::updateSGInChn(int chN, int *chns) 
-{
-  QString lb;
-
-  while (SGbdChannelCombo->count() > 0) {
-    SGbdChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    SGbdChannelCombo->addItem(lb);
-  }
 }
 
 void MyMainWindow::showDAQDlg()

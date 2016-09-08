@@ -88,8 +88,13 @@ void DCThread::run()
    board->generate_scan_list(inNo, inIdx);
    board->generate_analog_out_list(outNo, outIdx);
 
+   hhNeuron.clear();
+   for ( HHNeuronData &p : HHNeuronp ) {
+       hhNeuron.push_back(HHNeuronModel(&p));
+   }
+
    if (SGp.active) {
-     SG.init(&SGp, inNo, inIdx, inChn);
+     SG.init(&SGp, &inChn[inIdx[inNo]], this);
      if (!SGp.active) {    
        message(QString("SpkGen: Could not open ")+SGp.STInFName+QString(" ... SpkGen disabled ..."));
        inChn[inIdx[inNo]].V= 0.0;
@@ -101,11 +106,7 @@ void DCThread::run()
    else {
      inChn[inIdx[inNo]].V= 0.0;
    }
-
-   hhNeuron.clear();
-   for ( HHNeuronData &p : HHNeuronp ) {
-       hhNeuron.push_back(HHNeuronModel(&p));
-   }
+   inChn[inIdx[inNo]].active = SGp.active;
    
    // set up the graphic display channels
    QString lb;

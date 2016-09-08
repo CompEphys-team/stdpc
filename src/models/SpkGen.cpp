@@ -1,5 +1,6 @@
 #include <cassert>
 #include "SpkGen.h"
+#include "DCThread.h"
 #include <cmath>
  
 #define SGOFF 0
@@ -27,15 +28,15 @@ SpkGen::~SpkGen()
 {
 }
 
-void SpkGen::init(SGData *inp, short int inNo, short int *inIdx, inChannel *inChn)
+void SpkGen::init(SGData *inp, inChannel *inChn, DCThread *dcthr)
 {
   QString buf;
   double st, t, V;
   int sn;
      
   p= inp;
-  VChn= &inChn[inIdx[inNo]];
-  bdChn= &inChn[inIdx[p->bdChannel]];
+  VChn= inChn;
+  bdChn= dcthr->getInChan(p->bdChannel);
   if (p->LUTables) {
     theExp= &expLU;
     expLU.require(-50.0, 50.0, 0.02);
