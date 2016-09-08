@@ -71,6 +71,8 @@ void DCThread::run()
      if (inChnp[i].active) {
        inIdx[inNo++]= i;
        inChn[i].init(&inChnp[i]);
+     } else {
+       inChn[i].active = false;
      }
    }
    inIdx[inNo]= board->inChnNo;  // this is for the Spike Generator
@@ -80,6 +82,8 @@ void DCThread::run()
      if (outChnp[i].active) {
        outIdx[outNo++]= i;
        outChn[i].init(&outChnp[i]);
+     } else {
+       outChn[i].active = false;
      }
    }
    outIdx[outNo]= board->outChnNo;  // this is for the None output
@@ -123,9 +127,9 @@ void DCThread::run()
                      ? &hhNeuron[dex.modelID].inst[dex.instID].in.V
                      : &hhNeuron[dex.modelID].inst[dex.instID].out.I;
          } else if ( dex.index >= OUTCHN_OFFSET ) {
-             grp[i][grpNo[i]] = &(outChn[outIdx[dex.index - OUTCHN_OFFSET]].I);
+             grp[i][grpNo[i]] = &(outChn[dex.index - OUTCHN_OFFSET].I);
          } else if ( dex.index >= INCHN_OFFSET ) {
-             grp[i][grpNo[i]] = &(inChn[inIdx[dex.index - INCHN_OFFSET]].V);
+             grp[i][grpNo[i]] = &(inChn[dex.index - INCHN_OFFSET].V);
          } else {
              continue; // Oughtn't happen
          }
@@ -528,7 +532,7 @@ inChannel *DCThread::getInChan(int idx)
     } else if ( dex.isSG ) {
         return &inChn[inIdx[inNo]];
     } else if ( idx >= 0 ) {
-        return &inChn[inIdx[idx]];
+        return &inChn[idx];
     }
     return nullptr;
 }
@@ -546,7 +550,7 @@ outChannel *DCThread::getOutChan(int idx)
     } else if ( dex.isNone ) {
         return &outChn[outIdx[outNo]];
     } else if ( idx >= 0 ) {
-        return &outChn[outIdx[idx]];
+        return &outChn[idx];
     }
     return nullptr;
 }
