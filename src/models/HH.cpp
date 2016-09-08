@@ -16,11 +16,14 @@ HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment a) :
     if (p->LUTables) {
       theExp= &expLU;
       expLU.require(-1.0, 0.0, 0.001);
+      theTanh= &tanhLU;
+      tanhLU.require(-50.0, 50.0, 0.02);
       theExpSigmoid= &expSigmoidLU;
       expSigmoidLU.require(-50.0, 50.0, 0.02);
     }
     else {
       theExp= &expFunc;
+      theTanh= &tanhFunc;
       theExpSigmoid= &expSigmoidFunc;
     }
 }
@@ -42,10 +45,10 @@ void HH::currentUpdate(double t, double dt)
       if (p->taumType == 0) {
           taum= p->taum - p->taumAmpl*(*theExpSigmoid)((V-p->Vtaum)/p->staum);
       } else if (p->taumType == 1) {
-          tmp= tanh((V-p->Vtaum)/p->staum);
+          tmp= (*theTanh)((V-p->Vtaum)/p->staum);
           taum= p->taum+p->taumAmpl*(1.0-tmp*tmp);
       } else if (p->taumType == 2) {
-          tmp= exp((V-p->Vtaum)/p->staum);
+          tmp= (*theExp)((V-p->Vtaum)/p->staum);
           taum= p->taum + p->taumAmpl*tmp*minf;
       } else if (p->taumType == 3) {
           taum = p->taum + p->taumAmpl*V*1e3;
@@ -65,10 +68,10 @@ void HH::currentUpdate(double t, double dt)
       if (p->tauhType == 0) {
           tauh= p->tauh - p->tauhAmpl*(*theExpSigmoid)((V-p->Vtauh)/p->stauh);
       } else if (p->tauhType == 1) {
-          tmp= tanh((V-p->Vtauh)/p->stauh);
+          tmp= (*theTanh)((V-p->Vtauh)/p->stauh);
           tauh= p->tauh+p->tauhAmpl*(1.0-tmp*tmp);
       } else if (p->tauhType == 2) {
-          tmp= exp((V-p->Vtauh)/p->stauh);
+          tmp= (*theExp)((V-p->Vtauh)/p->stauh);
           tauh= p->tauh + p->tauhAmpl*tmp*hinf;
       } else if (p->tauhType == 3) {
           tauh = p->tauh + p->tauhAmpl*V*1e3;

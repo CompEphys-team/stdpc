@@ -12,6 +12,7 @@ class HH
   private:
     mhHHData *p;
     stdpc::function *theExp;
+    stdpc::function *theTanh;
     stdpc::function *theExpSigmoid;
     
   protected:
