@@ -43,7 +43,9 @@ public:
 public slots:
     void updateChns();
 
-private:
+protected:
+    void updateCount(ChannelListModel *swapAgainst = nullptr);
+
     const int displayFlags;
     int size;
     int nAI, nAO, nPHH;

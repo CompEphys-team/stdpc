@@ -12,173 +12,99 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
 {
 }
 
-void ChannelListModel::updateChns()
+void ChannelListModel::updateCount(ChannelListModel *swapAgainst)
 {
-    int count=0, nAI=0, nAO=0, nPHH=0;
-    QVector<int> nVHH;
-    ChannelType reset = None;
-
-    // Reverse order (set reset to the highest changing list entry type) to allow switch/no-break below
-    if ( displayFlags & AnalogOut ) {
-        if ( (int)outChnp.size() != this->nAO )
-            reset = AnalogOut;
-        nAO = outChnp.size();
-    }
-    if ( displayFlags & AnalogIn ) {
-        if ( (int)inChnp.size() != this->nAI )
-            reset = AnalogIn;
-        nAI = inChnp.size();
-    }
-    if ( displayFlags & Virtual ) {
-        if ( (int) HHNeuronp.size() != this->nVHH.size() ) {
-            reset = Virtual;
+    if ( swapAgainst ) {
+        using std::swap;
+        swap(size, swapAgainst->size);
+        swap(nPHH, swapAgainst->nPHH);
+        swap(nVHH, swapAgainst->nVHH);
+        swap(nAI, swapAgainst->nAI);
+        swap(nAO, swapAgainst->nAO);
+    } else {
+        size = 0;
+        if ( displayFlags & Blank )
+            size++;
+        if ( displayFlags & None )
+            size++;
+        if ( displayFlags & SpikeGen )
+            size++;
+        if ( displayFlags & Prototype ) {
+            nPHH = HHNeuronp.size();
+            size += nPHH;
+        }
+        if ( displayFlags & Virtual ) {
             nVHH.clear();
             for ( HHNeuronData &model : HHNeuronp ) {
                 int s = model.inst.size();
                 nVHH.push_back(s);
-                count += s;
-            }
-        } else {
-            nVHH = this->nVHH;
-            for ( int i = 0; i < nVHH.size(); i++ ) {
-                int s = HHNeuronp[i].inst.size();
-                if ( s != nVHH[i] ) {
-                    reset = Virtual;
-                    nVHH[i] = s;
-                }
-                count += nVHH[i];
+                size += s;
             }
         }
+        if ( displayFlags & AnalogIn ) {
+            nAI = inChnp.size();
+            size += nAI;
+        }
+        if ( displayFlags & AnalogOut ) {
+            nAO = outChnp.size();
+            size += nAO;
+        }
     }
+}
+
+void ChannelListModel::updateChns()
+{
+    ChannelIndex dex;
+    QModelIndexList currentIdx, newIdx;
+    ChannelListModel newM(displayFlags);
+    newM.updateCount();
+
+    // Ignore always-unchanged Blank, None, SpikeGen
     if ( displayFlags & Prototype ) {
-        if ( (int) HHNeuronp.size() != this->nPHH )
-            reset = Prototype;
-        nPHH = HHNeuronp.size();
-    }
-    if ( displayFlags & SpikeGen )   count++;
-    if ( displayFlags & None )       count++;
-    if ( displayFlags & Blank )      count++;
-
-    if ( reset > None ) {
-        int i, j;
-        QModelIndexList from, to;
-        ChannelIndex dex;
-        emit layoutAboutToBeChanged();
-
-        // Collect all rows that are liable to change, starting with the first that does change
-        switch ( reset ) {
-        case Prototype:
-            dex.isPrototype = true;
-            dex.isVirtual = true;
-            dex.modelClass = ChannelIndex::HH;
-            for ( i = 0; i < this->nPHH; i++ ) {
-                dex.modelID = i;
-                from.append(index(dex, Prototype));
-            }
-        case Virtual:
-            dex.isPrototype = false;
-            dex.isVirtual = true;
-            dex.modelClass = ChannelIndex::HH;
-            for ( i = 0; i < this->nVHH.size(); i++ ) {
-                dex.modelID = i;
-                for ( j = 0; j < this->nVHH[i]; j++ ) {
-                    dex.instID = j;
-                    from.append(index(dex, Virtual));
-                }
-            }
-        case AnalogIn:
-            dex.isPrototype = false;
-            dex.isVirtual = false;
-            dex.inChn = true;
-            for ( i = 0; i < this->nAI; i++ ) {
-                dex.index = i + offsetAnalogs*INCHN_OFFSET;
-                from.append(index(dex, AnalogIn));
-            }
-        case AnalogOut:
-            dex.isPrototype = false;
-            dex.isVirtual = false;
-            dex.inChn = false;
-            for ( i = 0; i < this->nAO; i++ ) {
-                dex.index = i + offsetAnalogs*OUTCHN_OFFSET;
-                from.append(index(dex, AnalogOut));
-            }
-        default: break;
+        dex.isPrototype = true;
+        dex.isVirtual = true;
+        dex.modelClass = ChannelIndex::HH;
+        for ( dex.modelID = 0; dex.modelID < nPHH; dex.modelID++ ) {
+            currentIdx.append(index(dex, Prototype));
+            newIdx.append(createIndex(newM.index(dex, Prototype).row(), 0));
         }
-
-        // Update internals
-        size = count + nAI + nAO + nPHH;
-        swap(this->nAI, nAI);
-        swap(this->nAO, nAO);
-        swap(this->nPHH, nPHH);
-        swap(this->nVHH, nVHH);
-
-        // Create replacement indices
-        switch ( reset ) {
-        case Prototype:
-            dex.isPrototype = true;
-            dex.isVirtual = true;
-            dex.modelClass = ChannelIndex::HH;
-            for ( i = 0; i < min(nPHH, this->nPHH); i++ ) {
-                dex.modelID = i;
-                to.append(index(dex, Prototype));
-            }
-            for ( ; i < nPHH; i++ ) {
-                to.append(QModelIndex());
-            }
-        case Virtual:
-            dex.isPrototype = false;
-            dex.isVirtual = true;
-            dex.modelClass = ChannelIndex::HH;
-            for ( i = 0; i < min(nVHH.size(), this->nVHH.size()); i++ ) {
-                dex.modelID = i;
-                for ( j = 0; j < min(nVHH[i], this->nVHH[i]); j++ ) {
-                    dex.instID = j;
-                    to.append(index(dex, Virtual));
-                }
-                for ( ; j < nVHH[i]; j++ ) {
-                    dex.instID = j;
-                    to.append(QModelIndex());
-                }
-            }
-            for ( ; i < nVHH.size(); i++ ) {
-                dex.modelID = i;
-                for ( j = 0; j < nVHH[i]; j++ ) {
-                    dex.instID = j;
-                    to.append(QModelIndex());
-                }
-            }
-        case AnalogIn:
-            dex.isPrototype = false;
-            dex.isVirtual = false;
-            dex.inChn = true;
-            // For existing rows that continue to exist, use new placement
-            for ( i = 0; i < min(nAI, this->nAI); i++ ) {
-                dex.index = i + offsetAnalogs*INCHN_OFFSET;
-                to.append(index(dex, AnalogIn));
-            }
-            // For existing rows that are dropped, use an invalid index
-            for ( ; i < nAI; i++ ) {
-                to.append(QModelIndex());
-            }
-            // No action for new rows
-            // No break to allow items farther down the list to adjust, too
-        case AnalogOut:
-            dex.isPrototype = false;
-            dex.isVirtual = false;
-            dex.inChn = false;
-            for ( i = 0; i < min(nAO, this->nAO); i++ ) {
-                dex.index = i + offsetAnalogs*OUTCHN_OFFSET;
-                to.append(index(dex, AnalogOut));
-            }
-            for ( ; i < nAO; i++ ) {
-                to.append(QModelIndex());
-            }
-        default: break;
-        }
-
-        changePersistentIndexList(from, to);
-        emit layoutChanged();
     }
+    if ( displayFlags & Virtual ) {
+        dex.isPrototype = false;
+        dex.isVirtual = true;
+        dex.modelClass = ChannelIndex::HH;
+        for ( dex.modelID = 0; dex.modelID < nVHH.size(); dex.modelID++ ) {
+            for ( dex.instID = 0; dex.instID < nVHH[dex.modelID]; dex.instID++ ) {
+                currentIdx.append(index(dex, Virtual));
+                newIdx.append(createIndex(newM.index(dex, Virtual).row(), 0));
+            }
+        }
+    }
+    if ( displayFlags & AnalogIn ) {
+        dex.isPrototype = false;
+        dex.isVirtual = false;
+        dex.inChn = true;
+        for ( int i = 0; i < nAI; i++ ) {
+            dex.index = i + offsetAnalogs*INCHN_OFFSET;
+            currentIdx.append(index(dex, AnalogIn));
+            newIdx.append(createIndex(newM.index(dex, AnalogIn).row(), 0));
+        }
+    }
+    if ( displayFlags & AnalogOut ) {
+        dex.isPrototype = false;
+        dex.isVirtual = false;
+        dex.inChn = false;
+        for ( int i = 0; i < nAO; i++ ) {
+            dex.index = i + offsetAnalogs*OUTCHN_OFFSET;
+            currentIdx.append(index(dex, AnalogOut));
+            newIdx.append(createIndex(newM.index(dex, AnalogOut).row(), 0));
+        }
+    }
+
+    emit layoutAboutToBeChanged();
+    updateCount(&newM);
+    changePersistentIndexList(currentIdx, newIdx);
+    emit layoutChanged();
 }
 
 int ChannelListModel::rowCount(const QModelIndex &) const
@@ -330,26 +256,41 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
         }
         if ( displayFlags & Prototype ) {
             if ( type & Prototype && dex.modelClass == ChannelIndex::HH ) {
-                return createIndex(row + dex.modelID, 0);
+                if ( dex.modelID >= 0 && dex.modelID < nPHH )
+                    return createIndex(row + dex.modelID, 0);
+                else
+                    return QModelIndex();
             }
             row += nPHH;
         }
         if ( displayFlags & Virtual ) {
             for ( int i = 0; i < nVHH.size(); i++ ) {
-                if ( type & Virtual && dex.modelClass == ChannelIndex::HH && dex.modelID == i )
-                    return createIndex(row + dex.instID, 0);
+                if ( type & Virtual && dex.modelClass == ChannelIndex::HH && dex.modelID == i ) {
+                    if ( dex.instID >= 0 && dex.instID < nVHH[i] )
+                        return createIndex(row + dex.instID, 0);
+                    else
+                        return QModelIndex();
+                }
                 row += nVHH[i];
             }
         }
         if ( displayFlags & AnalogIn ) { // Are AIs in the list?
             if ( type & AnalogIn ) { // Is the requested index an AI?
-                return createIndex(row + dex.index - offsetAnalogs*INCHN_OFFSET, 0); // If so, return the appropriate index
+                int i = dex.index - offsetAnalogs*INCHN_OFFSET;
+                if ( i >= 0 && i < nAI ) // Is it valid?
+                    return createIndex(row + i, 0); // If so, return the appropriate index
+                else
+                    return QModelIndex();
             }
             row += nAI; // Else, increase the offset
         }
         if ( displayFlags & AnalogOut ) {
             if ( type & AnalogOut ) {
-                return createIndex(row + dex.index - offsetAnalogs*OUTCHN_OFFSET, 0);
+                int i = dex.index - offsetAnalogs*OUTCHN_OFFSET;
+                if ( i >= 0 && i < nAO )
+                    return createIndex(row + i, 0);
+                else
+                    return QModelIndex();
             }
             row += nAO;
         }
