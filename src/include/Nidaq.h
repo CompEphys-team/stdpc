@@ -4,7 +4,7 @@
 using namespace std;
 
 #include "Channels.h"
-#include "DAQ.h"
+#include "Daq.h"
 
 #include <NIDAQmx.h>
 

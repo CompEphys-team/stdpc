@@ -1040,7 +1040,7 @@ p, li { white-space: pre-wrap; }
      </font>
     </property>
     <property name="text">
-     <string>Data Acqisition Board</string>
+     <string>Data Acquisition Board</string>
     </property>
    </widget>
   </widget>
@@ -1184,7 +1184,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>ComponentTable</class>
    <extends>QTableWidget</extends>
-   <header>componenttable.h</header>
+   <header>ComponentTable.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

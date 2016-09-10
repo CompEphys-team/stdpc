@@ -77,7 +77,7 @@ HEADERS += \
     $$PWD/src/include/GapJunction.h \
     $$PWD/src/include/HH.h \
     $$PWD/src/include/AbHH.h \
-    $$PWD/src/include/DAQ.h \
+    $$PWD/src/include/Daq.h \
     $$PWD/src/include/SimulDAQ.h \
     $$PWD/src/include/SpkGen.h \
     $$PWD/src/include/Graph.h \
@@ -128,7 +128,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/GapJunction.cpp \
     $$PWD/src/models/HH.cpp \
     $$PWD/src/models/AbHH.cpp \
-    $$PWD/src/drivers/DAQ.cpp \
+    $$PWD/src/drivers/Daq.cpp \
     $$PWD/src/drivers/SimulDAQ.cpp \
     $$PWD/src/models/SpkGen.cpp \
     $$PWD/src/core/Graph.cpp \
@@ -160,11 +160,11 @@ nidaqmx {
     # NIDAQmx static build based on NI DAQmx 15.5.1
     DEPENDPATH += $$PWD/src/nidaqmx
     SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
-    $$PWD/src/drivers/NIDAQ.cpp
+    $$PWD/src/drivers/Nidaq.cpp
     FORMS += $$PWD/src/gui/NIDAQDlg.ui
 
     HEADERS += $$PWD/src/include/NIDAQDlg.h \
-    $$PWD/src/include/NIDAQ.h
+    $$PWD/src/include/Nidaq.h
 
     INCLUDEPATH += $$PWD/src/nidaqmx
     LIBS += $$PWD/src/nidaqmx/nidaqmx.a

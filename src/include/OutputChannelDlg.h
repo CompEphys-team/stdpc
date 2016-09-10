@@ -7,7 +7,7 @@
 #include <QLineEdit>
 #include <QComboBox>
 
-#include "ui_outputChannelDlg.h"
+#include "ui_OutputChannelDlg.h"
 #include "ObjectDataTypes.h"
 #include "DigiData.h"
 
