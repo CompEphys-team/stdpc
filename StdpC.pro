@@ -89,7 +89,7 @@ HEADERS += \
     $$PWD/src/include/AECChannel.h \
     $$PWD/src/include/KernelCalculator.h \
     $$PWD/src/include/Calibrator.h \
-    $$PWD/src/include/Datasaver.h \
+    $$PWD/src/include/DataSaver.h \
     $$PWD/src/include/DataSavingDlg.h \
     $$PWD/src/include/ObjectDataTypes.h \
     $$PWD/src/include/Global.h \
@@ -141,7 +141,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/AECChannel.cpp \
     $$PWD/src/core/KernelCalculator.cpp \
     $$PWD/src/core/Calibrator.cpp \
-    $$PWD/src/core/Datasaver.cpp \
+    $$PWD/src/core/DataSaver.cpp \
     $$PWD/src/gui/DataSavingDlg.cpp \
     $$PWD/src/gui/DestexheSynDlg.cpp \
     $$PWD/src/models/DestexheSyn.cpp \
