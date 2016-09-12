@@ -1142,7 +1142,7 @@
   <customwidget>
    <class>AssignmentWidget&lt;CurrentAssignment&gt;</class>
    <extends>QTableWidget</extends>
-   <header location="global">assignmentwidget.h</header>
+   <header location="global">AssignmentWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

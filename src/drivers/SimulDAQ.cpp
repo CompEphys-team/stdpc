@@ -1,4 +1,4 @@
-#include "SimulDaq.h"
+#include "SimulDAQ.h"
 #include "limits.h"
 
 

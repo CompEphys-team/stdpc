@@ -3,7 +3,7 @@
 
 
 #include <QAbstractButton>
-#include "ui_abSynDlg.h"
+#include "ui_AbSynDlg.h"
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"

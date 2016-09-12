@@ -1,4 +1,4 @@
-#include "DAQ.h"
+#include "Daq.h"
 
 DAQ::DAQ() 
 {

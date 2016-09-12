@@ -3,7 +3,7 @@
 
 #include "Pt_ioctl_tn.h"
 #include "Channels.h"
-#include "DAQ.h"
+#include "Daq.h"
 
 // we need to translate commands because we are using portTalkX instead of the Borland IOport
 

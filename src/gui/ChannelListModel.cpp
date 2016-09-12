@@ -301,7 +301,7 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
 void ChannelListModel::subordinate(QComboBox *cb)
 {
     cb->setModel(this);
-    connect(this, ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(cb);});
+    connect(this, &ChannelListModel::layoutChanged, [=](){ChannelListModel::fixComboBoxWidth(cb);});
     fixComboBoxWidth(cb);
 }
 

@@ -7,7 +7,7 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include "Global.h"
-#include "ui_mainwin.h"
+#include "ui_MainWin.h"
 #include "InputChannelDlg.h"
 #include "OutputChannelDlg.h"
 #include "SpikeTimeDlg.h"

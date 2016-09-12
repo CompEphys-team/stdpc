@@ -77,7 +77,7 @@ HEADERS += \
     $$PWD/src/include/GapJunction.h \
     $$PWD/src/include/HH.h \
     $$PWD/src/include/AbHH.h \
-    $$PWD/src/include/DAQ.h \
+    $$PWD/src/include/Daq.h \
     $$PWD/src/include/SimulDAQ.h \
     $$PWD/src/include/SpkGen.h \
     $$PWD/src/include/Graph.h \
@@ -89,7 +89,7 @@ HEADERS += \
     $$PWD/src/include/AECChannel.h \
     $$PWD/src/include/KernelCalculator.h \
     $$PWD/src/include/Calibrator.h \
-    $$PWD/src/include/Datasaver.h \
+    $$PWD/src/include/DataSaver.h \
     $$PWD/src/include/DataSavingDlg.h \
     $$PWD/src/include/ObjectDataTypes.h \
     $$PWD/src/include/Global.h \
@@ -128,7 +128,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/GapJunction.cpp \
     $$PWD/src/models/HH.cpp \
     $$PWD/src/models/AbHH.cpp \
-    $$PWD/src/drivers/DAQ.cpp \
+    $$PWD/src/drivers/Daq.cpp \
     $$PWD/src/drivers/SimulDAQ.cpp \
     $$PWD/src/models/SpkGen.cpp \
     $$PWD/src/core/Graph.cpp \
@@ -141,7 +141,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/AECChannel.cpp \
     $$PWD/src/core/KernelCalculator.cpp \
     $$PWD/src/core/Calibrator.cpp \
-    $$PWD/src/core/Datasaver.cpp \
+    $$PWD/src/core/DataSaver.cpp \
     $$PWD/src/gui/DataSavingDlg.cpp \
     $$PWD/src/gui/DestexheSynDlg.cpp \
     $$PWD/src/models/DestexheSyn.cpp \
@@ -160,11 +160,11 @@ nidaqmx {
     # NIDAQmx static build based on NI DAQmx 15.5.1
     DEPENDPATH += $$PWD/src/nidaqmx
     SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
-    $$PWD/src/drivers/NIDAQ.cpp
+    $$PWD/src/drivers/Nidaq.cpp
     FORMS += $$PWD/src/gui/NIDAQDlg.ui
 
     HEADERS += $$PWD/src/include/NIDAQDlg.h \
-    $$PWD/src/include/NIDAQ.h
+    $$PWD/src/include/Nidaq.h
 
     INCLUDEPATH += $$PWD/src/nidaqmx
     LIBS += $$PWD/src/nidaqmx/nidaqmx.a

@@ -6,7 +6,7 @@ using namespace std;
 #include <iostream>
 #include <fstream>
 #include <QList>
-#include "DAQ.h"
+#include "Daq.h"
 
 class SimulDAQ: public DAQ
 {
