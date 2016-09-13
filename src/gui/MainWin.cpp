@@ -6,61 +6,70 @@
 
 void MyMainWindow::DAQSetup()
 {
-  QString name;
   bool success;
   QMessageBox LoadMsg;
      
   DAQtype= DAQComboBox->currentIndex();
   DAQName= DAQComboBox->currentText();
   DDataDlg->exportData(DigiDatap);
+  DigiDatap.active = false;
   SDAQDlg->exportData(SDAQp);
+  SDAQp.active = false;
 #ifdef NATIONAL_INSTRUMENTS 
   NDQDlg->exportData(NIDAQp);
+  NIDAQp.active = false;
 #endif
 
   if (!DCT->finished) {  
     DisplayMessage("Waiting for running Dynamic Clamp Thread to finish");
     while (!DCT->finished) { Sleep(1000);}
   }
-  if (board != NULL) delete board;
+
+  std::vector<inChnData> *inVec;
+  std::vector<outChnData> *outVec;
   switch (DAQtype) {
-  case 0: 
-    board= new SimulDAQ;
-    theDAQDlg= SDAQDlg;;
+  case 0:
+  default:
+    SDAQp.active = true;
+    inVec = &SDAQp.inChn;
+    outVec = &SDAQp.outChn;
+    theDAQDlg= SDAQDlg;
     break;
   case 1:
-    board= new DigiData;
+    DigiDatap.active = true;
+    inVec = &DigiDatap.inChn;
+    outVec = &DigiDatap.outChn;
     theDAQDlg= DDataDlg;
     break;
 #ifdef NATIONAL_INSTRUMENTS
   case 2:
-    board= new NIDAQ;
-    theDAQDlg= NDQDlg;       
+    NIDAQp.active = true;
+    inVec = &NIDAQp.inChn;
+    outVec = &NIDAQp.outChn;
+    theDAQDlg= NDQDlg;
+    break;
 #endif
   }
   LoadMsg.setIcon(QMessageBox::Information);
   LoadMsg.setWindowTitle(tr("StdpC 2012"));
   LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
-  //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
   LoadMsg.show();
 
-  success= board->initialize_board(name);
-  if (success) {
-    DisplayMessage(QString("Good news: ")+name+QString(" found and opened successfully!"));
-    StartBut->setEnabled(true);
+  success = DCT->init();
+  StartBut->setEnabled(success);
+  actionElectrode_setup->setEnabled(success);
+
+  // Stop-gap
+  actionInput_channels->setEnabled(success);
+  actionOutput_channels->setEnabled(success);
+  if ( success ) {
+      inVec->resize(DCT->clk.board[0]->inChnNo);
+      outVec->resize(DCT->clk.board[0]->outChnNo);
+      inChnDlg->init(DCT->clk.board[0]);
+      outChnDlg->init(DCT->clk.board[0]);
+  } else {
+      emit channelsChanged();
   }
-  else {
-    DisplayMessage(QString("Bad news: ")+name+QString(" not found or not opened successfully!"));
-    StartBut->setEnabled(false);
-  }
-
-  inChnp.resize(board->inChnNo);
-  inChnDlg->init(board); // already exports to inChnp ...
-
-  outChnp.resize(board->outChnNo);
-  outChnDlg->init(board); // already exports to outChnp ...
-
-  DCT->init(board);
 
   LoadMsg.hide();
 }
@@ -185,7 +194,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DataD1->setScene(&Graphs[0].Scene);
      DataD2->setScene(&Graphs[1].Scene);   
 
-     board= NULL;
      DAQSetup();
      
      DisplayMessage(QString("Main: Dynamic Clamp starting ..."));

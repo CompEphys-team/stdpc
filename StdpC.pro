@@ -103,7 +103,8 @@ HEADERS += \
     $$PWD/src/include/ModelInstDlg.h \
     $$PWD/src/include/AssignmentWidget.h \
     $$PWD/src/include/ComponentTable.h \
-    $$PWD/src/include/ComponentWidget.h
+    $$PWD/src/include/ComponentWidget.h \
+    $$PWD/src/include/Clock.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -153,7 +154,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/ModelInstDlg.cpp \
     $$PWD/src/gui/AssignmentWidget.cpp \
     $$PWD/src/gui/ComponentTable.cpp \
-    $$PWD/src/gui/ComponentWidget.cpp
+    $$PWD/src/gui/ComponentWidget.cpp \
+    $$PWD/src/drivers/Clock.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

@@ -53,28 +53,32 @@ std::pair<int, int> HHNeuronModel::numActiveInst()
     return std::pair<int, int>(p->active, nInst);
 }
 
-QVector<QString> HHNeuronModel::labels(int modelNo)
+QPair<QVector<QString>, QVector<inChannel *>> HHNeuronModel::inChans_to_save(int modelNo)
 {
-    QVector<QString> ret;
-    QString in = QString("HH%1-V%2").arg(modelNo);
-    QString out = QString("HH%1-I%2").arg(modelNo);
+    QVector<QString> labels;
+    QVector<inChannel*> chans;
     int i = 0;
     for ( HHNeuron &neuron : inst ) {
-        if ( neuron.in.save )
-            ret.push_back(in.arg(i));
-        if ( neuron.out.save )
-            ret.push_back(out.arg(i));
+        if ( neuron.in.save ) {
+            labels.push_back(QString("HH%1_V%2").arg(modelNo).arg(i));
+            chans.push_back(&neuron.in);
+        }
         ++i;
     }
-    return ret;
+    return qMakePair(labels, chans);
 }
 
-void HHNeuronModel::putData(QVector<double>::iterator &iter)
+QPair<QVector<QString>, QVector<outChannel *>> HHNeuronModel::outChans_to_save(int modelNo)
 {
+    QVector<QString> labels;
+    QVector<outChannel*> chans;
+    int i = 0;
     for ( HHNeuron &neuron : inst ) {
-        if ( neuron.in.save )
-            *(iter++) = neuron.in.V;
-        if ( neuron.out.save )
-            *(iter++) = neuron.out.I;
+        if ( neuron.out.save ) {
+            labels.push_back(QString("HH%1_I%2").arg(modelNo).arg(i));
+            chans.push_back(&neuron.out);
+        }
+        ++i;
     }
+    return qMakePair(labels, chans);
 }

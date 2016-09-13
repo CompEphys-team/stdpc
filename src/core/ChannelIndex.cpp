@@ -33,16 +33,26 @@ ChannelIndex ChannelIndex::toInstance(int instID) const
 
 inChnData *ChannelIndex::getInChnData() const
 {
-    if ( !isValid || !isAnalog || !isInChn || chanID >= (int)inChnp.size() )
+    if ( !isValid || !isAnalog || !isInChn )
         return nullptr;
-    return &inChnp[chanID];
+    switch ( daqClass ) {
+    case DAQClass::Simul :  return &SDAQp.inChn[chanID];
+    case DAQClass::DD1200 : return &DigiDatap.inChn[chanID];
+    case DAQClass::NI :     return &NIDAQp.inChn[chanID];
+    }
+    return nullptr;
 }
 
 outChnData *ChannelIndex::getOutChnData() const
 {
-    if ( !isValid || !isAnalog || isInChn || chanID >= (int)outChnp.size() )
+    if ( !isValid || !isAnalog || isInChn )
         return nullptr;
-    return &outChnp[chanID];
+    switch ( daqClass ) {
+    case DAQClass::Simul :  return &SDAQp.outChn[chanID];
+    case DAQClass::DD1200 : return &DigiDatap.outChn[chanID];
+    case DAQClass::NI :     return &NIDAQp.outChn[chanID];
+    }
+    return nullptr;
 }
 
 QString ChannelIndex::prettyName() const

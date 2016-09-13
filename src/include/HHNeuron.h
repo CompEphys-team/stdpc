@@ -3,6 +3,7 @@
 
 #include "ObjectDataTypes.h"
 #include "Channels.h"
+#include <QPair>
 
 class HHNeuron
 {
@@ -30,8 +31,8 @@ public:
     void updateChannels(double t);
 
     std::pair<int, int> numActiveInst();
-    QVector<QString> labels(int modelNo);
-    void putData(QVector<double>::iterator &iter);
+    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save(int modelNo);
+    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save(int modelNo);
 
     std::vector<HHNeuron> inst;
 

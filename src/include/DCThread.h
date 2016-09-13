@@ -12,6 +12,8 @@
 #include "AbHH.h"
 #include "SpkGen.h"
 #include "DigiData.h"
+#include "SimulDAQ.h"
+#include "Nidaq.h"
 #include "AECChannel.h"
 #include "DataSaver.h"
 #include "HHNeuron.h"
@@ -32,13 +34,13 @@ private:
  public:
      DCThread();
      virtual ~DCThread();
-     void init(DAQ *);
+     bool init();
      bool LoadScript(QString &);
      void UnloadScript();
-     double WaitTillNextSampling(double);
 
      inChannel *getInChan(ChannelIndex const& dex);
      outChannel *getOutChan(ChannelIndex const& dex);
+     DAQ *getBoard(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
      template <typename T>
@@ -53,8 +55,8 @@ private:
 
      // Temporary data storing object
      QVector<double> data;
-     QVector<int> inChnsToSave;
-     QVector<int> outChnsToSave;
+     QVector<inChannel *> inChnsToSave;
+     QVector<outChannel *> outChnsToSave;
      
      bool stopped;
      bool finished;
@@ -66,13 +68,18 @@ private:
      std::vector<DestexheSyn> dsyn;
      std::vector<HH> hh;
      std::vector<abHH> abhh;
-     DAQ *board;
-     inChannel *inChn;
-     outChannel *outChn;
-     short int *inIdx;
-     short int *outIdx;
-     short int inNo;
-     short int outNo;
+
+     SimulDAQ *simulDAQ;
+     DigiData *dd1200;
+#ifdef NATIONAL_INSTRUMENTS
+     NIDAQ *niDAQ;
+#else
+     DAQ *niDAQ;
+#endif
+     Clock clk;
+
+     inChannel inChnSG;
+     outChannel outChnNone;
 
      std::vector<HHNeuronModel> hhNeuron;
      
@@ -96,7 +103,7 @@ private:
      void message(QString message);
      void addPoint1(double, double, int);
      void addPoint2(double, double, int);
-     void CloseToLimit(QString, int, double, double, double);
+     void CloseToLimit(QString, QString, double, double, double);
 
 
 };

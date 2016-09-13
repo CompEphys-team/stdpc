@@ -4,10 +4,8 @@
 #include "Global.h"
 
 class inChannel {
- private:
-     inChnData *p;
-      
  public:
+    inChnData *p;
      bool active;
      bool save;
      double V;
@@ -23,10 +21,8 @@ class inChannel {
 
 
 class outChannel {
- private:
-     outChnData *p;
-     
  public:
+    outChnData *p;
      bool active;
      bool save;
      double I;

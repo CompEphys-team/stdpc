@@ -2,12 +2,14 @@
 #include "limits.h"
 
 
-SimulDAQ::SimulDAQ()
+SimulDAQ::SimulDAQ(SDAQData *p, int devID, Clock *clk) :
+    DAQ(p, devID, clk),
+    tOff(0.0)
 {
-  inChnNo= SDAQp.inChnNo;
+  inChnNo= p->inChn.size();
   inIdx= new short int[inChnNo];
   inGainFac= new double[inChnNo];
-  outChnNo= SDAQp.outChnNo;
+  outChnNo= p->outChn.size();
   outIdx= new short int[outChnNo];
   outGainFac= new double[outChnNo];
   inGainNo= 1;
@@ -46,10 +48,10 @@ SimulDAQ::~SimulDAQ()
   delete[] inIter;
 }
 
-void SimulDAQ::reset_RTC() {
+void SimulDAQ::start() {
+  tOff = 0.0;
   lastWrite= 0.0;
   rewind();
-  DAQ::reset_RTC();
 }
 
 bool SimulDAQ::initialize_board(QString &name)
@@ -64,14 +66,14 @@ bool SimulDAQ::initialize_board(QString &name)
 //  for (int i= 0; i < inChnNo; i++) inq[i].clear();
 //  delete[] inq;
 //  delete[] inIter;
-  is.open(SDAQp.inFileName.toLatin1());
+  is.open(static_cast<SDAQData*>(p)->inFileName.toLatin1());
   is >> t;
   t0= t;
 //  inChnNo= SDAQp.inChnNo;
 //  inq= new QList<double>[inChnNo];
 //  inIter= new QList<double>::const_iterator[inChnNo];
   while (is.good()) {
-    intq.append((t-t0)*SDAQp.inTFac);
+    intq.append((t-t0) * static_cast<SDAQData*>(p)->inTFac);
     for (int i= 0; i < inChnNo; i++) {
       is >> data;
       inq[i].append(data);
@@ -104,7 +106,7 @@ bool SimulDAQ::initialize_board(QString &name)
 //  outChnNo= SDAQp.outChnNo;
 //  outq= new QList<double>[outChnNo];
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toLatin1());
+  os.open(static_cast<SDAQData*>(p)->outFileName.toLatin1());
   if (!os.good()) {
     name=QString("SimulDAQ output files ");
     success= false;
@@ -113,7 +115,7 @@ bool SimulDAQ::initialize_board(QString &name)
 //  outIdx= new short int[outChnNo];
 //  delete[] outGainFac;
 //  outGainFac= new double[outChnNo];
-  reset_RTC();
+  start();
   
   initialized= success;
   
@@ -123,29 +125,38 @@ bool SimulDAQ::initialize_board(QString &name)
 void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i;
-  actInChnNo= chnNo;  
+  actInChnNo= chnNo;
+
+  ChannelIndex dex;
+  dex.isValid = true;
+  dex.isAnalog = true;
+  dex.daqClass = DAQClass::NI;
+  dex.devID = devID;
+  dex.isInChn = true;
+
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac;  // read V ... users take care of other units
+    inGainFac[i]= p->inChn[inIdx[i]].gainFac;  // read V ... users take care of other units
+    dex.chanID = inIdx[i];
+    inChnLabels[inIdx[i]] = dex.toString();
   }
 }
 
-void SimulDAQ::get_scan(inChannel *in)
+void SimulDAQ::get_scan()
 {
   short int i;
   short int idx;
   static double V;
 
   //os << t << endl;
-  if (t >= inT) {
+  if (t+tOff >= inT) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {
       inIter[i]++;
     }
     if (intIter == intq.end()) {
-      t-= dataT;
-      lastWrite-= dataT;
+      tOff+= dataT;
       rewind();
     }
     inT= *intIter;
@@ -162,21 +173,20 @@ void SimulDAQ::get_scan(inChannel *in)
   }
 }
 
-void SimulDAQ::get_single_scan(inChannel *in, int which)
+void SimulDAQ::get_single_scan(inChannel *in)
 {
    short int i;
    short int idx;
    static double V;
 
    //os << t << endl;
-   if (t >= inT) {
+   if (t+tOff >= inT) {
       intIter++;
       for (i= 0; i < inChnNo; i++) {
         inIter[i]++;
       }
       if (intIter == intq.end()) {
-        t-= dataT;
-        lastWrite-= dataT;
+        tOff+= dataT;
         rewind();
       }
       inT= *intIter;
@@ -185,8 +195,8 @@ void SimulDAQ::get_single_scan(inChannel *in, int which)
       for (i= 0; i < inChnNo; i++) {
         V= *inIter[i];
         if ((idx < actInChnNo) && (i == inIdx[idx])) {
-          if (i == which) {
-            in[i].V= V*inGainFac[idx];
+          if (&(this->in[i]) == in) {
+            in->V= V*inGainFac[idx];
           }
           idx++;
         }
@@ -197,26 +207,35 @@ void SimulDAQ::get_single_scan(inChannel *in, int which)
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
 {
+  ChannelIndex dex;
+  dex.isValid = true;
+  dex.isAnalog = true;
+  dex.daqClass = DAQClass::NI;
+  dex.devID = devID;
+  dex.isInChn = false;
+
   short int i;
   actOutChnNo= chnNo;
   for (i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac*1.0e9;  // write nA
+    outGainFac[i]= p->outChn[outIdx[i]].gainFac*1.0e9;  // write nA
+    dex.chanID = outIdx[i];
+    outChnLabels[outIdx[i]] = dex.toString();
   }
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toLatin1());
+  os.open(static_cast<SDAQData*>(p)->outFileName.toLatin1());
   lastWrite= 0.0;
 }
 
-void SimulDAQ::write_analog_out(outChannel *out)
+void SimulDAQ::write_analog_out()
 {
 //  short int idx;
 //  double dt;
   
 //  dt= get_RTC();
-  if (t > lastWrite+SDAQp.outDt) {
-    lastWrite= t;
-    outtq.append(t);
+  if (t+tOff > lastWrite + static_cast<SDAQData*>(p)->outDt) {
+    lastWrite= t+tOff;
+    outtq.append(t+tOff);
     for (int i= 0; i < outChnNo; i++) {
       outq[i].append(out[outIdx[i]].I);
     }
@@ -254,4 +273,10 @@ void SimulDAQ::rewind()
     }
     inT= *intIter;
   }
+}
+
+
+QString SimulDAQ::prefix()
+{
+    return QString("sim");
 }

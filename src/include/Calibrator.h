@@ -18,7 +18,7 @@ private:
     QString fname; // for testing results    
 
     // Referenced objects
-    DAQ *board;
+    DAQ *inBoard, *outBoard;
     KernelCalculator *kerCalc;
 
     // Channel related objects
@@ -87,7 +87,7 @@ public:
     double stdPerAverRate;
 
     Calibrator();
-    void GeneralInit(DAQ*, DCThread*);
+    void GeneralInit(DCThread*);
     int  ChannelInit(ChannelIndex, ChannelIndex);
     void ElectrodeMeasurement(double, double, int, double, double);
     void MembraneMeasurement(double, double, int, double);

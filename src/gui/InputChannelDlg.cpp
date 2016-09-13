@@ -50,7 +50,7 @@ void InputChannelDlg::clearAll()
   saveChnl.clear();
 }
 
-void InputChannelDlg::init(DAQ *board)
+void InputChannelDlg::init(DAQ *b)
 {
   #define Y0 100
   #define DY 22
@@ -70,6 +70,8 @@ void InputChannelDlg::init(DAQ *board)
   QLineEdit *letmp;
   QLabel *lb;
   QString nm;
+
+  board = b;
 
   clearAll();
   ChnNo= board->inChnNo;
@@ -187,36 +189,29 @@ InputChannelDlg::~InputChannelDlg()
 void InputChannelDlg::exportData()
 {
   for (int i= 0; i < ChnNo; i++) {
-    inChnp[i].active= (act[i]->checkState() > 0);
-    inChnp[i].gain= rng[i]->currentIndex();
-    inChnp[i].gainFac= factor[i]->text().toDouble();
-    inChnp[i].spkDetect= (sDetect[i]->checkState() > 0);
-    inChnp[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
-    inChnp[i].bias= bias[i]->text().toDouble()*1e-3;
-    inChnp[i].minVoltage = inLow[rng[i]->currentIndex()]*inChnp[i].gainFac;
-    inChnp[i].maxVoltage = inHigh[rng[i]->currentIndex()]*inChnp[i].gainFac;
-    inChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    board->p->inChn[i].active= (act[i]->checkState() > 0);
+    board->p->inChn[i].gain= rng[i]->currentIndex();
+    double gainFac = factor[i]->text().toDouble();
+    board->p->inChn[i].gainFac= gainFac;
+    board->p->inChn[i].spkDetect= (sDetect[i]->checkState() > 0);
+    board->p->inChn[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
+    board->p->inChn[i].bias= bias[i]->text().toDouble()*1e-3;
+    board->p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
+    board->p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
+    board->p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
 void InputChannelDlg::importData()
 {
-  QString lb;
-  
   for (int i= 0; i < ChnNo; i++) {
-    if (inChnp[i].active) act[i]->setCheckState(Qt::Checked);
-    else act[i]->setCheckState(Qt::Unchecked);
-    rng[i]->setCurrentIndex(inChnp[i].gain); 
-    lb.setNum(inChnp[i].gainFac);
-    factor[i]->setText(lb);
-    if (inChnp[i].spkDetect) sDetect[i]->setCheckState(Qt::Checked);
-    else sDetect[i]->setCheckState(Qt::Unchecked);
-    lb.setNum(inChnp[i].spkDetectThresh*1e3);
-    SDThresh[i]->setText(lb);
-    lb.setNum(inChnp[i].bias*1e3);
-    bias[i]->setText(lb);
-    if (inChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
-    else saveChnl[i]->setCheckState(Qt::Unchecked);
+    act[i]->setChecked(board->p->inChn[i].active);
+    rng[i]->setCurrentIndex(board->p->inChn[i].gain);
+    factor[i]->setText(QString::number(board->p->inChn[i].gainFac));
+    sDetect[i]->setChecked(board->p->inChn[i].spkDetect);
+    SDThresh[i]->setText(QString::number(board->p->inChn[i].spkDetectThresh*1e3));
+    bias[i]->setText(QString::number(board->p->inChn[i].bias*1e3));
+    saveChnl[i]->setChecked(board->p->inChn[i].chnlSaving);
   }
 }
 

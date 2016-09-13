@@ -30,9 +30,8 @@ Calibrator::Calibrator() :
 }
 
 
-void Calibrator::GeneralInit(DAQ *brd, DCThread *DCThrd)
+void Calibrator::GeneralInit(DCThread *DCThrd)
 {
-    board = brd;
     DCT = DCThrd;
 }
 
@@ -42,59 +41,18 @@ int Calibrator::ChannelInit(ChannelIndex inChNum, ChannelIndex outChNum)
     inputChannelNumber = inChNum;
     outputChannelNumber = outChNum;
 
-    int i;
+    for ( DAQ *b : DCT->clk.board )
+        b->init_chans();
 
-    short int *inIdx;
-    short int *outIdx;
-    short int inNo;
-    short int outNo;
+    inBoard = DCT->getBoard(inputChannelNumber);
+    inChn = DCT->getInChan(inputChannelNumber);
+    if ( !inBoard || !inChn || !inChn->active )
+        return 1; // Return code for inactive input channel
 
-    inChn  = new inChannel[board->inChnNo];
-    outChn = new outChannel[board->outChnNo];
-
-    inIdx  = new short int[board->inChnNo];
-    outIdx = new short int[board->outChnNo];
-
-    inNo= 0;
-    for (i= 0; i < board->inChnNo; i++) {
-       if (inChnp[i].active) {
-          inIdx[inNo++]= i;
-          inChn[i].init(&inChnp[i]);
-       }
-    }
-
-    outNo= 0;
-    for (i=0; i < board->outChnNo; i++) {
-        if (outChnp[i].active) {
-           outIdx[outNo++]= i;
-           outChn[i].init(&outChnp[i]);
-        }
-    }
-
-    // Check validity of selected channels
-    bool valid= false;
-
-    for (i= 0; i < inNo; i++) {
-        if(inIdx[i] == inputChannelNumber.chanID){
-             valid= true;
-        }
-    }
-
-    if (valid == false) return 1;  // Return code for inactive input channel
-
-    valid= false;
-
-    for (i= 0; i < outNo; i++) {
-        if(outIdx[i] == outputChannelNumber.chanID){
-             valid= true;
-        }
-    }
-
-    if (valid == false) return 2;  // Return code for inactive output channel
-
-    short int iCN = inputChannelNumber.chanID, oCN = outputChannelNumber.chanID;
-    board->generate_scan_list(1,&iCN);
-    board->generate_analog_out_list(1,&oCN);
+    outBoard = DCT->getBoard(outputChannelNumber);
+    outChn = DCT->getOutChan(outputChannelNumber);
+    if ( !outBoard || !outChn || !outChn->active )
+        return 2; // Return code for inactive output channel
 
     return 0;   // Return code for successfull channel initialization
 }
@@ -518,37 +476,37 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     t = 0.0; // init time
 
     // Create tolerance limits
-    double higherLimit = inChnp[inputChannelNumber.chanID].minVoltage + 0.9*(inChnp[inputChannelNumber.chanID].maxVoltage-inChnp[inputChannelNumber.chanID].minVoltage);
-    double lowerLimit =  inChnp[inputChannelNumber.chanID].minVoltage + 0.1*(inChnp[inputChannelNumber.chanID].maxVoltage-inChnp[inputChannelNumber.chanID].minVoltage);
+    double higherLimit = inChn->p->minVoltage + 0.9*(inChn->p->maxVoltage-inChn->p->minVoltage);
+    double lowerLimit =  inChn->p->minVoltage + 0.1*(inChn->p->maxVoltage-inChn->p->minVoltage);
     bool limitWarningEmitted = false;
 
     // board->reset_board();
-    board->reset_RTC();
+    DCT->clk.start();
 
     if( isCalibration == true ) // read -- wait -- write order in case of calibration
         for ( sample=1; sample<numOfSamples; sample++ )
         {
 
             // --- Read --- //
-            board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber.chanID].V; // save voltage
+            inBoard->get_scan();
+            voltages[sample]= inChn->V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChnp[inputChannelNumber.chanID].minVoltage, inChnp[inputChannelNumber.chanID].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChn->p->minVoltage, inChn->p->maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
 
 
             // --- Wait --- //
-            t += board->wait_till_elapsed(samplingPeriod);
+            t += DCT->clk.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
 
             // --- Write --- //
-            outChn[outputChannelNumber.chanID].I= currents[sample];
-            board->write_analog_out(outChn);
+            outChn->I= currents[sample];
+            outBoard->write_analog_out();
             // --- Write end --- //
 
         }
@@ -558,23 +516,23 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
         {
 
             // --- Write --- //
-            outChn[outputChannelNumber.chanID].I= currents[sample];
-            board->write_analog_out(outChn);
+            outChn->I= currents[sample];
+            outBoard->write_analog_out();
             // --- Write end --- //
 
 
             // --- Wait --- //
-            t += board->wait_till_elapsed(samplingPeriod);
+            t += DCT->clk.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
 
             // --- Read --- //
-            board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber.chanID].V; // save voltage
+            inBoard->get_scan();
+            voltages[sample]= inChn->V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChnp[inputChannelNumber.chanID].minVoltage, inChnp[inputChannelNumber.chanID].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChn->p->minVoltage, inChn->p->maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
@@ -590,7 +548,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     }
 
     // Reset board
-    board->reset_board();
+    DCT->clk.stop();
 }
 
 
@@ -602,20 +560,22 @@ double Calibrator::VoltageOffsetMeasurement()
     double offsetMeasLen = 5.0; // in msec
     int offsetSamplingNum = (int) (offsetMeasLen*1e-3/samplingPeriod);  // how many sampling steps
 
-    board->reset_RTC();
+    DCT->clk.start();
 
     // Measure the voltage offset
     for (sample=0; sample<offsetSamplingNum; sample++)
     {
         // Channel read
-        board->get_scan(inChn);
+        inBoard->get_scan();
 
         // Save voltage
-        vOffset += inChn[inputChannelNumber.chanID].V;
+        vOffset += inChn->V;
 
-        board->wait_till_elapsed(samplingPeriod);
+        DCT->clk.wait_till_elapsed(samplingPeriod);
     }
     vOffset /= offsetSamplingNum;
+
+    DCT->clk.stop();
 
     return vOffset;
 }

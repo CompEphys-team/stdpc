@@ -98,19 +98,22 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData();
+    DigiData(DigiDataData *p, int devID, Clock *clk);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
+    virtual void start() {}
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan(inChannel *);
-    virtual void get_single_scan(inChannel *, int);
-    virtual void write_analog_out(outChannel *);
+    virtual void get_scan();
+    virtual void get_single_scan(inChannel *);
+    virtual void write_analog_out();
     virtual void reset_board();
     short int* inChnGain;
     short int* DACEnable;
+
+    virtual QString prefix();
     
     // actually activated stuff
 };

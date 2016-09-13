@@ -5,7 +5,8 @@
 
 //---------------------------------------------------------------------------
 
-DigiData::DigiData()
+DigiData::DigiData(DigiDataData *p, int devID, Clock *clk) :
+    DAQ(p, devID, clk)
 {
   inChnNo= 16;
   inIdx= new short int[inChnNo];
@@ -55,7 +56,7 @@ DigiData::DigiData()
   DACEnable[1]= DACCHANNEL1ENABLE;
   portsOpen= false;
   init();
-};
+}
 
 DigiData::~DigiData()
 {
@@ -80,7 +81,7 @@ DigiData::~DigiData()
 
 void DigiData::init()
 {
-   short int base= DigiDatap.baseAddress;
+   short int base= static_cast<DigiDataData*>(p)->baseAddress;
    base_address=       base;
    DAC_data=           base | DACDATA;
    ADC_data=           base | ADCDATA;
@@ -150,21 +151,30 @@ void DigiData::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i, Chan_Gain_Code;
 
+  ChannelIndex dex;
+  dex.isValid = true;
+  dex.isAnalog = true;
+  dex.daqClass = DAQClass::NI;
+  dex.devID = devID;
+  dex.isInChn = true;
+
   actInChnNo= chnNo;  
   WriteWord(ADCDAC_control, ADCSCANLISTENABLE);
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac*inHigh[inChnp[inIdx[i]].gain]/16.0/COUNTS; // divide by 16.0 b/c of 12 bit in chns
-    Chan_Gain_Code= i + inChnGain[inChnp[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
+    inGainFac[i]= p->inChn[inIdx[i]].gainFac*inHigh[p->inChn[inIdx[i]].gain]/16.0/COUNTS; // divide by 16.0 b/c of 12 bit in chns
+    Chan_Gain_Code= i + inChnGain[p->inChn[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
     if(i == (actInChnNo -1)) Chan_Gain_Code+= LASTCHANNELFLAG;
     WriteWord(channel_scan_list, Chan_Gain_Code);
+    dex.chanID = inIdx[i];
+    inChnLabels[inIdx[i]] = dex.toString();
   }
   WriteWord(ADCDAC_control, ADCSCANLISTDISABLE);
 }
 
 //---------------------------------------------------------------------------
-void DigiData::get_scan(inChannel *in)
+void DigiData::get_scan()
 {
    short int i, scan;
 
@@ -176,7 +186,7 @@ void DigiData::get_scan(inChannel *in)
    }
 }
 
-void DigiData::get_single_scan(inChannel *in, int which)
+void DigiData::get_single_scan(inChannel *in)
 {
    short int i, scan;
 
@@ -184,8 +194,8 @@ void DigiData::get_single_scan(inChannel *in, int which)
 
    for(i= 0; i < actInChnNo; i++){
       scan= ReadWord(ADC_data);
-      if (inIdx[i] == which) {
-          in[inIdx[i]].V= inGainFac[i] * (double) scan;
+      if (&(this->in[inIdx[i]]) == in) {
+          in->V= inGainFac[i] * (double) scan;
       }
    }
 }
@@ -194,32 +204,48 @@ void DigiData::get_single_scan(inChannel *in, int which)
 //---------------------------------------------------------------------------
 void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 {
+  ChannelIndex dex;
+  dex.isValid = true;
+  dex.isAnalog = true;
+  dex.daqClass = DAQClass::NI;
+  dex.devID = devID;
+  dex.isInChn = false;
+
   // collect the active out channels
   actOutChnNo= chnNo;
   for (int i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac/outHigh[outChnp[outIdx[i]].gain]*1e9*COUNTS;
+    outGainFac[i]= p->outChn[outIdx[i]].gainFac/outHigh[p->outChn[outIdx[i]].gain]*1e9*COUNTS;
+    dex.chanID = outIdx[i];
+    outChnLabels[outIdx[i]] = dex.toString();
   }
 }
 
 
 //---------------------------------------------------------------------------
-void DigiData::write_analog_out(outChannel *out)
+void DigiData::write_analog_out()
 {
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
     int_I= ((short int) (out[outIdx[i]].I*outGainFac[i]))*16;
-    int_I|= DigiDatap.syncIOMask; // write synchronous digital IO
+    int_I|= static_cast<DigiDataData*>(p)->syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
   } 
 }
 
 
+//---------------------------------------------------------------------------
 void DigiData::reset_board() 
 {
   for (int i= 0; i < outChnNo; i++) {
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,0);
   } 
+}
+
+//---------------------------------------------------------------------------
+QString DigiData::prefix()
+{
+    return QString("DigiData_%1").arg(static_cast<DigiDataData*>(p)->baseAddress);
 }

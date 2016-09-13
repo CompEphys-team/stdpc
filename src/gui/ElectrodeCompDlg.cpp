@@ -524,22 +524,14 @@ void ElectrodeCompDlg::CalibrateElectrode()
 
 // Initializes the Calibrator object with the parameters read from the dialog window
 // and the input/output channels as well
-// warns if the DAQ has not yet been initialized or the input or output channel
+// warns if the input or output channel
 // are invalid (not active) and also returns false in these cases
 bool ElectrodeCompDlg::InitCalibrator()
 {
-    DAQ *board = ((MyMainWindow*) this->parent())->board;
-
-    if ( board->initialized == false )
-    {
-        QMessageBox::warning(this, tr("Warning"), tr("DAQ not initialized"));
-        return false;
-    }
-
     DCThread *DCT = (((MyMainWindow*) this->parent())->DCT);
 
     // General init
-    calibrator->GeneralInit(board, DCT);
+    calibrator->GeneralInit(DCT);
 
     this->setEnabled(false);
 

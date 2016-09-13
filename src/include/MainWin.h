@@ -62,7 +62,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      DCThread *DCT;
      int DAQtype;
      QString DAQName;
-     DAQ *board;
      DigiDataDlg *DDataDlg;
      SimulDAQDlg *SDAQDlg;
      HHModelDlg *hhModelDlg;

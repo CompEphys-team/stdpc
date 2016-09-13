@@ -24,6 +24,7 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      
      int ChnNo;
      int lbNum;
+     DAQ *board;
      
   protected:
      QVector<double> inLow;

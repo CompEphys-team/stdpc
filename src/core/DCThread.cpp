@@ -5,18 +5,17 @@
 #include <climits>
 #include "ChannelIndex.h"
 
-  
+
 #include "SimulDAQ.h" // for debugging only ...
- 
-DCThread::DCThread() 
+
+DCThread::DCThread() :
+    simulDAQ(nullptr),
+    dd1200(nullptr),
+    niDAQ(nullptr)
 {
   stopped= true;
   finished= true;
 
-  inChn= NULL;
-  outChn= NULL;
-  inIdx= NULL;
-  outIdx= NULL;
   scripting= false;
 
   aecChannels = QVector<AECChannel*>(MAX_ELECTRODE_NO);
@@ -26,27 +25,50 @@ DCThread::DCThread()
   dataSaver = new DataSaver();
 }
 
-DCThread::~DCThread() 
+DCThread::~DCThread()
 {
-   if (inChn != NULL) delete[] inChn;
-   if (outChn != NULL) delete[] outChn;
-   if (inIdx != NULL) delete[] inIdx;
-   if (outIdx != NULL) delete[] outIdx;  
+    delete simulDAQ;
+    delete dd1200;
+    delete niDAQ;
 }
- 
 
-void DCThread::init(DAQ *inBoard) 
+bool DCThread::init()
 {
-   if (inChn != NULL) delete[] inChn;
-   if (outChn != NULL) delete[] outChn;
-   if (inIdx != NULL) delete[] inIdx;
-   if (outIdx != NULL) delete[] outIdx;
+    std::function<bool(DAQ*)> binit = [=](DAQ *b){
+        QString name;
+        if ( b->initialize_board(name) ) {
+            emit message(QString("Good news: %1 found and opened successfully!").arg(name));
+            return true;
+        } else {
+            emit message(QString("Bad news: %1 not found or not opened successfully!").arg(name));
+            return false;
+        }
+    };
 
-   board= inBoard;
-   inChn= new inChannel[board->inChnNo+1];  // +1 for the spike Generator
-   outChn= new outChannel[board->outChnNo+1]; // +1 for "none" output
-   inIdx= new short int[board->inChnNo+1];
-   outIdx= new short int[board->outChnNo+1];
+    clk.clear();
+    delete simulDAQ; simulDAQ = nullptr;
+    delete dd1200;   dd1200 = nullptr;
+    delete niDAQ;    niDAQ = nullptr;
+
+    if ( SDAQp.active ) {
+        simulDAQ = new SimulDAQ(&SDAQp, 0, &clk);
+        if ( !binit(simulDAQ) )
+            clk.remove(simulDAQ);
+    }
+    if ( DigiDatap.active ) {
+        dd1200 = new DigiData(&DigiDatap, 0, &clk);
+        if ( !binit(dd1200) )
+            clk.remove(dd1200);
+    }
+#ifdef NATIONAL_INSTRUMENTS
+    if ( NIDAQp.active ) {
+        niDAQ = new NIDAQ(&NIDAQp, 0, &clk);
+        if ( !binit(niDAQ) )
+            clk.remove(niDAQ);
+    }
+#endif
+
+    return !clk.board.empty();
 }
 
 
@@ -57,40 +79,15 @@ void DCThread::run()
 
    static int i;
    static double evt;
-   // reset Lookup tables; they not be needed in this run ...
-//   tanhLU.reset();
-//   expLU.reset();
-//   expSigmoidLU.reset();
-   // collect the active channels
-   //exit(1);
-   // for Attila's Sample-and-hold
    bool SampleHoldOn= false;
+   inChannel *SampleHoldChan;
+   DAQ *SampleHoldBoard;
 
-   inNo= 0;  
-   for (i= 0; i < board->inChnNo; i++) {  
-     if (inChnp[i].active) {
-       inIdx[inNo++]= i;
-       inChn[i].init(&inChnp[i]);
-     } else {
-       inChn[i].active = false;
-     }
-   }
-   inIdx[inNo]= board->inChnNo;  // this is for the Spike Generator
-   inChn[board->inChnNo].init(&inSpkGenChnp);
-   outNo= 0;
-   for (i=0; i < board->outChnNo; i++) {
-     if (outChnp[i].active) {
-       outIdx[outNo++]= i;
-       outChn[i].init(&outChnp[i]);
-     } else {
-       outChn[i].active = false;
-     }
-   }
-   outIdx[outNo]= board->outChnNo;  // this is for the None output
-   outChn[board->outChnNo].init(&outSpkGenChnp);
-   
-   board->generate_scan_list(inNo, inIdx);
-   board->generate_analog_out_list(outNo, outIdx);
+   inChnSG.init(&inSpkGenChnp);
+   outChnNone.init(&outSpkGenChnp);
+
+   for ( DAQ *b : clk.board )
+       b->init_chans();
 
    hhNeuron.clear();
    for ( HHNeuronData &p : HHNeuronp ) {
@@ -98,20 +95,23 @@ void DCThread::run()
    }
 
    if (SGp.active) {
-     SG.init(&SGp, &inChn[inIdx[inNo]], this);
-     if (!SGp.active) {    
+     SG.init(&SGp, &inChnSG, this);
+     if (!SGp.active) {
        message(QString("SpkGen: Could not open ")+SGp.STInFName+QString(" ... SpkGen disabled ..."));
-       inChn[inIdx[inNo]].V= 0.0;
+       inChnSG.V= 0.0;
      }
      else {
        message(QString("SpkGen active ..."));
      }
    }
    else {
-     inChn[inIdx[inNo]].V= 0.0;
+     inChnSG.V= 0.0;
    }
-   inChn[inIdx[inNo]].active = SGp.active;
-   
+   inChnSG.active = SGp.active;
+
+   SampleHoldChan = getInChan(SampleHoldp.trigChn);
+   SampleHoldBoard = getBoard(SampleHoldp.trigChn);
+
    // set up the graphic display channels
    QString lb;
    for (i= 0; i < 2; i++) {
@@ -134,7 +134,7 @@ void DCThread::run()
              grp[i][grpNo[i]] = &(getOutChan(dex)->I);
          }
          pen[i][grpNo[i]++] = j;
-       }             
+       }
      }
      lb.setNum(grpNo[i]);
      message(QString("Added ")+lb+QString(" channels for Display"));
@@ -206,87 +206,84 @@ void DCThread::run()
        message(QString("DynClamp: %1 HH neuron model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
    }
 
-   int sz;   
+   int sz;
    sz= tanhLU.generate();
    if (sz > 0) message(QString("Tanh lookup table (re)generated"));
    sz= expLU.generate();
    if (sz > 0) message(QString("Exp lookup table (re)generated"));
    sz= expSigmoidLU.generate();
-   if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated")); 
-   
+   if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated"));
+
    // Checking validity of AEC channels
    numOfAecChannels = 0;
+   QVector<inChannel*> aecIn(aecChannels.size(), nullptr);
+   QVector<outChannel*> aecOut(aecChannels.size(), nullptr);
+   QVector<outChannel*> aecCopy(aecChannels.size(), nullptr);
    for ( int i=0; i<aecChannels.size(); i++ ){
      if ( aecChannels[i]->IsActive() ){
-       if ( inChnp[aecChannels[i]->inChnNum.chanID].active == true &&
-         outChnp[aecChannels[i]->outChnNum.chanID].active == true ){
-         message(QString("AEC channel is active on input channel ")+aecChannels[i]->inChnNum.prettyName()+" and output channel "+aecChannels[i]->outChnNum.prettyName());
+       aecIn[i] = getInChan(aecChannels[i]->inChnNum);
+       aecOut[i] = getOutChan(aecChannels[i]->outChnNum);
+       aecCopy[i] = getOutChan(elecCalibPs[i].copyChn);
+       if ( aecIn[i] && aecOut[i] && aecIn[i]->active && aecOut[i]->active ) {
+         message(QString("AEC channel is active on input channel ")+aecChannels[i]->inChnNum.toString()+" and output channel "+aecChannels[i]->outChnNum.toString());
        #ifdef TEST_VERSION
          numOfAecChannels++;
        #endif
        }
        else {
-         if ( inChnp[aecChannels[i]->inChnNum.chanID].active == false ){
-           message(QString("Input channel ")+aecChannels[i]->inChnNum.prettyName()+QString(" is not active! AEC disabled on that channel."));
+         if ( !aecIn[i] || !aecIn[i]->active ){
+           message(QString("Input channel ")+aecChannels[i]->inChnNum.toString()+QString(" is not active! AEC disabled on that channel."));
            aecChannels[i]->Inactivate();
          }
-         if ( outChnp[aecChannels[i]->outChnNum.chanID].active == false ){
-           message(QString("Output channel ")+aecChannels[i]->outChnNum.prettyName()+QString(" is not active! AEC disabled on that channel."));
+         if ( !aecOut[i] || !aecOut[i]->active ){
+           message(QString("Output channel ")+aecChannels[i]->outChnNum.toString()+QString(" is not active! AEC disabled on that channel."));
            aecChannels[i]->Inactivate();
          }
        }
      }
    }
 
-   // Create tolerance limits for all AEC channels
-   QVector<double> iHiLim = QVector<double>(outNo);   // high limit for current
-   QVector<double> iLoLim = QVector<double>(outNo);   // low limit for currents
-   QVector<double> vHiLim = QVector<double>(inNo);    // high limit for voltages
-   QVector<double> vLoLim = QVector<double>(inNo);    // low limit for voltages
-   double upTolFac = 0.99;   // upper tolerance factor
-   double loTolFac = 0.01;   // lower  tolerance factor
-   for ( int i=0; i<outNo; i++ ){
-     iHiLim[i] = outChnp[outIdx[i]].minCurrent + upTolFac*(outChnp[outIdx[i]].maxCurrent-outChnp[outIdx[i]].minCurrent);
-     iLoLim[i] = outChnp[outIdx[i]].minCurrent + loTolFac*(outChnp[outIdx[i]].maxCurrent-outChnp[outIdx[i]].minCurrent);
-   }
-   for ( int i=0; i<inNo; i++ ){
-     vHiLim[i] = inChnp[inIdx[i]].minVoltage + upTolFac*(inChnp[inIdx[i]].maxVoltage-inChnp[inIdx[i]].minVoltage);
-     vLoLim[i] = inChnp[inIdx[i]].minVoltage + loTolFac*(inChnp[inIdx[i]].maxVoltage-inChnp[inIdx[i]].minVoltage);
-   }
-
-   // Generate the index vector of in and out channels to be saved
-   inChnsToSave = QVector<int>(0);
-   for( i= 0; i < inNo; i++ )
-     if( inChn[inIdx[i]].save ) inChnsToSave.append(inIdx[i]);
-   outChnsToSave = QVector<int>(0);
-   for( i= 0; i < outNo; i++ )
-     if( outChn[outIdx[i]].save ) outChnsToSave.append(outIdx[i]);
-
    // Init data saving
    if (dataSavingPs.enabled) {
-     dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
-     savingPeriod = 1.0 / dataSavingPs.savingFreq;
+       dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
+       savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
-     // numOfAecChannels is only nonzero if TEST_VERSION is defined
-     data = QVector<double>(1+inChnsToSave.size()+outChnsToSave.size()+SGp.saving+numOfAecChannels); // time + in + out + SG (which can be 0)
-     QVector<QString> header = QVector<QString>(data.size()); // write file header
-     header[0] = "Time";
-     QString tmp;
-     for( i = 0; i < inChnsToSave.size();  i++) header[i+1]           = "V"+tmp.setNum(inChnsToSave[i]);
-     if( SGp.saving ) header[1+inChnsToSave.size()] = "SpikeGenerator";
-     for( i = 0; i < outChnsToSave.size(); i++) header[1+inChnsToSave.size()+SGp.saving+i] = "I"+tmp.setNum(outChnsToSave[i]);
+       inChnsToSave.clear();
+       outChnsToSave.clear();
+       QVector<QString> headerIn, headerOut;
 
-     // numOfAecChannels is only nonzero if TEST_VERSION is defined
-     for( i = 0; i < numOfAecChannels; i++) header[1+inChnsToSave.size()+SGp.saving+outChnsToSave.size()+i] = "Ve_"+tmp.setNum(i);
+       for ( DAQ *b : clk.board ) {
+           QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
+           QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
+           headerIn.append(its.first);
+           headerOut.append(ots.first);
+           inChnsToSave.append(its.second);
+           outChnsToSave.append(ots.second);
+       }
+       int i = 0;
+       for ( HHNeuronModel &m : hhNeuron ) {
+           QPair<QVector<QString>, QVector<inChannel*>> its = m.inChans_to_save(i);
+           QPair<QVector<QString>, QVector<outChannel*>> ots = m.outChans_to_save(i++);
+           headerIn.append(its.first);
+           headerOut.append(ots.first);
+           inChnsToSave.append(its.second);
+           outChnsToSave.append(ots.second);
+       }
+       if ( SGp.saving ) {
+           headerIn.append("SpikeGenerator");
+           inChnsToSave.append(&inChnSG);
+       }
 
-     // Add virtual neuron channels as needed
-     int modelNum = 0;
-     for ( HHNeuronModel &model : hhNeuron ) {
-         header.append(model.labels(modelNum++));
-     }
-     data.resize(header.size());
+       QVector<QString> header(1, "Time");
+       header.append(headerIn);
+       header.append(headerOut);
+       for ( int i = 0; i < numOfAecChannels; i++ ) {
+           header.append(QString("Ve_%1").arg(i));
+       }
+       dataSaver->SaveHeader(header);
 
-     dataSaver->SaveHeader(header);
+       data.clear();
+       data.resize(header.size());
    }
 
    bool limitWarningEmitted = false;
@@ -303,50 +300,52 @@ void DCThread::run()
      evt= scrIter->first;
    }
    else evt= 1e10;
-   board->reset_RTC();
+
+   clk.start();
 
    // Dynamic clamp loop begins
-   while (!stopped) {       
+   while (!stopped) {
 
 
      if (!SampleHoldOn) {
        // --- Read --- //
-          board->get_scan(inChn);
+         for ( DAQ *b : clk.board )
+             b->get_scan();
        // --- Read end --- //
 
        // --- Calculate --- //
 
         // Adaptive time step
-        dt = board->get_RTC();
+        dt = clk.get_RTC();
         t += dt;
 
         // AEC channel update part
-        for ( int k=0; k<aecChannels.size(); k++ )
-            if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum.chanID].I, dt);
-
         // AEC compensation
-        for ( int k=0; k<aecChannels.size(); k++ ){
-              if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum.chanID].V -= aecChannels[k]->v_e;
+        for ( int k=0; k<aecChannels.size(); k++ ) {
+            if ( aecChannels[k]->IsActive() ) {
+                aecChannels[k]->CalculateVe(aecOut[k]->I, dt);
+                aecIn[k]->V -= aecChannels[k]->v_e;
+            }
         }
-        // Apply channel bias voltages
-        for (int k= 0; k < inNo; k++) {
-            inChn[k].V+= inChnp[inIdx[k]].bias;
-        }
+
+        // Apply biases & detect spikes
+        for ( DAQ *b : clk.board )
+            b->process_scan(t);
      }
      else {
          // Adaptive time step
-         dt = board->get_RTC();
+         dt = clk.get_RTC();
          t += dt;
      }
      if (SampleHoldp.active) {
          if (SampleHoldOn) {
-             board->get_single_scan(inChn, SampleHoldp.trigChn.chanID);
-             if (inChn[SampleHoldp.trigChn.chanID].V < SampleHoldp.threshV) {
+             SampleHoldBoard->get_single_scan(SampleHoldChan);
+             if (SampleHoldChan->V < SampleHoldp.threshV) {
                  SampleHoldOn= false;
              }
          }
          else {
-             if (inChn[SampleHoldp.trigChn.chanID].V >= SampleHoldp.threshV) {
+             if (SampleHoldChan->V >= SampleHoldp.threshV) {
                  SampleHoldOn= true;
              }
          }
@@ -356,27 +355,17 @@ void DCThread::run()
          if (dataSavingPs.enabled) {
            if ( t >= lastSave + savingPeriod )
            {
-              data[0] = t;
-
-              for (i= 0; i < inChnsToSave.size(); i++)   data[i+1] = inChn[inChnsToSave[i]].V;    // voltages
-              if ( SGp.saving ) data[inChnsToSave.size()+1] = SG.V; // spike generator
-              for (i= 0; i < outChnsToSave.size(); i++)  data[inChnsToSave.size()+1+SGp.saving+i] = outChn[outChnsToSave[i]].I;    // currents
-
-              QVector<double>::iterator it = data.begin();
-              it += inChnsToSave.size()+1+SGp.saving+outChnsToSave.size();
+              i = 0;
+              data[i++] = t;
+              for ( inChannel *in : inChnsToSave )
+                  data[i++] = in->V;
+              for ( outChannel *out : outChnsToSave )
+                  data[i++] = out->I;
             #ifdef TEST_VERSION
-              int aecChannelNum = 0;
-              for ( int i=0; i<aecChannels.size(); i++ )
-                  if ( aecChannels[i]->IsActive() )
-                  {
-                      data[inChnsToSave.size()+1+SGp.saving+outChnsToSave.size()+aecChannelNum] = aecChannels[i]->v_e;
-                      aecChannelNum++;
-                  }
-              it += aecChannelNum;
+              for ( AECChannel *aec : aecChannels )
+                  if ( aec->IsActive() )
+                      data[i++] = aec->v_e;
             #endif
-
-              for ( HHNeuronModel &model : hhNeuron )
-                  model.putData(it);
 
               dataSaver->SaveLine(data);
               lastSave = t;
@@ -388,14 +377,9 @@ void DCThread::run()
          // Dynamic clamp current generation
          if (SGp.active) { // SpkGen active
            SG.VUpdate(t, dt);
+           inChnSG.spike_detect(t);
          }
-         inChn[inIdx[inNo]].active = SGp.active;
-         for (i= 0; i <= inNo; i++) {
-           inChn[inIdx[i]].spike_detect(t);  // the inChn decides whether to do anything or not
-         }
-         for (i= 0; i <= outNo; i++) {
-           outChn[outIdx[i]].I= outChnp[outIdx[i]].bias;
-         }
+         inChnSG.active = SGp.active;
 
          for ( HHNeuronModel &model : hhNeuron )
              model.updateChannels(t);
@@ -415,9 +399,6 @@ void DCThread::run()
 
          for ( HHNeuronModel &model : hhNeuron )
              model.updateNeurons(t, dt);
-
-         // spike generator ... write stuff to DAQ
-         // outChn[1].I= inChn[inIdx[inNo]].V;
 
          // Updated display
          if ( grpNo[0] ) {
@@ -448,41 +429,23 @@ void DCThread::run()
          }
 
          // Check channel limits
-         for (i= 0; i < inNo; i++)
-             if( inChn[inIdx[i]].V > vHiLim[i] || inChn[inIdx[i]].V < vLoLim[i])
-                  if ( limitWarningEmitted == false){
-                        emit CloseToLimit(QString("Voltage"), inIdx[i], inChnp[inIdx[i]].minVoltage, inChnp[inIdx[i]].maxVoltage, inChn[inIdx[i]].V);
-                        limitWarningEmitted = true;
-                    }
-
-          for (i= 0; i < outNo; i++) {
-              if( outChn[outIdx[i]].I > iHiLim[i] ) {
-                outChn[outIdx[i]].I = iHiLim[i];
-                if ( limitWarningEmitted == false){
-                        emit CloseToLimit(QString("Current"), outIdx[i], outChnp[outIdx[i]].minCurrent, outChnp[outIdx[i]].maxCurrent, outChn[outIdx[i]].I);
-                        limitWarningEmitted = true;
-                }
-              }
-              if( outChn[outIdx[i]].I < iLoLim[i] ) {
-                 outChn[outIdx[i]].I = iLoLim[i];
-                 if ( limitWarningEmitted == false){
-                        emit CloseToLimit(QString("Current"), outIdx[i], outChnp[outIdx[i]].minCurrent, outChnp[outIdx[i]].maxCurrent, outChn[outIdx[i]].I);
-                        limitWarningEmitted = true;
-                 }
-              }
-
-           }
+         DAQ::ChannelLimitWarning w;
+         for ( DAQ *b : clk.board ) {
+             if ( b->check_limits(!limitWarningEmitted, w) )
+                 emit CloseToLimit(w.what, w.chan_label, w.loLim, w.hiLim, w.value);
+         }
 
      // --- Calculate end --- //
 
      // copy AEC compensated input values to output channels if desired
      for ( int k=0; k<aecChannels.size(); k++ ){
-         if ( aecChannels[k]->IsActive() && elecCalibPs[k].copyChnOn)
-             outChn[elecCalibPs[k].copyChn.chanID].I= inChn[aecChannels[k]->inChnNum.chanID].V;
+         if ( aecChannels[k]->IsActive() && elecCalibPs[k].copyChnOn && aecCopy[k])
+             aecCopy[k]->I= aecIn[k]->V;
      }
 
      // --- Write --- //
-         board->write_analog_out(outChn);
+     for ( DAQ *b : clk.board )
+         b->write_analog_out();
      // --- Write end --- //
 
 
@@ -491,8 +454,10 @@ void DCThread::run()
 
 
    // In the end, let's do the cleanup
-   for (i= 0; i < outNo; i++) outChn[outIdx[i]].I = 0.0;
-   board->reset_board();
+   for ( DAQ *b : clk.board ) {
+       b->reset_board();
+       b->reset_chans();
+   }
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
 
    if (dataSavingPs.enabled) {
@@ -501,21 +466,6 @@ void DCThread::run()
 
    finished= true;
 
-} 
-
-
-// Completes the sampling cycle by waiting till the end of the sampling period
-// Not used for adaptive sampling
-double DCThread::WaitTillNextSampling(double time)
-{
-    double t = 0.0;
-
-    do
-    {
-        t += board->get_RTC();
-    } while (t < time);
-
-    return t;
 }
 
 
@@ -531,9 +481,22 @@ inChannel *DCThread::getInChan(ChannelIndex const& dex)
             return &(hhNeuron[dex.modelID].inst[dex.instID].in);
         }
     } else if ( dex.isSG ) {
-        return &inChn[inIdx[inNo]];
+        return &inChnSG;
     } else if ( dex.isAnalog && dex.isInChn ) {
-        return &inChn[dex.chanID];
+        switch ( dex.daqClass ) {
+        case DAQClass::Simul :
+            if ( !simulDAQ || simulDAQ->in.size() <= dex.chanID )
+                return nullptr;
+            return &(simulDAQ->in[dex.chanID]);
+        case DAQClass::DD1200 :
+            if ( !dd1200 || dd1200->in.size() <= dex.chanID )
+                return nullptr;
+            return &(dd1200->in[dex.chanID]);
+        case DAQClass::NI :
+            if ( !niDAQ || niDAQ->in.size() <= dex.chanID )
+                return nullptr;
+            return &(niDAQ->in[dex.chanID]);
+        }
     }
     return nullptr;
 }
@@ -550,9 +513,34 @@ outChannel *DCThread::getOutChan(ChannelIndex const& dex)
             return &(hhNeuron[dex.modelID].inst[dex.instID].out);
         }
     } else if ( dex.isNone ) {
-        return &outChn[outIdx[outNo]];
+        return &outChnNone;
     } else if ( dex.isAnalog && !dex.isInChn ) {
-        return &outChn[outIdx[dex.chanID]];
+        switch ( dex.daqClass ) {
+        case DAQClass::Simul :
+            if ( !simulDAQ || simulDAQ->out.size() <= dex.chanID )
+                return nullptr;
+            return &(simulDAQ->out[dex.chanID]);
+        case DAQClass::DD1200 :
+            if ( !dd1200 || dd1200->out.size() <= dex.chanID )
+                return nullptr;
+            return &(dd1200->out[dex.chanID]);
+        case DAQClass::NI :
+            if ( !niDAQ || niDAQ->out.size() <= dex.chanID )
+                return nullptr;
+            return &(niDAQ->out[dex.chanID]);
+        }
+    }
+    return nullptr;
+}
+
+DAQ *DCThread::getBoard(ChannelIndex const& dex)
+{
+    if ( !dex.isValid || !dex.isAnalog )
+        return nullptr;
+    switch ( dex.daqClass ) {
+    case DAQClass::Simul :  return simulDAQ;
+    case DAQClass::DD1200 : return dd1200;
+    case DAQClass::NI :     return niDAQ;
     }
     return nullptr;
 }
@@ -675,14 +663,14 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
 
 bool DCThread::LoadScript(QString &fname)
 {
-  double et; 
+  double et;
   QString rawname;
   bool done, success;
   QString qn;
   char buf[80];
-  
+
   ifstream is(fname.toLatin1());
-     
+
   is >> et;
   done= false;
   success= true;

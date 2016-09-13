@@ -7,8 +7,8 @@ ostream &operator<<(ostream &os, SDAQData &p)
   os << buf << " ";
   buf= p.outFileName.toStdString();
   os << buf << " ";
-  os << p.inChnNo << " ";
-  os << p.outChnNo << " ";
+  os << p.inChn.size() << " ";
+  os << p.outChn.size() << " ";
   os << p.inTFac << " ";
   os << p.outDt << " ";
   return os;
@@ -17,12 +17,13 @@ ostream &operator<<(ostream &os, SDAQData &p)
 istream &operator>>(istream &is, SDAQData &p) 
 {
   char cBuf[80];
+  size_t inChnNo, outChnNo;
   is >> cBuf;
   p.inFileName= QString(cBuf);;
   is >> cBuf;
   p.outFileName= QString(cBuf);
-  is >> p.inChnNo;
-  is >> p.outChnNo;
+  is >> inChnNo; p.inChn.resize(inChnNo);
+  is >> outChnNo; p.outChn.resize(outChnNo);
   is >> p.inTFac;
   is >> p.outDt;
   return is;
@@ -32,8 +33,8 @@ SDAQData &SDAQData::operator=(SDAQData old)
 {
   inFileName= old.inFileName;
   outFileName= old.outFileName;
-  inChnNo= old.inChnNo;
-  outChnNo= old.outChnNo;
+  inChn.resize(old.inChn.size());
+  outChn.resize(old.outChn.size());
   inTFac= old.inTFac;
   outDt= old.outDt;
   return *this;

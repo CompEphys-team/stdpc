@@ -43,7 +43,7 @@ void OutputChannelDlg::clearAll()
 }
 
 
-void OutputChannelDlg::init(DAQ *board)
+void OutputChannelDlg::init(DAQ *b)
 {
   #define Y0 90
   #define DY 22
@@ -60,6 +60,8 @@ void OutputChannelDlg::init(DAQ *board)
   QComboBox *qctmp;
   QLineEdit *letmp; 
   QString nm;
+
+  board = b;
      
   clearAll();
   ChnNo= board->outChnNo;
@@ -147,30 +149,25 @@ OutputChannelDlg::~OutputChannelDlg()
 void OutputChannelDlg::exportData()
 {
   for (int i= 0; i < ChnNo; i++) {
-    outChnp[i].active= (act[i]->checkState() > 0);
-    outChnp[i].gain= rng[i]->currentIndex();
-    outChnp[i].gainFac= factor[i]->text().toDouble();
-    outChnp[i].bias= bias[i]->text().toDouble()*1e-9;
-    outChnp[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/outChnp[i].gainFac;
-    outChnp[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/outChnp[i].gainFac;
-    outChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    board->p->outChn[i].active= (act[i]->checkState() > 0);
+    board->p->outChn[i].gain= rng[i]->currentIndex();
+    double gainFac = factor[i]->text().toDouble();
+    board->p->outChn[i].gainFac= gainFac;
+    board->p->outChn[i].bias= bias[i]->text().toDouble()*1e-9;
+    board->p->outChn[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/gainFac;
+    board->p->outChn[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/gainFac;
+    board->p->outChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
 void OutputChannelDlg::importData()
 {
-  QString lb;
-  
   for (int i= 0; i < ChnNo; i++) {
-    if (outChnp[i].active) act[i]->setCheckState(Qt::Checked);
-    else act[i]->setCheckState(Qt::Unchecked);
-    rng[i]->setCurrentIndex(outChnp[i].gain);
-    lb.setNum(outChnp[i].gainFac);
-    factor[i]->setText(lb);
-    lb.setNum(outChnp[i].bias*1e9);
-    bias[i]->setText(lb);
-    if (outChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
-    else saveChnl[i]->setCheckState(Qt::Unchecked);
+    act[i]->setChecked(board->p->outChn[i].active);
+    rng[i]->setCurrentIndex(board->p->outChn[i].gain);
+    factor[i]->setText(QString::number(board->p->outChn[i].gainFac));
+    bias[i]->setText(QString::number(board->p->outChn[i].bias*1e9));
+    saveChnl[i]->setChecked(board->p->outChn[i].chnlSaving);
   }
 }
 

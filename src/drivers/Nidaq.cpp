@@ -11,7 +11,8 @@
 
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ()
+NIDAQ::NIDAQ(NIDAQData *p, int devID, Clock *clk) :
+    DAQ(p, devID, clk)
 {
   char data[1024];
   float64 fdata[128];
@@ -20,7 +21,7 @@ NIDAQ::NIDAQ()
   char cbuf;
   
   devName= new char[80];
-  strcpy(devName, (const char *) NIDAQp.deviceName.toLatin1());
+  strcpy(devName, (const char *) p->deviceName.toLatin1());
   
   DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
   //if (!DevicePresent)
@@ -104,7 +105,7 @@ NIDAQ::NIDAQ()
 //               QMessageBox::Close); 
 
 //  init();
-};
+}
 
 NIDAQ::~NIDAQ()
 {
@@ -149,18 +150,17 @@ bool NIDAQ::initialize_board(QString &name)
     else name= QString(devName);
     DAQmxResetDevice(devName);
     initialized= success;
-  }
+  } else name = QString(devName);
   return success;
 }
 
-void NIDAQ::reset_RTC()
+void NIDAQ::start()
 {
   // this is called when the dynamic clamp starts ... start tasks
   if (DevicePresent) {
     DAQmxStartTask(inTask);
     DAQmxStartTask(outTask);
   }
-  DAQ::reset_RTC();
 }
 
 //---------------------------------------------------------------------------
@@ -181,12 +181,21 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
     }
     inBuf= new float64[chnNo];
     DAQmxCreateTask ("", &inTask);
+
+    ChannelIndex dex;
+    dex.isValid = true;
+    dex.isAnalog = true;
+    dex.daqClass = DAQClass::NI;
+    dex.devID = devID;
+    dex.isInChn = true;
   
     for (int i= 0; i < chnNo; i++) {
       inIdx[i]= Chns[i];
-      DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[inChnp[inIdx[i]].gain],
-                                inHigh[inChnp[inIdx[i]].gain], DAQmx_Val_Volts, "");
-      inGainFac[i]= inChnp[inIdx[i]].gainFac;
+      DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[p->inChn[inIdx[i]].gain],
+                                inHigh[p->inChn[inIdx[i]].gain], DAQmx_Val_Volts, "");
+      inGainFac[i]= p->inChn[inIdx[i]].gainFac;
+      dex.chanID = inIdx[i];
+      inChnLabels[inIdx[i]] = dex.toString();
     }
     DAQmxSetSampTimingType(inTask, DAQmx_Val_OnDemand);
     DAQmxSetReadOverWrite(inTask, DAQmx_Val_OverwriteUnreadSamps);
@@ -196,7 +205,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_scan(inChannel *in)
+void NIDAQ::get_scan()
 {
   // assume device is present if this is called (responsibility of calling code!)
   static int i;
@@ -212,7 +221,7 @@ void NIDAQ::get_scan(inChannel *in)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_single_scan(inChannel *in, int which)
+void NIDAQ::get_single_scan(inChannel *in)
 {
   // assume device is present if this is called (responsibility of calling code!)
   static int i;
@@ -225,8 +234,8 @@ void NIDAQ::get_single_scan(inChannel *in, int which)
 //                temp,
 //                QMessageBox::Ok);
   for (i= 0; i < actInChnNo; i++) {
-      if (inIdx[i] == which) {
-          in[inIdx[i]].V= inGainFac[i]*inBuf[i];
+      if (&(this->in[inIdx[i]]) == in) {
+          in->V= inGainFac[i]*inBuf[i];
       }
   }
 }
@@ -243,12 +252,21 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     }
     outBuf= new float64[actOutChnNo];
     DAQmxCreateTask("", &outTask);
+
+    ChannelIndex dex;
+    dex.isValid = true;
+    dex.isAnalog = true;
+    dex.daqClass = DAQClass::NI;
+    dex.devID = devID;
+    dex.isInChn = false;
    
     for (int i= 0; i < chnNo; i++) {
       outIdx[i]= Chns[i];
-      DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[outChnp[outIdx[i]].gain],
-                                outHigh[outChnp[outIdx[i]].gain], DAQmx_Val_Volts, "");
-      outGainFac[i]= outChnp[outIdx[i]].gainFac*1e9;
+      DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[p->outChn[outIdx[i]].gain],
+                                outHigh[p->outChn[outIdx[i]].gain], DAQmx_Val_Volts, "");
+      outGainFac[i]= p->outChn[outIdx[i]].gainFac*1e9;
+      dex.chanID = outIdx[i];
+      outChnLabels[outIdx[i]] = dex.toString();
     }
     DAQmxSetSampTimingType(outTask, DAQmx_Val_OnDemand);
     //DAQmxSetBufOutputBufSize(outTask, actOutChnNo*10);
@@ -258,7 +276,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::write_analog_out(outChannel *out)
+void NIDAQ::write_analog_out()
 {
   static int i;
   static int32 spw;
@@ -290,4 +308,11 @@ void NIDAQ::reset_board()
     }
     DAQmxResetDevice(devName);
  }
+}
+
+
+//---------------------------------------------------------------------------
+QString NIDAQ::prefix()
+{
+    return QString("NIDAQ_%1").arg(static_cast<NIDAQData*>(p)->deviceName);
 }

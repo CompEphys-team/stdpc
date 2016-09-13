@@ -276,27 +276,32 @@ struct outChnData {
   bool chnlSaving;
 };
 
-class SDAQData {
-  public: 
+class DAQData {
+public:
+    bool active;
+    std::vector<inChnData> inChn;
+    std::vector<outChnData> outChn;
+};
+
+class SDAQData : public DAQData {
+  public:
     QString inFileName;
     QString outFileName;
-    short int inChnNo;
-    short int outChnNo;
     double inTFac;
     double outDt;
     SDAQData &operator=(SDAQData);
 };
 
-class DigiDataData {
-  public: 
+class DigiDataData : public DAQData {
+  public:
     short int baseAddress;
     short int syncIOMask;
     DigiDataData &operator=(DigiDataData);
 };
 
 #ifdef NATIONAL_INSTRUMENTS
-class NIDAQData {
-  public: 
+class NIDAQData : public DAQData {
+  public:
     QString deviceName;
     NIDAQData &operator=(NIDAQData);
 };

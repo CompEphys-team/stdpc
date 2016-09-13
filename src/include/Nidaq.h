@@ -27,22 +27,20 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ();
+    NIDAQ(NIDAQData *p, int devID, Clock *clk);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
-    virtual void reset_RTC();
+    virtual void start();
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan(inChannel *);
-    virtual void get_single_scan(inChannel *, int);
-    virtual void write_analog_out(outChannel *);
+    virtual void get_scan();
+    virtual void get_single_scan(inChannel *);
+    virtual void write_analog_out();
     virtual void reset_board();
-    //short int* inChnGain;
-    //short int* DACEnable;
-    
-    // actually activated stuff
+
+    virtual QString prefix();
 };
 
 #endif

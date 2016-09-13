@@ -24,6 +24,7 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      
      int ChnNo;
      int lbNum;
+     DAQ *board;
 
   protected:
      QVector<double> outLow;
