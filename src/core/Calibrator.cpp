@@ -37,7 +37,7 @@ void Calibrator::GeneralInit(DAQ *brd, DCThread *DCThrd)
 }
 
 
-int Calibrator::ChannelInit(int inChNum, int outChNum)
+int Calibrator::ChannelInit(ChannelIndex inChNum, ChannelIndex outChNum)
 {
     inputChannelNumber = inChNum;
     outputChannelNumber = outChNum;
@@ -75,7 +75,7 @@ int Calibrator::ChannelInit(int inChNum, int outChNum)
     bool valid= false;
 
     for (i= 0; i < inNo; i++) {
-        if(inIdx[i] == inputChannelNumber){
+        if(inIdx[i] == inputChannelNumber.chanID){
              valid= true;
         }
     }
@@ -85,15 +85,16 @@ int Calibrator::ChannelInit(int inChNum, int outChNum)
     valid= false;
 
     for (i= 0; i < outNo; i++) {
-        if(outIdx[i] == outputChannelNumber){
+        if(outIdx[i] == outputChannelNumber.chanID){
              valid= true;
         }
     }
 
     if (valid == false) return 2;  // Return code for inactive output channel
 
-    board->generate_scan_list(1,&(inputChannelNumber));
-    board->generate_analog_out_list(1,&(outputChannelNumber));
+    short int iCN = inputChannelNumber.chanID, oCN = outputChannelNumber.chanID;
+    board->generate_scan_list(1,&iCN);
+    board->generate_analog_out_list(1,&oCN);
 
     return 0;   // Return code for successfull channel initialization
 }
@@ -226,13 +227,14 @@ void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, in
 
     //-----------------Only for testing---------------//
   #ifdef TEST_VERSION
-    fname = QString("iLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("iLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, iLevels);
-    fname = QString("vLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("vLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, vLevels);
-    fname = QString("rLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("rLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, rLevels);
-    fname = QString("tauE_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("tauE_")+inChnName+QString(".dat");
     saveData(fname, tauE);
  #endif
     //-----------------Only for testing---------------//
@@ -362,13 +364,14 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
 
   #ifdef TEST_VERSION
     //-----------------Only for testing---------------//
-    fname = QString("iLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("iLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, iLevels);
-    fname = QString("vLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("vLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, vLevels);
-    fname = QString("rLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("rLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, rLevels);
-    fname = QString("tauM_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("tauM_")+inChnName+QString(".dat");
     saveData(fname, tauM);  
     //-----------------Only for testing---------------//
   #endif
@@ -515,8 +518,8 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     t = 0.0; // init time
 
     // Create tolerance limits
-    double higherLimit = inChnp[inputChannelNumber].minVoltage + 0.9*(inChnp[inputChannelNumber].maxVoltage-inChnp[inputChannelNumber].minVoltage);
-    double lowerLimit =  inChnp[inputChannelNumber].minVoltage + 0.1*(inChnp[inputChannelNumber].maxVoltage-inChnp[inputChannelNumber].minVoltage);
+    double higherLimit = inChnp[inputChannelNumber.chanID].minVoltage + 0.9*(inChnp[inputChannelNumber.chanID].maxVoltage-inChnp[inputChannelNumber.chanID].minVoltage);
+    double lowerLimit =  inChnp[inputChannelNumber.chanID].minVoltage + 0.1*(inChnp[inputChannelNumber.chanID].maxVoltage-inChnp[inputChannelNumber.chanID].minVoltage);
     bool limitWarningEmitted = false;
 
     // board->reset_board();
@@ -528,10 +531,10 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
             // --- Read --- //
             board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            voltages[sample]= inChn[inputChannelNumber.chanID].V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChnp[inputChannelNumber.chanID].minVoltage, inChnp[inputChannelNumber.chanID].maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
@@ -544,7 +547,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
 
             // --- Write --- //
-            outChn[outputChannelNumber].I= currents[sample];
+            outChn[outputChannelNumber.chanID].I= currents[sample];
             board->write_analog_out(outChn);
             // --- Write end --- //
 
@@ -555,7 +558,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
         {
 
             // --- Write --- //
-            outChn[outputChannelNumber].I= currents[sample];
+            outChn[outputChannelNumber.chanID].I= currents[sample];
             board->write_analog_out(outChn);
             // --- Write end --- //
 
@@ -568,10 +571,10 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
             // --- Read --- //
             board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            voltages[sample]= inChn[inputChannelNumber.chanID].V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChnp[inputChannelNumber.chanID].minVoltage, inChnp[inputChannelNumber.chanID].maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
@@ -608,7 +611,7 @@ double Calibrator::VoltageOffsetMeasurement()
         board->get_scan(inChn);
 
         // Save voltage
-        vOffset += inChn[inputChannelNumber].V;
+        vOffset += inChn[inputChannelNumber.chanID].V;
 
         board->wait_till_elapsed(samplingPeriod);
     }

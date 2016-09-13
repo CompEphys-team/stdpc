@@ -178,8 +178,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(ECDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
 
-     connect(ECDlg->calibrator,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
-     connect(DCT,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
+     connect(ECDlg->calibrator,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
+     connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
      // graphical stuff
      DataD1->setScene(&Graphs[0].Scene);
@@ -213,9 +213,9 @@ MyMainWindow::~MyMainWindow()
   delete SaveProtocolFileDlg;
 }
 
-void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowLimit, double highLimit, double value)
+void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double lowLimit, double highLimit, double value)
 {
-   QString msg = what+QString(" is close to channel limit!\nChannel number: ")+QString::number(channelNum)+QString("\nHigh limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value)+QString("\nLow limit: ")+QString::number(lowLimit);
+   QString msg = what+QString(" is close to channel limit!\nChannel: ")+channelName+QString("\nHigh limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value)+QString("\nLow limit: ")+QString::number(lowLimit);
    //QMessageBox::warning(this, tr("Warning"), msg);
    DisplayMessage(msg);
    return;
@@ -407,7 +407,7 @@ void MyMainWindow::exportSGData()
   SGp.VRest= VRestE->text().toDouble()/1e3;
   
   SGp.bdType= BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= SGbdChannelCombo->currentData().toInt();
+  SGp.bdChannel= SGbdChannelCombo->currentData().value<ChannelIndex>();
   SGp.bdThresh= ThresholdE->text().toDouble()/1e3;
   SGp.bdNUnder= NUnderE->text().toInt();
   SGp.bdNOver= NOverE->text().toInt();
@@ -492,7 +492,6 @@ void MyMainWindow::LoadConfig()
   // special Sample-and-Hold for Attila
   SampleHoldp.active= false;
   SampleHoldp.threshV= 0.0;
-  SampleHoldp.trigChn= 0;
 }
 
 void MyMainWindow::doSaveProtocol(QString &fname)

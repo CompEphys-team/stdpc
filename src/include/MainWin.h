@@ -78,7 +78,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      
   public slots:
      void DAQSetup();
-     void CloseToLimitWarning(QString, int, double, double, double);
+     void CloseToLimitWarning(QString, QString, double, double, double);
      void DisplayAbout();
 
   signals:

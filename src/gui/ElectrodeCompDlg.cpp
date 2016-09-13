@@ -6,6 +6,7 @@
 #include "ui_ElectrodeCompDlg.h"
 #include "MainWin.h"
 #include "Global.h"
+#include "ChannelIndex.h"
 
 
 ElectrodeCompDlg::ElectrodeCompDlg(QWidget *parent) :
@@ -117,11 +118,11 @@ void ElectrodeCompDlg::exportData()
 
         // copy channel
         elecCalibPs[i].copyChnOn           = compVCopyOn[i]->isChecked();
-        elecCalibPs[i].copyChn             = compVCopyChannel[i]->currentData().toInt();
+        elecCalibPs[i].copyChn             = compVCopyChannel[i]->currentData().value<ChannelIndex>();
         // General params
         elecCalibPs[i].samplingRate        = leGenSamplingRate[i]->text().toDouble() * 1e3; // kHz -> Hz
-        elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->currentData().toInt();
-        elecCalibPs[i].outputChannelNumber = leGenOutChannelNum[i]->currentData().toInt();
+        elecCalibPs[i].inputChannelNumber  = leGenInChannelNum[i]->currentData().value<ChannelIndex>();
+        elecCalibPs[i].outputChannelNumber = leGenOutChannelNum[i]->currentData().value<ChannelIndex>();
 
         // Calibration params
         elecCalibPs[i].hyperpolCurr       = leHyperpolCurr[i]->text().toDouble() * 1e-9; // nA -> A
@@ -217,17 +218,17 @@ void ElectrodeCompDlg::MeasureElectrode()
          QMessageBox::warning(this, tr("Warning"), tr("Maximal current level must be higher than minimal level"));
          return;
     }
-    if ( elecCalibPs[elecNum].iMaxElec > outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].iMaxElec > elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent )
     {
          QString temp;
-         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         temp.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent);
          QMessageBox::warning(this, tr("Warning"), QString("Requested maximal current level exceeds the max limit of the channel: ")+temp+QString("A"));
          return;
     }
-    if ( elecCalibPs[elecNum].iMinElec < outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].iMinElec < elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent )
     {
          QString temp;
-         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         temp.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent);
          QMessageBox::warning(this, tr("Warning"), QString("Requested minimum current level exceeds the min limit of the channel: ")+temp+QString("A"));
          return;
     }
@@ -294,8 +295,8 @@ void ElectrodeCompDlg::MeasureElectrode()
     lInfo[elecNum]->repaint();
     this->setEnabled(true);
 
-    message(QString("Electrode characteristic measurement on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
-            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
+    message(QString("Electrode characteristic measurement on input channel ")+elecCalibPs[elecNum].inputChannelNumber.prettyName()+
+            QString(" and output channel ")+elecCalibPs[elecNum].outputChannelNumber.prettyName()+QString(" finished."));
 
 }
 
@@ -318,17 +319,17 @@ void ElectrodeCompDlg::MeasureMembrane()
          QMessageBox::warning(this, tr("Warning"), tr("Injection length must be positive"));
          return;
     }
-    if ( elecCalibPs[elecNum].iMembStep > outChnp[elecCalibPs[elecNum].inputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].iMembStep > elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent )
     {
          QString temp;
-         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         temp.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent);
          QMessageBox::warning(this, tr("Warning"), QString("Requested maximal current step exceeds the max limit of the channel: ")+temp+QString("A"));
          return;
     }
-    if ( elecCalibPs[elecNum].iMembStep < outChnp[elecCalibPs[elecNum].inputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].iMembStep < elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent )
     {
          QString temp;
-         temp.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         temp.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent);
          QMessageBox::warning(this, tr("Warning"), QString("Requested minimum current step exceeds the min limit of the channel: ")+temp+QString("A"));
          return;
 
@@ -396,8 +397,8 @@ void ElectrodeCompDlg::MeasureMembrane()
     lInfo[elecNum]->repaint();
     this->setEnabled(true);
 
-    message(QString("Membrane characteristic measurement on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
-            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
+    message(QString("Membrane characteristic measurement on input channel ")+elecCalibPs[elecNum].inputChannelNumber.prettyName()+
+            QString(" and output channel ")+elecCalibPs[elecNum].outputChannelNumber.prettyName()+QString(" finished."));
 
 }
 
@@ -410,20 +411,20 @@ void ElectrodeCompDlg::CalibrateElectrode()
     elecNum = electrodeTabs->currentIndex();
 
     // Check the task specific parameters provided by the user
-    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr > outChnp[elecCalibPs[elecNum].inputChannelNumber].maxCurrent )
+    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr > elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent )
     {
          QString temp1;
          QString temp2;
-         temp1.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].maxCurrent);
+         temp1.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->maxCurrent);
          temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
          QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the max limit of the channel: ")+temp1+QString("A"));
          return;
     }
-    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr < outChnp[elecCalibPs[elecNum].inputChannelNumber].minCurrent )
+    if ( elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr < elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent )
     {
          QString temp1;
          QString temp2;
-         temp1.setNum(outChnp[elecCalibPs[elecNum].outputChannelNumber].minCurrent);
+         temp1.setNum(elecCalibPs[elecNum].outputChannelNumber.getOutChnData()->minCurrent);
          temp2.setNum(elecCalibPs[elecNum].injCalAmp+elecCalibPs[elecNum].hyperpolCurr);
          QMessageBox::warning(this, tr("Warning"), QString("Requested calibration current (amplitude + hyperolarizing level): ")+temp2+QString("A, exceeds the min limit of the channel: ")+temp1+QString("A"));
          return;
@@ -516,8 +517,8 @@ void ElectrodeCompDlg::CalibrateElectrode()
     cbCompOn[elecNum]->setChecked(true);
     this->setEnabled(true);
 
-    message(QString("Calibration on input channel ")+QString::number(elecCalibPs[elecNum].inputChannelNumber)+
-            QString(" and output channel ")+QString::number(elecCalibPs[elecNum].outputChannelNumber)+QString(" finished."));
+    message(QString("Calibration on input channel ")+elecCalibPs[elecNum].inputChannelNumber.prettyName()+
+            QString(" and output channel ")+elecCalibPs[elecNum].outputChannelNumber.prettyName()+QString(" finished."));
 }
 
 
@@ -543,13 +544,13 @@ bool ElectrodeCompDlg::InitCalibrator()
     this->setEnabled(false);
 
     // Channel init
-    switch ( calibrator->ChannelInit( (short int) elecCalibPs[elecNum].inputChannelNumber, (short int) elecCalibPs[elecNum].outputChannelNumber) )
+    switch ( calibrator->ChannelInit(elecCalibPs[elecNum].inputChannelNumber, elecCalibPs[elecNum].outputChannelNumber) )
     {
             case 0: break;
-            case 1: QMessageBox::warning(this, tr("Warning"), tr("Selected input channel is not an exsisting active channel"));
+            case 1: QMessageBox::warning(this, tr("Warning"), tr("Selected input channel is not an existing active channel"));
                     this->setEnabled(true);
                     return false;
-            case 2: QMessageBox::warning(this, tr("Warning"), tr("Selected output channel is not an exsisting active channel"));
+            case 2: QMessageBox::warning(this, tr("Warning"), tr("Selected output channel is not an existing active channel"));
                     this->setEnabled(true);
                     return false;
     }

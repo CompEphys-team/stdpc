@@ -30,7 +30,7 @@ void AssignmentWidget<A>::exportData(std::vector<A> &p)
     for ( int i = 0; i < rowCount() - 1; i++ ) {
         a.active = boxes[i]->isChecked();
         for ( Dropdown<A> &d : drops )
-            a.*(d.channel) = d.combo[i]->currentData().toInt();
+            a.*(d.channel) = d.combo[i]->currentData().template value<ChannelIndex>();
         p.push_back(a);
     }
 }

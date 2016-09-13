@@ -118,20 +118,20 @@ void DCThread::run()
      grpNo[i]= 0;
      for (int j= 0; j < 4; j++) {
        if (Graphp[i].active[j]) {
-         ChannelIndex dex(Graphp[i].chn[j]);
-         if ( dex.isSG ) {
+         ChannelIndex &dex = Graphp[i].chn[j];
+         if ( !dex.isValid || dex.isNone ) {
+             continue;
+         } else if ( dex.isSG ) {
              grp[i][grpNo[i]]= &(SG.V);
          } else if ( dex.isVirtual ) {
              // Use inchan for mV units, outchan for nA units
              grp[i][grpNo[i]] = Graphp[i].yfac[j]==1e3
-                     ? &hhNeuron[dex.modelID].inst[dex.instID].in.V
-                     : &hhNeuron[dex.modelID].inst[dex.instID].out.I;
-         } else if ( dex.index >= OUTCHN_OFFSET ) {
-             grp[i][grpNo[i]] = &(outChn[dex.index - OUTCHN_OFFSET].I);
-         } else if ( dex.index >= INCHN_OFFSET ) {
-             grp[i][grpNo[i]] = &(inChn[dex.index - INCHN_OFFSET].V);
+                     ? &(getInChan(dex)->V)
+                     : &(getOutChan(dex)->I);
+         } else if ( dex.isInChn ) {
+             grp[i][grpNo[i]] = &(getInChan(dex)->V);
          } else {
-             continue; // Oughtn't happen
+             grp[i][grpNo[i]] = &(getOutChan(dex)->I);
          }
          pen[i][grpNo[i]++] = j;
        }             
@@ -218,20 +218,20 @@ void DCThread::run()
    numOfAecChannels = 0;
    for ( int i=0; i<aecChannels.size(); i++ ){
      if ( aecChannels[i]->IsActive() ){
-       if ( inChnp[aecChannels[i]->inChnNum].active == true &&
-         outChnp[aecChannels[i]->outChnNum].active == true ){
-         message(QString("AEC channel is active on input channel ")+QString::number(aecChannels[i]->inChnNum)+" and output channel "+QString::number(aecChannels[i]->outChnNum));
+       if ( inChnp[aecChannels[i]->inChnNum.chanID].active == true &&
+         outChnp[aecChannels[i]->outChnNum.chanID].active == true ){
+         message(QString("AEC channel is active on input channel ")+aecChannels[i]->inChnNum.prettyName()+" and output channel "+aecChannels[i]->outChnNum.prettyName());
        #ifdef TEST_VERSION
          numOfAecChannels++;
        #endif
        }
        else {
-         if ( inChnp[aecChannels[i]->inChnNum].active == false ){
-           message(QString("Input channel ")+QString::number(aecChannels[i]->inChnNum)+QString(" is not active! AEC disabled on that channel."));
+         if ( inChnp[aecChannels[i]->inChnNum.chanID].active == false ){
+           message(QString("Input channel ")+aecChannels[i]->inChnNum.prettyName()+QString(" is not active! AEC disabled on that channel."));
            aecChannels[i]->Inactivate();
          }
-         if ( outChnp[aecChannels[i]->outChnNum].active == false ){
-           message(QString("Output channel ")+QString::number(aecChannels[i]->outChnNum)+QString(" is not active! AEC disabled on that channel."));
+         if ( outChnp[aecChannels[i]->outChnNum.chanID].active == false ){
+           message(QString("Output channel ")+aecChannels[i]->outChnNum.prettyName()+QString(" is not active! AEC disabled on that channel."));
            aecChannels[i]->Inactivate();
          }
        }
@@ -322,11 +322,11 @@ void DCThread::run()
 
         // AEC channel update part
         for ( int k=0; k<aecChannels.size(); k++ )
-            if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum].I, dt);
+            if ( aecChannels[k]->IsActive() ) aecChannels[k]->CalculateVe(outChn[aecChannels[k]->outChnNum.chanID].I, dt);
 
         // AEC compensation
         for ( int k=0; k<aecChannels.size(); k++ ){
-              if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum].V -= aecChannels[k]->v_e;
+              if ( aecChannels[k]->IsActive() ) inChn[aecChannels[k]->inChnNum.chanID].V -= aecChannels[k]->v_e;
         }
         // Apply channel bias voltages
         for (int k= 0; k < inNo; k++) {
@@ -340,13 +340,13 @@ void DCThread::run()
      }
      if (SampleHoldp.active) {
          if (SampleHoldOn) {
-             board->get_single_scan(inChn, SampleHoldp.trigChn);
-             if (inChn[SampleHoldp.trigChn].V < SampleHoldp.threshV) {
+             board->get_single_scan(inChn, SampleHoldp.trigChn.chanID);
+             if (inChn[SampleHoldp.trigChn.chanID].V < SampleHoldp.threshV) {
                  SampleHoldOn= false;
              }
          }
          else {
-             if (inChn[SampleHoldp.trigChn].V >= SampleHoldp.threshV) {
+             if (inChn[SampleHoldp.trigChn.chanID].V >= SampleHoldp.threshV) {
                  SampleHoldOn= true;
              }
          }
@@ -478,7 +478,7 @@ void DCThread::run()
      // copy AEC compensated input values to output channels if desired
      for ( int k=0; k<aecChannels.size(); k++ ){
          if ( aecChannels[k]->IsActive() && elecCalibPs[k].copyChnOn)
-             outChn[elecCalibPs[k].copyChn].I= inChn[aecChannels[k]->inChnNum].V;
+             outChn[elecCalibPs[k].copyChn.chanID].I= inChn[aecChannels[k]->inChnNum.chanID].V;
      }
 
      // --- Write --- //
@@ -519,58 +519,61 @@ double DCThread::WaitTillNextSampling(double time)
 }
 
 
-inChannel *DCThread::getInChan(int idx)
+inChannel *DCThread::getInChan(ChannelIndex const& dex)
 {
-    ChannelIndex dex(idx, true);
-    if ( dex.isPrototype ) {
+    if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
     } else if ( dex.isVirtual ) {
         switch ( dex.modelClass ) {
-        case ChannelIndex::HH:
+        case ModelClass::HH:
+            if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
+                return nullptr;
             return &(hhNeuron[dex.modelID].inst[dex.instID].in);
         }
     } else if ( dex.isSG ) {
         return &inChn[inIdx[inNo]];
-    } else if ( idx >= 0 ) {
-        return &inChn[idx];
+    } else if ( dex.isAnalog && dex.isInChn ) {
+        return &inChn[dex.chanID];
     }
     return nullptr;
 }
 
-outChannel *DCThread::getOutChan(int idx)
+outChannel *DCThread::getOutChan(ChannelIndex const& dex)
 {
-    ChannelIndex dex(idx, false);
-    if ( dex.isPrototype ) {
+    if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
     } else if ( dex.isVirtual ) {
         switch ( dex.modelClass ) {
-        case ChannelIndex::HH:
+        case ModelClass::HH:
+            if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
+                return nullptr;
             return &(hhNeuron[dex.modelID].inst[dex.instID].out);
         }
     } else if ( dex.isNone ) {
         return &outChn[outIdx[outNo]];
-    } else if ( idx >= 0 ) {
-        return &outChn[idx];
+    } else if ( dex.isAnalog && !dex.isInChn ) {
+        return &outChn[outIdx[dex.chanID]];
     }
     return nullptr;
 }
 
-std::vector<int> DCThread::getChanIndices(int index)
+std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
 {
-    ChannelIndex dex(index);
-    if ( dex.isPrototype ) {
-        std::vector<int> ret;
+    std::vector<ChannelIndex> ret;
+    if ( !dex.isValid ) {
+        return ret;
+    } else if ( dex.isPrototype ) {
         switch ( dex.modelClass ) {
-        case ChannelIndex::HH:
-            for ( size_t i = 0; i < HHNeuronp[dex.modelID].inst.size(); i++ ) {
-                ret.push_back(dex.toInstance(i));
-            }
+        case ModelClass::HH:
+            if ( dex.modelID < (int)HHNeuronp.size() )
+                for ( size_t i = 0; i < HHNeuronp[dex.modelID].inst.size(); i++ )
+                    ret.push_back(dex.toInstance(i));
             break;
         }
-        return ret;
     } else {
-        return std::vector<int>(1, index);
+        ret.push_back(dex);
     }
+    return ret;
 }
 
 template <class T>
@@ -580,15 +583,15 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Curr
     tmp.actP = &a.active;
     if ( a.VChannel == a.IChannel ) {
         // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
-        for ( int VIChan : getChanIndices(a.VChannel) ) {
+        for ( ChannelIndex VIChan : getChanIndices(a.VChannel) ) {
             tmp.VChannel = VIChan;
             tmp.IChannel = VIChan;
             inst.push_back(T(&p, this, tmp));
         }
     } else {
-        for ( int VChan : getChanIndices(a.VChannel) ) {
+        for ( ChannelIndex VChan : getChanIndices(a.VChannel) ) {
             tmp.VChannel = VChan;
-            for ( int IChan : getChanIndices(a.IChannel) ) {
+            for ( ChannelIndex IChan : getChanIndices(a.IChannel) ) {
                 tmp.IChannel = IChan;
                 inst.push_back(T(&p, this, tmp));
             }
@@ -602,20 +605,20 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Syna
     SynapseAssignment tmp;
     tmp.actP = &a.active;
     if ( a.PostSynChannel == a.OutSynChannel ) {
-        for ( int post : getChanIndices(a.PostSynChannel) ) {
+        for ( ChannelIndex post : getChanIndices(a.PostSynChannel) ) {
             tmp.PostSynChannel = post;
             tmp.OutSynChannel = post;
-            for ( int pre : getChanIndices(a.PreSynChannel) ) {
+            for ( ChannelIndex pre : getChanIndices(a.PreSynChannel) ) {
                 tmp.PreSynChannel = pre;
                 inst.push_back(T(&p, this, tmp));
             }
         }
     } else {
-        for ( int post : getChanIndices(a.PostSynChannel) ) {
+        for ( ChannelIndex post : getChanIndices(a.PostSynChannel) ) {
             tmp.PostSynChannel = post;
-            for ( int out : getChanIndices(a.OutSynChannel) ) {
+            for ( ChannelIndex out : getChanIndices(a.OutSynChannel) ) {
                 tmp.OutSynChannel = out;
-                for ( int pre : getChanIndices(a.PreSynChannel) ) {
+                for ( ChannelIndex pre : getChanIndices(a.PreSynChannel) ) {
                     tmp.PreSynChannel = pre;
                     inst.push_back(T(&p, this, tmp));
                 }
@@ -631,15 +634,15 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
     GapJunctionAssignment tmp;
     tmp.actP = &a.active;
     if ( a.postInChannel == a.postOutChannel ) {
-        for ( int post : getChanIndices(a.postInChannel) ) {
+        for ( ChannelIndex post : getChanIndices(a.postInChannel) ) {
             tmp.postInChannel = post;
             tmp.postOutChannel = post;
             vec.push_back(tmp);
         }
     } else {
-        for ( int in : getChanIndices(a.postInChannel) ) {
+        for ( ChannelIndex in : getChanIndices(a.postInChannel) ) {
             tmp.postInChannel = in;
-            for ( int out : getChanIndices(a.postOutChannel) ) {
+            for ( ChannelIndex out : getChanIndices(a.postOutChannel) ) {
                 tmp.postOutChannel = out;
                 vec.push_back(tmp);
             }
@@ -647,7 +650,7 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
     }
 
     if ( a.preInChannel == a.preOutChannel ) {
-        for ( int pre : getChanIndices(a.preInChannel) ) {
+        for ( ChannelIndex pre : getChanIndices(a.preInChannel) ) {
             for ( GapJunctionAssignment &tmp : vec ) {
                 tmp.preInChannel = pre;
                 tmp.preOutChannel = pre;
@@ -655,8 +658,8 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJ
             }
         }
     } else {
-        for ( int in : getChanIndices(a.preInChannel) ) {
-            for ( int out : getChanIndices(a.preOutChannel) ) {
+        for ( ChannelIndex in : getChanIndices(a.preInChannel) ) {
+            for ( ChannelIndex out : getChanIndices(a.preOutChannel) ) {
                 for ( GapJunctionAssignment &tmp : vec ) {
                     tmp.preInChannel = in;
                     tmp.preOutChannel = out;

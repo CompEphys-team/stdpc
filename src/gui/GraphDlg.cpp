@@ -61,8 +61,8 @@ void GraphDlg::exportData(graphData &p)
   double yfac[2]= { 1e3, 1e9 };
   for (int i= 0; i < 4; i++) {
     p.color[i]= clrCombo[i]->currentText();
-    p.chn[i] = ChannelCombo[i]->currentData().toInt();
-    p.active[i] = p.chn[i]!=CHAN_NONE;
+    p.chn[i] = ChannelCombo[i]->currentData().value<ChannelIndex>();
+    p.active[i] = p.chn[i].isValid && !p.chn[i].isNone;
     p.yfac[i]= yfac[UnitCombo[i]->currentIndex()];
     p.miny[i]= MinE[i]->text().toDouble()/p.yfac[i];
     p.maxy[i]= MaxE[i]->text().toDouble()/p.yfac[i];

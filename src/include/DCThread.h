@@ -37,9 +37,9 @@ private:
      void UnloadScript();
      double WaitTillNextSampling(double);
 
-     inChannel *getInChan(int idx);
-     outChannel *getOutChan(int idx);
-     std::vector<int> getChanIndices(int index);
+     inChannel *getInChan(ChannelIndex const& dex);
+     outChannel *getOutChan(ChannelIndex const& dex);
+     std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
      template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, CurrentAssignment &);

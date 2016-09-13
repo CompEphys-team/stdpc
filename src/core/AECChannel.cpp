@@ -4,9 +4,6 @@
 
 AECChannel::AECChannel()
 {
-    inChnNum = -1;
-    outChnNum = -1;
-
     active = false;
 
     kerSampPer = 0.0;
@@ -21,7 +18,7 @@ AECChannel::AECChannel()
 }
 
 
-void AECChannel::Initialize(short int inChnNum, short int outChnNum, double kerSampPer, QVector<double> ker)
+void AECChannel::Initialize(ChannelIndex inChnNum, ChannelIndex outChnNum, double kerSampPer, QVector<double> ker)
 {
     this->inChnNum = inChnNum;
     this->outChnNum = outChnNum;

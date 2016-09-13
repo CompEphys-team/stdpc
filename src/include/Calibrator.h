@@ -2,6 +2,7 @@
 #include "ObjectDataTypes.h"
 #include "DCThread.h"
 #include "KernelCalculator.h"
+#include "ChannelIndex.h"
 #include <QObject>
 
 #ifndef CALIBRATOR_H
@@ -23,8 +24,8 @@ private:
     // Channel related objects
     inChannel *inChn;
     outChannel *outChn;
-    short int inputChannelNumber;
-    short int outputChannelNumber;
+    ChannelIndex inputChannelNumber;
+    ChannelIndex outputChannelNumber;
 
     // General params
     double samplingPeriod;
@@ -87,7 +88,7 @@ public:
 
     Calibrator();
     void GeneralInit(DAQ*, DCThread*);
-    int  ChannelInit(int, int);
+    int  ChannelInit(ChannelIndex, ChannelIndex);
     void ElectrodeMeasurement(double, double, int, double, double);
     void MembraneMeasurement(double, double, int, double);
     void Calibration(double, double, int, int, int, double, double);
@@ -95,7 +96,7 @@ public:
     void SetChannelActivation(int, bool);
 
 signals:
-    void CloseToLimit(QString, int, double, double, double);
+    void CloseToLimit(QString, QString, double, double, double);
 
 };
 

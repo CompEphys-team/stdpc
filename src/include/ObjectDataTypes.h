@@ -5,6 +5,7 @@ using namespace std;
 
 #include <QString>
 #include <iostream>
+#include "ChannelIndex.h"
 
 // Forward
 class DCThread;
@@ -12,25 +13,25 @@ class DCThread;
 struct SynapseAssignment {
     bool active;
     bool *actP;
-    int PreSynChannel;
-    int PostSynChannel;
-    int OutSynChannel;
+    ChannelIndex PreSynChannel;
+    ChannelIndex PostSynChannel;
+    ChannelIndex OutSynChannel;
 };
 
 struct GapJunctionAssignment {
     bool active;
     bool *actP;
-    int preInChannel;
-    int postInChannel;
-    int preOutChannel;
-    int postOutChannel;
+    ChannelIndex preInChannel;
+    ChannelIndex postInChannel;
+    ChannelIndex preOutChannel;
+    ChannelIndex postOutChannel;
 };
 
 struct CurrentAssignment {
     bool active;
     bool *actP;
-    int VChannel;
-    int IChannel;
+    ChannelIndex VChannel;
+    ChannelIndex IChannel;
 };
 
 typedef struct {
@@ -197,11 +198,12 @@ typedef struct {
 
   // channel copy parameters
   bool copyChnOn;
-  int copyChn;
+  ChannelIndex copyChn;
+
   // General params
   double samplingRate;
-  int inputChannelNumber;
-  int outputChannelNumber;
+  ChannelIndex inputChannelNumber;
+  ChannelIndex outputChannelNumber;
 
   // Electrode measurement params
   double iMaxElec;
@@ -240,7 +242,7 @@ struct SGData {
   double spkTimeScaling;
   double VRest;
   int bdType;
-  int bdChannel;
+  ChannelIndex bdChannel;
   double bdThresh;
   int bdNUnder;
   int bdNOver;
@@ -252,7 +254,7 @@ public:
   SGData() : SpikeT(10) {}
 };
  
-typedef struct {
+struct inChnData {
   bool active;
   int gain;
   double gainFac;
@@ -262,9 +264,9 @@ typedef struct {
   double minVoltage;
   double maxVoltage;
   bool chnlSaving;
-} inChnData;
+};
 
-typedef struct {
+struct outChnData {
   bool active;
   int gain;
   double gainFac;
@@ -272,7 +274,7 @@ typedef struct {
   double minCurrent;
   double maxCurrent;
   bool chnlSaving;
-} outChnData;
+};
 
 class SDAQData {
   public: 
@@ -303,7 +305,7 @@ class NIDAQData {
 typedef struct {
   bool active[4];
   QString color[4];
-  int chn[4];
+  ChannelIndex chn[4];
   double miny[4];
   double maxy[4];
   double xrange;
@@ -316,7 +318,7 @@ typedef struct {
 typedef struct {
   bool active;
   double threshV;
-  int trigChn;
+  ChannelIndex trigChn;
 } SampleHoldData;
 
 struct vInstData {

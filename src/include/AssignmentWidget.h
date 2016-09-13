@@ -11,11 +11,11 @@ template <class Assignment>
 struct Dropdown
 {
     Dropdown(){}
-    Dropdown(int Assignment::* c, ChannelListModel *m, QString const& l, int w) :
+    Dropdown(ChannelIndex Assignment::* c, ChannelListModel *m, QString const& l, int w) :
         channel(c), model(m), label(l), columnWidth(w)
     {}
 
-    int Assignment::* channel;
+    ChannelIndex Assignment::* channel;
     ChannelListModel *model;
     QString label;
     int columnWidth;

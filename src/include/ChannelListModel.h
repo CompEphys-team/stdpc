@@ -32,10 +32,8 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
-    int index(int channel) const;
+    int index(ChannelIndex dex) const;
     QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
-
-    inline bool areAnalogsOffset() const { return offsetAnalogs; }
 
     void subordinate(QComboBox *cb);
     static void fixComboBoxWidth(QComboBox *cb);
@@ -50,7 +48,6 @@ protected:
     int size;
     int nAI, nAO, nPHH;
     QVector<int> nVHH;
-    bool offsetAnalogs;
 };
 
 #endif // CHANNELLISTMODEL_H
