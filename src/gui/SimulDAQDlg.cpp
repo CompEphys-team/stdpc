@@ -2,6 +2,7 @@
 #include "Tools.cpp"
 #include "SimulDAQ.h"
 #include "DeviceManager.h"
+#include <QFileDialog>
 
 SimulDAQDlg::SimulDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
 {
@@ -103,4 +104,18 @@ void SimulDAQDlg::on_outChannels_clicked()
 {
     exportData();
     outDlg->open();
+}
+
+void SimulDAQDlg::on_InputFileB_clicked()
+{
+    QString file = QFileDialog::getOpenFileName(this, "Select input file...", InputFileE->text());
+    if ( !file.isEmpty() )
+        InputFileE->setText(file);
+}
+
+void SimulDAQDlg::on_OutputFileB_clicked()
+{
+    QString file = QFileDialog::getSaveFileName(this, "Select input file...", OutputFileE->text());
+    if ( !file.isEmpty() )
+        OutputFileE->setText(file);
 }

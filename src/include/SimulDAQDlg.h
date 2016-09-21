@@ -28,6 +28,10 @@ private slots:
      void on_inChannels_clicked();
      void on_outChannels_clicked();
 
+     void on_InputFileB_clicked();
+
+     void on_OutputFileB_clicked();
+
 protected:
     DeviceStatus initDAQ();
 
