@@ -150,7 +150,7 @@ void SimulDAQ::get_scan()
   static double V;
 
   //os << t << endl;
-  if (t+tOff >= inT) {
+  if (t >= inT + tOff) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {
       inIter[i]++;
@@ -180,7 +180,7 @@ void SimulDAQ::get_single_scan(inChannel *in)
    static double V;
 
    //os << t << endl;
-   if (t+tOff >= inT) {
+   if (t >= inT + tOff) {
       intIter++;
       for (i= 0; i < inChnNo; i++) {
         inIter[i]++;
@@ -233,9 +233,9 @@ void SimulDAQ::write_analog_out()
 //  double dt;
   
 //  dt= get_RTC();
-  if (t+tOff > lastWrite + static_cast<SDAQData*>(p)->outDt) {
-    lastWrite= t+tOff;
-    outtq.append(t+tOff);
+  if (t > lastWrite + static_cast<SDAQData*>(p)->outDt) {
+    lastWrite= t;
+    outtq.append(t);
     for (int i= 0; i < outChnNo; i++) {
       outq[i].append(out[outIdx[i]].I);
     }
