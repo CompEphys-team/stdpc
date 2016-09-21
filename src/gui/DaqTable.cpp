@@ -2,6 +2,8 @@
 #include "DeviceManager.h"
 #include <QtConcurrent/QtConcurrent>
 #include <QMessageBox>
+#include "MainWin.h"
+#include <functional>
 
 template class DaqOpts<SimulDAQDlg>;
 template class DaqOpts<DigiDataDlg>;
@@ -24,7 +26,7 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
     QFutureWatcher<DeviceStatus> watcher;
     connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
     QFuture<DeviceStatus> future = QtConcurrent::run(
-                &Devices, DeviceManager::initSingle<typename Dlg::param_type>, name, idx);
+                &Devices, DeviceManager::initSingle<typename Dlg::param_type>, std::ref(name), idx);
     watcher.setFuture(future);
     loadMsg.exec();
     future.waitForFinished();
@@ -35,11 +37,15 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
     c->_widget->setLabel(_label + " " + QString::number(idx));
     c->dlg = new Dlg(idx, parent);
     connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(open()));
-    connect(c->_widget->active, SIGNAL(stateChanged(int)), c, SLOT(activeChanged()));
+    connect(c->_widget->active, SIGNAL(clicked(bool)), c, SLOT(activeChanged()));
     connect(c->dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
     connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
     connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
     connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
+
+    static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
+    c->_widget->statusChanged(future.result());
+
     return c;
 }
 
