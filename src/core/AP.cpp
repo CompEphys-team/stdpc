@@ -66,9 +66,9 @@ void initAP()
     addAP("CSynp[#].Mgexpo", &CSynp, &CSynData::Mgexpo);
     addAP("CSynp[#].Plasticity", &CSynp, &CSynData::Plasticity);
     addAP("CSynp[#].assign[#].active", &CSynp, &CSynData::assign, &SynapseAssignment::active);
-    auto const& CSyn_pre = addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
-    auto const& CSyn_pst = addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
-    auto const& CSyn_out = addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
+    AP *CSyn_pre = addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
+    AP *CSyn_pst = addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
+    AP *CSyn_out = addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
 
     addDeprecatedAP("CSynp[#].PreSynChannel", CSyn_pre);
     addDeprecatedAP("CSynp[#].PostSynChannel", CSyn_pst);
@@ -126,9 +126,9 @@ void initAP()
     addAP("abSynp[#].Vpost", &abSynp, &abSynData::Vpost);
     addAP("abSynp[#].Plasticity", &abSynp, &abSynData::Plasticity);
     addAP("abSynp[#].assign[#].active", &abSynp, &abSynData::assign, &SynapseAssignment::active);
-    auto const& abSyn_pre = addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
-    auto const& abSyn_pst = addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
-    auto const& abSyn_out = addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
+    AP *abSyn_pre = addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
+    AP *abSyn_pst = addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
+    AP *abSyn_out = addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
 
     addDeprecatedAP("abSynp[#].PreSynChannel", abSyn_pre);
     addDeprecatedAP("abSynp[#].PostSynChannel", abSyn_pst);
@@ -184,9 +184,9 @@ void initAP()
     addAP("DxheSynp[#].Vpost", &DxheSynp, &DestexheSynData::Vpost);
     addAP("DxheSynp[#].Plasticity", &DxheSynp, &DestexheSynData::Plasticity);
     addAP("DxheSynp[#].assign[#].active", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::active);
-    auto const& DxSyn_pre = addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
-    auto const& DxSyn_pst = addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
-    auto const& DxSyn_out = addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
+    AP *DxSyn_pre = addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
+    AP *DxSyn_pst = addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
+    AP *DxSyn_out = addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
 
     addDeprecatedAP("DxheSynp[#].PreSynChannel", DxSyn_pre);
     addDeprecatedAP("DxheSynp[#].PostSynChannel", DxSyn_pst);
@@ -198,10 +198,10 @@ void initAP()
     addAP("ESynp[#].type", &ESynp, &GJunctData::type);
     addAP("ESynp[#].gSyn", &ESynp, &GJunctData::gSyn);
     addAP("ESynp[#].assign[#].active", &ESynp, &GJunctData::assign, &GapJunctionAssignment::active);
-    auto const& ESyn_prein = addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
-    auto const& ESyn_pstin = addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
-    auto const& ESyn_preut = addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
-    auto const& ESyn_pstut = addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
+    AP *ESyn_prein = addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
+    AP *ESyn_pstin = addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
+    AP *ESyn_preut = addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
+    AP *ESyn_pstut = addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
 
     addDeprecatedAP("ESynp[#].preInChannel", ESyn_prein);
     addDeprecatedAP("ESynp[#].postInChannel", ESyn_pstin);
@@ -233,8 +233,8 @@ void initAP()
     addAP("mhHHp[#].Vtauh", &mhHHp, &mhHHData::Vtauh);
     addAP("mhHHp[#].stauh", &mhHHp, &mhHHData::stauh);
     addAP("mhHHp[#].assign[#].active", &mhHHp, &mhHHData::assign, &CurrentAssignment::active);
-    auto const& mhHH_V = addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
-    auto const& mhHH_I = addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
+    AP *mhHH_V = addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
+    AP *mhHH_I = addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
 
     addDeprecatedAP("mhHHp[#].VChannel", mhHH_V);
     addDeprecatedAP("mhHHp[#].IChannel", mhHH_I);
@@ -264,8 +264,8 @@ void initAP()
     addAP("abHHp[#].hVb", &abHHp, &abHHData::hVb);
     addAP("abHHp[#].hsb", &abHHp, &abHHData::hsb);
     addAP("abHHp[#].assign[#].active", &abHHp, &abHHData::assign, &CurrentAssignment::active);
-    auto const& abHH_V = addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
-    auto const& abHH_I = addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
+    AP *abHH_V = addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
+    AP *abHH_I = addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
 
     addDeprecatedAP("abHHp[#].VChannel", abHH_V);
     addDeprecatedAP("abHHp[#].IChannel", abHH_I);

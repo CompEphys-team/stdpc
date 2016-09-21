@@ -21,14 +21,16 @@ void initAP();
  * starting from @arg head, ignoring any vector or array indices.
  */
 template <typename T, typename... Tail>
-inline std::unique_ptr<AP> const& addAP(QString name, T *head, Tail... tail);
+inline AP* addAP(QString name, T *head, Tail... tail);
 
 /**
  * @brief Add a deprecated AP, which delegates reading to @arg target and disables @fn write.
  * @param name: @see addAP. Indices in the target name are matched in order, defaulting to 0
  * if name has fewer indices than target->name.
+ * @param nIgnoredEarlyIndices: The number of indices at the start of target->name that should
+ * be set to 0 on insertion. Normal index matching resumes on the remaining indices.
  */
-inline std::unique_ptr<AP> const& addDeprecatedAP(QString name, std::unique_ptr<AP> const& target);
+inline AP* addDeprecatedAP(QString name, AP* target, int nIgnoredEarlyIndices = 0);
 
 class AP
 {
@@ -250,15 +252,18 @@ private:
 class APDeprec : public AP
 {
 public:
-    APDeprec(QString name, AP *target) : AP(name), target(target) {}
+    APDeprec(QString name, AP *target, int nIgnoredEarlyIndices) : AP(name), target(target), nIgnore(nIgnoredEarlyIndices) {}
     virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
     {
         // Replace existing indices in order
         QString tName(target->name());
         QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
-        int offset;
+        int offset, i = 0;
         while ( it.hasNext() && (offset = tName.indexOf('#')) ) {
-            tName.replace(offset, 1, it.next().captured(1));
+            if ( i++ < nIgnore )
+                tName.replace(offset, 1, '0');
+            else
+                tName.replace(offset, 1, it.next().captured(1));
         }
 
         // Replace remaining indices with 0
@@ -272,18 +277,19 @@ public:
 
 private:
     AP *target;
+    int nIgnore;
 };
 
 
 template <typename T, typename... Tail>
-inline std::unique_ptr<AP> const& addAP(QString name, T *head, Tail... tail) {
+inline AP* addAP(QString name, T *head, Tail... tail) {
     params.push_back(std::unique_ptr<AP>(new APInst<T, Tail...>(name, head, tail...)));
-    return params.back();
+    return params.back().get();
 }
 
-inline std::unique_ptr<AP> const& addDeprecatedAP(QString name, const std::unique_ptr<AP> &target) {
-    params.push_back(std::unique_ptr<AP>(new APDeprec(name, target.get())));
-    return params.back();
+inline AP* addDeprecatedAP(QString name, AP *target, int nIgnore) {
+    params.push_back(std::unique_ptr<AP>(new APDeprec(name, target, nIgnore)));
+    return params.back().get();
 }
 
 #endif // AP_H
