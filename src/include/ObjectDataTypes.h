@@ -281,6 +281,7 @@ public:
     bool active;
     std::vector<inChnData> inChn;
     std::vector<outChnData> outChn;
+    DAQData() : active(false) {}
 };
 
 class SDAQData : public DAQData {
@@ -289,18 +290,29 @@ class SDAQData : public DAQData {
     QString outFileName;
     double inTFac;
     double outDt;
+    SDAQData() : DAQData(),
+        inFileName("StdpcIn1.dat"),
+        outFileName("StdpcOut1.dat"),
+        inTFac(1),
+        outDt(0.001)
+    {}
 };
 
 class DigiDataData : public DAQData {
   public:
     short int baseAddress;
     short int syncIOMask;
+    DigiDataData() : DAQData(),
+        baseAddress(0x320),
+        syncIOMask(0x0000)
+    {}
 };
 
 #ifdef NATIONAL_INSTRUMENTS
 class NIDAQData : public DAQData {
   public:
     QString deviceName;
+    NIDAQData() : DAQData(), deviceName("Dev1") {}
 };
 #endif
 

@@ -142,6 +142,78 @@ std::ostream &operator<<(std::ostream &os, const ChannelIndex &dex)
     return os;
 }
 
+static void legacyRescue_0(QString str, ChannelIndex &dex)
+{
+    // Attempt legacy rescue
+    // Caveats: - inChn/outChn is unknowable; uses heuristics
+    //          - Graph channels are likely to fail
+    //          - Explicit NONE on pre-2016 collapses onto SG
+    bool ok = false;
+    int ch = str.toInt(&ok);
+    if ( !ok )
+        return;
+    DAQData *d;
+    switch ( LEGACY_DAQ_CLASS ) {
+    case DAQClass::Simul :  d =& SDAQp[0];     break;
+    case DAQClass::DD1200 : d =& DigiDatap[0]; break;
+#ifdef NATIONAL_INSTRUMENTS
+    case DAQClass::NI :     d =& NIDAQp[0];    break;
+#endif
+    default: return;
+    }
+    dex.daqClass = LEGACY_DAQ_CLASS;
+    dex.devID = 0;
+    if ( ch >= 0 && ch <= (int)(d->inChn.size()+d->outChn.size()+1) ) { // Pre-2016
+        dex.chanID = ch;
+        if ( ch < (int) d->inChn.size() && ch < (int)d->outChn.size() ) {
+            dex.isAnalog = true;
+            dex.isInChn = d->inChn.size() > d->outChn.size(); // Statistically...
+        } else if ( d->inChn.size() >= d->outChn.size() && ch < (int)d->inChn.size() ) {
+            dex.isAnalog = true;
+            dex.isInChn = true;
+        } else if ( d->inChn.size() < d->outChn.size() && ch < (int)d->outChn.size() ) {
+            dex.isAnalog = true;
+            dex.isInChn = false;
+        } else if ( ch == (int)d->inChn.size() || ch == (int)d->outChn.size() ) {
+            dex.isSG = true;
+        } else if ( ch == (int)(d->inChn.size()+d->outChn.size()+1) ) { // Graph SG ?
+            dex.isSG = true;
+        } else { // Graph out ?
+            dex.isAnalog = true;
+            dex.isInChn = false;
+            dex.chanID = ch - d->inChn.size() - 1;
+        }
+        dex.isValid = true; // One hopes.
+    } else if ( ch == -1 ) { // 2016-RC1 : None
+        dex.isNone = true;
+        dex.isValid = true;
+    } else if ( ch == 1000 ) { // 2016-RC1 : SG
+        dex.isSG = true;
+        dex.isValid = true;
+    } else if ( ch >= 10000 && ch < 10000 + (int)d->inChn.size() ) { // 2016-RC1 : Graph inChn
+        dex.isAnalog = true;
+        dex.chanID = ch - 10000;
+        dex.isInChn = true;
+        dex.isValid = true;
+    } else if ( ch >= 20000 && ch < 20000 + (int)d->outChn.size() ) { // 2016-RC1 : Graph outChn
+        dex.isAnalog = true;
+        dex.chanID = ch - 20000;
+        dex.isInChn = false;
+        dex.isValid = true;
+    } else if ( ch >= 1100000000 ) { // 2016-RC1 : HH Proto
+        dex.isPrototype = true;
+        dex.modelClass = ModelClass::HH;
+        dex.modelID = ((ch - 1100000000) / 100000) - 1;
+        dex.isValid = true;
+    } else if ( ch >= 100000000 ) { // 2016-RC1 : HH Inst
+        dex.isVirtual = true;
+        dex.modelClass = ModelClass::HH;
+        dex.modelID = ((ch - 100000000) / 100000) - 1;
+        dex.instID = ch % 100000;
+        dex.isValid = true;
+    }
+}
+
 std::istream &operator>>(std::istream &is, ChannelIndex &dex)
 {
     ChannelIndex blank;
@@ -151,7 +223,9 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
     QString str = QString::fromStdString(stdstr);
     QStringList parts = str.split("/");
     if ( parts.size() < 3 ) { // Minimum is Prototype/modelClass/modelID
-        // TODO: Attempt legacy rescue?
+        if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
+            legacyRescue_0(str, dex);
+        }
         return is;
     }
     if ( !parts.at(0).compare("None", Qt::CaseInsensitive) ) {

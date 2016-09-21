@@ -407,6 +407,125 @@ void initAP()
 
 }
 
+std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
+{
+    int skips = prefix.length() - QString(prefix).replace("[#]", "[]").length();
+    QStringList names({
+        "inChnp[#].active",
+        "inChnp[#].gain",
+        "inChnp[#].gainFac",
+        "inChnp[#].spkDetect",
+        "inChnp[#].spkDetectThresh",
+        "inChnp[#].bias",
+        "inChnp[#].chnlSaving",
+        "outChnp[#].active",
+        "outChnp[#].gain",
+        "outChnp[#].gainFac",
+        "outChnp[#].bias",
+        "outChnp[#].chnlSaving"
+    });
+    std::vector<std::unique_ptr<AP>> ret;
+    ret.reserve(names.size());
+    AP *target;
+    for ( QString name : names ) {
+        if ( (target = AP::find(prefix + "." + QString(name).replace("Chnp[#]", "Chn[#]"))) )
+            ret.push_back(std::unique_ptr<AP>(new APDeprec(name, target, skips)));
+    }
+    return ret;
+}
+
+bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
+{
+    QString name, header;
+    int version = 0;
+    int pos = is.tellg();
+    std::vector<std::unique_ptr<AP>> deprec;
+    SDAQData sdaq;
+    DigiDataData dd;
+#ifdef NATIONAL_INSTRUMENTS
+    NIDAQData nidaq;
+#endif
+
+    if ( is.good() ) {
+        is >> header;
+        if ( is.good() && !header.isEmpty() ) {
+            if ( header == STDPC_PROTOCOL_HEADER )
+                is >> version;
+            else
+                is.seekg(pos);
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+
+    // Unversioned legacy config
+    if ( !version ) {
+        int selection, sdaqInChnNo, sdaqOutChnNo;
+        is >> selection;
+        is >> sdaq.inFileName >> sdaq.outFileName >> sdaqInChnNo >> sdaqOutChnNo >> sdaq.inTFac >> sdaq.outDt;
+        sdaq.inChn.resize(sdaqInChnNo);
+        sdaq.outChn.resize(sdaqOutChnNo);
+        is >> dd.baseAddress;
+        if ( selection == 0 ) {
+            sdaq.active = true;
+            deprec = deprecateChannelsTo("SDAQp[#]");
+        } else if ( selection == 1 ) {
+            dd.active = true;
+            deprec = deprecateChannelsTo("DigiDatap[#]");
+        }
+#ifdef NATIONAL_INSTRUMENTS
+        if ( selection == 2 ) {
+            is >> nidaq.deviceName;
+            nidaq.active = true;
+            deprec = deprecateChannelsTo("NIDAQp[#]");
+        }
+#endif
+        if ( !is.good() )
+            return false;
+
+        AP *syncio = AP::find("DigiDatap[#].syncIOMask");
+        if ( syncio )
+            deprec.push_back(std::unique_ptr<AP>(new APDeprec("DigiDatap.syncIOMask", syncio, 1)));
+
+        SDAQp.insert(SDAQp.begin(), sdaq);
+        if ( sdaq.active )
+            LEGACY_DAQ_CLASS = DAQClass::Simul;
+        DigiDatap.insert(DigiDatap.begin(), dd);
+        if ( dd.active )
+            LEGACY_DAQ_CLASS = DAQClass::DD1200;
+#ifdef NATIONAL_INSTRUMENTS
+        if ( nidaq.active ) {
+            NIDAQp.insert(NIDAQp.begin(), nidaq);
+            LEGACY_DAQ_CLASS = DAQClass::NI;
+        }
+#endif
+    }
+
+    if ( !is.good() )
+        return false;
+
+    LOADED_PROTOCOL_VERSION = version;
+
+    AP *it;
+    is >> name;
+    while ( is.good() ) {
+        bool ok = false;
+        if ( (it = AP::find(name)) ) {
+            it->readNow(name, is, &ok);
+        } else if ( version < STDPC_PROTOCOL_VERSION ) {
+            if ( (it = AP::find(name, &deprec)) )
+                it->readNow(name, is, &ok);
+        }
+        if ( !ok && callback )
+            if ( (*callback)(name) )
+                return false;
+        is >> name;
+    }
+    return true;
+}
+
 std::istream &operator>>(std::istream &is, QString &str)
 {
     std::string tmp;

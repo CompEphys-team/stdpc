@@ -52,9 +52,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
-
-      // somewhat of a hack: Synchronous digital IO for DigiData boards
-//     DigiDatap.syncIOMask= 0x0000;
          
      DCT= new DCThread();
 
@@ -370,6 +367,7 @@ void MyMainWindow::importSGData()
 void MyMainWindow::SaveConfig()
 {
   ofstream os("StdpC.conf");
+  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
   QString D("DigiDatap"), S("SDAQp"), N("NIDAQp");
   for ( std::unique_ptr<AP> const& ap : params ) {
@@ -383,32 +381,22 @@ void MyMainWindow::SaveConfig()
 
 void MyMainWindow::LoadConfig()
 {
-  std::string name;
-  ifstream is("StdpC.conf");
+    ifstream is("StdpC.conf");
+    if ( readProtocol(is) )
+        DAQTable->importData();
+    else
+        DisplayMessage(QString("No valid config file found; reverting to standard settings"));
+    is.close();
 
-  if ( is.good() ) {
-    is >> name;
-    while ( is.good() ) {
-      QString rawname(QString::fromStdString(name));
-      auto const& it = AP::find(rawname);
-      if ( it != *params.end() )
-        it->readNow(rawname, is);
-      is >> name;
-    }
-    DAQTable->importData();
-  } else {
-    DisplayMessage(QString("No valid config file found; reverting to standard settings"));
-  }
-  is.close();
-
-  // special Sample-and-Hold for Attila
-  SampleHoldp.active= false;
-  SampleHoldp.threshV= 0.0;
+    // special Sample-and-Hold for Attila
+    SampleHoldp.active= false;
+    SampleHoldp.threshV= 0.0;
 }
 
 void MyMainWindow::doSaveProtocol(QString &fname)
 {
   ofstream os(fname.toLatin1());
+  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
   exportData();
 
@@ -423,8 +411,6 @@ void MyMainWindow::doSaveProtocol(QString &fname)
 void MyMainWindow::doLoadProtocol(QString &fname)
 {
   ifstream is(fname.toLatin1());
-  char name[80];
-
   if (!is.good()) {
     DisplayMessage(QString("Error opening Protocol file"));
     return;
@@ -444,18 +430,11 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   NIDAQp.clear();
 #endif
 
-  is >> name;
-  while ( is.good() ) {
-    QString rawname(name);
-    bool ok = false;
-    auto const& it = AP::find(rawname);
-    if ( it != *params.end() )
-      it->readNow(rawname, is, &ok);
-    if ( !ok )
+  std::function<bool(QString)> callback = [=](QString name) {
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
-    is >> name;
-  }
-
+      return false;
+  };
+  readProtocol(is, &callback);
   is.close();
 
   importData();

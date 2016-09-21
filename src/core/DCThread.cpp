@@ -597,8 +597,8 @@ bool DCThread::LoadScript(QString &fname)
   {
     is >> buf;
     rawname= QString(buf);
-    auto const& it = AP::find(rawname);
-    if ( it != *params.end() ) {
+    AP *it = AP::find(rawname);
+    if ( it ) {
         scriptq.append(qMakePair(et, it->readLater(rawname, is, &success)));
     } else {
         success = false;

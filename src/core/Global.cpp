@@ -1,6 +1,9 @@
 #include "Global.h"
 #include "DeviceManager.h"
 
+int LOADED_PROTOCOL_VERSION;
+DAQClass LEGACY_DAQ_CLASS;
+
 std::vector<CSynData> CSynp;
 std::vector<abSynData> abSynp;
 std::vector<GJunctData> ESynp;

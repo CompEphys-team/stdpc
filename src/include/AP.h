@@ -11,6 +11,8 @@
 class AP;
 extern std::vector<std::unique_ptr<AP>> params;
 void initAP();
+std::istream &operator>>(std::istream &is, QString &str);
+std::ostream &operator<<(std::ostream &os, const QString &str);
 
 /**
  * @brief Add a parameter to the global registry. See @fn initAP() for examples.
@@ -31,6 +33,23 @@ inline AP* addAP(QString name, T *head, Tail... tail);
  * be set to 0 on insertion. Normal index matching resumes on the remaining indices.
  */
 inline AP* addDeprecatedAP(QString name, AP* target, int nIgnoredEarlyIndices = 0);
+
+/**
+ * @brief deprecateChannelsTo returns a (temporary) list of APs deprecating the removed inChnp/outChnp
+ * parameters to a specific DAQ.
+ * @param prefix is the DAQ param name to deprecate to, e.g. "NIDAQp[#]". Should not include a "." at the end.
+ * @return A list of APDeprec for temporary use while importing a script/protocol
+ */
+std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix);
+
+/**
+ * @brief readProtocol reads a protocol file, taking into account config version
+ * @param is - the protocol file
+ * @param callback - pointer to a function that is called when a parameter can't be found. Receives the
+ * raw parameter name as a QString argument. May return true to cancel reading.
+ * @return true if everything went to plan; false when cancelled through callback or if protocol is malformed.
+ */
+bool readProtocol(std::istream &is, std::function<bool(QString)> *callback = nullptr);
 
 class AP
 {
@@ -60,11 +79,15 @@ public:
      */
     virtual void write(std::ostream &os) = 0;
 
-    static std::unique_ptr<AP> const& find(QString rawName)
+    static AP* find(QString rawName, std::vector<std::unique_ptr<AP>> *vec = &params)
     {
         rawName.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
-        return *std::find_if(params.begin(), params.end(),
-                             [&](std::unique_ptr<AP> &a){return !rawName.compare(a->name());});
+        std::vector<std::unique_ptr<AP>>::iterator it;
+        it = std::find_if(vec->begin(), vec->end(), [&](std::unique_ptr<AP> &a){return !rawName.compare(a->name());});
+        if ( it == vec->end() )
+            return nullptr;
+        else
+            return it->get();
     }
 
     inline QString const& name() { return _name; }

@@ -12,6 +12,11 @@
 #define VTHRESH -30
 #define MAX_ELECTRODE_NO 4
 
+#define STDPC_PROTOCOL_VERSION 1
+#define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
+extern int LOADED_PROTOCOL_VERSION;
+extern DAQClass LEGACY_DAQ_CLASS;
+
 // Forward
 class DeviceManager;
 
