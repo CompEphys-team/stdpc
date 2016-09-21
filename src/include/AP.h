@@ -87,6 +87,11 @@ template <typename T, typename... Tail>
 std::function<void(std::vector<T>&)> getReadFunc(QString &name, int offset, std::istream &is, bool *ok,
                                                  std::vector<T> &head, Tail... tail);
 
+template <typename T, typename Base, typename S, typename... Tail>
+typename std::enable_if<(std::is_base_of<Base, T>::value), std::function<void(T&)>>::type
+  getReadFunc(QString &name, int offset, std::istream &is, bool *ok,
+              T &head, S Base::* index, Tail... tail);
+
 template <typename T>
 std::function<void(T&)> getReadFunc(QString &, int, std::istream &is, bool *ok, T&)
 {
@@ -155,6 +160,24 @@ std::function<void(T&)> getReadFunc(QString &name, int offset, std::istream &is,
 }
 
 
+template <typename T, typename Base, typename S, typename... Tail>
+typename std::enable_if<(std::is_base_of<Base, T>::value), std::function<void(T&)>>::type
+  getReadFunc(QString &name, int offset, std::istream &is, bool *ok,
+              T &head, S Base::* index, Tail... tail)
+{
+    QRegularExpressionMatch structIndex
+            = QRegularExpression("\\.[a-zA-Z_][a-zA-Z0-9_]*").match(name, offset);
+    if ( structIndex.hasMatch() ) {
+        offset = structIndex.capturedEnd(0);
+        std::function<void(S&)> func = getReadFunc(name, offset, is, ok, head.*index, tail...);
+        return [=](T& v){ func(v.*index); };
+    } else {
+        if (ok) *ok = false;
+        return [](T&){};
+    }
+}
+
+
 template <typename T, typename... Tail>
 void write(QString &name, std::ostream &os, std::vector<T> &head, Tail... tail);
 
@@ -163,6 +186,10 @@ void write(QString &name, std::ostream &os, T (&head)[SZ], Tail... tail);
 
 template <typename T, typename S, typename... Tail>
 void write(QString &name, std::ostream &os, T &head, S T::* index, Tail... tail);
+
+template <typename T, typename Base, typename S, typename... Tail>
+typename std::enable_if<(std::is_base_of<Base, T>::value), void>::type
+  write(QString &name, std::ostream &os, T &head, S Base::* index, Tail... tail);
 
 template <typename T>
 void write(QString &name, std::ostream &os, T &head)
@@ -194,6 +221,13 @@ void write(QString &name, std::ostream &os, T (&head)[SZ], Tail... tail)
 
 template <typename T, typename S, typename... Tail>
 void write(QString &name, std::ostream &os, T &head, S T::* index, Tail... tail)
+{
+    write(name, os, head.*index, tail...);
+}
+
+template <typename T, typename Base, typename S, typename... Tail>
+typename std::enable_if<(std::is_base_of<Base, T>::value), void>::type
+  write(QString &name, std::ostream &os, T &head, S Base::* index, Tail... tail)
 {
     write(name, os, head.*index, tail...);
 }
