@@ -26,7 +26,6 @@ bool NIDAQDlg::exportData(bool forceInit)
         devOK = initDAQ() != DeviceStatus::Failed;
     inDlg->exportData();
     outDlg->exportData();
-    emit channelsChanged();
     return devOK;
 }
 
@@ -55,7 +54,6 @@ void NIDAQDlg::reject()
     NIDAQp[idx] = backup;
     if ( didInit )
         initDAQ();
-    emit channelsChanged();
     importData();
     QDialog::reject();
 }

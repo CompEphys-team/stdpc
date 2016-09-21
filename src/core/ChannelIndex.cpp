@@ -220,12 +220,6 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
     is >> stdstr;
     QString str = QString::fromStdString(stdstr);
     QStringList parts = str.split("/");
-    if ( parts.size() < 3 ) { // Minimum is Prototype/modelClass/modelID
-        if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
-            legacyRescue_0(str, dex);
-        }
-        return is;
-    }
     if ( !parts.at(0).compare("None", Qt::CaseInsensitive) ) {
         dex.isNone = true;
         dex.isValid = true;
@@ -257,6 +251,9 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.chanID = parts.at(3).mid(2).toInt();
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Prototype", Qt::CaseInsensitive) ) {
+        if ( parts.size() != 3 )
+            return is;
+
         if ( !parts.at(1).compare("HH", Qt::CaseInsensitive) )
             dex.modelClass = ModelClass::HH;
         else
@@ -278,6 +275,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.modelID = parts.at(2).toInt();
         dex.instID = parts.at(3).toInt();
         dex.isValid = true;
+    } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
+        legacyRescue_0(str, dex);
     }
     return is;
 }

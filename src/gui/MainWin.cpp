@@ -158,6 +158,7 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
     bool success = !Devices.actdev.empty();
     StartBut->setEnabled(success);
     actionElectrode_setup->setEnabled(success);
+    emit channelsChanged();
 }
 
 

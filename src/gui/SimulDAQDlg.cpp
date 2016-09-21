@@ -38,7 +38,6 @@ bool SimulDAQDlg::exportData(bool forceInit)
 
   inDlg->exportData();
   outDlg->exportData();
-  emit channelsChanged();
   return devOK;
 }
 
@@ -76,7 +75,6 @@ void SimulDAQDlg::reject()
   SDAQp[idx] = backup;
   if ( didInit )
       initDAQ();
-  emit channelsChanged();
   importData();
   QDialog::reject();
 }
