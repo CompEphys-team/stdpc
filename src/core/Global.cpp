@@ -1,4 +1,5 @@
 #include "Global.h"
+#include "DeviceManager.h"
 
 std::vector<CSynData> CSynp;
 std::vector<abSynData> abSynp;
@@ -8,17 +9,15 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-std::vector<inChnData> inChnp;
-std::vector<outChnData> outChnp;
 inChnData inSpkGenChnp;
 outChnData outSpkGenChnp;
 
 std::vector<HHNeuronData> HHNeuronp;
 
-DigiDataData DigiDatap;
-SDAQData SDAQp;
+std::vector<DigiDataData> DigiDatap;
+std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
-NIDAQData NIDAQp;
+std::vector<NIDAQData> NIDAQp;
 #endif
 SGData SGp;
 
@@ -34,3 +33,6 @@ SampleHoldData SampleHoldp;
 tanhLUtable tanhLU;
 expLUtable expLU;
 expSigmoidLUtable expSigmoidLU;
+
+Clock DAQClock;
+DeviceManager Devices;

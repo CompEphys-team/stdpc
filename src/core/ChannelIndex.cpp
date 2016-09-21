@@ -36,9 +36,18 @@ inChnData *ChannelIndex::getInChnData() const
     if ( !isValid || !isAnalog || !isInChn )
         return nullptr;
     switch ( daqClass ) {
-    case DAQClass::Simul :  return &SDAQp.inChn[chanID];
-    case DAQClass::DD1200 : return &DigiDatap.inChn[chanID];
-    case DAQClass::NI :     return &NIDAQp.inChn[chanID];
+    case DAQClass::Simul :
+        if ( SDAQp.empty() || (int)SDAQp.size() <= devID || (int)SDAQp[devID].inChn.size() <= chanID )
+            return nullptr;
+        return &(SDAQp[devID].inChn[chanID]);
+    case DAQClass::DD1200 :
+        if ( DigiDatap.empty() || (int)DigiDatap.size() <= devID || (int)DigiDatap[devID].inChn.size() <= chanID )
+            return nullptr;
+        return &(DigiDatap[devID].inChn[chanID]);
+    case DAQClass::NI :
+        if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].inChn.size() <= chanID )
+            return nullptr;
+        return &(NIDAQp[devID].inChn[chanID]);
     }
     return nullptr;
 }
@@ -48,9 +57,18 @@ outChnData *ChannelIndex::getOutChnData() const
     if ( !isValid || !isAnalog || isInChn )
         return nullptr;
     switch ( daqClass ) {
-    case DAQClass::Simul :  return &SDAQp.outChn[chanID];
-    case DAQClass::DD1200 : return &DigiDatap.outChn[chanID];
-    case DAQClass::NI :     return &NIDAQp.outChn[chanID];
+    case DAQClass::Simul :
+        if ( SDAQp.empty() || (int)SDAQp.size() <= devID || (int)SDAQp[devID].outChn.size() <= chanID )
+            return nullptr;
+        return &(SDAQp[devID].outChn[chanID]);
+    case DAQClass::DD1200 :
+        if ( DigiDatap.empty() || (int)DigiDatap.size() <= devID || (int)DigiDatap[devID].outChn.size() <= chanID )
+            return nullptr;
+        return &(DigiDatap[devID].outChn[chanID]);
+    case DAQClass::NI :
+        if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].outChn.size() <= chanID )
+            return nullptr;
+        return &(NIDAQp[devID].outChn[chanID]);
     }
     return nullptr;
 }
@@ -74,7 +92,7 @@ QString ChannelIndex::prettyName() const
         case DAQClass::DD1200 : ret += "DigiData 1200(A)"; break;
         case DAQClass::NI :     ret += "NI";               break;
         }
-        // ret += QString(", device %1").arg(devID);
+        ret += QString(", device %1").arg(devID);
     } else ret = "NYI";
     return ret;
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1013</width>
-    <height>794</height>
+    <height>912</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>350</y>
+      <y>470</y>
       <width>641</width>
       <height>391</height>
      </rect>
@@ -101,7 +101,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>200</y>
+      <y>320</y>
       <width>731</width>
       <height>141</height>
      </rect>
@@ -151,7 +151,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>270</x>
-      <y>50</y>
+      <y>170</y>
       <width>731</width>
       <height>141</height>
      </rect>
@@ -201,7 +201,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>350</y>
+      <y>470</y>
       <width>341</width>
       <height>391</height>
      </rect>
@@ -997,51 +997,59 @@ p, li { white-space: pre-wrap; }
       <x>10</x>
       <y>50</y>
       <width>251</width>
-      <height>291</height>
+      <height>411</height>
      </rect>
     </property>
    </widget>
-   <widget class="QComboBox" name="DAQComboBox">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>20</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <item>
-     <property name="text">
-      <string>Simulated DAQ</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>DigiData 1200/1200A</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QLabel" name="DAQL">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
+   <widget class="QGroupBox" name="DAQBox">
     <property name="geometry">
      <rect>
       <x>270</x>
       <y>20</y>
-      <width>121</width>
-      <height>16</height>
+      <width>731</width>
+      <height>141</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <weight>75</weight>
-      <bold>true</bold>
-     </font>
+    <property name="title">
+     <string>Data acquisition devices</string>
     </property>
-    <property name="text">
-     <string>Data Acquisition Board</string>
-    </property>
+    <widget class="DaqTable" name="DAQTable">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>16</y>
+       <width>731</width>
+       <height>124</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Box</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOn</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
+     <property name="showGrid">
+      <bool>false</bool>
+     </property>
+     <attribute name="horizontalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>143</number>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>101</number>
+     </attribute>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1185,6 +1193,11 @@ p, li { white-space: pre-wrap; }
    <class>ComponentTable</class>
    <extends>QTableWidget</extends>
    <header>ComponentTable.h</header>
+  </customwidget>
+  <customwidget>
+   <class>DaqTable</class>
+   <extends>QTableWidget</extends>
+   <header>DaqTable.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

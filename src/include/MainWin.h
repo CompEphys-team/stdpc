@@ -8,20 +8,11 @@
 #include <QFileDialog>
 #include "Global.h"
 #include "ui_MainWin.h"
-#include "InputChannelDlg.h"
-#include "OutputChannelDlg.h"
 #include "SpikeTimeDlg.h"
-#include "DigiDataDlg.h"
-#include "SimulDAQDlg.h"
 #include "ElectrodeCompDlg.h"
 #include "DataSavingDlg.h"
 #include "AECChannel.h"
 #include "HHModelDlg.h"
-
-
-#ifdef NATIONAL_INSTRUMENTS
-#include "NIDAQDlg.h" 
-#endif
 
 #include "ObjectDataTypes.h"
 #include "SimulDAQ.h"
@@ -47,38 +38,28 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
   public:
      MyMainWindow(QWidget *parent= 0);
      virtual ~MyMainWindow();
-     void exportData();
+     void exportData(bool ignoreDAQ = false);
      void importData();
      void exportSGData();
      void importSGData();
- 
-     InputChannelDlg *inChnDlg;
-     OutputChannelDlg *outChnDlg;
 
      ElectrodeCompDlg *ECDlg;
      DataSavingDlg *DSDlg;
      SpikeTimeDlg *SpkTDlg;
      GraphDlg *graphDlg[2];
      DCThread *DCT;
-     int DAQtype;
-     QString DAQName;
-     DigiDataDlg *DDataDlg;
-     SimulDAQDlg *SDAQDlg;
+
      HHModelDlg *hhModelDlg;
 
      ChannelListModel *inChnModel, *outChnModel, *SGbdChannelModel;
 
-#ifdef NATIONAL_INSTRUMENTS     
-     NIDAQDlg *NDQDlg;
-#endif
-     
-     DAQDlg *theDAQDlg;
      Graph Graphs[2];
      
   public slots:
-     void DAQSetup();
      void CloseToLimitWarning(QString, QString, double, double, double);
      void DisplayAbout();
+     void DisplayMessage(QString);
+     void updateDeviceStatus(DeviceStatus = DeviceStatus::Inactive, const QString & = QString());
 
   signals:
      void channelsChanged();
@@ -88,9 +69,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
 
      void StartButClicked();
      void StopButClicked();
-     
-     void DisplayMessage(QString);
-     void showDAQDlg();
      
      void SaveConfig();
      void LoadConfig();

@@ -11,7 +11,7 @@ using namespace std;
 class SimulDAQ: public DAQ
 {
   public:
-    SimulDAQ(SDAQData *p, int devID, Clock *clk);
+    SimulDAQ(SDAQData *p, int devID);
     virtual ~SimulDAQ();
     virtual bool initialize_board(QString &);
     virtual void start();

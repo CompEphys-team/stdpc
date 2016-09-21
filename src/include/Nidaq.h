@@ -27,7 +27,7 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ(NIDAQData *p, int devID, Clock *clk);
+    NIDAQ(NIDAQData *p, int devID);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);

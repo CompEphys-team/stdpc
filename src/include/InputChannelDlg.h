@@ -43,7 +43,6 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
     void reject();
       
   private:
-     bool initial;
      void clearAll();
 }; 
 

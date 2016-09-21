@@ -1,5 +1,10 @@
 #include "DAQDlg.h"
 
-DAQDlg::DAQDlg(QWidget *parent) : QDialog(parent)
+DAQDlg::DAQDlg(int no, QWidget *parent) :
+    QDialog(parent),
+    idx(no),
+    inDlg(new InputChannelDlg(this)),
+    outDlg(new OutputChannelDlg(this)),
+    board(nullptr)
 {
 }

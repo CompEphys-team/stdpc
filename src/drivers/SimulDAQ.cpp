@@ -2,8 +2,8 @@
 #include "limits.h"
 
 
-SimulDAQ::SimulDAQ(SDAQData *p, int devID, Clock *clk) :
-    DAQ(p, devID, clk),
+SimulDAQ::SimulDAQ(SDAQData *p, int devID) :
+    DAQ(p, devID),
     tOff(0.0)
 {
   inChnNo= p->inChn.size();
@@ -16,17 +16,17 @@ SimulDAQ::SimulDAQ(SDAQData *p, int devID, Clock *clk) :
   inGainText= new char*[inGainNo];
   inGainText[0]= new char[80];
   strcpy(inGainText[0], "n/a");
-  inLow = QVector<double>(inChnNo);
+  inLow = QVector<double>(inGainNo);
   inLow[0] = -1e10;
-  inHigh = QVector<double>(inChnNo);
+  inHigh = QVector<double>(inGainNo);
   inHigh[0] = 1e10;
   outGainNo= 1;
   outGainText= new char*[outGainNo];
   outGainText[0]= new char[80];
   strcpy(outGainText[0], "n/a");
-  outLow = QVector<double>(outChnNo);
+  outLow = QVector<double>(outGainNo);
   outLow[0] = -1e10;
-  outHigh = QVector<double>(outChnNo);
+  outHigh = QVector<double>(outGainNo);
   outHigh[0] = +1e10;
   inq= new QList<double>[inChnNo];
   outq= new QList<double>[outChnNo];

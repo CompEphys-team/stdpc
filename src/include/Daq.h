@@ -21,7 +21,7 @@ class DAQ {
     QVector<QString> outChnLabels;
 
   public:
-    DAQ(DAQData *p, int devID, Clock *clk);
+    DAQ(DAQData *p, int devID);
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;

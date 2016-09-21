@@ -75,6 +75,7 @@ void InputChannelDlg::init(DAQ *b)
 
   clearAll();
   ChnNo= board->inChnNo;
+  board->p->inChn.resize(ChnNo);
   inLow = QVector<double>(board->inGainNo);
   for(int i= 0; i < board->inGainNo; i++){
     inLow[i]= board->inLow[i];
@@ -175,10 +176,6 @@ void InputChannelDlg::init(DAQ *b)
   geo= buttonBox->geometry();
   geo.moveBottom(Y0+ChnNo*DY+50);
   buttonBox->setGeometry(geo);
-//  QMessageBox::warning((QWidget *)parent(), tr("My Application"),
-//                tr("The signal for index change has been received"),
-//               QMessageBox::Close);
-  accept();   // export the current state, update chn info in other dialogs
 }    
 
 InputChannelDlg::~InputChannelDlg()

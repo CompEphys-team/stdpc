@@ -53,7 +53,9 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/HHModelDlg.ui \
     $$PWD/src/gui/ModelInstDlg.ui \
     $$PWD/src/gui/ComponentWidget.ui \
-    $$PWD/src/gui/ComponentFactoryWidget.ui
+    $$PWD/src/gui/ComponentFactoryWidget.ui \
+    $$PWD/src/gui/DaqWidget.ui \
+    $$PWD/src/gui/DaqFactoryWidget.ui
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -104,7 +106,10 @@ HEADERS += \
     $$PWD/src/include/AssignmentWidget.h \
     $$PWD/src/include/ComponentTable.h \
     $$PWD/src/include/ComponentWidget.h \
-    $$PWD/src/include/Clock.h
+    $$PWD/src/include/Clock.h \
+    $$PWD/src/include/DaqTable.h \
+    $$PWD/src/include/DaqWidget.h \
+    $$PWD/src/include/DeviceManager.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -135,7 +140,6 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Graph.cpp \
     $$PWD/src/gui/GraphDlg.cpp \
     $$PWD/src/gui/DAQDlg.cpp \
-    $$PWD/src/core/ObjectDataTypes.cpp \
     $$PWD/src/gui/AbSynDlg.cpp \
     $$PWD/src/gui/ElectrodeCompDlg.cpp \
     $$PWD/src/models/AbSyn.cpp \
@@ -155,7 +159,10 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/AssignmentWidget.cpp \
     $$PWD/src/gui/ComponentTable.cpp \
     $$PWD/src/gui/ComponentWidget.cpp \
-    $$PWD/src/drivers/Clock.cpp
+    $$PWD/src/drivers/Clock.cpp \
+    $$PWD/src/gui/DaqTable.cpp \
+    $$PWD/src/gui/DaqWidget.cpp \
+    $$PWD/src/drivers/DeviceManager.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

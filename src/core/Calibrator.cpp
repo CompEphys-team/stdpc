@@ -8,10 +8,7 @@
 #include <time.h>
 #include <cmath>
 
-#include "SimulDAQ.h"
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
+#include "DeviceManager.h"
 
 
 Calibrator::Calibrator() :
@@ -41,16 +38,16 @@ int Calibrator::ChannelInit(ChannelIndex inChNum, ChannelIndex outChNum)
     inputChannelNumber = inChNum;
     outputChannelNumber = outChNum;
 
-    for ( DAQ *b : DCT->clk.board )
+    for ( DAQ *b : Devices.actdev )
         b->init_chans();
 
-    inBoard = DCT->getBoard(inputChannelNumber);
-    inChn = DCT->getInChan(inputChannelNumber);
+    inBoard = Devices.getDevice(inputChannelNumber);
+    inChn = Devices.getInChan(inputChannelNumber);
     if ( !inBoard || !inChn || !inChn->active )
         return 1; // Return code for inactive input channel
 
-    outBoard = DCT->getBoard(outputChannelNumber);
-    outChn = DCT->getOutChan(outputChannelNumber);
+    outBoard = Devices.getDevice(outputChannelNumber);
+    outChn = Devices.getOutChan(outputChannelNumber);
     if ( !outBoard || !outChn || !outChn->active )
         return 2; // Return code for inactive output channel
 
@@ -481,7 +478,9 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     bool limitWarningEmitted = false;
 
     // board->reset_board();
-    DCT->clk.start();
+    DAQClock.reset_RTC();
+    inBoard->start();
+    outBoard->start();;
 
     if( isCalibration == true ) // read -- wait -- write order in case of calibration
         for ( sample=1; sample<numOfSamples; sample++ )
@@ -499,7 +498,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
 
             // --- Wait --- //
-            t += DCT->clk.wait_till_elapsed(samplingPeriod);
+            t += DAQClock.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
@@ -522,7 +521,7 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
 
 
             // --- Wait --- //
-            t += DCT->clk.wait_till_elapsed(samplingPeriod);
+            t += DAQClock.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
@@ -548,7 +547,8 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     }
 
     // Reset board
-    DCT->clk.stop();
+    for ( DAQ *b : Devices.actdev )
+        b->reset_board();
 }
 
 
@@ -560,7 +560,8 @@ double Calibrator::VoltageOffsetMeasurement()
     double offsetMeasLen = 5.0; // in msec
     int offsetSamplingNum = (int) (offsetMeasLen*1e-3/samplingPeriod);  // how many sampling steps
 
-    DCT->clk.start();
+    DAQClock.reset_RTC();
+    inBoard->start();
 
     // Measure the voltage offset
     for (sample=0; sample<offsetSamplingNum; sample++)
@@ -571,11 +572,11 @@ double Calibrator::VoltageOffsetMeasurement()
         // Save voltage
         vOffset += inChn->V;
 
-        DCT->clk.wait_till_elapsed(samplingPeriod);
+        DAQClock.wait_till_elapsed(samplingPeriod);
     }
     vOffset /= offsetSamplingNum;
 
-    DCT->clk.stop();
+    inBoard->reset_board();
 
     return vOffset;
 }

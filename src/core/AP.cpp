@@ -290,22 +290,60 @@ void initAP()
     addAP("SGp.SpikeT[#]", &(SGp.SpikeT));
 
 
-    // inChnp
-    addAP("inChnp[#].active", &inChnp, &inChnData::active);
-    addAP("inChnp[#].gain", &inChnp, &inChnData::gain);
-    addAP("inChnp[#].gainFac", &inChnp, &inChnData::gainFac);
-    addAP("inChnp[#].spkDetect", &inChnp, &inChnData::spkDetect);
-    addAP("inChnp[#].spkDetectThresh", &inChnp, &inChnData::spkDetectThresh);
-    addAP("inChnp[#].bias", &inChnp, &inChnData::bias);
-    addAP("inChnp[#].chnlSaving", &inChnp, &inChnData::chnlSaving);
+    // SDAQp
+    addAP("SDAQp[#].active", &SDAQp, &SDAQData::active);
+    addAP("SDAQp[#].inFileName", &SDAQp, &SDAQData::inFileName);
+    addAP("SDAQp[#].outFileName", &SDAQp, &SDAQData::outFileName);
+    addAP("SDAQp[#].inTFac", &SDAQp, &SDAQData::inTFac);
+    addAP("SDAQp[#].outDt", &SDAQp, &SDAQData::outDt);
+    addAP("SDAQp[#].inChn[#].active", &SDAQp, &SDAQData::inChn, &inChnData::active);
+    addAP("SDAQp[#].inChn[#].gain", &SDAQp, &SDAQData::inChn, &inChnData::gain);
+    addAP("SDAQp[#].inChn[#].gainFac", &SDAQp, &SDAQData::inChn, &inChnData::gainFac);
+    addAP("SDAQp[#].inChn[#].spkDetect", &SDAQp, &SDAQData::inChn, &inChnData::spkDetect);
+    addAP("SDAQp[#].inChn[#].spkDetectThresh", &SDAQp, &SDAQData::inChn, &inChnData::spkDetectThresh);
+    addAP("SDAQp[#].inChn[#].bias", &SDAQp, &SDAQData::inChn, &inChnData::bias);
+    addAP("SDAQp[#].inChn[#].chnlSaving", &SDAQp, &SDAQData::inChn, &inChnData::chnlSaving);
+    addAP("SDAQp[#].outChn[#].active", &SDAQp, &SDAQData::outChn, &outChnData::active);
+    addAP("SDAQp[#].outChn[#].gain", &SDAQp, &SDAQData::outChn, &outChnData::gain);
+    addAP("SDAQp[#].outChn[#].gainFac", &SDAQp, &SDAQData::outChn, &outChnData::gainFac);
+    addAP("SDAQp[#].outChn[#].bias", &SDAQp, &SDAQData::outChn, &outChnData::bias);
+    addAP("SDAQp[#].outChn[#].chnlSaving", &SDAQp, &SDAQData::outChn, &outChnData::chnlSaving);
 
 
-    // outChnp
-    addAP("outChnp[#].active", &outChnp, &outChnData::active);
-    addAP("outChnp[#].gain", &outChnp, &outChnData::gain);
-    addAP("outChnp[#].gainFac", &outChnp, &outChnData::gainFac);
-    addAP("outChnp[#].bias", &outChnp, &outChnData::bias);
-    addAP("outChnp[#].chnlSaving", &outChnp, &outChnData::chnlSaving);
+    // DigiDatap
+    addAP("DigiDatap[#].active", &DigiDatap, &DigiDataData::active);
+    addAP("DigiDatap[#].baseAddress", &DigiDatap, &DigiDataData::baseAddress);
+    addAP("DigiDatap[#].syncIOMask", &DigiDatap, &DigiDataData::syncIOMask);
+    addAP("DigiDatap[#].inChn[#].active", &DigiDatap, &DigiDataData::inChn, &inChnData::active);
+    addAP("DigiDatap[#].inChn[#].gain", &DigiDatap, &DigiDataData::inChn, &inChnData::gain);
+    addAP("DigiDatap[#].inChn[#].gainFac", &DigiDatap, &DigiDataData::inChn, &inChnData::gainFac);
+    addAP("DigiDatap[#].inChn[#].spkDetect", &DigiDatap, &DigiDataData::inChn, &inChnData::spkDetect);
+    addAP("DigiDatap[#].inChn[#].spkDetectThresh", &DigiDatap, &DigiDataData::inChn, &inChnData::spkDetectThresh);
+    addAP("DigiDatap[#].inChn[#].bias", &DigiDatap, &DigiDataData::inChn, &inChnData::bias);
+    addAP("DigiDatap[#].inChn[#].chnlSaving", &DigiDatap, &DigiDataData::inChn, &inChnData::chnlSaving);
+    addAP("DigiDatap[#].outChn[#].active", &DigiDatap, &DigiDataData::outChn, &outChnData::active);
+    addAP("DigiDatap[#].outChn[#].gain", &DigiDatap, &DigiDataData::outChn, &outChnData::gain);
+    addAP("DigiDatap[#].outChn[#].gainFac", &DigiDatap, &DigiDataData::outChn, &outChnData::gainFac);
+    addAP("DigiDatap[#].outChn[#].bias", &DigiDatap, &DigiDataData::outChn, &outChnData::bias);
+    addAP("DigiDatap[#].outChn[#].chnlSaving", &DigiDatap, &DigiDataData::outChn, &outChnData::chnlSaving);
+
+#ifdef NATIONAL_INSTRUMENTS
+    // NIDAQp
+    addAP("NIDAQp[#].active", &NIDAQp, &NIDAQData::active);
+    addAP("NIDAQp[#].deviceName", &NIDAQp, &NIDAQData::deviceName);
+    addAP("NIDAQp[#].inChn[#].active", &NIDAQp, &NIDAQData::inChn, &inChnData::active);
+    addAP("NIDAQp[#].inChn[#].gain", &NIDAQp, &NIDAQData::inChn, &inChnData::gain);
+    addAP("NIDAQp[#].inChn[#].gainFac", &NIDAQp, &NIDAQData::inChn, &inChnData::gainFac);
+    addAP("NIDAQp[#].inChn[#].spkDetect", &NIDAQp, &NIDAQData::inChn, &inChnData::spkDetect);
+    addAP("NIDAQp[#].inChn[#].spkDetectThresh", &NIDAQp, &NIDAQData::inChn, &inChnData::spkDetectThresh);
+    addAP("NIDAQp[#].inChn[#].bias", &NIDAQp, &NIDAQData::inChn, &inChnData::bias);
+    addAP("NIDAQp[#].inChn[#].chnlSaving", &NIDAQp, &NIDAQData::inChn, &inChnData::chnlSaving);
+    addAP("NIDAQp[#].outChn[#].active", &NIDAQp, &NIDAQData::outChn, &outChnData::active);
+    addAP("NIDAQp[#].outChn[#].gain", &NIDAQp, &NIDAQData::outChn, &outChnData::gain);
+    addAP("NIDAQp[#].outChn[#].gainFac", &NIDAQp, &NIDAQData::outChn, &outChnData::gainFac);
+    addAP("NIDAQp[#].outChn[#].bias", &NIDAQp, &NIDAQData::outChn, &outChnData::bias);
+    addAP("NIDAQp[#].outChn[#].chnlSaving", &NIDAQp, &NIDAQData::outChn, &outChnData::chnlSaving);
+#endif
 
 
     // HHNeuronp
@@ -360,10 +398,6 @@ void initAP()
     addAP("Graphp[#].xtNo", &Graphp, &graphData::xtNo);
     addAP("Graphp[#].ytNo", &Graphp, &graphData::ytNo);
     addAP("Graphp[#].yfac[#]", &Graphp, &graphData::yfac);
-
-
-    // Digidata
-    addAP("DigiDatap.syncIOMask", &(DigiDatap.syncIOMask));
 
 
     // Sample & hold

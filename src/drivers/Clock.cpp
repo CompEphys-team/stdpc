@@ -9,36 +9,16 @@ Clock::Clock()
     clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
 }
 
-void Clock::add(DAQ *b)
-{
-    remove(b);
-    board.push_back(b);
-}
-
-void Clock::remove(DAQ *b)
-{
-    QMutableVectorIterator<DAQ*> it(board);
-    while ( it.hasNext() )
-        if ( it.next() == b )
-            it.remove();
-}
-
-void Clock::clear()
-{
-    board.clear();
-}
 
 //---------------------------------------------------------------------------
-void Clock::start()
+void Clock::reset_RTC()
 {
   static LARGE_INTEGER inT;
   QueryPerformanceCounter(&inT);
   sysT= ((double) inT.LowPart)/clock_frequency;
   t= 0.0;
-
-  for ( DAQ *b : board )
-      b->start();
 }
+
 
 //---------------------------------------------------------------------------
 double Clock::get_RTC()
@@ -54,13 +34,6 @@ double Clock::get_RTC()
   t+= dt;
 
   return dt;
-}
-
-//---------------------------------------------------------------------------
-void Clock::stop()
-{
-  for ( DAQ *b : board )
-      b->reset_board();
 }
 
 

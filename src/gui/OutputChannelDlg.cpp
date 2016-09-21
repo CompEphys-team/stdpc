@@ -65,6 +65,7 @@ void OutputChannelDlg::init(DAQ *b)
      
   clearAll();
   ChnNo= board->outChnNo;
+  board->p->outChn.resize(ChnNo);
 
   outLow = QVector<double>(board->outGainNo);
   for(int i= 0; i < board->outGainNo; i++){
@@ -138,7 +139,6 @@ void OutputChannelDlg::init(DAQ *b)
   geo= buttonBox->geometry();
   geo.moveBottom(Y0+ChnNo*DY+50);
   buttonBox->setGeometry(geo);
-  accept();  // export the current state, update chn info in other dialogs
 }    
 
 OutputChannelDlg::~OutputChannelDlg()

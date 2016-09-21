@@ -98,7 +98,7 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData(DigiDataData *p, int devID, Clock *clk);
+    DigiData(DigiDataData *p, int devID);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);

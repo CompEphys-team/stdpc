@@ -289,21 +289,18 @@ class SDAQData : public DAQData {
     QString outFileName;
     double inTFac;
     double outDt;
-    SDAQData &operator=(SDAQData);
 };
 
 class DigiDataData : public DAQData {
   public:
     short int baseAddress;
     short int syncIOMask;
-    DigiDataData &operator=(DigiDataData);
 };
 
 #ifdef NATIONAL_INSTRUMENTS
 class NIDAQData : public DAQData {
   public:
     QString deviceName;
-    NIDAQData &operator=(NIDAQData);
 };
 #endif
 
@@ -339,14 +336,5 @@ struct HHNeuronData {
     double ELeak;
     std::vector<vInstData> inst;
 };
-
-ostream &operator<<(ostream &os, SDAQData &p);
-istream &operator>>(istream &is, SDAQData &p); 
-ostream &operator<<(ostream &os, DigiDataData &p);
-istream &operator>>(istream &is, DigiDataData &p);
-#ifdef NATIONAL_INSTRUMENTS
-ostream &operator<<(ostream &os, NIDAQData &p); 
-istream &operator>>(istream &is, NIDAQData &p); 
-#endif
 
 #endif

@@ -41,7 +41,6 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      void reject();
      
   private:
-     bool initial;
      void clearAll();
 }; 
 

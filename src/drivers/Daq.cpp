@@ -1,12 +1,11 @@
 #include "Daq.h"
 
-DAQ::DAQ(DAQData *p, int devID, Clock *clk) :
+DAQ::DAQ(DAQData *p, int devID) :
     p(p),
     devID(devID),
-    t(clk->t)
+    t(DAQClock.t)
 {
   initialized= false;
-  clk->add(this);
 }
 
 

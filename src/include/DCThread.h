@@ -34,13 +34,11 @@ private:
  public:
      DCThread();
      virtual ~DCThread();
-     bool init();
      bool LoadScript(QString &);
      void UnloadScript();
 
      inChannel *getInChan(ChannelIndex const& dex);
      outChannel *getOutChan(ChannelIndex const& dex);
-     DAQ *getBoard(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
      template <typename T>
@@ -68,15 +66,6 @@ private:
      std::vector<DestexheSyn> dsyn;
      std::vector<HH> hh;
      std::vector<abHH> abhh;
-
-     SimulDAQ *simulDAQ;
-     DigiData *dd1200;
-#ifdef NATIONAL_INSTRUMENTS
-     NIDAQ *niDAQ;
-#else
-     DAQ *niDAQ;
-#endif
-     Clock clk;
 
      inChannel inChnSG;
      outChannel outChnNone;

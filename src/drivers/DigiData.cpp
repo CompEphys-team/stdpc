@@ -5,8 +5,8 @@
 
 //---------------------------------------------------------------------------
 
-DigiData::DigiData(DigiDataData *p, int devID, Clock *clk) :
-    DAQ(p, devID, clk)
+DigiData::DigiData(DigiDataData *p, int devID) :
+    DAQ(p, devID)
 {
   inChnNo= 16;
   inIdx= new short int[inChnNo];

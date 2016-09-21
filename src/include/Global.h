@@ -5,11 +5,15 @@
 #include <vector>
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
+#include "Clock.h"
 
 #define MAX_ST_HISTORY 20
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
 #define MAX_ELECTRODE_NO 4
+
+// Forward
+class DeviceManager;
 
 
 extern std::vector<CSynData> CSynp;
@@ -20,17 +24,15 @@ extern std::vector<DestexheSynData> DxheSynp;
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
-extern std::vector<inChnData> inChnp;
-extern std::vector<outChnData> outChnp;
 extern inChnData inSpkGenChnp;
 extern outChnData outSpkGenChnp;
 
 extern std::vector<HHNeuronData> HHNeuronp;
 
-extern DigiDataData DigiDatap;
-extern SDAQData SDAQp;
+extern std::vector<DigiDataData> DigiDatap;
+extern std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
-extern NIDAQData NIDAQp;
+extern std::vector<NIDAQData> NIDAQp;
 #endif
 extern SGData SGp;
 
@@ -48,5 +50,7 @@ extern tanhLUtable tanhLU;
 extern expLUtable expLU;
 extern expSigmoidLUtable expSigmoidLU;
 
+extern Clock DAQClock;
+extern DeviceManager Devices;
 
 #endif

@@ -4,14 +4,11 @@
 #include <cmath>
 #include <climits>
 #include "ChannelIndex.h"
-
+#include "DeviceManager.h"
 
 #include "SimulDAQ.h" // for debugging only ...
 
-DCThread::DCThread() :
-    simulDAQ(nullptr),
-    dd1200(nullptr),
-    niDAQ(nullptr)
+DCThread::DCThread()
 {
   stopped= true;
   finished= true;
@@ -27,48 +24,6 @@ DCThread::DCThread() :
 
 DCThread::~DCThread()
 {
-    delete simulDAQ;
-    delete dd1200;
-    delete niDAQ;
-}
-
-bool DCThread::init()
-{
-    std::function<bool(DAQ*)> binit = [=](DAQ *b){
-        QString name;
-        if ( b->initialize_board(name) ) {
-            emit message(QString("Good news: %1 found and opened successfully!").arg(name));
-            return true;
-        } else {
-            emit message(QString("Bad news: %1 not found or not opened successfully!").arg(name));
-            return false;
-        }
-    };
-
-    clk.clear();
-    delete simulDAQ; simulDAQ = nullptr;
-    delete dd1200;   dd1200 = nullptr;
-    delete niDAQ;    niDAQ = nullptr;
-
-    if ( SDAQp.active ) {
-        simulDAQ = new SimulDAQ(&SDAQp, 0, &clk);
-        if ( !binit(simulDAQ) )
-            clk.remove(simulDAQ);
-    }
-    if ( DigiDatap.active ) {
-        dd1200 = new DigiData(&DigiDatap, 0, &clk);
-        if ( !binit(dd1200) )
-            clk.remove(dd1200);
-    }
-#ifdef NATIONAL_INSTRUMENTS
-    if ( NIDAQp.active ) {
-        niDAQ = new NIDAQ(&NIDAQp, 0, &clk);
-        if ( !binit(niDAQ) )
-            clk.remove(niDAQ);
-    }
-#endif
-
-    return !clk.board.empty();
 }
 
 
@@ -86,7 +41,7 @@ void DCThread::run()
    inChnSG.init(&inSpkGenChnp);
    outChnNone.init(&outSpkGenChnp);
 
-   for ( DAQ *b : clk.board )
+   for ( DAQ *b : Devices.actdev )
        b->init_chans();
 
    hhNeuron.clear();
@@ -110,7 +65,7 @@ void DCThread::run()
    inChnSG.active = SGp.active;
 
    SampleHoldChan = getInChan(SampleHoldp.trigChn);
-   SampleHoldBoard = getBoard(SampleHoldp.trigChn);
+   SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
 
    // set up the graphic display channels
    QString lb;
@@ -252,7 +207,7 @@ void DCThread::run()
        outChnsToSave.clear();
        QVector<QString> headerIn, headerOut;
 
-       for ( DAQ *b : clk.board ) {
+       for ( DAQ *b : Devices.actdev ) {
            QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
            QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
            headerIn.append(its.first);
@@ -301,7 +256,9 @@ void DCThread::run()
    }
    else evt= 1e10;
 
-   clk.start();
+   DAQClock.reset_RTC();
+   for ( DAQ *b : Devices.actdev )
+       b->start();
 
    // Dynamic clamp loop begins
    while (!stopped) {
@@ -309,14 +266,14 @@ void DCThread::run()
 
      if (!SampleHoldOn) {
        // --- Read --- //
-         for ( DAQ *b : clk.board )
+         for ( DAQ *b : Devices.actdev )
              b->get_scan();
        // --- Read end --- //
 
        // --- Calculate --- //
 
         // Adaptive time step
-        dt = clk.get_RTC();
+        dt = DAQClock.get_RTC();
         t += dt;
 
         // AEC channel update part
@@ -329,12 +286,12 @@ void DCThread::run()
         }
 
         // Apply biases & detect spikes
-        for ( DAQ *b : clk.board )
+        for ( DAQ *b : Devices.actdev )
             b->process_scan(t);
      }
      else {
          // Adaptive time step
-         dt = clk.get_RTC();
+         dt = DAQClock.get_RTC();
          t += dt;
      }
      if (SampleHoldp.active) {
@@ -430,7 +387,7 @@ void DCThread::run()
 
          // Check channel limits
          DAQ::ChannelLimitWarning w;
-         for ( DAQ *b : clk.board ) {
+         for ( DAQ *b : Devices.actdev ) {
              if ( b->check_limits(!limitWarningEmitted, w) )
                  emit CloseToLimit(w.what, w.chan_label, w.loLim, w.hiLim, w.value);
          }
@@ -444,7 +401,7 @@ void DCThread::run()
      }
 
      // --- Write --- //
-     for ( DAQ *b : clk.board )
+     for ( DAQ *b : Devices.actdev )
          b->write_analog_out();
      // --- Write end --- //
 
@@ -454,7 +411,7 @@ void DCThread::run()
 
 
    // In the end, let's do the cleanup
-   for ( DAQ *b : clk.board ) {
+   for ( DAQ *b : Devices.actdev ) {
        b->reset_board();
        b->reset_chans();
    }
@@ -483,20 +440,7 @@ inChannel *DCThread::getInChan(ChannelIndex const& dex)
     } else if ( dex.isSG ) {
         return &inChnSG;
     } else if ( dex.isAnalog && dex.isInChn ) {
-        switch ( dex.daqClass ) {
-        case DAQClass::Simul :
-            if ( !simulDAQ || simulDAQ->in.size() <= dex.chanID )
-                return nullptr;
-            return &(simulDAQ->in[dex.chanID]);
-        case DAQClass::DD1200 :
-            if ( !dd1200 || dd1200->in.size() <= dex.chanID )
-                return nullptr;
-            return &(dd1200->in[dex.chanID]);
-        case DAQClass::NI :
-            if ( !niDAQ || niDAQ->in.size() <= dex.chanID )
-                return nullptr;
-            return &(niDAQ->in[dex.chanID]);
-        }
+        return Devices.getInChan(dex);
     }
     return nullptr;
 }
@@ -515,32 +459,7 @@ outChannel *DCThread::getOutChan(ChannelIndex const& dex)
     } else if ( dex.isNone ) {
         return &outChnNone;
     } else if ( dex.isAnalog && !dex.isInChn ) {
-        switch ( dex.daqClass ) {
-        case DAQClass::Simul :
-            if ( !simulDAQ || simulDAQ->out.size() <= dex.chanID )
-                return nullptr;
-            return &(simulDAQ->out[dex.chanID]);
-        case DAQClass::DD1200 :
-            if ( !dd1200 || dd1200->out.size() <= dex.chanID )
-                return nullptr;
-            return &(dd1200->out[dex.chanID]);
-        case DAQClass::NI :
-            if ( !niDAQ || niDAQ->out.size() <= dex.chanID )
-                return nullptr;
-            return &(niDAQ->out[dex.chanID]);
-        }
-    }
-    return nullptr;
-}
-
-DAQ *DCThread::getBoard(ChannelIndex const& dex)
-{
-    if ( !dex.isValid || !dex.isAnalog )
-        return nullptr;
-    switch ( dex.daqClass ) {
-    case DAQClass::Simul :  return simulDAQ;
-    case DAQClass::DD1200 : return dd1200;
-    case DAQClass::NI :     return niDAQ;
+        return Devices.getOutChan(dex);
     }
     return nullptr;
 }

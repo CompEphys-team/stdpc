@@ -45,23 +45,26 @@ public slots:
 protected:
     void updateCount(ChannelListModel *from = nullptr);
 
+    template <typename T>
     class DAQHelper {
     private:
         const DAQClass daqClass;
-        DAQData *const p;
+        std::vector<T> *const p;
         ChannelListModel *const parent;
     public:
-        DAQHelper(DAQClass c, DAQData *p, ChannelListModel *parent) : daqClass(c), p(p), parent(parent), nAI(0), nAO(0) {}
+        DAQHelper(DAQClass c, std::vector<T> *p, ChannelListModel *parent) : daqClass(c), p(p), parent(parent), nAI(0), nAO(0) {}
         void updateCount();
         void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
         bool data(int row, int role, int &offset, QVariant &ret) const;
         bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
-        int nAI, nAO;
+        QVector<int> nAI, nAO;
     };
 
     const int displayFlags;
     int size;
-    DAQHelper hSimul, hDD1200, hNI;
+    DAQHelper<SDAQData> hSimul;
+    DAQHelper<DigiDataData> hDD1200;
+    DAQHelper<NIDAQData> hNI;
     int nPHH;
     QVector<int> nVHH;
 };

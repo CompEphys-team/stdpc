@@ -11,8 +11,8 @@
 
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ(NIDAQData *p, int devID, Clock *clk) :
-    DAQ(p, devID, clk)
+NIDAQ::NIDAQ(NIDAQData *p, int devID) :
+    DAQ(p, devID)
 {
   char data[1024];
   float64 fdata[128];

@@ -1,73 +1,144 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>DigiDataDlg</class>
- <widget class="QDialog" name="DigiDataDlg" >
-  <property name="geometry" >
+ <widget class="QDialog" name="DigiDataDlg">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>127</height>
+    <height>162</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>DigiData 1200/1200A Setup</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox" >
-   <property name="geometry" >
+  <widget class="QDialogButtonBox" name="buttonBox">
+   <property name="geometry">
     <rect>
      <x>211</x>
-     <y>80</y>
+     <y>120</y>
      <width>160</width>
      <height>32</height>
     </rect>
    </property>
-   <property name="orientation" >
+   <property name="orientation">
     <enum>Qt::Horizontal</enum>
    </property>
-   <property name="standardButtons" >
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::NoButton|QDialogButtonBox::Ok</set>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="BaseAddressE" >
-   <property name="geometry" >
+  <widget class="QLineEdit" name="BaseAddressE">
+   <property name="geometry">
     <rect>
      <x>130</x>
-     <y>30</y>
+     <y>48</y>
      <width>113</width>
      <height>20</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>320</string>
    </property>
   </widget>
-  <widget class="QLabel" name="BaseAddressL" >
-   <property name="geometry" >
+  <widget class="QLabel" name="BaseAddressL">
+   <property name="geometry">
     <rect>
      <x>30</x>
-     <y>30</y>
+     <y>48</y>
      <width>64</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>Base address</string>
    </property>
   </widget>
-  <widget class="QLabel" name="xlb" >
-   <property name="geometry" >
+  <widget class="QLabel" name="xlb">
+   <property name="geometry">
     <rect>
      <x>110</x>
-     <y>32</y>
+     <y>50</y>
      <width>16</width>
      <height>16</height>
     </rect>
    </property>
-   <property name="layoutDirection" >
+   <property name="layoutDirection">
     <enum>Qt::RightToLeft</enum>
    </property>
-   <property name="text" >
+   <property name="text">
     <string>0x</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="DAQLabel">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>10</y>
+     <width>201</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string/>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::Panel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <property name="lineWidth">
+    <number>1</number>
+   </property>
+   <property name="midLineWidth">
+    <number>0</number>
+   </property>
+   <property name="text">
+    <string>DigiData 1200(A), device %1</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="inChannels">
+   <property name="geometry">
+    <rect>
+     <x>14</x>
+     <y>80</y>
+     <width>131</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Input channels</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="outChannels">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>80</y>
+     <width>131</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Output channels</string>
    </property>
   </widget>
  </widget>
@@ -79,11 +150,11 @@
    <receiver>DigiDataDlg</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>248</x>
      <y>254</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>157</x>
      <y>274</y>
     </hint>
@@ -95,11 +166,11 @@
    <receiver>DigiDataDlg</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
+    <hint type="sourcelabel">
      <x>316</x>
      <y>260</y>
     </hint>
-    <hint type="destinationlabel" >
+    <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
     </hint>
