@@ -100,9 +100,7 @@ QString ChannelIndex::prettyName() const
 QString ChannelIndex::toString(QChar sep) const
 {
     QString ret;
-    if ( !isValid ) {
-        return ret;
-    } else if ( isNone ) {
+    if ( !isValid || isNone ) {
         ret = "None";
     } else if ( isSG ) {
         ret = "SpikeGen";
