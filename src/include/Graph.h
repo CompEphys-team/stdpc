@@ -20,7 +20,7 @@ class Graph : public QObject
     qreal dyt;
     qreal lbxOff, lbyOff;
     
-    qreal xlast, ylast[4];
+    qreal xlast[4], ylast[4];
     qreal gxlast;
     
     bool initial[4];

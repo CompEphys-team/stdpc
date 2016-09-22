@@ -126,11 +126,11 @@ void Graph::addPoint(double t, double data, int pn)
   y= data - p->miny[pn];
   gy= (1.0-y/yrange[pn])*ht;
   if (initial[pn]) {
-    xlast= gx;
+    xlast[pn]= gx;
     ylast[pn]= gy;
     initial[pn]= false;
   }
-  Items[pn][idx] = Scene.addLine(xlast, ylast[pn], gx, gy, pen[pn]);
+  Items[pn][idx] = Scene.addLine(xlast[pn], ylast[pn], gx, gy, pen[pn]);
   ylast[pn]= gy;
-  xlast= gx;
+  xlast[pn]= gx;
 }
