@@ -14,7 +14,6 @@
 #include "DigiData.h"
 #include "SimulDAQ.h"
 #include "Nidaq.h"
-#include "AECChannel.h"
 #include "DataSaver.h"
 #include "HHNeuron.h"
 
@@ -47,9 +46,6 @@ private:
      void instantiate(std::vector<T> &, typename T::param_type &, SynapseAssignment &);
      template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
-
-     // List of AEC channels (io-channels pairs, kernels and current buffers)
-     QVector<AECChannel*> aecChannels;
 
      // Temporary data storing object
      QVector<double> data;

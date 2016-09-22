@@ -10,9 +10,8 @@
 #define MAX_ST_HISTORY 20
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
-#define MAX_ELECTRODE_NO 4
 
-#define STDPC_PROTOCOL_VERSION 1
+#define STDPC_PROTOCOL_VERSION 2
 #define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
 extern int LOADED_PROTOCOL_VERSION;
 extern DAQClass LEGACY_DAQ_CLASS;
@@ -42,8 +41,6 @@ extern std::vector<NIDAQData> NIDAQp;
 extern SGData SGp;
 
 extern dataSavingParams dataSavingPs;
-extern std::vector<elecCalibParams> elecCalibPs;
-
 
 extern std::vector<graphData> Graphp;
 

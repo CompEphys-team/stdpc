@@ -15,10 +15,6 @@ DCThread::DCThread()
 
   scripting= false;
 
-  aecChannels = QVector<AECChannel*>(MAX_ELECTRODE_NO);
-  for(int i=0; i<aecChannels.size(); i++)
-    aecChannels[i] = new AECChannel();
-
   dataSaver = new DataSaver();
 }
 
@@ -29,7 +25,6 @@ DCThread::~DCThread()
 
 void DCThread::run()
 {
-   int numOfAecChannels;
    double savingPeriod= 1.0;
 
    static int i;
@@ -170,32 +165,29 @@ void DCThread::run()
    if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated"));
 
    // Checking validity of AEC channels
-   numOfAecChannels = 0;
+   QVector<AECChannel*> aecChannels;
+   for ( DAQ *b : Devices.actdev ) {
+       for ( AECChannel *aec : b->aecChans() ) {
+           DAQ *outB = Devices.getDevice(aec->outChnNum);
+           outChannel *outC = getOutChan(aec->outChnNum);
+           if ( !outB || !outB->initialized || !outC || !outC->active ) {
+               message(QString("AEC output channel/device %1 is not active! AEC disabled on input channel %2")
+                       .arg(aec->outChnNum.prettyName(), aec->inChnNum.prettyName()));
+           } else {
+               message(QString("AEC channel is active on input channel %1 and output channel %2")
+                       .arg(aec->inChnNum.prettyName(), aec->outChnNum.prettyName()));
+               aecChannels.push_back(aec);
+           }
+       }
+   }
    QVector<inChannel*> aecIn(aecChannels.size(), nullptr);
    QVector<outChannel*> aecOut(aecChannels.size(), nullptr);
    QVector<outChannel*> aecCopy(aecChannels.size(), nullptr);
-   for ( int i=0; i<aecChannels.size(); i++ ){
-     if ( aecChannels[i]->IsActive() ){
-       aecIn[i] = getInChan(aecChannels[i]->inChnNum);
-       aecOut[i] = getOutChan(aecChannels[i]->outChnNum);
-       aecCopy[i] = getOutChan(elecCalibPs[i].copyChn);
-       if ( aecIn[i] && aecOut[i] && aecIn[i]->active && aecOut[i]->active ) {
-         message(QString("AEC channel is active on input channel ")+aecChannels[i]->inChnNum.toString()+" and output channel "+aecChannels[i]->outChnNum.toString());
-       #ifdef TEST_VERSION
-         numOfAecChannels++;
-       #endif
-       }
-       else {
-         if ( !aecIn[i] || !aecIn[i]->active ){
-           message(QString("Input channel ")+aecChannels[i]->inChnNum.toString()+QString(" is not active! AEC disabled on that channel."));
-           aecChannels[i]->Inactivate();
-         }
-         if ( !aecOut[i] || !aecOut[i]->active ){
-           message(QString("Output channel ")+aecChannels[i]->outChnNum.toString()+QString(" is not active! AEC disabled on that channel."));
-           aecChannels[i]->Inactivate();
-         }
-       }
-     }
+   for ( AECChannel *aec : aecChannels ) {
+       aecIn[i] = getInChan(aec->inChnNum);
+       aecOut[i] = getOutChan(aec->outChnNum);
+       if ( aecIn[i]->p->calib.copyChnOn )
+          aecCopy[i] = getOutChan(aecIn[i]->p->calib.copyChn);
    }
 
    // Init data saving
@@ -237,9 +229,11 @@ void DCThread::run()
        QVector<QString> header(1, "Time");
        header.append(headerIn);
        header.append(headerOut);
-       for ( int i = 0; i < numOfAecChannels; i++ ) {
-           header.append(QString("Ve_%1").arg(i));
+#ifdef TEST_VERSION
+       for ( AECChannel *aec : aecChannels ) {
+           header.append(QString("VAEC_%1").arg(aec->inChnNum.toString('_')));
        }
+#endif
        dataSaver->SaveHeader(header);
 
        data.clear();
@@ -285,10 +279,8 @@ void DCThread::run()
         // AEC channel update part
         // AEC compensation
         for ( int k=0; k<aecChannels.size(); k++ ) {
-            if ( aecChannels[k]->IsActive() ) {
-                aecChannels[k]->CalculateVe(aecOut[k]->I, dt);
-                aecIn[k]->V -= aecChannels[k]->v_e;
-            }
+            aecChannels[k]->CalculateVe(aecOut[k]->I, dt);
+            aecIn[k]->V -= aecChannels[k]->v_e;
         }
 
         // Apply biases & detect spikes
@@ -325,8 +317,7 @@ void DCThread::run()
                   data[i++] = out->I;
             #ifdef TEST_VERSION
               for ( AECChannel *aec : aecChannels )
-                  if ( aec->IsActive() )
-                      data[i++] = aec->v_e;
+                  data[i++] = aec->v_e;
             #endif
 
               dataSaver->SaveLine(data);
@@ -406,7 +397,7 @@ void DCThread::run()
 
      // copy AEC compensated input values to output channels if desired
      for ( int k=0; k<aecChannels.size(); k++ ){
-         if ( aecChannels[k]->IsActive() && elecCalibPs[k].copyChnOn && aecCopy[k])
+         if ( aecCopy[k])
              aecCopy[k]->I= aecIn[k]->V;
      }
 

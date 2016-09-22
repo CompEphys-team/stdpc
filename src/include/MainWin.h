@@ -43,7 +43,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      void exportSGData();
      void importSGData();
 
-     ElectrodeCompDlg *ECDlg;
      DataSavingDlg *DSDlg;
      SpikeTimeDlg *SpkTDlg;
      GraphDlg *graphDlg[2];

@@ -308,6 +308,7 @@ void initAP()
     addAP("SDAQp[#].outChn[#].gainFac", &SDAQp, &SDAQData::outChn, &outChnData::gainFac);
     addAP("SDAQp[#].outChn[#].bias", &SDAQp, &SDAQData::outChn, &outChnData::bias);
     addAP("SDAQp[#].outChn[#].chnlSaving", &SDAQp, &SDAQData::outChn, &outChnData::chnlSaving);
+    // Ignore unused inChnData::calib
 
 
     // DigiDatap
@@ -327,6 +328,24 @@ void initAP()
     addAP("DigiDatap[#].outChn[#].bias", &DigiDatap, &DigiDataData::outChn, &outChnData::bias);
     addAP("DigiDatap[#].outChn[#].chnlSaving", &DigiDatap, &DigiDataData::outChn, &outChnData::chnlSaving);
 
+    addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
+    addAP("DigiDatap[#].inChn[#].calib.copyChn", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
+    addAP("DigiDatap[#].inChn[#].calib.samplingRate", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
+    addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
+    addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
+    addAP("DigiDatap[#].inChn[#].calib.iMinElec", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
+    addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
+    addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
+    addAP("DigiDatap[#].inChn[#].calib.iMembStep", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
+    addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
+    addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
+    addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
+    addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
+    addAP("DigiDatap[#].inChn[#].calib.injCalLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
+    addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
+    addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
+
+
 #ifdef NATIONAL_INSTRUMENTS
     // NIDAQp
     addAP("NIDAQp[#].active", &NIDAQp, &NIDAQData::active);
@@ -343,6 +362,23 @@ void initAP()
     addAP("NIDAQp[#].outChn[#].gainFac", &NIDAQp, &NIDAQData::outChn, &outChnData::gainFac);
     addAP("NIDAQp[#].outChn[#].bias", &NIDAQp, &NIDAQData::outChn, &outChnData::bias);
     addAP("NIDAQp[#].outChn[#].chnlSaving", &NIDAQp, &NIDAQData::outChn, &outChnData::chnlSaving);
+
+    addAP("NIDAQp[#].inChn[#].calib.copyChnOn", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
+    addAP("NIDAQp[#].inChn[#].calib.copyChn", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
+    addAP("NIDAQp[#].inChn[#].calib.samplingRate", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
+    addAP("NIDAQp[#].inChn[#].calib.outputChannelNumber", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
+    addAP("NIDAQp[#].inChn[#].calib.iMaxElec", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
+    addAP("NIDAQp[#].inChn[#].calib.iMinElec", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
+    addAP("NIDAQp[#].inChn[#].calib.numberOfLevels", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
+    addAP("NIDAQp[#].inChn[#].calib.injLenPerLevel", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
+    addAP("NIDAQp[#].inChn[#].calib.iMembStep", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
+    addAP("NIDAQp[#].inChn[#].calib.numberOfRepeats", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
+    addAP("NIDAQp[#].inChn[#].calib.injLenPerRepeat", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
+    addAP("NIDAQp[#].inChn[#].calib.hyperpolCurr", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
+    addAP("NIDAQp[#].inChn[#].calib.injCalAmp", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
+    addAP("NIDAQp[#].inChn[#].calib.injCalLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
+    addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
+    addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
 #endif
 
 
@@ -368,23 +404,23 @@ void initAP()
 
 
     // Electrode compensation
-    addAP("elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
-    addAP("elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
-    addAP("elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
-    addAP("elecCalibPs[#].inputChannelNumber", &elecCalibPs, &elecCalibParams::inputChannelNumber);
-    addAP("elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::outputChannelNumber);
-    addAP("elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
-    addAP("elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
-    addAP("elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
-    addAP("elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
-    addAP("elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
-    addAP("elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
-    addAP("elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
-    addAP("elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
-    addAP("elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
-    addAP("elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
-    addAP("elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
-    addAP("elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
+//    addAP("elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
+//    addAP("elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
+//    addAP("elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
+//    addAP("elecCalibPs[#].inputChannelNumber", &elecCalibPs, &elecCalibParams::inputChannelNumber);
+//    addAP("elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::outputChannelNumber);
+//    addAP("elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
+//    addAP("elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
+//    addAP("elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
+//    addAP("elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
+//    addAP("elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
+//    addAP("elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
+//    addAP("elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
+//    addAP("elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
+//    addAP("elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
+//    addAP("elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
+//    addAP("elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
+//    addAP("elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
 
 
     // Graphs

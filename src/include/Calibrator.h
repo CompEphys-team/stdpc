@@ -51,8 +51,6 @@ private:
 
 public:
 
-    DCThread *DCT;
-
     int incorrectMeasurement; // for error checking
 
     // Kernel params
@@ -87,13 +85,12 @@ public:
     double stdPerAverRate;
 
     Calibrator();
-    void GeneralInit(DCThread*);
     int  ChannelInit(ChannelIndex, ChannelIndex);
     void ElectrodeMeasurement(double, double, int, double, double);
     void MembraneMeasurement(double, double, int, double);
-    void Calibration(double, double, int, int, int, double, double);
+    void Calibration(double, double, int, int, double, double);
     void CalcSamplingStats();
-    void SetChannelActivation(int, bool);
+    void SetChannelActivation(bool);
 
 signals:
     void CloseToLimit(QString, QString, double, double, double);

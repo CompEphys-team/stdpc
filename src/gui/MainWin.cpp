@@ -12,7 +12,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
      outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
 
-     ECDlg= new ElectrodeCompDlg(this);
      DSDlg= new DataSavingDlg(this);
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
@@ -65,7 +64,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
      
      connect(actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(open()));
      connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
      connect(actionHH_models, SIGNAL(triggered()), hhModelDlg, SLOT(open()));
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
@@ -96,9 +94,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DCT,SIGNAL(addPoint1(double, double, int)), &Graphs[0], SLOT(addPoint(double, double, int)));
      connect(DCT,SIGNAL(addPoint2(double, double, int)), &Graphs[1], SLOT(addPoint(double, double, int)));
      
-     connect(ECDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-
-     connect(ECDlg->calibrator,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
      // graphical stuff
@@ -157,7 +152,6 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
 
     bool success = !Devices.actdev.empty();
     StartBut->setEnabled(success);
-    actionElectrode_setup->setEnabled(success);
     emit channelsChanged();
 }
 
@@ -292,7 +286,6 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   for (int i= 0; i < 2; i++) graphDlg[i]->exportData(Graphp[i]);
 
   DSDlg->exportData();
-  ECDlg->exportData();
 
   hhModelDlg->exportData();
 }
@@ -307,7 +300,6 @@ void MyMainWindow::importData()
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
 
   DSDlg->importData();
-  ECDlg->importData();
 
   hhModelDlg->importData();
 }

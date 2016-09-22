@@ -27,7 +27,6 @@ SGData SGp;
 std::vector<graphData> Graphp(2);
 
 dataSavingParams dataSavingPs;
-std::vector<elecCalibParams> elecCalibPs(MAX_ELECTRODE_NO);
 
 // Attilas Sample-and-Hold
 SampleHoldData SampleHoldp;

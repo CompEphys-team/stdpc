@@ -1086,7 +1086,6 @@ p, li { white-space: pre-wrap; }
     <addaction name="actionDAQ"/>
     <addaction name="actionInput_channels"/>
     <addaction name="actionOutput_channels"/>
-    <addaction name="actionElectrode_setup"/>
     <addaction name="actionData_saving"/>
     <addaction name="menuSimulated_neurons"/>
    </widget>

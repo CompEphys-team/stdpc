@@ -103,6 +103,18 @@ QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
     return qMakePair(labels, chans);
 }
 
+//---------------------------------------------------------------------------
+QVector<AECChannel*> DAQ::aecChans()
+{
+    QVector<AECChannel*> chans;
+    for ( int i = 0; i < actOutChnNo; i++ ) {
+        if ( in[inIdx[i]].aec.IsActive() ) {
+            chans.push_back(&in[inIdx[i]].aec);
+        }
+    }
+    return chans;
+}
+
 
 //---------------------------------------------------------------------------
 bool DAQ::check_limits(bool checkV_and_warn, ChannelLimitWarning &w)

@@ -42,6 +42,8 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
     connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
     connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
     connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
+    connect(c->dlg, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
+            parent, SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
 
     static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
     c->_widget->statusChanged(future.result());

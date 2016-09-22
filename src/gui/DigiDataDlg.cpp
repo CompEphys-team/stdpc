@@ -13,6 +13,7 @@ DigiDataDlg::DigiDataDlg(int no, QWidget *parent) : DAQDlg(no, parent)
     dex.daqClass = DAQClass::DD1200;
     dex.devID = no;
     board = Devices.getDevice(dex);
+    inDlg->dex = dex;
     inDlg->init(board);
     outDlg->init(board);
 }

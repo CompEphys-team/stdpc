@@ -27,28 +27,25 @@ Calibrator::Calibrator() :
 }
 
 
-void Calibrator::GeneralInit(DCThread *DCThrd)
-{
-    DCT = DCThrd;
-}
-
-
 int Calibrator::ChannelInit(ChannelIndex inChNum, ChannelIndex outChNum)
 {
     inputChannelNumber = inChNum;
     outputChannelNumber = outChNum;
 
-    for ( DAQ *b : Devices.actdev )
-        b->init_chans();
-
     inBoard = Devices.getDevice(inputChannelNumber);
+    if ( !inBoard || !inBoard->initialized )
+        return 3; // Return code for inactive input device
+    inBoard->init_chans();
     inChn = Devices.getInChan(inputChannelNumber);
-    if ( !inBoard || !inChn || !inChn->active )
+    if ( !inChn || !inChn->active )
         return 1; // Return code for inactive input channel
 
     outBoard = Devices.getDevice(outputChannelNumber);
+    if ( !outBoard || !outBoard->initialized )
+        return 4; // Return code for inactive output device
+    outBoard->init_chans();
     outChn = Devices.getOutChan(outputChannelNumber);
-    if ( !outBoard || !outChn || !outChn->active )
+    if ( !outChn || !outChn->active )
         return 2; // Return code for inactive output channel
 
     return 0;   // Return code for successfull channel initialization
@@ -333,7 +330,7 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
 }
 
 
-void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
+void Calibrator::Calibration(double injCalLen, double sampRate, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
 {
     fullKerLen = fullKLen;
     elecKerLen = elecKLen;   
@@ -402,22 +399,23 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
 
     //-----------------Only for testing---------------//
   #ifdef TEST_VERSION
-    fname = QString("full_kernel_")+QString::number(elecNum)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("full_kernel_")+inChnName+QString(".dat");
     saveData(fname, kerCalc->fullKernel);
-    fname = QString("currents_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("currents_")+inChnName+QString(".dat");
     saveData(fname, currents);
-    fname = QString("voltages_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("voltages_")+inChnName+QString(".dat");
     saveData(fname, voltages);
-    fname = QString("times_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("times_")+inChnName+QString(".dat");
     saveData(fname, times);
   #endif
     //-----------------Only for testing---------------//
 
     // Init AECChannel with the kernel
-    DCT->aecChannels[elecNum]->Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());
+    inChn->aec.Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());
 
     // Save the kernel for testing
-    QString fname = QString("kernel_")+QString::number(elecNum)+QString(".dat");
+    QString fname = QString("kernel_%1.dat").arg(inputChannelNumber.toString('-'));
     saveData(fname, kerCalc->GetElecKernel());
 
 }
@@ -480,7 +478,8 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     // board->reset_board();
     DAQClock.reset_RTC();
     inBoard->start();
-    outBoard->start();;
+    if ( inBoard != outBoard )
+        outBoard->start();
 
     if( isCalibration == true ) // read -- wait -- write order in case of calibration
         for ( sample=1; sample<numOfSamples; sample++ )
@@ -547,8 +546,9 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     }
 
     // Reset board
-    for ( DAQ *b : Devices.actdev )
-        b->reset_board();
+    inBoard->reset_board();
+    if ( inBoard != outBoard )
+        outBoard->reset_board();
 }
 
 
@@ -626,10 +626,10 @@ void Calibrator::CalcSamplingStats()
 
 
 // Turns on/off the compensation on the corresponding electrode
-void Calibrator::SetChannelActivation(int elecNum, bool state)
+void Calibrator::SetChannelActivation(bool state)
 {
-    if ( state == true ) DCT->aecChannels[elecNum]->Activate();
-    else                 DCT->aecChannels[elecNum]->Inactivate();
+    if ( state == true ) inChn->aec.Activate();
+    else                 inChn->aec.Inactivate();
 }
 
 

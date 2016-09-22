@@ -2,14 +2,14 @@
 #define INPUTCHANNELDLG_H
 
 
-#include <QAbstractButton>
+#include <QPushButton>
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QComboBox>
 
 #include "ui_InputChannelDlg.h"
 #include "ObjectDataTypes.h"
-#include "DigiData.h"
+#include "Daq.h"
 
 class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
 {
@@ -18,13 +18,13 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
   public:
      InputChannelDlg(QWidget *parent= 0);
      void init(DAQ *);
-     void exportData();
      void importData();
      virtual ~InputChannelDlg();
      
      int ChnNo;
      int lbNum;
      DAQ *board;
+     ChannelIndex dex;
      
   protected:
      QVector<double> inLow;
@@ -37,10 +37,16 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      QVector<QLineEdit *> SDThresh;
      QVector<QLineEdit *> bias;
      QVector<QCheckBox *> saveChnl;
+     QVector<QPushButton *> calib;
+
+     QVector<elecCalibParams> calibBackup;
 
   public slots:
     void accept();
     void reject();
+    void open();
+
+    void exportData();
       
   private:
      void clearAll();

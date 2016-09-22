@@ -37,6 +37,7 @@ class DAQ {
     void process_scan(double t); // Applies bias, detects spikes
     QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save();
     QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save();
+    QVector<AECChannel*> aecChans();
 
     struct ChannelLimitWarning {QString what; QString chan_label; double hiLim; double loLim; double value;};
     bool check_limits(bool checkV_and_warn, ChannelLimitWarning &w);

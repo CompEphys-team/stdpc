@@ -194,15 +194,13 @@ typedef struct {
   std::vector<CurrentAssignment> assign;
 } abHHData;
 
-typedef struct {
-
+struct elecCalibParams {
   // channel copy parameters
   bool copyChnOn;
   ChannelIndex copyChn;
 
   // General params
   double samplingRate;
-  ChannelIndex inputChannelNumber;
   ChannelIndex outputChannelNumber;
 
   // Electrode measurement params
@@ -222,8 +220,7 @@ typedef struct {
   double injCalLen;
   double fullKernelLen;
   double electrodeKernelLen;
-
-} elecCalibParams;
+};
 
 typedef struct {
   bool enabled;
@@ -264,6 +261,7 @@ struct inChnData {
   double minVoltage;
   double maxVoltage;
   bool chnlSaving;
+  elecCalibParams calib;
 };
 
 struct outChnData {

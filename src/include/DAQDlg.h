@@ -17,6 +17,7 @@ class DAQDlg : public QDialog
     void message(QString);
     void deviceStatusChanged(DeviceStatus, const QString&);
     void channelsChanged();
+    void CloseToLimit(QString,QString,double,double,double);
 
 protected:
     int idx;

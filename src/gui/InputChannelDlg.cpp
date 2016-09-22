@@ -1,10 +1,10 @@
 #include "InputChannelDlg.h"
 #include <QMessageBox>
+#include "ElectrodeCompDlg.h"
 
 InputChannelDlg::InputChannelDlg(QWidget *parent)
      : QDialog(parent)
 {
-     
   setupUi(this);
 }
 
@@ -48,6 +48,10 @@ void InputChannelDlg::clearAll()
     delete *saveIter;
   }
   saveChnl.clear();
+  for ( QPushButton *btn : calib ) {
+      delete btn;
+  }
+  calib.clear();
 }
 
 void InputChannelDlg::init(DAQ *b)
@@ -64,10 +68,12 @@ void InputChannelDlg::init(DAQ *b)
   #define X7 600
   #define X8 675
   #define X9 700
+  #define X10 750
 
   QCheckBox *cbtmp;
   QComboBox *qctmp;
   QLineEdit *letmp;
+  QPushButton *btntmp;
   QLabel *lb;
   QString nm;
 
@@ -123,6 +129,7 @@ void InputChannelDlg::init(DAQ *b)
     cbtmp->setObjectName(QString("Analog In ")+nm);
     cbtmp->setText(QString("Analog ")+nm);
     if (i < 2) cbtmp->setCheckState(Qt::Checked);
+    connect(cbtmp, SIGNAL(clicked(bool)), this, SLOT(exportData()));
     act.append(cbtmp);
     qctmp= new QComboBox(this);
     qctmp->setGeometry(QRect(X1, Y0+i*DY, 100, 18));
@@ -169,6 +176,22 @@ void InputChannelDlg::init(DAQ *b)
     cbtmp->setGeometry(QRect(X9+15, Y0+i*DY, 15, 18));
     cbtmp->setObjectName(QString("Save Channel ")+nm);
     saveChnl.append(cbtmp);
+    btntmp= new QPushButton("Calibration", this);
+    btntmp->setGeometry(QRect(X10, Y0+i*DY-1, 70, 20));
+    btntmp->setObjectName(QString("Calibrate ")+nm);
+    connect(btntmp, &QPushButton::clicked, [=](){
+        dex.isInChn = true;
+        dex.chanID = i;
+        ElectrodeCompDlg *calibDlg = new ElectrodeCompDlg(board->p->inChn[i].calib, dex, this);
+        connect(calibDlg, SIGNAL(message(QString)), this->parent(), SIGNAL(message(QString)));
+        connect(&calibDlg->calibrator, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
+                this->parent(), SIGNAL(CloseToLimit(QString,QString,double,double,double)));
+        if ( calibDlg->exec() == QDialog::Accepted )
+            calibDlg->exportData();
+        delete calibDlg;
+    });
+    btntmp->setEnabled(false);
+    calib.append(btntmp);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
@@ -196,6 +219,7 @@ void InputChannelDlg::exportData()
     board->p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
     board->p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
     board->p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    calib[i]->setEnabled(board->initialized && board->p->inChn[i].active && dex.daqClass != DAQClass::Simul);
   }
 }
 
@@ -221,7 +245,17 @@ void InputChannelDlg::accept()
 void InputChannelDlg::reject()
 {
   importData();
+  for ( int i = 0; i < ChnNo; i++ )
+      board->p->inChn[i].calib = calibBackup[i];
   QDialog::reject();
+}
+
+void InputChannelDlg::open()
+{
+    calibBackup.resize(ChnNo);
+    for ( int i = 0; i < ChnNo; i++ )
+        calibBackup[i] = board->p->inChn[i].calib;
+    QDialog::open();
 }
 
 

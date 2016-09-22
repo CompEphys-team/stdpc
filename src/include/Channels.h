@@ -2,6 +2,7 @@
 #define CHANNELS_H
 
 #include "Global.h"
+#include "AECChannel.h"
 
 class inChannel {
  public:
@@ -13,6 +14,7 @@ class inChannel {
      bool spiking;
      int lastSpikeN;
      double lastSpike[MAX_ST_HISTORY];
+     AECChannel aec;
      
      inChannel();
      void init(inChnData *);
