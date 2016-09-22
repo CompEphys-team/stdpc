@@ -199,8 +199,13 @@ void DCThread::run()
    }
 
    // Init data saving
-   if (dataSavingPs.enabled) {
-       dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
+   bool saving = false;
+   if ( dataSavingPs.enabled ) {
+       saving = dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
+       if ( !saving )
+           dataSaver->EndDataSaving();
+   }
+   if (saving) {
        savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
        inChnsToSave.clear();
@@ -309,7 +314,7 @@ void DCThread::run()
      }
 
      //--------------- Data saving ------------------------//
-         if (dataSavingPs.enabled) {
+         if ( saving && dataSavingPs.enabled ) {
            if ( t >= lastSave + savingPeriod )
            {
               i = 0;
@@ -422,7 +427,7 @@ void DCThread::run()
    }
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
 
-   if (dataSavingPs.enabled) {
+   if ( saving ) {
        dataSaver->EndDataSaving();
    }
 
