@@ -314,5 +314,5 @@ void NIDAQ::reset_board()
 //---------------------------------------------------------------------------
 QString NIDAQ::prefix()
 {
-    return QString("NIDAQ_%1").arg(static_cast<NIDAQData*>(p)->deviceName);
+    return QString("NIDAQ_%1").arg(devID);
 }

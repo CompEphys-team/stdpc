@@ -247,5 +247,5 @@ void DigiData::reset_board()
 //---------------------------------------------------------------------------
 QString DigiData::prefix()
 {
-    return QString("DigiData_%1").arg(static_cast<DigiDataData*>(p)->baseAddress);
+    return QString("DigiData_%1").arg(devID);
 }

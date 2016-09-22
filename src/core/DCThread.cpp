@@ -242,6 +242,7 @@ void DCThread::run()
    }
 
    bool limitWarningEmitted = false;
+   bool processAnalogs = false;
 
    message(QString("DynClamp: Clamping ..."));
    stopped= false;
@@ -286,8 +287,7 @@ void DCThread::run()
         }
 
         // Apply biases & detect spikes
-        for ( DAQ *b : Devices.actdev )
-            b->process_scan(t);
+        processAnalogs = true;
      }
      else {
          // Adaptive time step
@@ -330,6 +330,11 @@ void DCThread::run()
          }
          //--------------- Data saving end ---------------------//
 
+         if ( processAnalogs ) {
+             for ( DAQ *b : Devices.actdev )
+                 b->process_scan(t);
+             processAnalogs = false;
+         }
 
          // Dynamic clamp current generation
          if (SGp.active) { // SpkGen active

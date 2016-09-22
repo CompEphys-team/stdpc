@@ -60,7 +60,7 @@ QPair<QVector<QString>, QVector<inChannel *>> HHNeuronModel::inChans_to_save(int
     int i = 0;
     for ( HHNeuron &neuron : inst ) {
         if ( neuron.in.save ) {
-            labels.push_back(QString("HH%1_V%2").arg(modelNo).arg(i));
+            labels.push_back(QString("HH_%1_V%2").arg(modelNo).arg(i));
             chans.push_back(&neuron.in);
         }
         ++i;
@@ -75,7 +75,7 @@ QPair<QVector<QString>, QVector<outChannel *>> HHNeuronModel::outChans_to_save(i
     int i = 0;
     for ( HHNeuron &neuron : inst ) {
         if ( neuron.out.save ) {
-            labels.push_back(QString("HH%1_I%2").arg(modelNo).arg(i));
+            labels.push_back(QString("HH_%1_I%2").arg(modelNo).arg(i));
             chans.push_back(&neuron.out);
         }
         ++i;

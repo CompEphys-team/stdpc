@@ -278,5 +278,5 @@ void SimulDAQ::rewind()
 
 QString SimulDAQ::prefix()
 {
-    return QString("sim");
+    return QString("SimulDAQ_%1").arg(devID);
 }

@@ -96,7 +96,7 @@ QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
     QVector<outChannel*> chans;
     for ( int i = 0; i < actOutChnNo; i++ ) {
         if ( out[outIdx[i]].save ) {
-            labels.push_back(QString("%1_V%2").arg(prefix()).arg(outIdx[i]));
+            labels.push_back(QString("%1_I%2").arg(prefix()).arg(outIdx[i]));
             chans.push_back(&out[outIdx[i]]);
         }
     }
