@@ -23,10 +23,13 @@ bool NIDAQDlg::exportData(bool forceInit)
     bool change= false;
     bool devOK = true;
     getEntry(NIDAQp[idx].deviceName, DeviceNameE->text(), change);
-    if ( change || forceInit )
-        devOK = initDAQ() != DeviceStatus::Failed;
     inDlg->exportData();
     outDlg->exportData();
+    if ( change || forceInit ) {
+        devOK = initDAQ() != DeviceStatus::Failed;
+        inDlg->importData();
+        outDlg->importData();
+    }
     return devOK;
 }
 

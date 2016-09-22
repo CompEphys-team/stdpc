@@ -28,10 +28,13 @@ bool DigiDataDlg::exportData(bool forceInit)
     if (success) {
         getEntry(DigiDatap[idx].baseAddress, tmp, change);
     }
-    if ( change || forceInit )
-        devOK = initDAQ() != DeviceStatus::Failed;
     inDlg->exportData();
     outDlg->exportData();
+    if ( change || forceInit ) {
+        devOK = initDAQ() != DeviceStatus::Failed;
+        inDlg->importData();
+        outDlg->importData();
+    }
     return devOK;
 }
 

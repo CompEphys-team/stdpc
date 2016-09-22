@@ -34,11 +34,13 @@ bool SimulDAQDlg::exportData(bool forceInit)
       SDAQp[idx].inChn.resize(inChnNo);
       SDAQp[idx].outChn.resize(outChnNo);
   }
-  if ( change || forceInit )
-      devOK = initDAQ() != DeviceStatus::Failed;
-
   inDlg->exportData();
   outDlg->exportData();
+  if ( change || forceInit ) {
+      devOK = initDAQ() != DeviceStatus::Failed;
+      inDlg->importData();
+      outDlg->importData();
+  }
   return devOK;
 }
 
