@@ -403,26 +403,6 @@ void initAP()
     addAP("dataSavingPs.isBinary", &(dataSavingPs.isBinary));
 
 
-    // Electrode compensation
-//    addAP("elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
-//    addAP("elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
-//    addAP("elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
-//    addAP("elecCalibPs[#].inputChannelNumber", &elecCalibPs, &elecCalibParams::inputChannelNumber);
-//    addAP("elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::outputChannelNumber);
-//    addAP("elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
-//    addAP("elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
-//    addAP("elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
-//    addAP("elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
-//    addAP("elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
-//    addAP("elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
-//    addAP("elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
-//    addAP("elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
-//    addAP("elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
-//    addAP("elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
-//    addAP("elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
-//    addAP("elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
-
-
     // Graphs
     addAP("Graphp[#].active[#]", &Graphp, &graphData::active);
     addAP("Graphp[#].color[#]", &Graphp, &graphData::color);
@@ -537,10 +517,40 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             LEGACY_DAQ_CLASS = DAQClass::NI;
         }
 #endif
+        if ( !is.good() )
+            return false;
     }
 
-    if ( !is.good() )
-        return false;
+    // before version 2: 4 AEC channels only
+    std::vector<elecCalibParams> elecCalibPs;
+    std::vector<ChannelIndex> elecInChn;
+    std::vector<std::unique_ptr<AP>> elecAP;
+    if ( version < 2 ) {
+        QVector<QString> names(17);
+        deprec.reserve(deprec.size() + 17);
+        elecAP.reserve(17);
+        int i = 0;
+        addAP(elecAP, names[i++] = "elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].inputChannelNumber", &elecInChn);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::outputChannelNumber);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
+        addAP(elecAP, names[i++] = "elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
+        for ( i = 0; i < names.size(); i++ ) {
+            deprec.push_back(std::unique_ptr<AP>(new APDeprec(names[i], elecAP.at(i).get())));
+        }
+    }
 
     LOADED_PROTOCOL_VERSION = version;
 
@@ -559,6 +569,16 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                 return false;
         is >> name;
     }
+
+    if ( version < 2 && elecInChn.size() ) {
+        for ( size_t i = 0; i < elecInChn.size(); i++ ) {
+            inChnData *chn = elecInChn[i].getInChnData();
+            if ( chn ) {
+                chn->calib = elecCalibPs[i];
+            }
+        }
+    }
+
     return true;
 }
 

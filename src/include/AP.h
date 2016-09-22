@@ -26,6 +26,12 @@ template <typename T, typename... Tail>
 inline AP* addAP(QString name, T *head, Tail... tail);
 
 /**
+ * @brief Same as addAP(QString, T, Tail...), but adding to a local registry vec.
+ */
+template <typename T, typename... Tail>
+inline AP* addAP(std::vector<std::unique_ptr<AP>> &vec, QString name, T *head, Tail... tail);
+
+/**
  * @brief Add a deprecated AP, which delegates reading to @arg target and disables @fn write.
  * @param name: @see addAP. Indices in the target name are matched in order, defaulting to 0
  * if name has fewer indices than target->name.
@@ -309,14 +315,14 @@ private:
 class APDeprec : public AP
 {
 public:
-    APDeprec(QString name, AP *target, int nIgnoredEarlyIndices) : AP(name), target(target), nIgnore(nIgnoredEarlyIndices) {}
+    APDeprec(QString name, AP *target, int nIgnoredEarlyIndices=0) : AP(name), target(target), nIgnore(nIgnoredEarlyIndices) {}
     virtual std::function<void()> readLater(QString &rawName, std::istream &is, bool *ok=nullptr)
     {
         // Replace existing indices in order
         QString tName(target->name());
         QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
         int offset, i = 0;
-        while ( it.hasNext() && (offset = tName.indexOf('#')) ) {
+        while ( it.hasNext() && (offset = tName.indexOf('#')) > 0 ) {
             if ( i++ < nIgnore )
                 tName.replace(offset, 1, '0');
             else
@@ -339,9 +345,14 @@ private:
 
 
 template <typename T, typename... Tail>
+inline AP* addAP(std::vector<std::unique_ptr<AP>> &vec, QString name, T *head, Tail... tail) {
+    vec.push_back(std::unique_ptr<AP>(new APInst<T, Tail...>(name, head, tail...)));
+    return vec.back().get();
+}
+
+template <typename T, typename... Tail>
 inline AP* addAP(QString name, T *head, Tail... tail) {
-    params.push_back(std::unique_ptr<AP>(new APInst<T, Tail...>(name, head, tail...)));
-    return params.back().get();
+    return addAP(params, name, head, tail...);
 }
 
 inline AP* addDeprecatedAP(QString name, AP *target, int nIgnore) {
