@@ -80,7 +80,13 @@ DeviceStatus DeviceManager::_initSingle(DAQ *dev, bool active, QString &name)
 
 QVector<QPair<DeviceStatus, QString>> DeviceManager::init()
 {
-    QVector<QPair<DeviceStatus, QString>> ret(SDAQp.size() + DigiDatap.size() + NIDAQp.size());
+    QVector<QPair<DeviceStatus, QString>> ret(
+                SDAQp.size()
+                + DigiDatap.size()
+#ifdef NATIONAL_INSTRUMENTS
+                + NIDAQp.size()
+#endif
+                );
     int r = 0;
     clear();
     for ( size_t i = 0; i < SDAQp.size(); i++ ) {
@@ -142,6 +148,8 @@ inChannel *DeviceManager::getInChan(const ChannelIndex &dex)
                 return nullptr;
             return &(nidaq[dex.devID]->in[dex.chanID]);
 #endif
+        default:
+            return nullptr;
         }
     }
     return nullptr;
@@ -165,6 +173,8 @@ outChannel *DeviceManager::getOutChan(const ChannelIndex &dex)
                 return nullptr;
             return &(nidaq[dex.devID]->out[dex.chanID]);
 #endif
+        default:
+            return nullptr;
         }
     }
     return nullptr;

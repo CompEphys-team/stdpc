@@ -45,9 +45,13 @@ inChnData *ChannelIndex::getInChnData() const
             return nullptr;
         return &(DigiDatap[devID].inChn[chanID]);
     case DAQClass::NI :
+#ifdef NATIONAL_INSTRUMENTS
         if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].inChn.size() <= chanID )
             return nullptr;
         return &(NIDAQp[devID].inChn[chanID]);
+#endif
+    default:
+        return nullptr;
     }
     return nullptr;
 }
@@ -66,9 +70,13 @@ outChnData *ChannelIndex::getOutChnData() const
             return nullptr;
         return &(DigiDatap[devID].outChn[chanID]);
     case DAQClass::NI :
+#ifdef NATIONAL_INSTRUMENTS
         if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].outChn.size() <= chanID )
             return nullptr;
         return &(NIDAQp[devID].outChn[chanID]);
+#endif
+    default:
+        return nullptr;
     }
     return nullptr;
 }

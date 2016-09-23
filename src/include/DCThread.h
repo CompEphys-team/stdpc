@@ -13,7 +13,9 @@
 #include "SpkGen.h"
 #include "DigiData.h"
 #include "SimulDAQ.h"
+#ifdef NATIONAL_INSTRUMENTS
 #include "Nidaq.h"
+#endif
 #include "DataSaver.h"
 #include "HHNeuron.h"
 

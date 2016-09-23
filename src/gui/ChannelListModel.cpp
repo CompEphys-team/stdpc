@@ -10,7 +10,9 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
       size(0),
       hSimul(DAQHelper<SDAQData>(DAQClass::Simul, &SDAQp, this)),
       hDD1200(DAQHelper<DigiDataData>(DAQClass::DD1200, &DigiDatap, this)),
+#ifdef NATIONAL_INSTRUMENTS
       hNI(DAQHelper<NIDAQData>(DAQClass::NI, &NIDAQp, this)),
+#endif
       nPHH(0)
 {
 }
@@ -24,8 +26,10 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         hSimul.nAO = from->hSimul.nAO;
         hDD1200.nAI = from->hDD1200.nAI;
         hDD1200.nAO = from->hDD1200.nAO;
+#ifdef NATIONAL_INSTRUMENTS
         hNI.nAI = from->hNI.nAI;
         hNI.nAO = from->hNI.nAO;
+#endif
 
         nPHH = from->nPHH;
         nVHH = from->nVHH;
@@ -52,7 +56,9 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         }
         hSimul.updateCount();
         hDD1200.updateCount();
+#ifdef NATIONAL_INSTRUMENTS
         hNI.updateCount();
+#endif
     }
 }
 
@@ -108,7 +114,9 @@ void ChannelListModel::updateChns()
     }
     hSimul.updateChns(currentIdx, newIdx, newM);
     hDD1200.updateChns(currentIdx, newIdx, newM);
+#ifdef NATIONAL_INSTRUMENTS
     hNI.updateChns(currentIdx, newIdx, newM);
+#endif
 
     emit layoutAboutToBeChanged();
     updateCount(&newM);
@@ -235,8 +243,10 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         return ret;
     if ( hDD1200.data(row, role, offset, ret) )
         return ret;
+#ifdef NATIONAL_INSTRUMENTS
     if ( hNI.data(row, role, offset, ret) )
         return ret;
+#endif
 
     if ( role == Qt::UserRole ) {
         dex.isNone = true;
@@ -358,8 +368,10 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
             return ret;
         if ( hDD1200.index(dex, type, row, ret) )
             return ret;
+#ifdef NATIONAL_INSTRUMENTS
         if ( hNI.index(dex, type, row, ret) )
             return ret;
+#endif
     }
     return QModelIndex();
 }

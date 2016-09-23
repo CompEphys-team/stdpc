@@ -64,7 +64,9 @@ protected:
     int size;
     DAQHelper<SDAQData> hSimul;
     DAQHelper<DigiDataData> hDD1200;
+#ifdef NATIONAL_INSTRUMENTS
     DAQHelper<NIDAQData> hNI;
+#endif
     int nPHH;
     QVector<int> nVHH;
 };
