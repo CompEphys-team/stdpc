@@ -3,6 +3,7 @@
 #include "AP.h"
 #include <windows.h>
 #include "ComponentTable.h"
+#include <QScrollBar>
 
 MyMainWindow::MyMainWindow(QWidget *parent)
      : QMainWindow(parent)
@@ -133,7 +134,11 @@ void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double
 void MyMainWindow::DisplayMessage(QString message)
 {
   QTime tstamp= QTime::currentTime();
+  QScrollBar *sb = MessageWindow->verticalScrollBar();
+  bool down = sb->value() == sb->maximum();
   MessageWindow->addItem(tstamp.toString()+QString(": ")+message);
+  if ( down )
+    MessageWindow->scrollToBottom();
 }
 
 void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
