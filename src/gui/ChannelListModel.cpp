@@ -215,7 +215,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
             dex.modelID = row-offset;
             ret.setValue(dex);
             switch ( role ) {
-            case Qt::DisplayRole:   return QString("HH %1:all (model %1, all instances)").arg(row-offset+1);
+            case Qt::DisplayRole:   return QString("HH %1:all (model %1, all instances)").arg(row-offset);
             case Qt::UserRole:      return ret;
             case Qt::UserRole + 1:  return QVariant(HHNeuronp[row-offset].active);
             }
@@ -231,9 +231,9 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
                 dex.instID = row-offset;
                 ret.setValue(dex);
                 switch ( role ) {
-                case Qt::DisplayRole:   return QString("HH %1:%2 (model %1, instance %2)").arg(i+1).arg(row-offset+1);
+                case Qt::DisplayRole:   return QString("HH %1:%2 (model %1, instance %2)").arg(i).arg(row-offset);
                 case Qt::UserRole:      return ret;
-                case Qt::UserRole + 1:  return QVariant(HHNeuronp[i].inst[row-offset].active);
+                case Qt::UserRole + 1:  return HHNeuronp[i].active && HHNeuronp[i].inst[row-offset].active;
                 }
             }
             offset += nVHH[i];
