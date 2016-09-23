@@ -16,6 +16,7 @@ GenericComponent *Component<Dlg>::create(int idx, ChannelListModel *in, ChannelL
     c->_widget = new ComponentWidget();
     c->_widget->label->setText(_label + " " + QString::number(idx));
     QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(show()));
+    QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(raise()));
     return c;
 }
 
