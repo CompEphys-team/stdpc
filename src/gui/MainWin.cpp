@@ -2,7 +2,6 @@
 #include "LUtables.h"
 #include "AP.h"
 #include <windows.h>
-#include "ComponentTable.h"
 #include <QScrollBar>
 
 MyMainWindow::MyMainWindow(QWidget *parent)
@@ -17,7 +16,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      SpkTDlg= new SpikeTimeDlg;
      graphDlg[0]= new GraphDlg(0, this);
      graphDlg[1]= new GraphDlg(1, this);
-     hhModelDlg = new HHModelDlg(this);
 
      QVector<GenericComponent *> prototypes;
      prototypes.push_back(new Component<HHDlg>("m/h/tau HH", &mhHHp));
@@ -37,6 +35,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 #ifdef NATIONAL_INSTRUMENTS
      dprot.push_back(new DaqOpts<NIDAQDlg>(this, "Nat'l Instruments", &NIDAQp));
 #endif
+     dprot.push_back(new DaqOpts<HHModelDlg>(this, "HH Model", &HHNeuronp));
      DAQTable->init(dprot);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
@@ -66,7 +65,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(actionExit, SIGNAL(triggered()), SLOT(close()));
      connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
-     connect(actionHH_models, SIGNAL(triggered()), hhModelDlg, SLOT(open()));
      connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
@@ -81,7 +79,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
 
-     connect(hhModelDlg, SIGNAL(accepted()), this, SIGNAL(channelsChanged()));
      connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), SGbdChannelModel, SLOT(updateChns()));
@@ -112,8 +109,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
 MyMainWindow::~MyMainWindow()
 {
-  delete hhModelDlg;
-
   delete inChnModel;
   delete outChnModel;
   
@@ -283,16 +278,13 @@ void MyMainWindow::exportData(bool ignoreDAQ)
 {
   synapseTable->exportData();
   currentTable->exportData();
-  if ( !ignoreDAQ ) // Speed up initial loading - DAQTable has just imported from config anyway.
-      DAQTable->exportData();
+  DAQTable->exportData(ignoreDAQ);
 
   exportSGData();
   SpkTDlg->exportData();
   for (int i= 0; i < 2; i++) graphDlg[i]->exportData(Graphp[i]);
 
   DSDlg->exportData();
-
-  hhModelDlg->exportData();
 }
  
 void MyMainWindow::importData()
@@ -305,8 +297,6 @@ void MyMainWindow::importData()
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
 
   DSDlg->importData();
-
-  hhModelDlg->importData();
 }
 
 void MyMainWindow::exportSGData() 

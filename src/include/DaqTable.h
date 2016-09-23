@@ -10,6 +10,8 @@
 #include "NIDAQDlg.h"
 #endif
 
+#include "HHModelDlg.h"
+
 class GenericDaqOpts : public QObject
 {
     Q_OBJECT
@@ -21,16 +23,15 @@ public:
     virtual GenericDaqOpts *create(int idx) = 0;
     virtual QVector<GenericDaqOpts *> createAll() = 0;
     virtual void importData() = 0;
-    virtual void exportData() = 0;
+    virtual void exportData(bool ignoreDAQ = false) = 0;
 
     virtual QString const& label() = 0;
     virtual DaqWidget *widget() = 0;
 
+    QWidget *parent;
+
 protected slots:
     virtual void activeChanged() = 0;
-
-protected:
-    QWidget *parent;
 };
 
 template <class DaqDlg>
@@ -45,12 +46,11 @@ public:
     QVector<GenericDaqOpts *> createAll();
 
     void importData();
-    void exportData();
+    void exportData(bool ignoreDAQ = false);
 
     inline DaqWidget *widget() { return _widget; }
     inline QString const& label() { return _label; }
 
-protected:
     void activeChanged();
 
     QString _label;
@@ -72,7 +72,7 @@ public:
     void init(QVector<GenericDaqOpts *> prototypes);
 
     void importData();
-    void exportData();
+    void exportData(bool ignoreDAQ = false);
 
 private slots:
     void addDaqOpts();

@@ -4,12 +4,15 @@
 #include <QMessageBox>
 #include "MainWin.h"
 #include <functional>
+#include <type_traits>
 
 template class DaqOpts<SimulDAQDlg>;
 template class DaqOpts<DigiDataDlg>;
 #ifdef NATIONAL_INSTRUMENTS
 template class DaqOpts<NIDAQDlg>;
 #endif
+
+template class DaqOpts<HHModelDlg>;
 
 template <class Dlg>
 GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
@@ -20,33 +23,39 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
     }
 
     QString name;
-    QMessageBox loadMsg(QMessageBox::Information, "Loading...",
-                        "Initializing hardware ... this may take a while ...");
-    loadMsg.setStandardButtons(QMessageBox::NoButton);
-    QFutureWatcher<DeviceStatus> watcher;
-    connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
-    QFuture<DeviceStatus> future = QtConcurrent::run(
-                &Devices, DeviceManager::initSingle<typename Dlg::param_type>, std::ref(name), idx);
-    watcher.setFuture(future);
-    loadMsg.exec();
-    future.waitForFinished();
+    QFuture<DeviceStatus> future;
+    if ( Dlg::isDAQ::value ) {
+        QMessageBox loadMsg(QMessageBox::Information, "Loading...",
+                            "Initializing hardware ... this may take a while ...");
+        loadMsg.setStandardButtons(QMessageBox::NoButton);
+        QFutureWatcher<DeviceStatus> watcher;
+        QObject::connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
+        future = QtConcurrent::run(
+                    &Devices, DeviceManager::initSingle<typename Dlg::param_type>, std::ref(name), idx);
+        watcher.setFuture(future);
+        loadMsg.exec();
+        future.waitForFinished();
+    }
 
     DaqOpts<Dlg> *c = new DaqOpts<Dlg>(parent, _label, params);
     c->idx = idx;
     c->_widget = new DaqWidget();
     c->_widget->setLabel(_label + " " + QString::number(idx));
     c->dlg = new Dlg(idx, parent);
-    connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(open()));
-    connect(c->_widget->active, SIGNAL(clicked(bool)), c, SLOT(activeChanged()));
-    connect(c->dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
-    connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
-    connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
-    connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
-    connect(c->dlg, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
-            parent, SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
+    QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(open()));
+    QObject::connect(c->_widget->active, SIGNAL(clicked(bool)), c, SLOT(activeChanged()));
+    QObject::connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
 
-    static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
-    c->_widget->statusChanged(future.result());
+    if ( Dlg::isDAQ::value ) {
+        QObject::connect(c->dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
+        QObject::connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
+        QObject::connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
+        QObject::connect(c->dlg, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
+                parent, SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
+
+        static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
+        c->_widget->statusChanged(future.result());
+    }
 
     return c;
 }
@@ -73,10 +82,12 @@ void DaqOpts<Dlg>::importData()
 }
 
 template <class Dlg>
-void DaqOpts<Dlg>::exportData()
+void DaqOpts<Dlg>::exportData(bool ignoreDAQ)
 {
-    (*params)[idx].active = _widget->active->isChecked();
-    dlg->exportData();
+    if ( !ignoreDAQ || !Dlg::isDAQ::value ) {
+        (*params)[idx].active = _widget->active->isChecked();
+        dlg->exportData();
+    }
 }
 
 template <class Dlg>
@@ -133,10 +144,10 @@ void DaqTable::importData()
     setCellWidget(0, i, factory);
 }
 
-void DaqTable::exportData()
+void DaqTable::exportData(bool ignoreDAQ)
 {
     for ( GenericDaqOpts *c : comp )
-        c->exportData();
+        c->exportData(ignoreDAQ);
 }
 
 void DaqTable::addDaqOpts()

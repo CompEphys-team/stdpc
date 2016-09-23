@@ -4,40 +4,50 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
-#include <QPushButton>
-#include "ModelInstDlg.h"
+#include "ObjectDataTypes.h"
 
 namespace Ui {
 class HHModelDlg;
 }
+enum class DeviceStatus;
 
 class HHModelDlg : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit HHModelDlg(QWidget *parent = 0);
+    explicit HHModelDlg(int idx, QWidget *parent = 0);
     ~HHModelDlg();
 
     void importData();
-    void exportData();
+    void exportData(bool = false);
+
+    typedef HHNeuronData param_type;
+    typedef false_type isDAQ;
 
 public slots:
     void accept();
     void reject();
 
+signals:
+    void channelsChanged();
+
 private:
     Ui::HHModelDlg *ui;
-    QVector<QCheckBox*> boxes;
-    QVector<QDoubleSpinBox*> Cs, gLeaks, ELeaks;
-    QMetaObject::Connection boxc, Cc, gLc, ELc, btnc;
-    QVector<ModelInstDlg*> instDlg;
+    QVector<QCheckBox*> actives, vSaves, spkDs, iSaves;
+    QVector<QDoubleSpinBox*> vBiases, spkThrs, iBiases;
+    QMetaObject::Connection activec, vSavec, vBiasc, spkDc, spkThrc, iSavec, iBiasc;
 
-    void addRow(int row, QCheckBox *box, QDoubleSpinBox *C, QDoubleSpinBox *gLeak, QDoubleSpinBox *ELeak,
-                QPushButton *btn);
+    int idx;
+
+    void addRow(int row, QCheckBox *active,
+                QCheckBox *vSave, QDoubleSpinBox *vBias, QCheckBox *spkD, QDoubleSpinBox *spkThr,
+                QCheckBox *iSave, QDoubleSpinBox *iBias);
+    void setCellCheckBox(int row, int column, QCheckBox *box);
 
 private slots:
     void growTable(bool reactive = true);
+    void addMultiple();
 };
 
 #endif // HHMODELDLG_H

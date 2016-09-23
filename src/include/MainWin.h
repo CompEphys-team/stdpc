@@ -9,17 +9,8 @@
 #include "Global.h"
 #include "ui_MainWin.h"
 #include "SpikeTimeDlg.h"
-#include "ElectrodeCompDlg.h"
 #include "DataSavingDlg.h"
-#include "AECChannel.h"
-#include "HHModelDlg.h"
-
 #include "ObjectDataTypes.h"
-#include "SimulDAQ.h"
-
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
 
 #include "DCThread.h"
 #include "Graph.h"
@@ -47,8 +38,6 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      SpikeTimeDlg *SpkTDlg;
      GraphDlg *graphDlg[2];
      DCThread *DCT;
-
-     HHModelDlg *hhModelDlg;
 
      ChannelListModel *inChnModel, *outChnModel, *SGbdChannelModel;
 

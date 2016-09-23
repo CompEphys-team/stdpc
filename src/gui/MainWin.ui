@@ -1011,7 +1011,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="title">
-     <string>Data acquisition devices</string>
+     <string>Data sources</string>
     </property>
     <widget class="DaqTable" name="DAQTable">
      <property name="geometry">
@@ -1077,14 +1077,7 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>Config</string>
     </property>
-    <widget class="QMenu" name="menuSimulated_neurons">
-     <property name="title">
-      <string>Simulated neurons</string>
-     </property>
-     <addaction name="actionHH_models"/>
-    </widget>
     <addaction name="actionData_saving"/>
-    <addaction name="menuSimulated_neurons"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">

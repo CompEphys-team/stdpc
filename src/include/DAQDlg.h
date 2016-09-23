@@ -12,6 +12,8 @@ class DAQDlg : public QDialog
 
   public:
      DAQDlg(int no, QWidget *parent= 0);
+
+     typedef true_type isDAQ;
     
   signals:
     void message(QString);
