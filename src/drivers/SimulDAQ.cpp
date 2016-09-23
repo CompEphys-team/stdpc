@@ -1,6 +1,8 @@
 #include "SimulDAQ.h"
 #include "limits.h"
-
+#include <QFileInfo>
+#include <QDir>
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 SimulDAQ::SimulDAQ(SDAQData *p, int devID) :
     DAQ(p, devID),
@@ -63,15 +65,9 @@ bool SimulDAQ::initialize_board(QString &name)
   name= QString("SimulDAQ files ");
 
   intq.clear();
-//  for (int i= 0; i < inChnNo; i++) inq[i].clear();
-//  delete[] inq;
-//  delete[] inIter;
   is.open(static_cast<SDAQData*>(p)->inFileName.toLatin1());
   is >> t;
   t0= t;
-//  inChnNo= SDAQp.inChnNo;
-//  inq= new QList<double>[inChnNo];
-//  inIter= new QList<double>::const_iterator[inChnNo];
   while (is.good()) {
     intq.append((t-t0) * static_cast<SDAQData*>(p)->inTFac);
     for (int i= 0; i < inChnNo; i++) {
@@ -94,27 +90,19 @@ bool SimulDAQ::initialize_board(QString &name)
   }       
   is.close();
   is.clear();
-//  inChnNo= SDAQp.inChnNo;
-//  delete[] inIdx;
-//  inIdx= new short int[inChnNo];
-//  delete[] inGainFac;
-//  inGainFac= new double[inChnNo];
+
   outtq.clear();
   for (int i= 0; i < outChnNo; i++) outq[i].clear();
-//  delete[] outq;
-
-//  outChnNo= SDAQp.outChnNo;
-//  outq= new QList<double>[outChnNo];
   if (os.is_open()) os.close();
-  os.open(static_cast<SDAQData*>(p)->outFileName.toLatin1());
-  if (!os.good()) {
+
+  qt_ntfs_permission_lookup++;
+  QFileInfo fInfo(static_cast<SDAQData*>(p)->outFileName.toLatin1());
+  if ( !fInfo.dir().isReadable() || (fInfo.exists() && !fInfo.isWritable()) ) {
     name=QString("SimulDAQ output files ");
     success= false;
   }
-//  delete[] outIdx;
-//  outIdx= new short int[outChnNo];
-//  delete[] outGainFac;
-//  outGainFac= new double[outChnNo];
+  qt_ntfs_permission_lookup--;
+
   start();
   
   initialized= success;
