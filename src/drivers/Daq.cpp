@@ -107,7 +107,7 @@ QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
 QVector<AECChannel*> DAQ::aecChans()
 {
     QVector<AECChannel*> chans;
-    for ( int i = 0; i < actOutChnNo; i++ ) {
+    for ( int i = 0; i < actInChnNo; i++ ) {
         if ( in[inIdx[i]].aec.IsActive() ) {
             chans.push_back(&in[inIdx[i]].aec);
         }
