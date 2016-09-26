@@ -349,6 +349,7 @@ struct HHNeuronData {
     double gLeak;
     double ELeak;
     std::vector<vInstData> inst;
+    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
 };
 
 #endif
