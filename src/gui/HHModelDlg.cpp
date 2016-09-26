@@ -98,6 +98,7 @@ void HHModelDlg::exportData(bool)
     HHNeuronp[idx].gLeak = ui->gLeak->value() * 1e-9;
     HHNeuronp[idx].ELeak = ui->ELeak->value() * 1e-3;
     emit channelsChanged();
+    emit modelStatusChanged();
 }
 
 void HHModelDlg::accept()

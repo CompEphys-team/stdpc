@@ -31,6 +31,7 @@ public slots:
 
 signals:
     void channelsChanged();
+    void modelStatusChanged();
 
 private:
     Ui::HHModelDlg *ui;

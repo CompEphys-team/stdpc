@@ -48,6 +48,7 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
      void DisplayAbout();
      void DisplayMessage(QString);
      void updateDeviceStatus(DeviceStatus = DeviceStatus::Inactive, const QString & = QString());
+     void updateStartButton();
 
   signals:
      void channelsChanged();

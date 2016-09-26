@@ -150,9 +150,28 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
         break;
     }
 
-    bool success = !Devices.actdev.empty();
-    StartBut->setEnabled(success);
     emit channelsChanged();
+    updateStartButton();
+}
+
+void MyMainWindow::updateStartButton()
+{
+    bool success = !Devices.actdev.empty();
+    if ( !success && HHNeuronp.size() ) {
+        for ( HHNeuronData const& p : HHNeuronp ) {
+            if ( p.active && p.inst.size() ) {
+                for ( vInstData const& inst : p.inst ) {
+                    if ( inst.active ) {
+                        success = true;
+                        break;
+                    }
+                }
+            }
+            if ( success )
+                break;
+        }
+    }
+    StartBut->setEnabled(success);
 }
 
 

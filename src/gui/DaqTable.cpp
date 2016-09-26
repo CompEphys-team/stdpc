@@ -29,7 +29,7 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
                             "Initializing hardware ... this may take a while ...");
         loadMsg.setStandardButtons(QMessageBox::NoButton);
         QFutureWatcher<DeviceStatus> watcher;
-        QObject::connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
+        connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
         future = QtConcurrent::run(
                     &Devices, DeviceManager::initSingle<typename Dlg::param_type>, std::ref(name), idx);
         watcher.setFuture(future);
@@ -42,19 +42,21 @@ GenericDaqOpts *DaqOpts<Dlg>::create(int idx)
     c->_widget = new DaqWidget();
     c->_widget->setLabel(_label + " " + QString::number(idx));
     c->dlg = new Dlg(idx, parent);
-    QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(open()));
-    QObject::connect(c->_widget->active, SIGNAL(clicked(bool)), c, SLOT(activeChanged()));
-    QObject::connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
+    connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(open()));
+    connect(c->_widget->active, SIGNAL(clicked(bool)), c, SLOT(activeChanged()));
+    connect(c->dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
 
     if ( Dlg::isDAQ::value ) {
-        QObject::connect(c->dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
-        QObject::connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
-        QObject::connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
-        QObject::connect(c->dlg, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
+        connect(c->dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
+        connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
+        connect(c->dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), c->_widget, SLOT(statusChanged(DeviceStatus)));
+        connect(c->dlg, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
                 parent, SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
 
         static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
         c->_widget->statusChanged(future.result());
+    } else {
+        connect(c->dlg, SIGNAL(modelStatusChanged()), parent, SLOT(updateStartButton()));
     }
 
     return c;
