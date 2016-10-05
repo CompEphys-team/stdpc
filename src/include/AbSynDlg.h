@@ -16,8 +16,9 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
      abSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(abSynData &);
      void importData(abSynData);
+     void setIndex(int);
 
-     int No;   
+     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
 

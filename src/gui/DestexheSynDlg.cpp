@@ -7,11 +7,11 @@ DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *o
  {
      setupUi(this);
 
-     No= no;
-     DestexheSynDlgLabel->setText(DestexheSynDlgLabel->text().arg(no));
+     STDP= new STDPDlg(this);
+     ODESTDP= new ODESTDPDlg(this);
 
-     STDP= new STDPDlg(this, No);
-     ODESTDP= new ODESTDPDlg(this, No);
+     label = DestexheSynDlgLabel->text();
+     setIndex(no);
 
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
@@ -21,6 +21,14 @@ DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *o
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
      assignments->init(vec);
+}
+
+void DestexheSynDlg::setIndex(int no)
+{
+    QString lb = label.arg(no);
+    DestexheSynDlgLabel->setText(lb);
+    STDP->setLabel(lb);
+    ODESTDP->setLabel(lb);
 }
 
 void DestexheSynDlg::ResCloseClicked(QAbstractButton *but)

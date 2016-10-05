@@ -1,15 +1,15 @@
 
 #include "ODESTDPDlg.h"
 
-ODESTDPDlg::ODESTDPDlg(QWidget *parent, int no)
+ODESTDPDlg::ODESTDPDlg(QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
-     
-     No= no;
-     lb.setNum(No);
-     synSTDPLabel->setText(QString("Synapse ")+lb);
+}
+
+void ODESTDPDlg::setLabel(const QString &lb)
+{
+    synSTDPLabel->setText(lb);
 }
 
 void ODESTDPDlg::exportData(ODEPlast &d)

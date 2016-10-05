@@ -107,7 +107,9 @@ HEADERS += \
     $$PWD/src/include/Clock.h \
     $$PWD/src/include/DaqTable.h \
     $$PWD/src/include/DaqWidget.h \
-    $$PWD/src/include/DeviceManager.h
+    $$PWD/src/include/DeviceManager.h \
+    $$PWD/src/include/ComponentPrototype.h \
+    $$PWD/src/include/Component.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \

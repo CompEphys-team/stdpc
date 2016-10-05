@@ -7,11 +7,11 @@ ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWid
  {
      setupUi(this);
      
-     No= no;
-     ChemSynDlgLabel->setText(ChemSynDlgLabel->text().arg(no));
-     
-     STDP= new STDPDlg(this, No);
-     ODESTDP= new ODESTDPDlg(this, No);
+     STDP= new STDPDlg(this);
+     ODESTDP= new ODESTDPDlg(this);
+
+     label = ChemSynDlgLabel->text();
+     setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
@@ -22,6 +22,14 @@ ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWid
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
      assignments->init(vec);
+}
+
+void ChemSynDlg::setIndex(int no)
+{
+    QString lb = label.arg(no);
+    ChemSynDlgLabel->setText(lb);
+    STDP->setLabel(lb);
+    ODESTDP->setLabel(lb);
 }
 
 void ChemSynDlg::ResCloseClicked(QAbstractButton *but)

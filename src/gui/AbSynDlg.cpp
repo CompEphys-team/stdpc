@@ -7,11 +7,11 @@ abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget 
  {
      setupUi(this);
      
-     No= no;
-     abSynDlgLabel->setText(abSynDlgLabel->text().arg(no));
-     
-     STDP= new STDPDlg(this, No);
-     ODESTDP= new ODESTDPDlg(this, No);
+     STDP= new STDPDlg(this);
+     ODESTDP= new ODESTDPDlg(this);
+
+     label = abSynDlgLabel->text();
+     setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
@@ -21,6 +21,14 @@ abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget 
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
      vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
      assignments->init(vec);
+}
+
+void abSynDlg::setIndex(int no)
+{
+    QString lb = label.arg(no);
+    abSynDlgLabel->setText(lb);
+    STDP->setLabel(lb);
+    ODESTDP->setLabel(lb);
 }
 
 void abSynDlg::ResCloseClicked(QAbstractButton *but)

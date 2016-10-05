@@ -1,57 +1,5 @@
 #include "ComponentTable.h"
 
-template class Component<ChemSynDlg>;
-template class Component<abSynDlg>;
-template class Component<GapJunctionDlg>;
-template class Component<DestexheSynDlg>;
-template class Component<AlphaBetaHHDlg>;
-template class Component<HHDlg>;
-
-template <class Dlg>
-GenericComponent *Component<Dlg>::create(int idx, ChannelListModel *in, ChannelListModel *out)
-{
-    Component<Dlg> *c = new Component<Dlg>(_label, params);
-    c->dlg = new Dlg(idx, in, out);
-    c->idx = idx;
-    c->_widget = new ComponentWidget();
-    c->_widget->label->setText(_label + " " + QString::number(idx));
-    QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(show()));
-    QObject::connect(c->_widget->params, SIGNAL(clicked(bool)), c->dlg, SLOT(raise()));
-    return c;
-}
-
-template <class Dlg>
-QVector<GenericComponent *> Component<Dlg>::createAll(ChannelListModel *in, ChannelListModel *out)
-{
-    QVector<GenericComponent *> vec;
-    vec.reserve(params->size());
-    GenericComponent *c;
-    for ( size_t i = 0; i < params->size(); i++ ) {
-        c = create(i, in, out);
-        c->importData();
-        vec.push_back(c);
-    }
-    return vec;
-}
-
-template <class Dlg>
-void Component<Dlg>::importData()
-{
-    dlg->importData(params->at(idx));
-    _widget->active->setChecked(params->at(idx).active);
-}
-
-template <class Dlg>
-void Component<Dlg>::exportData()
-{
-    if ( idx >= (int) params->size() )
-        params->resize(idx+1);
-    dlg->exportData(params->at(idx));
-    (*params)[idx].active = _widget->active->isChecked();
-}
-
-
-
 ComponentTable::ComponentTable(QWidget *parent) :
     QTableWidget(parent)
 {
@@ -59,15 +7,21 @@ ComponentTable::ComponentTable(QWidget *parent) :
     setColumnCount(1);
 }
 
+ComponentTable::~ComponentTable()
+{
+    for ( ComponentPrototypeBase *p : proto )
+        delete p;
+}
+
 void ComponentTable::makeFactory()
 {
     factory = new ComponentFactoryWidget(this);
     connect(factory->button, SIGNAL(clicked(bool)), this, SLOT(addComponent()));
-    for ( GenericComponent *c : proto )
-        factory->combo->addItem(c->label());
+    for ( ComponentPrototypeBase *p : proto )
+        factory->combo->addItem(p->label);
 }
 
-void ComponentTable::init(QVector<GenericComponent *> prototypes, ChannelListModel *in, ChannelListModel *out)
+void ComponentTable::init(QVector<ComponentPrototypeBase *> prototypes, ChannelListModel *in, ChannelListModel *out)
 {
     proto = prototypes;
     idx = QVector<int>(proto.size(), 0);
@@ -77,18 +31,18 @@ void ComponentTable::init(QVector<GenericComponent *> prototypes, ChannelListMod
     setCellWidget(0, 0, factory);
 }
 
-void ComponentTable::importData()
+void ComponentTable::importData(bool activeOnly)
 {
     clear();
-    for ( GenericComponent *c : comp )
-        delete c;
     comp.clear();
-
     int i = 0;
-    for ( GenericComponent *p : proto ) {
-        QVector<GenericComponent*> comps = p->createAll(in, out);
-        comp.append(comps);
-        idx[i++] = comps.size();
+    for ( ComponentPrototypeBase *p : proto ) {
+        if ( activeOnly )
+            p->clearInactive();
+        else
+            p->createAll(in, out);
+        comp.append(p->inst);
+        idx[i++] = p->inst.size();
     }
     i = 0;
     setColumnCount(comp.size() + 1);
@@ -102,8 +56,20 @@ void ComponentTable::importData()
 
 void ComponentTable::exportData()
 {
+    for ( ComponentPrototypeBase *p : proto )
+        p->exportData();
+}
+
+void ComponentTable::activateAll()
+{
     for ( GenericComponent *c : comp )
-        c->exportData();
+        c->widget()->active->setChecked(true);
+}
+
+void ComponentTable::deactivateAll()
+{
+    for ( GenericComponent *c : comp )
+        c->widget()->active->setChecked(false);
 }
 
 void ComponentTable::addComponent()

@@ -17,16 +17,16 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      graphDlg[0]= new GraphDlg(0, this);
      graphDlg[1]= new GraphDlg(1, this);
 
-     QVector<GenericComponent *> prototypes;
-     prototypes.push_back(new Component<HHDlg>("m/h/tau HH", &mhHHp));
-     prototypes.push_back(new Component<AlphaBetaHHDlg>("a/b HH", &abHHp));
+     QVector<ComponentPrototypeBase *> prototypes;
+     prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
+     prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
      currentTable->init(prototypes, inChnModel, outChnModel);
 
      prototypes.clear();
-     prototypes.push_back(new Component<ChemSynDlg>("ChemSyn", &CSynp));
-     prototypes.push_back(new Component<abSynDlg>("a/b Syn", &abSynp));
-     prototypes.push_back(new Component<GapJunctionDlg>("Gap Junction", &ESynp));
-     prototypes.push_back(new Component<DestexheSynDlg>("DestexheSyn", &DxheSynp));
+     prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));
+     prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
+     prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
+     prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
      synapseTable->init(prototypes, inChnModel, outChnModel);
 
      QVector<GenericDaqOpts*> dprot;
@@ -86,6 +86,15 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
      connect(Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
 
+     connect(HHActivate, SIGNAL(clicked(bool)), currentTable, SLOT(activateAll()));
+     connect(HHDeactivate, SIGNAL(clicked(bool)), currentTable, SLOT(deactivateAll()));
+     connect(HHClear, &QPushButton::clicked, [=](){currentTable->importData(true);});
+     connect(HHReset, SIGNAL(clicked(bool)), currentTable, SLOT(importData()));
+
+     connect(SynActivate, SIGNAL(clicked(bool)), synapseTable, SLOT(activateAll()));
+     connect(SynDeactivate, SIGNAL(clicked(bool)), synapseTable, SLOT(deactivateAll()));
+     connect(SynClear, &QPushButton::clicked, [=](){synapseTable->importData(true);});
+     connect(SynReset, SIGNAL(clicked(bool)), synapseTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));

@@ -16,8 +16,9 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
      DestexheSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(DestexheSynData &);
      void importData(DestexheSynData);
+     void setIndex(int);
 
-     int No;
+     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
 

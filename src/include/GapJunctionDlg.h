@@ -13,10 +13,11 @@ class GapJunctionDlg : public QDialog, private Ui::GapJunctionDlg
      GapJunctionDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(GJunctData &);
      void importData(GJunctData);
+     void setIndex(int);
 
      typedef GJunctData param_type;
      
-     int No;
+     QString label;
 }; 
 
 #endif

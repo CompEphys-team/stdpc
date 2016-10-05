@@ -114,7 +114,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>0</x>
        <y>16</y>
-       <width>731</width>
+       <width>631</width>
        <height>124</height>
       </rect>
      </property>
@@ -146,6 +146,58 @@ p, li { white-space: pre-wrap; }
       <number>101</number>
      </attribute>
     </widget>
+    <widget class="QPushButton" name="HHActivate">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>16</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Activate all</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="HHDeactivate">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>46</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deactivate all</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="HHClear">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>76</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear inactive</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="HHReset">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>106</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QGroupBox" name="SynBox">
     <property name="geometry">
@@ -164,7 +216,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>0</x>
        <y>16</y>
-       <width>731</width>
+       <width>631</width>
        <height>124</height>
       </rect>
      </property>
@@ -195,6 +247,58 @@ p, li { white-space: pre-wrap; }
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>101</number>
      </attribute>
+    </widget>
+    <widget class="QPushButton" name="SynReset">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>106</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SynClear">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>76</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear inactive</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SynDeactivate">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>46</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Deactivate all</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="SynActivate">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>16</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Activate all</string>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="groupBox">

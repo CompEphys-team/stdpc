@@ -6,8 +6,8 @@ GapJunctionDlg::GapJunctionDlg(int no, ChannelListModel *in, ChannelListModel *o
  {
      setupUi(this);
      
-     No= no;
-     gapJunctDlgLabel->setText(gapJunctDlgLabel->text().arg(no));
+     label = gapJunctDlgLabel->text();
+     setIndex(no);
 
      QVector<Dropdown<GapJunctionAssignment>> vec;
      vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::preInChannel, in, "Presyn V", 95));
@@ -31,4 +31,9 @@ void GapJunctionDlg::importData(GJunctData p)
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
   assignments->importData(p.assign);
+}
+
+void GapJunctionDlg::setIndex(int no)
+{
+    gapJunctDlgLabel->setText(label.arg(no));
 }

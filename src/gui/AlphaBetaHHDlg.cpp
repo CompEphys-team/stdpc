@@ -6,12 +6,19 @@ AlphaBetaHHDlg::AlphaBetaHHDlg(int no, ChannelListModel *in, ChannelListModel *o
      : QDialog(parent)
  {
   setupUi(this);
-  HHDlgLabel->setText(HHDlgLabel->text().arg(no));
+
+  label = HHDlgLabel->text();
+  setIndex(no);
 
   QVector<Dropdown<CurrentAssignment>> vec;
   vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::VChannel, in, "V in", 95));
   vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::IChannel, out, "I out", 95));
   assignments->init(vec);
+}
+
+void AlphaBetaHHDlg::setIndex(int no)
+{
+    HHDlgLabel->setText(label.arg(no));
 }
 
 void AlphaBetaHHDlg::exportData(abHHData &p)
