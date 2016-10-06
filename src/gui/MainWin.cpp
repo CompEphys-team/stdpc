@@ -1,13 +1,15 @@
 #include "MainWin.h"
+#include "ui_MainWin.h"
 #include "LUtables.h"
 #include "AP.h"
 #include <windows.h>
 #include <QScrollBar>
 
 MyMainWindow::MyMainWindow(QWidget *parent)
-     : QMainWindow(parent)
+     : QMainWindow(parent),
+       ui(new Ui::MainWindow)
  {
-     setupUi(this);
+     ui->setupUi(this);
 
      inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
      outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
@@ -20,14 +22,14 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      QVector<ComponentPrototypeBase *> prototypes;
      prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
      prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
-     currentTable->init(prototypes, inChnModel, outChnModel);
+     ui->currentTable->init(prototypes, inChnModel, outChnModel);
 
      prototypes.clear();
      prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));
      prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
      prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
      prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
-     synapseTable->init(prototypes, inChnModel, outChnModel);
+     ui->synapseTable->init(prototypes, inChnModel, outChnModel);
 
      QVector<GenericDaqOpts*> dprot;
      dprot.push_back(new DaqOpts<SimulDAQDlg>(this, "SimulDAQ", &SDAQp));
@@ -36,7 +38,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      dprot.push_back(new DaqOpts<NIDAQDlg>(this, "Nat'l Instruments", &NIDAQp));
 #endif
      dprot.push_back(new DaqOpts<HHModelDlg>(this, "HH Model", &HHNeuronp));
-     DAQTable->init(dprot);
+     ui->DAQTable->init(dprot);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
                QString("*.log"));
@@ -55,46 +57,46 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DCT= new DCThread();
 
      SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual, this);
-     SGbdChannelCombo->setModel(SGbdChannelModel);
-     connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
-     connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
+     ui->SGbdChannelCombo->setModel(SGbdChannelModel);
+     connect(ui->SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
+     connect(ui->BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      
-     connect(SpikeTimesBut, SIGNAL(clicked()), SpkTDlg, SLOT(show()));
-     connect(StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
-     connect(StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
+     connect(ui->SpikeTimesBut, SIGNAL(clicked()), SpkTDlg, SLOT(show()));
+     connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
+     connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
      
-     connect(actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
-     connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
-     connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
+     connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
+     connect(ui->actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
+     connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
+     connect(ui->actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
-     connect(actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
-     connect(actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
+     connect(ui->actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
+     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
      connect(LoadProtocolFileDlg, SIGNAL(accepted()), SLOT(LoadProtocol()));
-     connect(actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
+     connect(ui->actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
      connect(SaveProtocolFileDlg, SIGNAL(accepted()), SLOT(SaveProtocol()));
-     connect(actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
+     connect(ui->actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
-     connect(actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));    
-     connect(actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
+     connect(ui->actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));
+     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
 
      connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), SGbdChannelModel, SLOT(updateChns()));
      
-     connect(Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
-     connect(Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
+     connect(ui->Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
+     connect(ui->Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
 
-     connect(HHActivate, SIGNAL(clicked(bool)), currentTable, SLOT(activateAll()));
-     connect(HHDeactivate, SIGNAL(clicked(bool)), currentTable, SLOT(deactivateAll()));
-     connect(HHClear, &QPushButton::clicked, [=](){currentTable->importData(true);});
-     connect(HHReset, SIGNAL(clicked(bool)), currentTable, SLOT(importData()));
+     connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
+     connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
+     connect(ui->HHClear, &QPushButton::clicked, [=](){ui->currentTable->importData(true);});
+     connect(ui->HHReset, SIGNAL(clicked(bool)), ui->currentTable, SLOT(importData()));
 
-     connect(SynActivate, SIGNAL(clicked(bool)), synapseTable, SLOT(activateAll()));
-     connect(SynDeactivate, SIGNAL(clicked(bool)), synapseTable, SLOT(deactivateAll()));
-     connect(SynClear, &QPushButton::clicked, [=](){synapseTable->importData(true);});
-     connect(SynReset, SIGNAL(clicked(bool)), synapseTable, SLOT(importData()));
+     connect(ui->SynActivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(activateAll()));
+     connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
+     connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
+     connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
@@ -104,8 +106,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
      // graphical stuff
-     DataD1->setScene(&Graphs[0].Scene);
-     DataD2->setScene(&Graphs[1].Scene);
+     ui->DataD1->setScene(&Graphs[0].Scene);
+     ui->DataD2->setScene(&Graphs[1].Scene);
 
      initAP();
      LoadConfig();
@@ -124,6 +126,8 @@ MyMainWindow::~MyMainWindow()
   delete ExportLogFileDlg;
   delete LoadProtocolFileDlg;
   delete SaveProtocolFileDlg;
+
+  delete ui;
 }
 
 void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double lowLimit, double highLimit, double value)
@@ -138,11 +142,11 @@ void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double
 void MyMainWindow::DisplayMessage(QString message)
 {
   QTime tstamp= QTime::currentTime();
-  QScrollBar *sb = MessageWindow->verticalScrollBar();
+  QScrollBar *sb = ui->MessageWindow->verticalScrollBar();
   bool down = sb->value() == sb->maximum();
-  MessageWindow->addItem(tstamp.toString()+QString(": ")+message);
+  ui->MessageWindow->addItem(tstamp.toString()+QString(": ")+message);
   if ( down )
-    MessageWindow->scrollToBottom();
+    ui->MessageWindow->scrollToBottom();
 }
 
 void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
@@ -180,7 +184,7 @@ void MyMainWindow::updateStartButton()
                 break;
         }
     }
-    StartBut->setEnabled(success);
+    ui->StartBut->setEnabled(success);
 }
 
 
@@ -206,71 +210,71 @@ void MyMainWindow::SGMethodChanged()
 //                tr("The signal for index change has been received"),
 //               QMessageBox::Close); 
 
-  int index= SGMethodCombo->currentIndex();
-  int index2= BurstDetectionCombo->currentIndex();
+  int index= ui->SGMethodCombo->currentIndex();
+  int index2= ui->BurstDetectionCombo->currentIndex();
 
-  SGSave->setEnabled(false);
-  SGLUTableCombo->setEnabled(false);
-  SpikesL->setEnabled(false);              
-  VSpikeE->setEnabled(false); VSpikeL->setEnabled(false); VSpikeU->setEnabled(false);
-  WidthE->setEnabled(false); WidthL->setEnabled(false); WidthU->setEnabled(false);
-  VRestE->setEnabled(false); VRestL->setEnabled(false); VRestU->setEnabled(false);
-  VRestE->setEnabled(false); VRestL->setEnabled(false); VRestU->setEnabled(false);
-  ExplicitSpikeTimesL->setEnabled(false);
-  NumberE->setEnabled(false); NumberL->setEnabled(false); NumberU->setEnabled(false);
-  PeriodE->setEnabled(false); PeriodL->setEnabled(false); PeriodU->setEnabled(false);
-  SpikeTimesBut->setEnabled(false); 
-  BurstDetectionL->setEnabled(false);
-  BurstDetectionCombo->setEnabled(false);
-  SGbdChannelCombo->setEnabled(false); ChannelL->setEnabled(false);
-  ThresholdE->setEnabled(false); ThresholdL->setEnabled(false); ThresholdU->setEnabled(false);
-  NUnderE->setEnabled(false); NUnderL->setEnabled(false); 
-  NOverE->setEnabled(false); NOverL->setEnabled(false);
-  STInputFileL->setEnabled(false); STInputFileE->setEnabled(false); 
-  if (index == 0) SGSave->setChecked(false);
+  ui->SGSave->setEnabled(false);
+  ui->SGLUTableCombo->setEnabled(false);
+  ui->SpikesL->setEnabled(false);
+  ui->VSpikeE->setEnabled(false); ui->VSpikeL->setEnabled(false); ui->VSpikeU->setEnabled(false);
+  ui->WidthE->setEnabled(false); ui->WidthL->setEnabled(false); ui->WidthU->setEnabled(false);
+  ui->VRestE->setEnabled(false); ui->VRestL->setEnabled(false); ui->VRestU->setEnabled(false);
+  ui->VRestE->setEnabled(false); ui->VRestL->setEnabled(false); ui->VRestU->setEnabled(false);
+  ui->ExplicitSpikeTimesL->setEnabled(false);
+  ui->NumberE->setEnabled(false); ui->NumberL->setEnabled(false); ui->NumberU->setEnabled(false);
+  ui->PeriodE->setEnabled(false); ui->PeriodL->setEnabled(false); ui->PeriodU->setEnabled(false);
+  ui->SpikeTimesBut->setEnabled(false);
+  ui->BurstDetectionL->setEnabled(false);
+  ui->BurstDetectionCombo->setEnabled(false);
+  ui->SGbdChannelCombo->setEnabled(false); ui->ChannelL->setEnabled(false);
+  ui->ThresholdE->setEnabled(false); ui->ThresholdL->setEnabled(false); ui->ThresholdU->setEnabled(false);
+  ui->NUnderE->setEnabled(false); ui->NUnderL->setEnabled(false);
+  ui->NOverE->setEnabled(false); ui->NOverL->setEnabled(false);
+  ui->STInputFileL->setEnabled(false); ui->STInputFileE->setEnabled(false);
+  if (index == 0) ui->SGSave->setChecked(false);
   if (index == 3) {
-    SGSave->setEnabled(true); STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
+    ui->SGSave->setEnabled(true); ui->STInputFileL->setEnabled(true); ui->STInputFileE->setEnabled(true);
   }
   else {
     if (index > 0) {
-      SGSave->setEnabled(true);
-      SGLUTableCombo->setEnabled(true);
-      SpikesL->setEnabled(true);              
-      VSpikeE->setEnabled(true); VSpikeL->setEnabled(true); VSpikeU->setEnabled(true);
-      WidthE->setEnabled(true); WidthL->setEnabled(true); WidthU->setEnabled(true);
-      VRestE->setEnabled(true); VRestL->setEnabled(true); VRestU->setEnabled(true);
-      BurstDetectionL->setEnabled(true);
-      BurstDetectionCombo->setEnabled(true);
+      ui->SGSave->setEnabled(true);
+      ui->SGLUTableCombo->setEnabled(true);
+      ui->SpikesL->setEnabled(true);
+      ui->VSpikeE->setEnabled(true); ui->VSpikeL->setEnabled(true); ui->VSpikeU->setEnabled(true);
+      ui->WidthE->setEnabled(true); ui->WidthL->setEnabled(true); ui->WidthU->setEnabled(true);
+      ui->VRestE->setEnabled(true); ui->VRestL->setEnabled(true); ui->VRestU->setEnabled(true);
+      ui->BurstDetectionL->setEnabled(true);
+      ui->BurstDetectionCombo->setEnabled(true);
       if (index2 > 0) {
-        SGbdChannelCombo->setEnabled(true); ChannelL->setEnabled(true); 
-        ThresholdE->setEnabled(true); ThresholdL->setEnabled(true); ThresholdU->setEnabled(true);
-        NUnderE->setEnabled(true); NUnderL->setEnabled(true);
-        NOverE->setEnabled(true); NOverL->setEnabled(true);
+        ui->SGbdChannelCombo->setEnabled(true); ui->ChannelL->setEnabled(true);
+        ui->ThresholdE->setEnabled(true); ui->ThresholdL->setEnabled(true); ui->ThresholdU->setEnabled(true);
+        ui->NUnderE->setEnabled(true); ui->NUnderL->setEnabled(true);
+        ui->NOverE->setEnabled(true); ui->NOverL->setEnabled(true);
       }
     }
     if (index == 1) {
-      ExplicitSpikeTimesL->setEnabled(true);
-      NumberE->setEnabled(true); NumberL->setEnabled(true); NumberU->setEnabled(true);
-      PeriodE->setEnabled(true); PeriodL->setEnabled(true); PeriodU->setEnabled(true);
-      SpikeTimesBut->setEnabled(true);
+      ui->ExplicitSpikeTimesL->setEnabled(true);
+      ui->NumberE->setEnabled(true); ui->NumberL->setEnabled(true); ui->NumberU->setEnabled(true);
+      ui->PeriodE->setEnabled(true); ui->PeriodL->setEnabled(true); ui->PeriodU->setEnabled(true);
+      ui->SpikeTimesBut->setEnabled(true);
     }
     if (index == 2) {
-      STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
+      ui->STInputFileL->setEnabled(true); ui->STInputFileE->setEnabled(true);
     }
   }
 }
 
 void MyMainWindow::StartButClicked() 
 {
-  actionLoad_Protocol->setEnabled(false);
-  actionSave_Protocol->setEnabled(false);
-  actionLoad_Script->setEnabled(false);
-  actionUnload_Script->setEnabled(false);
-  actionExport_Log->setEnabled(false);
-  actionExit->setEnabled(false);
-  actionSave_config->setEnabled(false);
-  menuConfig->setEnabled(false);
-  DAQTable->setEnabled(false);
+  ui->actionLoad_Protocol->setEnabled(false);
+  ui->actionSave_Protocol->setEnabled(false);
+  ui->actionLoad_Script->setEnabled(false);
+  ui->actionUnload_Script->setEnabled(false);
+  ui->actionExport_Log->setEnabled(false);
+  ui->actionExit->setEnabled(false);
+  ui->actionSave_config->setEnabled(false);
+  ui->menuConfig->setEnabled(false);
+  ui->DAQTable->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
@@ -287,15 +291,15 @@ void MyMainWindow::StartButClicked()
 
 void MyMainWindow::StopButClicked()
 {
-  actionLoad_Protocol->setEnabled(true);
-  actionSave_Protocol->setEnabled(true);
-  actionLoad_Script->setEnabled(!DCT->scripting);
-  actionUnload_Script->setEnabled(DCT->scripting);
-  actionExport_Log->setEnabled(true);
-  actionExit->setEnabled(true);
-  actionSave_config->setEnabled(true);
-  menuConfig->setEnabled(true);
-  DAQTable->setEnabled(true);
+  ui->actionLoad_Protocol->setEnabled(true);
+  ui->actionSave_Protocol->setEnabled(true);
+  ui->actionLoad_Script->setEnabled(!DCT->scripting);
+  ui->actionUnload_Script->setEnabled(DCT->scripting);
+  ui->actionExport_Log->setEnabled(true);
+  ui->actionExit->setEnabled(true);
+  ui->actionSave_config->setEnabled(true);
+  ui->menuConfig->setEnabled(true);
+  ui->DAQTable->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
@@ -304,9 +308,9 @@ void MyMainWindow::StopButClicked()
 
 void MyMainWindow::exportData(bool ignoreDAQ)
 {
-  synapseTable->exportData();
-  currentTable->exportData();
-  DAQTable->exportData(ignoreDAQ);
+  ui->synapseTable->exportData();
+  ui->currentTable->exportData();
+  ui->DAQTable->exportData(ignoreDAQ);
 
   exportSGData();
   SpkTDlg->exportData();
@@ -317,9 +321,9 @@ void MyMainWindow::exportData(bool ignoreDAQ)
  
 void MyMainWindow::importData()
 {
-  DAQTable->importData();
-  synapseTable->importData();
-  currentTable->importData();
+  ui->DAQTable->importData();
+  ui->synapseTable->importData();
+  ui->currentTable->importData();
   importSGData();
   SpkTDlg->importData();
   for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
@@ -329,55 +333,55 @@ void MyMainWindow::importData()
 
 void MyMainWindow::exportSGData() 
 {
-  SGp.method= SGMethodCombo->currentIndex();
+  SGp.method= ui->SGMethodCombo->currentIndex();
   SGp.active= (SGp.method > 0);
-  SGp.LUTables= SGLUTableCombo->currentIndex();
-  if (SGp.active) SGp.saving= (SGSave->checkState() > 0);
+  SGp.LUTables= ui->SGLUTableCombo->currentIndex();
+  if (SGp.active) SGp.saving= (ui->SGSave->checkState() > 0);
   else SGp.saving= false;
-  SGp.VSpike= VSpikeE->text().toDouble()/1e3;
-  SGp.spkTimeScaling= 5e3/WidthE->text().toDouble();
-  SGp.VRest= VRestE->text().toDouble()/1e3;
+  SGp.VSpike= ui->VSpikeE->text().toDouble()/1e3;
+  SGp.spkTimeScaling= 5e3/ui->WidthE->text().toDouble();
+  SGp.VRest= ui->VRestE->text().toDouble()/1e3;
   
-  SGp.bdType= BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= SGbdChannelCombo->currentData().value<ChannelIndex>();
-  SGp.bdThresh= ThresholdE->text().toDouble()/1e3;
-  SGp.bdNUnder= NUnderE->text().toInt();
-  SGp.bdNOver= NOverE->text().toInt();
+  SGp.bdType= ui->BurstDetectionCombo->currentIndex();
+  SGp.bdChannel= ui->SGbdChannelCombo->currentData().value<ChannelIndex>();
+  SGp.bdThresh= ui->ThresholdE->text().toDouble()/1e3;
+  SGp.bdNUnder= ui->NUnderE->text().toInt();
+  SGp.bdNOver= ui->NOverE->text().toInt();
   
-  SGp.period= PeriodE->text().toDouble()/1e3;
-  SGp.SpikeNo= NumberE->text().toInt();
+  SGp.period= ui->PeriodE->text().toDouble()/1e3;
+  SGp.SpikeNo= ui->NumberE->text().toInt();
   
-  SGp.STInFName= STInputFileE->text();
+  SGp.STInFName= ui->STInputFileE->text();
 }
 
 void MyMainWindow::importSGData() 
 {
   QString num;
-  SGMethodCombo->setCurrentIndex(SGp.method);
-  SGSave->setChecked(SGp.saving);
-  SGLUTableCombo->setCurrentIndex(SGp.LUTables);
+  ui->SGMethodCombo->setCurrentIndex(SGp.method);
+  ui->SGSave->setChecked(SGp.saving);
+  ui->SGLUTableCombo->setCurrentIndex(SGp.LUTables);
   num.setNum(SGp.VSpike*1e3);
-  VSpikeE->setText(num);
+  ui->VSpikeE->setText(num);
   num.setNum(5e3/SGp.spkTimeScaling);
-  WidthE->setText(num);
+  ui->WidthE->setText(num);
   num.setNum(SGp.VRest*1e3);
-  VRestE->setText(num);
+  ui->VRestE->setText(num);
   
-  BurstDetectionCombo->setCurrentIndex(SGp.bdType);
-  SGbdChannelCombo->setCurrentIndex(SGbdChannelModel->index(SGp.bdChannel));
+  ui->BurstDetectionCombo->setCurrentIndex(SGp.bdType);
+  ui->SGbdChannelCombo->setCurrentIndex(SGbdChannelModel->index(SGp.bdChannel));
   num.setNum(SGp.bdThresh*1e3);
-  ThresholdE->setText(num);
+  ui->ThresholdE->setText(num);
   num.setNum(SGp.bdNUnder);
-  NUnderE->setText(num);
+  ui->NUnderE->setText(num);
   num.setNum(SGp.bdNOver);
-  NOverE->setText(num);
+  ui->NOverE->setText(num);
   
   num.setNum(SGp.period*1e3);
-  PeriodE->setText(num);
+  ui->PeriodE->setText(num);
   num.setNum(SGp.SpikeNo);
-  NumberE->setText(num);
+  ui->NumberE->setText(num);
   
-  STInputFileE->setText(SGp.STInFName);
+  ui->STInputFileE->setText(SGp.STInFName);
 }
 
 void MyMainWindow::SaveConfig()
@@ -399,7 +403,7 @@ void MyMainWindow::LoadConfig()
 {
     ifstream is("StdpC.conf");
     if ( readProtocol(is) )
-        DAQTable->importData();
+        ui->DAQTable->importData();
     else
         DisplayMessage(QString("No valid config file found; reverting to standard settings"));
     is.close();
@@ -470,7 +474,7 @@ void MyMainWindow::doExportLog(QString &fname)
   QListWidgetItem *it;
   
   while (!done) {
-    it= MessageWindow->item(i);
+    it= ui->MessageWindow->item(i);
     if (it != NULL) {
       os << it->text().toStdString() << endl;
     }
@@ -482,7 +486,7 @@ void MyMainWindow::doExportLog(QString &fname)
     
 void MyMainWindow::ClearLog()
 {
-  MessageWindow->clear();
+  ui->MessageWindow->clear();
 }
 
 void MyMainWindow::LoadProtocol()
@@ -501,16 +505,16 @@ void MyMainWindow::LoadScript()
 {
   QStringList fnlist= LoadScriptFileDlg->selectedFiles();
   if (DCT->LoadScript(*fnlist.begin())) {
-    actionLoad_Script->setEnabled(false);
-    actionUnload_Script->setEnabled(true);
+    ui->actionLoad_Script->setEnabled(false);
+    ui->actionUnload_Script->setEnabled(true);
   }
 }
 
 void MyMainWindow::UnLoadScript()
 {
   DCT->UnloadScript();
-  actionLoad_Script->setEnabled(true);
-  actionUnload_Script->setEnabled(false);
+  ui->actionLoad_Script->setEnabled(true);
+  ui->actionUnload_Script->setEnabled(false);
 }
 
 void MyMainWindow::DisplayAbout()

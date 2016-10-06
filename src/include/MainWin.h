@@ -7,18 +7,20 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include "Global.h"
-#include "ui_MainWin.h"
 #include "SpikeTimeDlg.h"
 #include "DataSavingDlg.h"
 #include "ObjectDataTypes.h"
+#include "DeviceManager.h"
 
 #include "DCThread.h"
 #include "Graph.h"
 #include "GraphDlg.h"
 
+namespace Ui {
+class MainWindow;
+}
 
-
-class MyMainWindow : public QMainWindow, private Ui::MainWindow
+class MyMainWindow : public QMainWindow
 {
      Q_OBJECT
 
@@ -78,6 +80,8 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
 
     void doLoadProtocol(QString &);
     void doSaveProtocol(QString &);
+
+    Ui::MainWindow *ui;
 
 }; 
 
