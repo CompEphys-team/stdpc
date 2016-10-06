@@ -1012,7 +1012,7 @@ p, li { white-space: pre-wrap; }
       </property>
      </item>
     </widget>
-    <widget class="QComboBox" name="SGbdChannelCombo">
+    <widget class="WideComboBox" name="SGbdChannelCombo">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -1282,6 +1282,11 @@ p, li { white-space: pre-wrap; }
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>WideComboBox</class>
+   <extends>QComboBox</extends>
+   <header>WideComboBox.h</header>
+  </customwidget>
   <customwidget>
    <class>ComponentTable</class>
    <extends>QTableWidget</extends>

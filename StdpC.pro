@@ -109,7 +109,8 @@ HEADERS += \
     $$PWD/src/include/DaqWidget.h \
     $$PWD/src/include/DeviceManager.h \
     $$PWD/src/include/ComponentPrototype.h \
-    $$PWD/src/include/Component.h
+    $$PWD/src/include/Component.h \
+    $$PWD/src/include/WideComboBox.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -161,7 +162,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/drivers/Clock.cpp \
     $$PWD/src/gui/DaqTable.cpp \
     $$PWD/src/gui/DaqWidget.cpp \
-    $$PWD/src/drivers/DeviceManager.cpp
+    $$PWD/src/drivers/DeviceManager.cpp \
+    $$PWD/src/gui/WideComboBox.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

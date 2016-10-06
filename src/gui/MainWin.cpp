@@ -55,7 +55,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DCT= new DCThread();
 
      SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual, this);
-     SGbdChannelModel->subordinate(SGbdChannelCombo);
+     SGbdChannelCombo->setModel(SGbdChannelModel);
      connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      

@@ -25,8 +25,8 @@ ElectrodeCompDlg::ElectrodeCompDlg(elecCalibParams &p, ChannelIndex dex, QWidget
     setWindowTitle(windowTitle().arg(dex.prettyName()));
 
     outChnModel.updateChns();
-    outChnModel.subordinate(ui->leGenOutChannelNum_1);
-    outChnModel.subordinate(ui->leGenCopyChannelNum_1);
+    ui->leGenOutChannelNum_1->setModel(&outChnModel);
+    ui->leGenCopyChannelNum_1->setModel(&outChnModel);
 
     importData();
     ui->label_inChn->setText(dex.prettyName());

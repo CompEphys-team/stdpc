@@ -13,7 +13,6 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
                                 | ChannelListModel::SpikeGen
                                 | ChannelListModel::Virtual, this))
  {
-   QColor clr;
    QString lb;
    
    setupUi(this);
@@ -27,12 +26,11 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
      clrCombo[i]->addItem(QString("green"));
      clrCombo[i]->addItem(QString("blue"));
      clrCombo[i]->addItem(QString("black"));
-     //clrCombo[i]->insertItems(0, clr.colorNames());
      clrCombo[i]->setCurrentIndex(i);
-     ChannelCombo[i] = new QComboBox(this);
+     ChannelCombo[i] = new WideComboBox(this);
      ChannelCombo[i]->setObjectName(QString("ChannelCombo")+QString(i));
      ChannelCombo[i]->setGeometry(QRect(40, 40+30*i, 69, 22));
-     clm->subordinate(ChannelCombo[i]);
+     ChannelCombo[i]->setModel(clm);
      ChannelCombo[i]->setCurrentIndex(0);
      MinE[i] = new QLineEdit(this);
      MinE[i]->setObjectName(QString("MinE")+QString(i));

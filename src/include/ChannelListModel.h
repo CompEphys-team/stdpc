@@ -36,9 +36,6 @@ public:
     int index(const ChannelIndex &dex) const;
     QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
 
-    void subordinate(QComboBox *cb);
-    static void fixComboBoxWidth(QComboBox *cb);
-
 public slots:
     void updateChns();
 

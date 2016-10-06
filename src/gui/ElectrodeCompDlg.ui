@@ -837,7 +837,7 @@
             <string>Output compensated voltage to channel</string>
            </property>
           </widget>
-          <widget class="QComboBox" name="leGenOutChannelNum_1">
+          <widget class="WideComboBox" name="leGenOutChannelNum_1">
            <property name="geometry">
             <rect>
              <x>250</x>
@@ -847,7 +847,7 @@
             </rect>
            </property>
           </widget>
-          <widget class="QComboBox" name="leGenCopyChannelNum_1">
+          <widget class="WideComboBox" name="leGenCopyChannelNum_1">
            <property name="geometry">
             <rect>
              <x>250</x>
@@ -1197,6 +1197,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WideComboBox</class>
+   <extends>QComboBox</extends>
+   <header>WideComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

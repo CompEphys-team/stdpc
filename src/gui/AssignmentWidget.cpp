@@ -43,7 +43,6 @@ void AssignmentWidget<A>::importData(std::vector<A> const& p)
     boxes.clear();
     for ( Dropdown<A> &d : drops ) {
         d.combo.clear();
-        d.model->disconnect();
     }
     setRowCount(0);
 
@@ -78,8 +77,8 @@ void AssignmentWidget<A>::addRow(int row, QCheckBox *box)
 
     int i = 1;
     for ( Dropdown<A> &d : drops ) {
-        QComboBox *combo = new QComboBox(this);
-        d.model->subordinate(combo);
+        WideComboBox *combo = new WideComboBox(this);
+        combo->setModel(d.model);
         setCellWidget(row, i++, combo);
         d.combo.insert(row, combo);
     }

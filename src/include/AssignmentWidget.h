@@ -3,7 +3,7 @@
 
 #include <QTableWidget>
 #include <QCheckBox>
-#include <QComboBox>
+#include "WideComboBox.h"
 #include "ChannelListModel.h"
 #include "ObjectDataTypes.h"
 
@@ -21,7 +21,7 @@ struct Dropdown
     int columnWidth;
 
     QMetaObject::Connection connection;
-    QVector<QComboBox *> combo;
+    QVector<WideComboBox *> combo;
 };
 
 
