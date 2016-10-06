@@ -31,14 +31,14 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
      ui->synapseTable->init(prototypes, inChnModel, outChnModel);
 
-     QVector<GenericDaqOpts*> dprot;
-     dprot.push_back(new DaqOpts<SimulDAQDlg>(this, "SimulDAQ", &SDAQp));
-     dprot.push_back(new DaqOpts<DigiDataDlg>(this, "DigiData 1200(A)", &DigiDatap));
+     QVector<DaqOptsPrototypeBase*> dprot;
+     dprot.push_back(new DaqOptsPrototype<SimulDAQDlg>("SimulDAQ", &SDAQp));
+     dprot.push_back(new DaqOptsPrototype<DigiDataDlg>("DigiData 1200(A)", &DigiDatap));
 #ifdef NATIONAL_INSTRUMENTS
-     dprot.push_back(new DaqOpts<NIDAQDlg>(this, "Nat'l Instruments", &NIDAQp));
+     dprot.push_back(new DaqOptsPrototype<NIDAQDlg>("Nat'l Instruments", &NIDAQp));
 #endif
-     dprot.push_back(new DaqOpts<HHModelDlg>(this, "HH Model", &HHNeuronp));
-     ui->DAQTable->init(dprot);
+     dprot.push_back(new DaqOptsPrototype<HHModelDlg>("HH Model", &HHNeuronp));
+     ui->DAQTable->init(dprot, this);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
                QString("*.log"));
@@ -97,6 +97,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
      connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
      connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
+
+     connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
+     connect(ui->DAQReset, SIGNAL(clicked(bool)), ui->DAQTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));

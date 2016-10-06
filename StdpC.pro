@@ -110,7 +110,9 @@ HEADERS += \
     $$PWD/src/include/DeviceManager.h \
     $$PWD/src/include/ComponentPrototype.h \
     $$PWD/src/include/Component.h \
-    $$PWD/src/include/WideComboBox.h
+    $$PWD/src/include/WideComboBox.h \
+    $$PWD/src/include/DaqOpts.h \
+    $$PWD/src/include/DaqOptsPrototype.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \

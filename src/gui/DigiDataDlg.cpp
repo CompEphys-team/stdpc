@@ -6,7 +6,16 @@
 DigiDataDlg::DigiDataDlg(int no, QWidget *parent) : DAQDlg(no, parent)
 {
     setupUi(this);
-    DAQLabel->setText(DAQLabel->text().arg(no));
+    label = DAQLabel->text();
+    setIndex(no);
+    inDlg->init(board);
+    outDlg->init(board);
+}
+
+void DigiDataDlg::setIndex(int no)
+{
+    idx = no;
+    DAQLabel->setText(label.arg(no));
     ChannelIndex dex;
     dex.isValid = true;
     dex.isAnalog = true;
@@ -14,8 +23,7 @@ DigiDataDlg::DigiDataDlg(int no, QWidget *parent) : DAQDlg(no, parent)
     dex.devID = no;
     board = Devices.getDevice(dex);
     inDlg->dex = dex;
-    inDlg->init(board);
-    outDlg->init(board);
+    emit channelsChanged();
 }
 
 bool DigiDataDlg::exportData(bool forceInit)

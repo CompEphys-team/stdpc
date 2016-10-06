@@ -15,6 +15,7 @@ class DigiDataDlg : public DAQDlg, private Ui::DigiDataDlg
      DigiDataDlg(int no, QWidget *parent= 0);
      bool exportData(bool forceInit = false);
      void importData();
+     void setIndex(int);
 
      typedef DigiDataData param_type;
      
@@ -31,6 +32,7 @@ protected:
     DeviceStatus initDAQ();
 
     DigiDataData backup;
+    QString label;
 };
 
 #endif

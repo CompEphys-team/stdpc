@@ -21,6 +21,9 @@ public:
     template <typename param_type>
     DeviceStatus initSingle(QString &name, int idx);
 
+    template <typename param_type>
+    void remove(int idx);
+
     DAQ *getDevice(ChannelIndex const&);
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);

@@ -16,6 +16,7 @@ class NIDAQDlg : public DAQDlg, private Ui::NIDAQDlg
      NIDAQDlg(int no, QWidget *parent= 0);
      bool exportData(bool forceInit = false);
      void importData();
+     void setIndex(int);
 
      typedef NIDAQData param_type;
      
@@ -32,6 +33,7 @@ protected:
     DeviceStatus initDAQ();
 
     NIDAQData backup;
+    QString label;
 };
 
 #endif

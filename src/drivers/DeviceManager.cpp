@@ -37,6 +37,14 @@ DeviceStatus DeviceManager::initSingle<SDAQData>(QString &name, int idx)
 }
 
 template <>
+void DeviceManager::remove<SDAQData>(int idx)
+{
+    actdev.removeAll(sdaq[idx]);
+    delete sdaq[idx];
+    sdaq.remove(idx);
+}
+
+template <>
 DeviceStatus DeviceManager::initSingle<DigiDataData>(QString &name, int idx)
 {
     if ( idx < dd1200.size() ) {
@@ -47,6 +55,14 @@ DeviceStatus DeviceManager::initSingle<DigiDataData>(QString &name, int idx)
         dd1200.push_back(new DigiData(&DigiDatap[idx], idx));
     }
     return _initSingle(dd1200[idx], DigiDatap[idx].active, name);
+}
+
+template <>
+void DeviceManager::remove<DigiDataData>(int idx)
+{
+    actdev.removeAll(dd1200[idx]);
+    delete dd1200[idx];
+    dd1200.remove(idx);
 }
 
 #ifdef NATIONAL_INSTRUMENTS
@@ -61,6 +77,14 @@ DeviceStatus DeviceManager::initSingle<NIDAQData>(QString &name, int idx)
         nidaq.push_back(new NIDAQ(&NIDAQp[idx], idx));
     }
     return _initSingle(nidaq[idx], NIDAQp[idx].active, name);
+}
+
+template <>
+void DeviceManager::remove<NIDAQData>(int idx)
+{
+    actdev.removeAll(nidaq[idx]);
+    delete nidaq[idx];
+    nidaq.remove(idx);
 }
 #endif
 

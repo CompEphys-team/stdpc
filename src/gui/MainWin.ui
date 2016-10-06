@@ -1122,7 +1122,7 @@ p, li { white-space: pre-wrap; }
       <rect>
        <x>0</x>
        <y>16</y>
-       <width>731</width>
+       <width>631</width>
        <height>124</height>
       </rect>
      </property>
@@ -1153,6 +1153,32 @@ p, li { white-space: pre-wrap; }
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>101</number>
      </attribute>
+    </widget>
+    <widget class="QPushButton" name="DAQReset">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>46</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="DAQClear">
+     <property name="geometry">
+      <rect>
+       <x>640</x>
+       <y>16</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Clear inactive</string>
+     </property>
     </widget>
    </widget>
   </widget>

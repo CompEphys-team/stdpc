@@ -7,16 +7,24 @@
 SimulDAQDlg::SimulDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
 {
   setupUi(this);
-  DAQLabel->setText(DAQLabel->text().arg(no));
-  ChannelIndex dex;
-  dex.isValid = true;
-  dex.isAnalog = true;
-  dex.daqClass = DAQClass::Simul;
-  dex.devID = no;
-  board = Devices.getDevice(dex);
-  inDlg->dex = dex;
+  label = DAQLabel->text();
+  setIndex(no);
   inDlg->init(board);
   outDlg->init(board);
+}
+
+void SimulDAQDlg::setIndex(int no)
+{
+    idx = no;
+    DAQLabel->setText(label.arg(no));
+    ChannelIndex dex;
+    dex.isValid = true;
+    dex.isAnalog = true;
+    dex.daqClass = DAQClass::Simul;
+    dex.devID = no;
+    board = Devices.getDevice(dex);
+    inDlg->dex = dex;
+    emit channelsChanged();
 }
 
 bool SimulDAQDlg::exportData(bool forceInit)

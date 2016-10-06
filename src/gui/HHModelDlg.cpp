@@ -6,11 +6,11 @@
 
 HHModelDlg::HHModelDlg(int idx, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::HHModelDlg),
-    idx(idx)
+    ui(new Ui::HHModelDlg)
 {
     ui->setupUi(this);
-    ui->titleLabel->setText(ui->titleLabel->text().arg(idx));
+    label = ui->titleLabel->text();
+    setIndex(idx);
     ui->table->setHorizontalHeaderLabels({"Active",
                                           "",
                                           "VChan\nSave",
@@ -32,6 +32,13 @@ HHModelDlg::HHModelDlg(int idx, QWidget *parent) :
     growTable(false);
 
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addMultiple()));
+}
+
+void HHModelDlg::setIndex(int no)
+{
+    idx = no;
+    ui->titleLabel->setText(label.arg(no));
+    emit channelsChanged();
 }
 
 HHModelDlg::~HHModelDlg()

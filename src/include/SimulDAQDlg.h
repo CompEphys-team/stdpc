@@ -16,6 +16,7 @@ class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
      SimulDAQDlg(int no, QWidget *parent= 0);
      bool exportData(bool forceInit = false);
      void importData();
+     void setIndex(int);
 
      typedef SDAQData param_type;
      
@@ -36,6 +37,7 @@ protected:
     DeviceStatus initDAQ();
 
      SDAQData backup;
+     QString label;
 };
 
 #endif

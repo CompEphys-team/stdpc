@@ -21,6 +21,7 @@ public:
 
     void importData();
     void exportData(bool = false);
+    void setIndex(int);
 
     typedef HHNeuronData param_type;
     typedef false_type isDAQ;
@@ -40,6 +41,7 @@ private:
     QMetaObject::Connection activec, vSavec, vBiasc, spkDc, spkThrc, iSavec, iBiasc;
 
     int idx;
+    QString label;
 
     void addRow(int row, QCheckBox *active,
                 QCheckBox *vSave, QDoubleSpinBox *vBias, QCheckBox *spkD, QDoubleSpinBox *spkThr,
