@@ -30,9 +30,9 @@ DeviceStatus DeviceManager::initSingle<SDAQData>(QString &name, int idx)
     if ( idx < sdaq.size() ) {
         actdev.removeAll(sdaq[idx]);
         sdaq[idx]->~DAQ();
-        sdaq[idx] = new(sdaq[idx]) SimulDAQ(&SDAQp[idx], idx);
+        sdaq[idx] = new(sdaq[idx]) SimulDAQ(idx);
     } else {
-        sdaq.push_back(new SimulDAQ(&SDAQp[idx], idx));
+        sdaq.push_back(new SimulDAQ(idx));
     }
     return _initSingle(sdaq[idx], SDAQp[idx].active, name);
 }
@@ -58,9 +58,9 @@ DeviceStatus DeviceManager::initSingle<DigiDataData>(QString &name, int idx)
     if ( idx < dd1200.size() ) {
         actdev.removeAll(dd1200[idx]);
         dd1200[idx]->~DAQ();
-        dd1200[idx] = new(dd1200[idx]) DigiData(&DigiDatap[idx], idx);
+        dd1200[idx] = new(dd1200[idx]) DigiData(idx);
     } else {
-        dd1200.push_back(new DigiData(&DigiDatap[idx], idx));
+        dd1200.push_back(new DigiData(idx));
     }
     return _initSingle(dd1200[idx], DigiDatap[idx].active, name);
 }
@@ -87,9 +87,9 @@ DeviceStatus DeviceManager::initSingle<NIDAQData>(QString &name, int idx)
     if ( idx < nidaq.size() ) {
         actdev.removeAll(nidaq[idx]);
         nidaq[idx]->~DAQ();
-        nidaq[idx] = new(nidaq[idx]) NIDAQ(&NIDAQp[idx], idx);
+        nidaq[idx] = new(nidaq[idx]) NIDAQ(idx);
     } else {
-        nidaq.push_back(new NIDAQ(&NIDAQp[idx], idx));
+        nidaq.push_back(new NIDAQ(idx));
     }
     return _initSingle(nidaq[idx], NIDAQp[idx].active, name);
 }

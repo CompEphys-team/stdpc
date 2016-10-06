@@ -27,7 +27,7 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ(NIDAQData *p, int devID);
+    NIDAQ(int devID);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
@@ -40,6 +40,7 @@ class NIDAQ: public DAQ
     virtual void write_analog_out();
     virtual void reset_board();
 
+    virtual inline DAQData *params() { return &NIDAQp[devID]; }
     virtual QString prefix();
 };
 

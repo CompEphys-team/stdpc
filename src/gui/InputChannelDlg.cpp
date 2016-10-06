@@ -81,7 +81,7 @@ void InputChannelDlg::init(DAQ *b)
 
   clearAll();
   ChnNo= board->inChnNo;
-  board->p->inChn.resize(ChnNo);
+  board->params()->inChn.resize(ChnNo);
   inLow = QVector<double>(board->inGainNo);
   for(int i= 0; i < board->inGainNo; i++){
     inLow[i]= board->inLow[i];
@@ -182,7 +182,7 @@ void InputChannelDlg::init(DAQ *b)
     connect(btntmp, &QPushButton::clicked, [=](){
         dex.isInChn = true;
         dex.chanID = i;
-        ElectrodeCompDlg *calibDlg = new ElectrodeCompDlg(board->p->inChn[i].calib, dex, this);
+        ElectrodeCompDlg *calibDlg = new ElectrodeCompDlg(board->params()->inChn[i].calib, dex, this);
         connect(calibDlg, SIGNAL(message(QString)), this->parent(), SIGNAL(message(QString)));
         connect(&calibDlg->calibrator, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
                 this->parent(), SIGNAL(CloseToLimit(QString,QString,double,double,double)));
@@ -208,31 +208,33 @@ InputChannelDlg::~InputChannelDlg()
 
 void InputChannelDlg::exportData()
 {
+  DAQData *p = board->params();
   for (int i= 0; i < ChnNo; i++) {
-    board->p->inChn[i].active= (act[i]->checkState() > 0);
-    board->p->inChn[i].gain= rng[i]->currentIndex();
+    p->inChn[i].active= (act[i]->checkState() > 0);
+    p->inChn[i].gain= rng[i]->currentIndex();
     double gainFac = factor[i]->text().toDouble();
-    board->p->inChn[i].gainFac= gainFac;
-    board->p->inChn[i].spkDetect= (sDetect[i]->checkState() > 0);
-    board->p->inChn[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
-    board->p->inChn[i].bias= bias[i]->text().toDouble()*1e-3;
-    board->p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
-    board->p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
-    board->p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
-    calib[i]->setEnabled(board->initialized && board->p->inChn[i].active && dex.daqClass != DAQClass::Simul);
+    p->inChn[i].gainFac= gainFac;
+    p->inChn[i].spkDetect= (sDetect[i]->checkState() > 0);
+    p->inChn[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
+    p->inChn[i].bias= bias[i]->text().toDouble()*1e-3;
+    p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
+    p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
+    p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    calib[i]->setEnabled(board->initialized && p->inChn[i].active && dex.daqClass != DAQClass::Simul);
   }
 }
 
 void InputChannelDlg::importData()
 {
+  DAQData *p = board->params();
   for (int i= 0; i < ChnNo; i++) {
-    act[i]->setChecked(board->p->inChn[i].active);
-    rng[i]->setCurrentIndex(board->p->inChn[i].gain);
-    factor[i]->setText(QString::number(board->p->inChn[i].gainFac));
-    sDetect[i]->setChecked(board->p->inChn[i].spkDetect);
-    SDThresh[i]->setText(QString::number(board->p->inChn[i].spkDetectThresh*1e3));
-    bias[i]->setText(QString::number(board->p->inChn[i].bias*1e3));
-    saveChnl[i]->setChecked(board->p->inChn[i].chnlSaving);
+    act[i]->setChecked(p->inChn[i].active);
+    rng[i]->setCurrentIndex(p->inChn[i].gain);
+    factor[i]->setText(QString::number(p->inChn[i].gainFac));
+    sDetect[i]->setChecked(p->inChn[i].spkDetect);
+    SDThresh[i]->setText(QString::number(p->inChn[i].spkDetectThresh*1e3));
+    bias[i]->setText(QString::number(p->inChn[i].bias*1e3));
+    saveChnl[i]->setChecked(p->inChn[i].chnlSaving);
   }
 }
 
@@ -245,17 +247,17 @@ void InputChannelDlg::accept()
 void InputChannelDlg::reject()
 {
   importData();
+  DAQData *p = board->params();
   for ( int i = 0; i < ChnNo; i++ )
-      board->p->inChn[i].calib = calibBackup[i];
+      p->inChn[i].calib = calibBackup[i];
   QDialog::reject();
 }
 
 void InputChannelDlg::open()
 {
+    DAQData *p = board->params();
     calibBackup.resize(ChnNo);
     for ( int i = 0; i < ChnNo; i++ )
-        calibBackup[i] = board->p->inChn[i].calib;
+        calibBackup[i] = p->inChn[i].calib;
     QDialog::open();
 }
-
-

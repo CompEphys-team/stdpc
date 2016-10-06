@@ -5,8 +5,8 @@
 
 //---------------------------------------------------------------------------
 
-DigiData::DigiData(DigiDataData *p, int devID) :
-    DAQ(p, devID)
+DigiData::DigiData(int devID) :
+    DAQ(devID)
 {
   inChnNo= 16;
   inIdx= new short int[inChnNo];
@@ -81,7 +81,7 @@ DigiData::~DigiData()
 
 void DigiData::init()
 {
-   short int base= static_cast<DigiDataData*>(p)->baseAddress;
+   short int base= DigiDatap[devID].baseAddress;
    base_address=       base;
    DAC_data=           base | DACDATA;
    ADC_data=           base | ADCDATA;
@@ -150,7 +150,7 @@ void DigiData::digital_out(unsigned char outbyte)
 void DigiData::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i, Chan_Gain_Code;
-
+  DAQData *p = params();
   ChannelIndex dex;
   dex.isValid = true;
   dex.isAnalog = true;
@@ -204,6 +204,7 @@ void DigiData::get_single_scan(inChannel *in)
 //---------------------------------------------------------------------------
 void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 {
+  DAQData *p = params();
   ChannelIndex dex;
   dex.isValid = true;
   dex.isAnalog = true;
@@ -228,7 +229,7 @@ void DigiData::write_analog_out()
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
     int_I= ((short int) (out[outIdx[i]].I*outGainFac[i]))*16;
-    int_I|= static_cast<DigiDataData*>(p)->syncIOMask; // write synchronous digital IO
+    int_I|= DigiDatap[devID].syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
   } 

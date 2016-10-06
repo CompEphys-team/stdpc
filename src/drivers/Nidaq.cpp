@@ -11,8 +11,8 @@
 
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ(NIDAQData *p, int devID) :
-    DAQ(p, devID)
+NIDAQ::NIDAQ(int devID) :
+    DAQ(devID)
 {
   char data[1024];
   float64 fdata[128];
@@ -21,7 +21,7 @@ NIDAQ::NIDAQ(NIDAQData *p, int devID) :
   char cbuf;
   
   devName= new char[80];
-  strcpy(devName, (const char *) p->deviceName.toLatin1());
+  strcpy(devName, (const char *) NIDAQp[devID].deviceName.toLatin1());
   
   DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
   //if (!DevicePresent)
@@ -182,6 +182,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
     inBuf= new float64[chnNo];
     DAQmxCreateTask ("", &inTask);
 
+    DAQData *p = params();
     ChannelIndex dex;
     dex.isValid = true;
     dex.isAnalog = true;
@@ -253,6 +254,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     outBuf= new float64[actOutChnNo];
     DAQmxCreateTask("", &outTask);
 
+    DAQData *p = params();
     ChannelIndex dex;
     dex.isValid = true;
     dex.isAnalog = true;

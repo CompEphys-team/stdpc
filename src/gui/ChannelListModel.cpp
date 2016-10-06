@@ -67,7 +67,7 @@ void ChannelListModel::DAQHelper<T>::updateCount()
     if ( parent->displayFlags & AnalogIn ) {
         nAI.clear();
         for ( DAQ *daq : Devices.get<T>() ) {
-            int s = daq->p->inChn.size();
+            int s = daq->params()->inChn.size();
             nAI.push_back(s);
             parent->size += s;
         }
@@ -75,7 +75,7 @@ void ChannelListModel::DAQHelper<T>::updateCount()
     if ( parent->displayFlags & AnalogOut ) {
         nAO.clear();
         for ( DAQ *daq : Devices.get<T>() ) {
-            int s = daq->p->outChn.size();
+            int s = daq->params()->outChn.size();
             nAO.push_back(s);
             parent->size += s;
         }
@@ -266,7 +266,7 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
             if ( row-offset < nAI[i] ) {
-                DAQData *p = Devices.get<T>()[i]->p;
+                DAQData *p = Devices.get<T>()[i]->params();
                 dex.devID = i;
                 dex.isInChn = true;
                 dex.chanID = row - offset;
@@ -282,7 +282,7 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     if ( parent->displayFlags & AnalogOut ) {
         for ( int i = 0; i < nAO.size(); i++ ) {
             if ( row-offset < nAO[i] ) {
-                DAQData *p = Devices.get<T>()[i]->p;
+                DAQData *p = Devices.get<T>()[i]->params();
                 dex.devID = i;
                 dex.isInChn = false;
                 dex.chanID = row - offset;

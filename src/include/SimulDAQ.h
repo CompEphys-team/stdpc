@@ -11,7 +11,7 @@ using namespace std;
 class SimulDAQ: public DAQ
 {
   public:
-    SimulDAQ(SDAQData *p, int devID);
+    SimulDAQ(int devID);
     virtual ~SimulDAQ();
     virtual bool initialize_board(QString &);
     virtual void start();
@@ -22,6 +22,7 @@ class SimulDAQ: public DAQ
     virtual void write_analog_out();
     virtual void reset_board();
 
+    virtual inline DAQData *params() { return &SDAQp[devID]; }
     virtual QString prefix();
 
     ifstream is;

@@ -1,7 +1,6 @@
 #include "Daq.h"
 
-DAQ::DAQ(DAQData *p, int devID) :
-    p(p),
+DAQ::DAQ(int devID) :
     devID(devID),
     t(DAQClock.t)
 {
@@ -17,6 +16,7 @@ DAQ::~DAQ()
 //---------------------------------------------------------------------------
 void DAQ::init_chans()
 {
+    DAQData *p = params();
     short int No = 0;
     short int Chns[p->inChn.size()];
     in.resize(p->inChn.size());
@@ -67,6 +67,7 @@ void DAQ::reset_chans()
 //---------------------------------------------------------------------------
 void DAQ::process_scan(double t)
 {
+    DAQData *p = params();
     for ( int i = 0; i < actOutChnNo; i++ )
         out[outIdx[i]].I = p->outChn[outIdx[i]].bias;
     for ( int i = 0; i < actInChnNo; i++ ) {

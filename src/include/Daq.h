@@ -21,7 +21,7 @@ class DAQ {
     QVector<QString> outChnLabels;
 
   public:
-    DAQ(DAQData *p, int devID);
+    DAQ(int devID);
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;
@@ -31,6 +31,8 @@ class DAQ {
     virtual void get_single_scan(inChannel *)= 0;
     virtual void write_analog_out()= 0;
     virtual void reset_board()= 0;
+
+    virtual DAQData *params() = 0;
 
     void init_chans(); // Sets up scan list, analog out list
     void reset_chans();
@@ -44,7 +46,6 @@ class DAQ {
 
     virtual QString prefix() = 0;
 
-    DAQData *p;
     int devID;
 
     const double &t;

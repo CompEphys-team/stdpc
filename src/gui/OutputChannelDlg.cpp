@@ -65,7 +65,7 @@ void OutputChannelDlg::init(DAQ *b)
      
   clearAll();
   ChnNo= board->outChnNo;
-  board->p->outChn.resize(ChnNo);
+  board->params()->outChn.resize(ChnNo);
 
   outLow = QVector<double>(board->outGainNo);
   for(int i= 0; i < board->outGainNo; i++){
@@ -148,26 +148,28 @@ OutputChannelDlg::~OutputChannelDlg()
 
 void OutputChannelDlg::exportData()
 {
+  DAQData *p = board->params();
   for (int i= 0; i < ChnNo; i++) {
-    board->p->outChn[i].active= (act[i]->checkState() > 0);
-    board->p->outChn[i].gain= rng[i]->currentIndex();
+    p->outChn[i].active= (act[i]->checkState() > 0);
+    p->outChn[i].gain= rng[i]->currentIndex();
     double gainFac = factor[i]->text().toDouble();
-    board->p->outChn[i].gainFac= gainFac;
-    board->p->outChn[i].bias= bias[i]->text().toDouble()*1e-9;
-    board->p->outChn[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/gainFac;
-    board->p->outChn[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/gainFac;
-    board->p->outChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    p->outChn[i].gainFac= gainFac;
+    p->outChn[i].bias= bias[i]->text().toDouble()*1e-9;
+    p->outChn[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/gainFac;
+    p->outChn[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/gainFac;
+    p->outChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
 void OutputChannelDlg::importData()
 {
+  DAQData *p = board->params();
   for (int i= 0; i < ChnNo; i++) {
-    act[i]->setChecked(board->p->outChn[i].active);
-    rng[i]->setCurrentIndex(board->p->outChn[i].gain);
-    factor[i]->setText(QString::number(board->p->outChn[i].gainFac));
-    bias[i]->setText(QString::number(board->p->outChn[i].bias*1e9));
-    saveChnl[i]->setChecked(board->p->outChn[i].chnlSaving);
+    act[i]->setChecked(p->outChn[i].active);
+    rng[i]->setCurrentIndex(p->outChn[i].gain);
+    factor[i]->setText(QString::number(p->outChn[i].gainFac));
+    bias[i]->setText(QString::number(p->outChn[i].bias*1e9));
+    saveChnl[i]->setChecked(p->outChn[i].chnlSaving);
   }
 }
 

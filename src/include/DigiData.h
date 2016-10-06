@@ -98,7 +98,7 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData(DigiDataData *p, int devID);
+    DigiData(int devID);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
@@ -113,6 +113,7 @@ class DigiData: public DAQ
     short int* inChnGain;
     short int* DACEnable;
 
+    virtual inline DAQData *params() { return &DigiDatap[devID]; }
     virtual QString prefix();
     
     // actually activated stuff

@@ -4,14 +4,14 @@
 #include <QDir>
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
-SimulDAQ::SimulDAQ(SDAQData *p, int devID) :
-    DAQ(p, devID),
+SimulDAQ::SimulDAQ(int devID) :
+    DAQ(devID),
     tOff(0.0)
 {
-  inChnNo= p->inChn.size();
+  inChnNo= params()->inChn.size();
   inIdx= new short int[inChnNo];
   inGainFac= new double[inChnNo];
-  outChnNo= p->outChn.size();
+  outChnNo= params()->outChn.size();
   outIdx= new short int[outChnNo];
   outGainFac= new double[outChnNo];
   inGainNo= 1;
@@ -65,11 +65,11 @@ bool SimulDAQ::initialize_board(QString &name)
   name= QString("SimulDAQ files ");
 
   intq.clear();
-  is.open(static_cast<SDAQData*>(p)->inFileName.toLatin1());
+  is.open(SDAQp[devID].inFileName.toLatin1());
   is >> t;
   t0= t;
   while (is.good()) {
-    intq.append((t-t0) * static_cast<SDAQData*>(p)->inTFac);
+    intq.append((t-t0) * SDAQp[devID].inTFac);
     for (int i= 0; i < inChnNo; i++) {
       is >> data;
       inq[i].append(data);
@@ -96,7 +96,7 @@ bool SimulDAQ::initialize_board(QString &name)
   if (os.is_open()) os.close();
 
   qt_ntfs_permission_lookup++;
-  QFileInfo fInfo(static_cast<SDAQData*>(p)->outFileName.toLatin1());
+  QFileInfo fInfo(SDAQp[devID].outFileName.toLatin1());
   if ( !fInfo.dir().isReadable() || (fInfo.exists() && !fInfo.isWritable()) ) {
     name=QString("SimulDAQ output files ");
     success= false;
@@ -125,7 +125,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= p->inChn[inIdx[i]].gainFac;  // read V ... users take care of other units
+    inGainFac[i]= params()->inChn[inIdx[i]].gainFac;  // read V ... users take care of other units
     dex.chanID = inIdx[i];
     inChnLabels[inIdx[i]] = dex.toString();
   }
@@ -206,12 +206,12 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
   actOutChnNo= chnNo;
   for (i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= p->outChn[outIdx[i]].gainFac*1.0e9;  // write nA
+    outGainFac[i]= params()->outChn[outIdx[i]].gainFac*1.0e9;  // write nA
     dex.chanID = outIdx[i];
     outChnLabels[outIdx[i]] = dex.toString();
   }
   if (os.is_open()) os.close();
-  os.open(static_cast<SDAQData*>(p)->outFileName.toLatin1());
+  os.open(SDAQp[devID].outFileName.toLatin1());
   lastWrite= 0.0;
 }
 
@@ -221,7 +221,7 @@ void SimulDAQ::write_analog_out()
 //  double dt;
   
 //  dt= get_RTC();
-  if (t > lastWrite + static_cast<SDAQData*>(p)->outDt) {
+  if (t > lastWrite + SDAQp[devID].outDt) {
     lastWrite= t;
     outtq.append(t);
     for (int i= 0; i < outChnNo; i++) {
