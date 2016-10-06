@@ -1,15 +1,16 @@
 #include "ChannelListModel.h"
 #include "Global.h"
 #include "ChannelIndex.h"
+#include "DeviceManager.h"
 
 ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
     : QAbstractListModel(parent),
       displayFlags(displayFlags),
       size(0),
-      hSimul(DAQHelper<SDAQData>(DAQClass::Simul, &SDAQp, this)),
-      hDD1200(DAQHelper<DigiDataData>(DAQClass::DD1200, &DigiDatap, this)),
+      hSimul(DAQHelper<SDAQData>(DAQClass::Simul, this)),
+      hDD1200(DAQHelper<DigiDataData>(DAQClass::DD1200, this)),
 #ifdef NATIONAL_INSTRUMENTS
-      hNI(DAQHelper<NIDAQData>(DAQClass::NI, &NIDAQp, this)),
+      hNI(DAQHelper<NIDAQData>(DAQClass::NI, this)),
 #endif
       nPHH(0)
 {
@@ -65,16 +66,16 @@ void ChannelListModel::DAQHelper<T>::updateCount()
 {
     if ( parent->displayFlags & AnalogIn ) {
         nAI.clear();
-        for ( T &data : *p ) {
-            int s = data.inChn.size();
+        for ( DAQ *daq : Devices.get<T>() ) {
+            int s = daq->p->inChn.size();
             nAI.push_back(s);
             parent->size += s;
         }
     }
     if ( parent->displayFlags & AnalogOut ) {
         nAO.clear();
-        for ( T &data : *p ) {
-            int s = data.outChn.size();
+        for ( DAQ *daq : Devices.get<T>() ) {
+            int s = daq->p->outChn.size();
             nAO.push_back(s);
             parent->size += s;
         }
@@ -265,13 +266,14 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
             if ( row-offset < nAI[i] ) {
+                DAQData *p = Devices.get<T>()[i]->p;
                 dex.devID = i;
                 dex.isInChn = true;
                 dex.chanID = row - offset;
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                         return true;
                 case Qt::UserRole:      ret.setValue(dex);                              return true;
-                case Qt::UserRole + 1:  ret = p->at(i).active && p->at(i).inChn[dex.chanID].active; return true;
+                case Qt::UserRole + 1:  ret = p->active && p->inChn[dex.chanID].active; return true;
                 }
             }
             offset += nAI[i];
@@ -280,13 +282,14 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     if ( parent->displayFlags & AnalogOut ) {
         for ( int i = 0; i < nAO.size(); i++ ) {
             if ( row-offset < nAO[i] ) {
+                DAQData *p = Devices.get<T>()[i]->p;
                 dex.devID = i;
                 dex.isInChn = false;
                 dex.chanID = row - offset;
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                          return true;
                 case Qt::UserRole:      ret.setValue(dex);                               return true;
-                case Qt::UserRole + 1:  ret = p->at(i).active && p->at(i).outChn[dex.chanID].active; return true;
+                case Qt::UserRole + 1:  ret = p->active && p->outChn[dex.chanID].active; return true;
                 }
             }
             offset += nAO[i];

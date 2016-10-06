@@ -28,16 +28,19 @@ public:
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);
 
+    template <typename param_type>
+    QVector<DAQ *> get();
+
     QVector<DAQ *> actdev;
 
 private:
     DeviceStatus _initSingle(DAQ *dev, bool active, QString &name);
     void clear();
 
-    QVector<SimulDAQ*> sdaq;
-    QVector<DigiData*> dd1200;
+    QVector<DAQ*> sdaq;
+    QVector<DAQ*> dd1200;
 #ifdef NATIONAL_INSTRUMENTS
-    QVector<NIDAQ*> nidaq;
+    QVector<DAQ*> nidaq;
 #endif
 };
 

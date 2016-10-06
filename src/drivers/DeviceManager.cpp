@@ -10,25 +10,26 @@ DeviceManager::~DeviceManager()
 void DeviceManager::clear()
 {
     actdev.clear();
-    for ( SimulDAQ *d : sdaq )
+    for ( DAQ *d : sdaq )
         delete d;
     sdaq.clear();
-    for ( DigiData *d : dd1200 )
+    for ( DAQ *d : dd1200 )
         delete d;
     dd1200.clear();
 #ifdef NATIONAL_INSTRUMENTS
-    for ( NIDAQ *d : nidaq )
+    for ( DAQ *d : nidaq )
         delete d;
     nidaq.clear();
 #endif
 }
+
 
 template <>
 DeviceStatus DeviceManager::initSingle<SDAQData>(QString &name, int idx)
 {
     if ( idx < sdaq.size() ) {
         actdev.removeAll(sdaq[idx]);
-        sdaq[idx]->~SimulDAQ();
+        sdaq[idx]->~DAQ();
         sdaq[idx] = new(sdaq[idx]) SimulDAQ(&SDAQp[idx], idx);
     } else {
         sdaq.push_back(new SimulDAQ(&SDAQp[idx], idx));
@@ -45,11 +46,18 @@ void DeviceManager::remove<SDAQData>(int idx)
 }
 
 template <>
+QVector<DAQ *> DeviceManager::get<SDAQData>()
+{
+    return sdaq;
+}
+
+
+template <>
 DeviceStatus DeviceManager::initSingle<DigiDataData>(QString &name, int idx)
 {
     if ( idx < dd1200.size() ) {
         actdev.removeAll(dd1200[idx]);
-        dd1200[idx]->~DigiData();
+        dd1200[idx]->~DAQ();
         dd1200[idx] = new(dd1200[idx]) DigiData(&DigiDatap[idx], idx);
     } else {
         dd1200.push_back(new DigiData(&DigiDatap[idx], idx));
@@ -65,13 +73,20 @@ void DeviceManager::remove<DigiDataData>(int idx)
     dd1200.remove(idx);
 }
 
+template <>
+QVector<DAQ *> DeviceManager::get<DigiDataData>()
+{
+    return dd1200;
+}
+
+
 #ifdef NATIONAL_INSTRUMENTS
 template <>
 DeviceStatus DeviceManager::initSingle<NIDAQData>(QString &name, int idx)
 {
     if ( idx < nidaq.size() ) {
         actdev.removeAll(nidaq[idx]);
-        nidaq[idx]->~NIDAQ();
+        nidaq[idx]->~DAQ();
         nidaq[idx] = new(nidaq[idx]) NIDAQ(&NIDAQp[idx], idx);
     } else {
         nidaq.push_back(new NIDAQ(&NIDAQp[idx], idx));
@@ -85,6 +100,12 @@ void DeviceManager::remove<NIDAQData>(int idx)
     actdev.removeAll(nidaq[idx]);
     delete nidaq[idx];
     nidaq.remove(idx);
+}
+
+template <>
+QVector<DAQ *> DeviceManager::get<NIDAQData>()
+{
+    return nidaq;
 }
 #endif
 
