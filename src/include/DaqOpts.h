@@ -24,6 +24,9 @@ public:
     virtual DaqWidget *widget() = 0;
     virtual void regenerateWidget() = 0;
 
+signals:
+    void removedModel(ChannelIndex);
+
 protected slots:
     virtual void activeChanged() = 0;
 };
@@ -42,6 +45,7 @@ public:
             params->resize(idx+1);
             (*params)[idx].active = false;
         }
+        (*params)[idx].removed = false;
 
         QString name;
         QFuture<DeviceStatus> future;
@@ -74,6 +78,8 @@ public:
             _widget->statusChanged(future.result());
         } else {
             connect(dlg, SIGNAL(modelStatusChanged()), parent, SLOT(updateStartButton()));
+            connect(this, SIGNAL(removedModel(ChannelIndex)), parent, SIGNAL(modelRemoved(ChannelIndex)));
+            static_cast<MyMainWindow*>(parent)->channelsChanged();
         }
     }
 
@@ -82,11 +88,7 @@ public:
         delete dlg;
     }
 
-    void removeDevice(int idx)
-    {
-        if ( DaqDlg::isDAQ::value )
-            Devices.remove(idx, params);
-    }
+    inline void removeDevice(int idx) { _removeDevice(idx); }
 
     void importData()
     {
@@ -132,6 +134,30 @@ public:
     DaqDlg *dlg;
     int idx;
     DaqWidget *_widget;
+
+private:
+    template <typename... DoNotSpecify, typename T = DaqDlg>
+    typename std::enable_if<T::isDAQ::value>::type _removeDevice(int idx)
+    {
+        static_assert(sizeof...(DoNotSpecify)==0, "Do not specify template arguments!");
+        Devices.remove(idx, params);
+    }
+
+    template <typename... DoNotSpecify, typename T = DaqDlg>
+    typename std::enable_if<!T::isDAQ::value>::type _removeDevice(int idx)
+    {
+        static_assert(sizeof...(DoNotSpecify)==0, "Do not specify template arguments!");
+        typename DaqDlg::param_type del = (*params)[idx];
+        params->erase(params->begin() + idx);
+        del.removed = true;
+        params->push_back(del);
+        ChannelIndex dex;
+        dex.isValid = true;
+        dex.isPrototype = true;
+        dex.modelClass = DaqDlg::param_type::modelClass;
+        dex.modelID = idx;
+        emit removedModel(dex);
+    }
 };
 
 #endif // DAQOPTS_H

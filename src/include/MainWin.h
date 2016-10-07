@@ -54,6 +54,7 @@ class MyMainWindow : public QMainWindow
 
   signals:
      void channelsChanged();
+     void modelRemoved(ChannelIndex);
                  
   private slots:
      void SGMethodChanged();

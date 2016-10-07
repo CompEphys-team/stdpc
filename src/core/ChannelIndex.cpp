@@ -101,7 +101,15 @@ QString ChannelIndex::prettyName() const
         case DAQClass::NI :     ret += "NI";               break;
         }
         ret += QString(", device %1").arg(devID);
-    } else ret = "NYI";
+    } else if ( isPrototype || isVirtual ) {
+        if ( isPrototype )
+            ret = QString("%2 %1:all (model %1, all instances)").arg(modelID);
+        else
+            ret = QString("%3 %1:%2 (model %1, instance %2)").arg(modelID).arg(instID);
+        switch ( modelClass ) {
+        case ModelClass::HH : ret = ret.arg("HH"); break;
+        }
+    } else ret = "Oops: Invalid channel index";
     return ret;
 }
 

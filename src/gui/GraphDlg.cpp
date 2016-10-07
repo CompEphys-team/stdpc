@@ -52,6 +52,7 @@ GraphDlg::GraphDlg(int no, QWidget *parent)
    outChnNo= 0;
 
    connect(parent, SIGNAL(channelsChanged()), clm, SLOT(updateChns()));
+   connect(parent, SIGNAL(modelRemoved(ChannelIndex)), clm, SLOT(updateChns(ChannelIndex)));
 }
 
 void GraphDlg::exportData(graphData &p)

@@ -7,14 +7,15 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
     : QAbstractListModel(parent),
       displayFlags(displayFlags),
       size(0),
-      hSimul(DAQHelper<SDAQData>(DAQClass::Simul, this)),
-      hDD1200(DAQHelper<DigiDataData>(DAQClass::DD1200, this)),
+      hSimul(DAQHelper<SDAQData>(this)),
+      hDD1200(DAQHelper<DigiDataData>(this)),
 #ifdef NATIONAL_INSTRUMENTS
-      hNI(DAQHelper<NIDAQData>(DAQClass::NI, this)),
+      hNI(DAQHelper<NIDAQData>(this)),
 #endif
-      nPHH(0)
+      hHH(ModelHelper<HHNeuronData>(&HHNeuronp, this))
 {
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
+    // Owner connects model removals
 }
 
 void ChannelListModel::updateCount(ChannelListModel *from)
@@ -30,11 +31,8 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         hNI.nAI = from->hNI.nAI;
         hNI.nAO = from->hNI.nAO;
 #endif
-
-        nPHH = from->nPHH;
-        nVHH = from->nVHH;
+        hHH.nInst = from->hHH.nInst;
     } else {
-        int s;
         size = 0;
         if ( displayFlags & Blank )
             size++;
@@ -42,18 +40,9 @@ void ChannelListModel::updateCount(ChannelListModel *from)
             size++;
         if ( displayFlags & SpikeGen )
             size++;
-        if ( displayFlags & Prototype ) {
-            nPHH = HHNeuronp.size();
-            size += nPHH;
-        }
-        if ( displayFlags & Virtual ) {
-            nVHH.clear();
-            for ( HHNeuronData &model : HHNeuronp ) {
-                s = model.inst.size();
-                nVHH.push_back(s);
-                size += s;
-            }
-        }
+
+        hHH.updateCount();
+
         hSimul.updateCount();
         hDD1200.updateCount();
 #ifdef NATIONAL_INSTRUMENTS
@@ -83,6 +72,29 @@ void ChannelListModel::DAQHelper<T>::updateCount()
     }
 }
 
+template <typename T>
+void ChannelListModel::ModelHelper<T>::updateCount()
+{
+    int s = 0;
+    for ( T const& p : *params ) // Don't include removed models.
+        if ( !p.removed )        // They're at the end of the vector, but let's not be complicated.
+            s++;
+    nInst.resize(s);
+    if ( parent->displayFlags & Prototype ) {
+        parent->size += nInst.size();
+    }
+    if ( parent->displayFlags & Virtual ) {
+        int i = 0;
+        for ( T const& p: *params ) {
+            if ( !p.removed ) {
+                s = p.inst.size();
+                nInst[i++] = s;
+                parent->size += s;
+            }
+        }
+    }
+}
+
 void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 {
     rmDevDex = removeDeviceDex;
@@ -94,25 +106,9 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
     newM.updateCount();
 
     // Ignore always-unchanged Blank, None, SpikeGen
-    if ( displayFlags & Prototype ) {
-        dex.isPrototype = true;
-        dex.modelClass = ModelClass::HH;
-        for ( dex.modelID = 0; dex.modelID < nPHH; dex.modelID++ ) {
-            currentIdx.append(index(dex, Prototype));
-            newIdx.append(createIndex(newM.index(dex, Prototype).row(), 0));
-        }
-    }
-    dex = blank;
-    if ( displayFlags & Virtual ) {
-        dex.isVirtual = true;
-        dex.modelClass = ModelClass::HH;
-        for ( dex.modelID = 0; dex.modelID < nVHH.size(); dex.modelID++ ) {
-            for ( dex.instID = 0; dex.instID < nVHH[dex.modelID]; dex.instID++ ) {
-                currentIdx.append(index(dex, Virtual));
-                newIdx.append(createIndex(newM.index(dex, Virtual).row(), 0));
-            }
-        }
-    }
+
+    hHH.updateChns(currentIdx, newIdx, newM);
+
     hSimul.updateChns(currentIdx, newIdx, newM);
     hDD1200.updateChns(currentIdx, newIdx, newM);
 #ifdef NATIONAL_INSTRUMENTS
@@ -136,9 +132,11 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
     if ( parent->displayFlags & AnalogIn ) {
         dex.isAnalog = true;
         dex.isInChn = true;
-        dex.daqClass = daqClass;
+        dex.daqClass = T::daqClass;
         for ( dex.devID = 0; dex.devID < nAI.size(); dex.devID++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==dex.devID;
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
+                    && parent->rmDevDex.daqClass == T::daqClass
+                    && parent->rmDevDex.devID == dex.devID;
             for ( dex.chanID = 0; dex.chanID < nAI[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogIn));
                 if ( mvDev ) {
@@ -158,9 +156,11 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
     if ( parent->displayFlags & AnalogOut ) {
         dex.isAnalog = true;
         dex.isInChn = false;
-        dex.daqClass = daqClass;
+        dex.daqClass = T::daqClass;
         for ( dex.devID = 0; dex.devID < nAO.size(); dex.devID++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==dex.devID;
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
+                    && parent->rmDevDex.daqClass == T::daqClass
+                    && parent->rmDevDex.devID == dex.devID;
             for ( dex.chanID = 0; dex.chanID < nAO[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogOut));
                 if ( mvDev ) {
@@ -172,6 +172,56 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
                 }
             }
             if ( mvDev )
+                mvOffset = 1;
+        }
+    }
+}
+
+template <typename T>
+void ChannelListModel::ModelHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
+{
+    ChannelIndex dex, blank;
+    bool rmModel;
+    int mvOffset = 0;
+    blank.isValid = true;
+    blank.modelClass = T::modelClass;
+    dex = blank;
+    if ( parent->displayFlags & Prototype ) {
+        dex.isPrototype = true;
+        for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
+            currentIdx.append(parent->index(dex, Prototype));
+            if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
+                 && parent->rmDevDex.modelClass == T::modelClass
+                 && parent->rmDevDex.modelID == dex.modelID ) {
+                newIdx.append(QModelIndex());
+                mvOffset = 1;
+            } else {
+                dex.modelID -= mvOffset;
+                newIdx.append(parent->createIndex(newM.index(dex, Prototype).row(), 0));
+                dex.modelID += mvOffset;
+            }
+        }
+    }
+
+    mvOffset = 0;
+    dex = blank;
+    if ( parent->displayFlags & Virtual ) {
+        dex.isVirtual = true;
+        for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
+            rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
+                    && parent->rmDevDex.modelClass == T::modelClass
+                    && parent->rmDevDex.modelID == dex.modelID;
+            for ( dex.instID = 0; dex.instID < nInst[dex.modelID]; dex.instID++ ) {
+                currentIdx.append(parent->index(dex, Virtual));
+                if ( rmModel ) {
+                    newIdx.append(QModelIndex());
+                } else {
+                    dex.modelID -= mvOffset;
+                    newIdx.append(parent->createIndex(newM.index(dex, Virtual).row(), 0));
+                    dex.modelID += mvOffset;
+                }
+            }
+            if ( rmModel )
                 mvOffset = 1;
         }
     }
@@ -232,37 +282,8 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         }
         offset++;
     }
-    if ( displayFlags & Prototype ) {
-        if ( row-offset < nPHH ) {
-            dex.isPrototype = true;
-            dex.modelClass = ModelClass::HH;
-            dex.modelID = row-offset;
-            ret.setValue(dex);
-            switch ( role ) {
-            case Qt::DisplayRole:   return QString("HH %1:all (model %1, all instances)").arg(row-offset);
-            case Qt::UserRole:      return ret;
-            case Qt::UserRole + 1:  return QVariant(HHNeuronp[row-offset].active);
-            }
-        }
-        offset += nPHH;
-    }
-    if ( displayFlags & Virtual ) {
-        for ( int i = 0; i < nVHH.size(); i++ ) {
-            if ( row-offset < nVHH[i] ) {
-                dex.isVirtual = true;
-                dex.modelClass = ModelClass::HH;
-                dex.modelID = i;
-                dex.instID = row-offset;
-                ret.setValue(dex);
-                switch ( role ) {
-                case Qt::DisplayRole:   return QString("HH %1:%2 (model %1, instance %2)").arg(i).arg(row-offset);
-                case Qt::UserRole:      return ret;
-                case Qt::UserRole + 1:  return HHNeuronp[i].active && HHNeuronp[i].inst[row-offset].active;
-                }
-            }
-            offset += nVHH[i];
-        }
-    }
+    if ( hHH.data(row, role, offset, ret) )
+        return ret;
     if ( hSimul.data(row, role, offset, ret) )
         return ret;
     if ( hDD1200.data(row, role, offset, ret) )
@@ -285,24 +306,32 @@ template <typename T>
 bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
 {
     ChannelIndex dex;
-    bool mvDev;
+    bool rmDev;
     int mvOffset = 0;
     dex.isValid = true;
     dex.isAnalog = true;
-    dex.daqClass = daqClass;
+    dex.daqClass = T::daqClass;
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==i;
-            i -= mvOffset;
-            if ( row-offset < nAI[i] ) {
-                if ( mvDev ) {
+            // parent->rmDevDex comes through parent->updateChns(rmDevDex), called when a device is removed.
+            // During the update process, data(...) is called while ChannelListModel internals and the caller
+            // (i.e. the dropdown's ListView) are stale, but the outside world (i.e. Devices, params) has already changed.
+            // Thus, we need to adjust indexing for calls to the outside world, omitting the rmDevDex device and shifting
+            // its later siblings down into its space.
+            // Correctness of data returned probably isn't too important, as this occurs /before/ the model is
+            // fully updated, but let's give it the new values anyway, just in case it sticks.
+            rmDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
+                    && parent->rmDevDex.daqClass == T::daqClass
+                    && parent->rmDevDex.devID == i;
+            if ( row-offset < nAI[i] ) { // Caller and internal: Stale index
+                if ( rmDev ) { // Stale caller meets removed device: Return rubbish
                     ret = QVariant();
                     return true;
                 }
-                DAQData *p = Devices.get<T>()[i]->params();
-                dex.devID = i;
+                dex.devID = i - mvOffset; // Display value: Adjusted index
                 dex.isInChn = true;
                 dex.chanID = row - offset;
+                DAQData *p = Devices.get<T>()[dex.devID]->params(); // Outside world: Adjusted index
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                         return true;
                 case Qt::UserRole:      ret.setValue(dex);                              return true;
@@ -310,8 +339,7 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                 }
             }
             offset += nAI[i];
-            i += mvOffset;
-            if ( mvDev )
+            if ( rmDev ) // Stale caller meets moved device(s): Adjust external indices accordingly
                 mvOffset = 1;
         }
     }
@@ -319,15 +347,16 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
         for ( int i = 0; i < nAO.size(); i++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==i;
-            i -= mvOffset;
+            rmDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
+                    && parent->rmDevDex.daqClass == T::daqClass
+                    && parent->rmDevDex.devID == i;
             if ( row-offset < nAO[i] ) {
-                if ( mvDev ) {
+                if ( rmDev ) {
                     ret = QVariant();
                     return true;
                 }
-                DAQData *p = Devices.get<T>()[i]->params();
-                dex.devID = i;
+                DAQData *p = Devices.get<T>()[i - mvOffset]->params();
+                dex.devID = i - mvOffset;
                 dex.isInChn = false;
                 dex.chanID = row - offset;
                 switch ( role ) {
@@ -337,8 +366,67 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                 }
             }
             offset += nAO[i];
-            i += mvOffset;
-            if ( mvDev )
+            if ( rmDev )
+                mvOffset = 1;
+        }
+    }
+    return false;
+}
+
+template <typename T>
+bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
+{
+    ChannelIndex dex, blank;
+    blank.isValid = true;
+    blank.modelClass = T::modelClass;
+    dex = blank;
+    int mvOffset = 0;
+    if ( parent->displayFlags & Prototype ) {
+        if ( row-offset < nInst.size() ) {
+            if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype && parent->rmDevDex.modelClass == T::modelClass ) {
+                if ( parent->rmDevDex.modelID == row-offset ) {
+                    ret = QVariant();
+                    return true;
+                } else if ( parent->rmDevDex.modelID < row-offset ) {
+                    mvOffset = 1;
+                }
+            }
+            dex.isPrototype = true;
+            dex.modelID = row - offset - mvOffset;
+            switch ( role ) {
+            case Qt::DisplayRole:   ret = dex.prettyName();              return true;
+            case Qt::UserRole:      ret.setValue(dex);                   return true;
+            case Qt::UserRole + 1:  ret = (*params)[dex.modelID].active; return true;
+            }
+        }
+        offset += nInst.size();
+    }
+
+    bool rmModel;
+    mvOffset = 0;
+    dex = blank;
+    if ( parent->displayFlags & Virtual ) {
+        for ( int i = 0; i < nInst.size(); i++ ) {
+            rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
+                    && parent->rmDevDex.modelClass == T::modelClass
+                    && parent->rmDevDex.modelID == i;
+            if ( row-offset < nInst[i] ) {
+                if ( rmModel ) {
+                    ret = QVariant();
+                    return true;
+                }
+                dex.isVirtual = true;
+                dex.modelID = i - mvOffset;
+                dex.instID = row-offset;
+                T *p = &(*params)[dex.modelID];
+                switch ( role ) {
+                case Qt::DisplayRole:   ret = dex.prettyName();                        return true;
+                case Qt::UserRole:      ret.setValue(dex);                             return true;
+                case Qt::UserRole + 1:  ret = p->active && p->inst[dex.instID].active; return true;
+                }
+            }
+            offset += nInst[i];
+            if ( rmModel )
                 mvOffset = 1;
         }
     }
@@ -391,27 +479,9 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
             }
             row++;
         }
-        if ( displayFlags & Prototype ) {
-            if ( type & Prototype && dex.modelClass == ModelClass::HH ) {
-                if ( dex.modelID >= 0 && dex.modelID < nPHH )
-                    return createIndex(row + dex.modelID, 0);
-                else
-                    return QModelIndex();
-            }
-            row += nPHH;
-        }
-        if ( displayFlags & Virtual ) {
-            for ( int i = 0; i < nVHH.size(); i++ ) {
-                if ( type & Virtual && dex.modelClass == ModelClass::HH && dex.modelID == i ) {
-                    if ( dex.instID >= 0 && dex.instID < nVHH[i] )
-                        return createIndex(row + dex.instID, 0);
-                    else
-                        return QModelIndex();
-                }
-                row += nVHH[i];
-            }
-        }
         QModelIndex ret;
+        if ( hHH.index(dex, type, row, ret) )
+            return ret;
         if ( hSimul.index(dex, type, row, ret) )
             return ret;
         if ( hDD1200.index(dex, type, row, ret) )
@@ -429,7 +499,7 @@ bool ChannelListModel::DAQHelper<T>::index(const ChannelIndex &dex, ChannelType 
 {
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
-            if ( type & AnalogIn && dex.daqClass == daqClass && dex.devID == i ) {
+            if ( type & AnalogIn && dex.daqClass == T::daqClass && dex.devID == i ) {
                 if ( dex.chanID >= 0 && dex.chanID < nAI[i] )
                     ret = parent->createIndex(dex.chanID + offset, 0);
                 return true;
@@ -439,12 +509,36 @@ bool ChannelListModel::DAQHelper<T>::index(const ChannelIndex &dex, ChannelType 
     }
     if ( parent->displayFlags & AnalogOut ) {
         for ( int i = 0; i < nAO.size(); i++ ) {
-            if ( type & AnalogOut && dex.daqClass == daqClass && dex.devID == i ) {
+            if ( type & AnalogOut && dex.daqClass == T::daqClass && dex.devID == i ) {
                 if ( dex.chanID >= 0 && dex.chanID < nAO[i] )
                     ret = parent->createIndex(dex.chanID + offset, 0);
                 return true;
             }
             offset += nAO[i];
+        }
+    }
+    return false;
+}
+
+template <typename T>
+bool ChannelListModel::ModelHelper<T>::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
+{
+    if ( parent->displayFlags & Prototype ) {
+        if ( type & Prototype && dex.modelClass == T::modelClass ) {
+            if ( dex.modelID >= 0 && dex.modelID < nInst.size() )
+                ret = parent->createIndex(dex.modelID + offset, 0);
+            return true;
+        }
+        offset += nInst.size();
+    }
+    if ( parent->displayFlags & Virtual ) {
+        for ( int i = 0; i < nInst.size(); i++ ) {
+            if ( type & Virtual && dex.modelClass == T::modelClass && dex.modelID == i ) {
+                if ( dex.instID >= 0 && dex.instID < nInst[i] )
+                    ret = parent->createIndex(dex.instID + offset, 0);
+                return true;
+            }
+            offset += nInst[i];
         }
     }
     return false;

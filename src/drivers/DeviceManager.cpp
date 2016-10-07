@@ -49,7 +49,7 @@ void DeviceManager::remove(int idx, std::vector<param_type> *params)
         swap((*params)[i-1], (*params)[i]);
     for ( int i = idx; i < vec.size(); i++ )
         vec[idx]->devID = i;
-    emit removedDevice(getDex(param_type::DaqClass, idx));
+    emit removedDevice(getDex(param_type::daqClass, idx));
 }
 
 template <>

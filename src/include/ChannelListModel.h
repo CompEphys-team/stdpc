@@ -45,15 +45,28 @@ protected:
     template <typename T>
     class DAQHelper {
     private:
-        const DAQClass daqClass;
         ChannelListModel *const parent;
     public:
-        DAQHelper(DAQClass c, ChannelListModel *parent) : daqClass(c), parent(parent), nAI(0), nAO(0) {}
+        DAQHelper(ChannelListModel *parent) : parent(parent), nAI(0), nAO(0) {}
         void updateCount();
         void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
         bool data(int row, int role, int &offset, QVariant &ret) const;
         bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
         QVector<int> nAI, nAO;
+    };
+
+    template <typename T>
+    class ModelHelper {
+    private:
+        ChannelListModel *const parent;
+        std::vector<T> *params;
+    public:
+        ModelHelper(std::vector<T> *params, ChannelListModel *parent) : parent(parent), params(params), nInst(0) {}
+        void updateCount();
+        void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
+        bool data(int row, int role, int &offset, QVariant &ret) const;
+        bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
+        QVector<int> nInst;
     };
 
     const int displayFlags;
@@ -63,8 +76,9 @@ protected:
 #ifdef NATIONAL_INSTRUMENTS
     DAQHelper<NIDAQData> hNI;
 #endif
-    int nPHH;
-    QVector<int> nVHH;
+    ModelHelper<HHNeuronData> hHH;
+//    int nPHH;
+//    QVector<int> nVHH;
 
     ChannelIndex rmDevDex;
 };

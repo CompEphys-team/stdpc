@@ -84,6 +84,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), SGbdChannelModel, SLOT(updateChns()));
+     connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
+     connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
+     connect(this, SIGNAL(modelRemoved(ChannelIndex)), SGbdChannelModel, SLOT(updateChns(ChannelIndex)));
      
      connect(ui->Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
      connect(ui->Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));

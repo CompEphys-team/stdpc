@@ -280,6 +280,8 @@ public:
     std::vector<inChnData> inChn;
     std::vector<outChnData> outChn;
     DAQData() : active(false) {}
+
+    bool removed; // Dummy (for now)
 };
 
 class SimulDAQ;
@@ -303,7 +305,7 @@ class SDAQData : public DAQData {
 
     typedef SimulDAQ DaqType;
     typedef SimulDAQDlg DlgType;
-    static constexpr DAQClass DaqClass = DAQClass::Simul;
+    static constexpr DAQClass daqClass = DAQClass::Simul;
 };
 
 class DigiData;
@@ -319,7 +321,7 @@ class DigiDataData : public DAQData {
 
     typedef DigiData DaqType;
     typedef DigiDataDlg DlgType;
-    static constexpr DAQClass DaqClass = DAQClass::DD1200;
+    static constexpr DAQClass daqClass = DAQClass::DD1200;
 };
 
 #ifdef NATIONAL_INSTRUMENTS
@@ -332,7 +334,7 @@ class NIDAQData : public DAQData {
 
     typedef NIDAQ DaqType;
     typedef NIDAQDlg DlgType;
-    static constexpr DAQClass DaqClass = DAQClass::NI;
+    static constexpr DAQClass daqClass = DAQClass::NI;
 };
 #endif
 
@@ -361,13 +363,23 @@ struct vInstData {
     outChnData outChn;
 };
 
-struct HHNeuronData {
+struct ModelData {
     bool active;
+    std::vector<vInstData> inst;
+    ModelData() : active(false), removed(false) {}
+
+    bool removed; // Internal use only (set to true when reversibly deleted in the GUI)
+};
+
+class HHModelDlg;
+struct HHNeuronData : public ModelData {
     double C;
     double gLeak;
     double ELeak;
-    std::vector<vInstData> inst;
     HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
+
+    typedef HHModelDlg DlgType;
+    static constexpr ModelClass modelClass = ModelClass::HH;
 };
 
 #endif
