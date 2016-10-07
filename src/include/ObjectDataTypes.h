@@ -282,6 +282,8 @@ public:
     DAQData() : active(false) {}
 };
 
+class SimulDAQ;
+class SimulDAQDlg;
 class SDAQData : public DAQData {
   public:
     QString inFileName;
@@ -298,8 +300,14 @@ class SDAQData : public DAQData {
         outChn.resize(1);
         inChn[0].active = inChn[1].active = outChn[0].active = true;
     }
+
+    typedef SimulDAQ DaqType;
+    typedef SimulDAQDlg DlgType;
+    static constexpr DAQClass DaqClass = DAQClass::Simul;
 };
 
+class DigiData;
+class DigiDataDlg;
 class DigiDataData : public DAQData {
   public:
     short int baseAddress;
@@ -308,13 +316,23 @@ class DigiDataData : public DAQData {
         baseAddress(0x320),
         syncIOMask(0x0000)
     {}
+
+    typedef DigiData DaqType;
+    typedef DigiDataDlg DlgType;
+    static constexpr DAQClass DaqClass = DAQClass::DD1200;
 };
 
 #ifdef NATIONAL_INSTRUMENTS
+class NIDAQ;
+class NIDAQDlg;
 class NIDAQData : public DAQData {
   public:
     QString deviceName;
     NIDAQData() : DAQData(), deviceName("Dev1") {}
+
+    typedef NIDAQ DaqType;
+    typedef NIDAQDlg DlgType;
+    static constexpr DAQClass DaqClass = DAQClass::NI;
 };
 #endif
 

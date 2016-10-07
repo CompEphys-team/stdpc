@@ -21,17 +21,19 @@ public:
     QVector<QPair<DeviceStatus, QString>> init();
 
     template <typename param_type>
-    DeviceStatus initSingle(QString &name, int idx);
+    DeviceStatus initSingle(QString &name, int idx, std::vector<param_type> *params);
 
+    /// Remove a device from active use, freeing its space and moving up all subsequent devices of the same type.
+    /// In the interest of undoability, the corresponding parameters are moved to the end of the param vector.
     template <typename param_type>
-    void remove(int idx);
+    void remove(int idx, std::vector<param_type> *params);
 
     DAQ *getDevice(ChannelIndex const&);
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);
 
     template <typename param_type>
-    QVector<DAQ *> get();
+    QVector<DAQ *> &get();
 
     QVector<DAQ *> actdev;
 

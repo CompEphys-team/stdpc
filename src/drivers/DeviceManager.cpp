@@ -23,108 +23,50 @@ void DeviceManager::clear()
 #endif
 }
 
-
-template <>
-DeviceStatus DeviceManager::initSingle<SDAQData>(QString &name, int idx)
+template <typename param_type>
+DeviceStatus DeviceManager::initSingle(QString &name, int idx, std::vector<param_type> *params)
 {
-    if ( idx < sdaq.size() ) {
-        actdev.removeAll(sdaq[idx]);
-        sdaq[idx]->~DAQ();
-        sdaq[idx] = new(sdaq[idx]) SimulDAQ(idx);
+    QVector<DAQ*> &vec = get<param_type>();
+    if ( idx < vec.size() ) {
+        actdev.removeAll(vec[idx]);
+        vec[idx]->~DAQ();
+        vec[idx] = new(vec[idx]) typename param_type::DaqType(idx);
     } else {
-        sdaq.push_back(new SimulDAQ(idx));
+        vec.push_back(new typename param_type::DaqType(idx));
     }
-    return _initSingle(sdaq[idx], SDAQp[idx].active, name);
+    return _initSingle(vec[idx], (*params)[idx].active, name);
 }
 
-template <>
-void DeviceManager::remove<SDAQData>(int idx)
+template <typename param_type>
+void DeviceManager::remove(int idx, std::vector<param_type> *params)
 {
-    actdev.removeAll(sdaq[idx]);
-    delete sdaq[idx];
-    sdaq.remove(idx);
+    QVector<DAQ*> &vec = get<param_type>();
+    actdev.removeAll(vec[idx]);
+    delete vec[idx];
+    vec.remove(idx);
     using std::swap;
-    for ( int i = idx+1; i < (int)SDAQp.size(); i++ )
-        swap(SDAQp[i-1], SDAQp[i]);
-    for ( int i = idx; i < sdaq.size(); i++ )
-        sdaq[idx]->devID = i;
-    emit removedDevice(getDex(DAQClass::Simul, idx));
+    for ( int i = idx+1; i < (int)params->size(); i++ )
+        swap((*params)[i-1], (*params)[i]);
+    for ( int i = idx; i < vec.size(); i++ )
+        vec[idx]->devID = i;
+    emit removedDevice(getDex(param_type::DaqClass, idx));
 }
 
 template <>
-QVector<DAQ *> DeviceManager::get<SDAQData>()
-{
-    return sdaq;
-}
-
+QVector<DAQ *> &DeviceManager::get<SDAQData>() { return sdaq; }
+template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<SDAQData>*);
+template void DeviceManager::remove(int,std::vector<SDAQData>*);
 
 template <>
-DeviceStatus DeviceManager::initSingle<DigiDataData>(QString &name, int idx)
-{
-    if ( idx < dd1200.size() ) {
-        actdev.removeAll(dd1200[idx]);
-        dd1200[idx]->~DAQ();
-        dd1200[idx] = new(dd1200[idx]) DigiData(idx);
-    } else {
-        dd1200.push_back(new DigiData(idx));
-    }
-    return _initSingle(dd1200[idx], DigiDatap[idx].active, name);
-}
-
-template <>
-void DeviceManager::remove<DigiDataData>(int idx)
-{
-    actdev.removeAll(dd1200[idx]);
-    delete dd1200[idx];
-    dd1200.remove(idx);
-    using std::swap;
-    for ( int i = idx+1; i < (int)DigiDatap.size(); i++ )
-        swap(DigiDatap[i-1], DigiDatap[i]);
-    for ( int i = idx; i < dd1200.size(); i++ )
-        dd1200[idx]->devID = i;
-    emit removedDevice(getDex(DAQClass::DD1200, idx));
-}
-
-template <>
-QVector<DAQ *> DeviceManager::get<DigiDataData>()
-{
-    return dd1200;
-}
-
+QVector<DAQ *> &DeviceManager::get<DigiDataData>() { return dd1200; }
+template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<DigiDataData>*);
+template void DeviceManager::remove(int,std::vector<DigiDataData>*);
 
 #ifdef NATIONAL_INSTRUMENTS
 template <>
-DeviceStatus DeviceManager::initSingle<NIDAQData>(QString &name, int idx)
-{
-    if ( idx < nidaq.size() ) {
-        actdev.removeAll(nidaq[idx]);
-        nidaq[idx]->~DAQ();
-        nidaq[idx] = new(nidaq[idx]) NIDAQ(idx);
-    } else {
-        nidaq.push_back(new NIDAQ(idx));
-    }
-    return _initSingle(nidaq[idx], NIDAQp[idx].active, name);
-}
-
-template <>
-void DeviceManager::remove<NIDAQData>(int idx)
-{
-    actdev.removeAll(nidaq[idx]);
-    delete nidaq[idx];
-    nidaq.remove(idx);
-    using std::swap;
-    for ( int i = idx+1; i < (int)NIDAQp.size(); i++ )
-        swap(NIDAQp[i-1], NIDAQp[i]);
-    for ( int i = idx; i < nidaq.size(); i++ )
-        nidaq[idx]->devID = i;
-    emit removedDevice(getDex(DAQClass::NI, idx));
-}
-
-template <>
-QVector<DAQ *> DeviceManager::get<NIDAQData>()
-{
-    return nidaq;
-}
+QVector<DAQ *> &DeviceManager::get<NIDAQData>() { return nidaq; }
+template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<NIDAQData>*);
+template void DeviceManager::remove(int,std::vector<NIDAQData>*);
 #endif
 
 DeviceStatus DeviceManager::_initSingle(DAQ *dev, bool active, QString &name)
@@ -153,16 +95,16 @@ QVector<QPair<DeviceStatus, QString>> DeviceManager::init()
     int r = 0;
     clear();
     for ( size_t i = 0; i < SDAQp.size(); i++ ) {
-        ret[r].first = initSingle<SDAQData>(ret[r].second, i);
+        ret[r].first = initSingle(ret[r].second, i, &SDAQp);
         ++r;
     }
     for ( size_t i = 0; i < DigiDatap.size(); i++ ) {
-        ret[r].first = initSingle<DigiDataData>(ret[r].second, i);
+        ret[r].first = initSingle(ret[r].second, i, &DigiDatap);
         ++r;
     }
 #ifdef NATIONAL_INSTRUMENTS
     for ( size_t i = 0; i < NIDAQp.size(); i++ ) {
-        ret[r].first = initSingle<NIDAQData>(ret[r].second, i);
+        ret[r].first = initSingle(ret[r].second, i, &NIDAQp);
         ++r;
     }
 #endif

@@ -73,7 +73,7 @@ void NIDAQDlg::reject()
 DeviceStatus NIDAQDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle<NIDAQData>(name, idx);
+    DeviceStatus status = Devices.initSingle(name, idx, &NIDAQp);
     emit deviceStatusChanged(status, name);
     inDlg->init(board);
     outDlg->init(board);

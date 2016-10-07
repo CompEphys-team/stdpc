@@ -81,7 +81,7 @@ void DigiDataDlg::reject()
 DeviceStatus DigiDataDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle<DigiDataData>(name, idx);
+    DeviceStatus status = Devices.initSingle(name, idx, &DigiDatap);
     emit deviceStatusChanged(status, name);
     inDlg->init(board);
     outDlg->init(board);

@@ -94,7 +94,7 @@ void SimulDAQDlg::reject()
 DeviceStatus SimulDAQDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle<SDAQData>(name, idx);
+    DeviceStatus status = Devices.initSingle(name, idx, &SDAQp);
     emit deviceStatusChanged(status, name);
     inDlg->init(board);
     outDlg->init(board);
