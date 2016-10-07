@@ -43,6 +43,11 @@ void DeviceManager::remove<SDAQData>(int idx)
     actdev.removeAll(sdaq[idx]);
     delete sdaq[idx];
     sdaq.remove(idx);
+    using std::swap;
+    for ( int i = idx+1; i < (int)SDAQp.size(); i++ )
+        swap(SDAQp[i-1], SDAQp[i]);
+    for ( int i = idx; i < sdaq.size(); i++ )
+        sdaq[idx]->devID = i;
     emit removedDevice(getDex(DAQClass::Simul, idx));
 }
 
@@ -72,6 +77,11 @@ void DeviceManager::remove<DigiDataData>(int idx)
     actdev.removeAll(dd1200[idx]);
     delete dd1200[idx];
     dd1200.remove(idx);
+    using std::swap;
+    for ( int i = idx+1; i < (int)DigiDatap.size(); i++ )
+        swap(DigiDatap[i-1], DigiDatap[i]);
+    for ( int i = idx; i < dd1200.size(); i++ )
+        dd1200[idx]->devID = i;
     emit removedDevice(getDex(DAQClass::DD1200, idx));
 }
 
@@ -102,6 +112,11 @@ void DeviceManager::remove<NIDAQData>(int idx)
     actdev.removeAll(nidaq[idx]);
     delete nidaq[idx];
     nidaq.remove(idx);
+    using std::swap;
+    for ( int i = idx+1; i < (int)NIDAQp.size(); i++ )
+        swap(NIDAQp[i-1], NIDAQp[i]);
+    for ( int i = idx; i < nidaq.size(); i++ )
+        nidaq[idx]->devID = i;
     emit removedDevice(getDex(DAQClass::NI, idx));
 }
 
