@@ -1,6 +1,7 @@
 #ifndef DEVICEMANAGER_H
 #define DEVICEMANAGER_H
 
+#include <QObject>
 #include <QVector>
 #include "SimulDAQ.h"
 #include "DigiData.h"
@@ -10,8 +11,9 @@
 
 enum class DeviceStatus { Active, Inactive, Failed };
 
-class DeviceManager
+class DeviceManager : public QObject
 {
+    Q_OBJECT
 public:
     DeviceManager() {}
     ~DeviceManager();
@@ -33,9 +35,13 @@ public:
 
     QVector<DAQ *> actdev;
 
+signals:
+    void removedDevice(ChannelIndex dex);
+
 private:
     DeviceStatus _initSingle(DAQ *dev, bool active, QString &name);
     void clear();
+    ChannelIndex getDex(DAQClass type, int idx);
 
     QVector<DAQ*> sdaq;
     QVector<DAQ*> dd1200;

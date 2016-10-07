@@ -37,7 +37,7 @@ public:
     QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
 
 public slots:
-    void updateChns();
+    void updateChns(ChannelIndex removeDeviceDex = ChannelIndex());
 
 protected:
     void updateCount(ChannelListModel *from = nullptr);
@@ -65,6 +65,8 @@ protected:
 #endif
     int nPHH;
     QVector<int> nVHH;
+
+    ChannelIndex rmDevDex;
 };
 
 #endif // CHANNELLISTMODEL_H

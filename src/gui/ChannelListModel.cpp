@@ -14,6 +14,7 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
 #endif
       nPHH(0)
 {
+    connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
 }
 
 void ChannelListModel::updateCount(ChannelListModel *from)
@@ -82,8 +83,9 @@ void ChannelListModel::DAQHelper<T>::updateCount()
     }
 }
 
-void ChannelListModel::updateChns()
+void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 {
+    rmDevDex = removeDeviceDex;
     ChannelIndex dex, blank;
     blank.isValid = true;
     dex = blank;
@@ -119,6 +121,7 @@ void ChannelListModel::updateChns()
 
     emit layoutAboutToBeChanged();
     updateCount(&newM);
+    rmDevDex = ChannelIndex();
     changePersistentIndexList(currentIdx, newIdx);
     emit layoutChanged();
 }
@@ -127,27 +130,49 @@ template <typename T>
 void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
 {
     ChannelIndex dex;
+    bool mvDev;
+    int mvOffset = 0;
     dex.isValid = true;
     if ( parent->displayFlags & AnalogIn ) {
         dex.isAnalog = true;
         dex.isInChn = true;
         dex.daqClass = daqClass;
         for ( dex.devID = 0; dex.devID < nAI.size(); dex.devID++ ) {
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==dex.devID;
             for ( dex.chanID = 0; dex.chanID < nAI[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogIn));
-                newIdx.append(parent->createIndex(newM.index(dex, AnalogIn).row(), 0));
+                if ( mvDev ) {
+                    newIdx.append(QModelIndex());
+                } else {
+                    dex.devID -= mvOffset;
+                    newIdx.append(parent->createIndex(newM.index(dex, AnalogIn).row(), 0));
+                    dex.devID += mvOffset;
+                }
             }
+            if ( mvDev )
+                mvOffset = 1;
         }
     }
+
+    mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
         dex.isAnalog = true;
         dex.isInChn = false;
         dex.daqClass = daqClass;
         for ( dex.devID = 0; dex.devID < nAO.size(); dex.devID++ ) {
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==dex.devID;
             for ( dex.chanID = 0; dex.chanID < nAO[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogOut));
-                newIdx.append(parent->createIndex(newM.index(dex, AnalogOut).row(), 0));
+                if ( mvDev ) {
+                    newIdx.append(QModelIndex());
+                } else {
+                    dex.devID -= mvOffset;
+                    newIdx.append(parent->createIndex(newM.index(dex, AnalogOut).row(), 0));
+                    dex.devID += mvOffset;
+                }
             }
+            if ( mvDev )
+                mvOffset = 1;
         }
     }
 }
@@ -260,12 +285,20 @@ template <typename T>
 bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
 {
     ChannelIndex dex;
+    bool mvDev;
+    int mvOffset = 0;
     dex.isValid = true;
     dex.isAnalog = true;
     dex.daqClass = daqClass;
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==i;
+            i -= mvOffset;
             if ( row-offset < nAI[i] ) {
+                if ( mvDev ) {
+                    ret = QVariant();
+                    return true;
+                }
                 DAQData *p = Devices.get<T>()[i]->params();
                 dex.devID = i;
                 dex.isInChn = true;
@@ -277,11 +310,22 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                 }
             }
             offset += nAI[i];
+            i += mvOffset;
+            if ( mvDev )
+                mvOffset = 1;
         }
     }
+
+    mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
         for ( int i = 0; i < nAO.size(); i++ ) {
+            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.daqClass==daqClass && parent->rmDevDex.devID==i;
+            i -= mvOffset;
             if ( row-offset < nAO[i] ) {
+                if ( mvDev ) {
+                    ret = QVariant();
+                    return true;
+                }
                 DAQData *p = Devices.get<T>()[i]->params();
                 dex.devID = i;
                 dex.isInChn = false;
@@ -293,6 +337,9 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                 }
             }
             offset += nAO[i];
+            i += mvOffset;
+            if ( mvDev )
+                mvOffset = 1;
         }
     }
     return false;

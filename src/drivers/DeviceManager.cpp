@@ -43,6 +43,7 @@ void DeviceManager::remove<SDAQData>(int idx)
     actdev.removeAll(sdaq[idx]);
     delete sdaq[idx];
     sdaq.remove(idx);
+    emit removedDevice(getDex(DAQClass::Simul, idx));
 }
 
 template <>
@@ -71,6 +72,7 @@ void DeviceManager::remove<DigiDataData>(int idx)
     actdev.removeAll(dd1200[idx]);
     delete dd1200[idx];
     dd1200.remove(idx);
+    emit removedDevice(getDex(DAQClass::DD1200, idx));
 }
 
 template <>
@@ -100,6 +102,7 @@ void DeviceManager::remove<NIDAQData>(int idx)
     actdev.removeAll(nidaq[idx]);
     delete nidaq[idx];
     nidaq.remove(idx);
+    emit removedDevice(getDex(DAQClass::NI, idx));
 }
 
 template <>
@@ -223,4 +226,14 @@ outChannel *DeviceManager::getOutChan(const ChannelIndex &dex)
         }
     }
     return nullptr;
+}
+
+ChannelIndex DeviceManager::getDex(DAQClass type, int idx)
+{
+    ChannelIndex dex;
+    dex.isValid = true;
+    dex.isAnalog = true;
+    dex.daqClass = type;
+    dex.devID = idx;
+    return dex;
 }
