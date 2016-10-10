@@ -2,7 +2,6 @@
 #include <QEvent>
 #include <QAbstractItemView>
 #include <QApplication>
-#include <iostream>
 
 WideComboBox::WideComboBox(QWidget *parent) :
     QComboBox(parent)
@@ -10,10 +9,11 @@ WideComboBox::WideComboBox(QWidget *parent) :
 
 bool WideComboBox::event(QEvent *e)
 {
-    if ( e->type() == QEvent::ChildPolished ) {
+    static bool recur = false;
+    if ( !recur && e->type() == QEvent::ChildAdded ) {
+        recur = true;
         if ( !QComboBox::event(e) )
             return false;
-        Qt::TextElideMode old = view()->textElideMode();
         view()->setTextElideMode(Qt::ElideNone);
         int scroll = count() <= maxVisibleItems() ? 0 :
             QApplication::style()->pixelMetric(QStyle::PixelMetric::PM_ScrollBarExtent);
@@ -24,8 +24,8 @@ bool WideComboBox::event(QEvent *e)
             if (max < width)
                 max = width;
         }
-        view()->setMinimumWidth(scroll + max + 5);
-        view()->setTextElideMode(old);
+        view()->setMinimumWidth(scroll + max + 10);
+        recur = false;
         return true;
     }
     return QComboBox::event(e);
