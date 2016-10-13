@@ -16,8 +16,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
      DSDlg= new DataSavingDlg(this);
      SpkTDlg= new SpikeTimeDlg;
-     graphDlg[0]= new GraphDlg(0, this);
-     graphDlg[1]= new GraphDlg(1, this);
+     graphDlg = new GraphDlg(this);
 
      QVector<ComponentPrototypeBase *> prototypes;
      prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
@@ -88,8 +87,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), SGbdChannelModel, SLOT(updateChns(ChannelIndex)));
      
-     connect(ui->Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
-     connect(ui->Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
+     connect(ui->actionData_display, SIGNAL(triggered(bool)), graphDlg, SLOT(show()));
 
      connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
      connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
@@ -106,22 +104,15 @@ MyMainWindow::MyMainWindow(QWidget *parent)
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-     connect(DCT,SIGNAL(addPoint1(double, double, int)), &Graphs[0], SLOT(addPoint(double, double, int)));
-     connect(DCT,SIGNAL(addPoint2(double, double, int)), &Graphs[1], SLOT(addPoint(double, double, int)));
-     
+
      connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
-     // graphical stuff
-     ui->DataD1->setScene(&Graphs[0].Scene);
-     ui->DataD2->setScene(&Graphs[1].Scene);
-
      initAP();
      LoadConfig();
 
      DisplayMessage(QString("Main: Dynamic Clamp starting ..."));
      exportData(true);
      updateDeviceStatus();
-     for (int i= 0; i < 2; i++) Graphs[i].init(&Graphp[i]);
  } 
 
 MyMainWindow::~MyMainWindow()
@@ -287,11 +278,8 @@ void MyMainWindow::StartButClicked()
   }
   while (!DCT->finished) Sleep(100);
   exportData();
-  for (int i= 0; i < 2; i++) Graphs[i].init(&Graphp[i]);
-//      QMessageBox::warning(this, tr("My Application"),
-//                tr("init'ing outChnDlg!"),
-//                QMessageBox::Ok); 
 
+  graphDlg->startPlotting(DCT);
   DCT->start();
 }
 
@@ -310,6 +298,7 @@ void MyMainWindow::StopButClicked()
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
+  graphDlg->stopPlotting();
 }
 
 void MyMainWindow::exportData(bool ignoreDAQ)
@@ -320,8 +309,6 @@ void MyMainWindow::exportData(bool ignoreDAQ)
 
   exportSGData();
   SpkTDlg->exportData();
-  for (int i= 0; i < 2; i++) graphDlg[i]->exportData(Graphp[i]);
-
   DSDlg->exportData();
 }
  
@@ -332,9 +319,8 @@ void MyMainWindow::importData()
   ui->currentTable->importData();
   importSGData();
   SpkTDlg->importData();
-  for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
-
   DSDlg->importData();
+  graphDlg->reloadGraphs();
 }
 
 void MyMainWindow::exportSGData() 

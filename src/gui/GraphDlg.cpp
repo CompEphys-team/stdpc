@@ -1,96 +1,185 @@
-
+#include "ui_GraphDlg.h"
 #include "GraphDlg.h"
-#include <QMessageBox>
+#include <QColorDialog>
+#include "Global.h"
+#include "DCThread.h"
 
-#define MINV -100
-#define MAXV 60
-
-GraphDlg::GraphDlg(int no, QWidget *parent)
+GraphDlg::GraphDlg(QWidget *parent)
      : QDialog(parent),
-       clm(new ChannelListModel(ChannelListModel::AnalogIn
-                                | ChannelListModel::AnalogOut
-                                | ChannelListModel::None
-                                | ChannelListModel::SpikeGen
-                                | ChannelListModel::Virtual, this))
+       ui(new Ui::GraphDlg),
+       clm(ChannelListModel::AnalogIn
+         | ChannelListModel::AnalogOut
+         | ChannelListModel::SpikeGen
+         | ChannelListModel::Virtual, this),
+       color("black"),
+       dataTimer(this)
  {
-   QString lb;
-   
-   setupUi(this);
+    ui->setupUi(this);
 
-   myNo= no;
-   for (int i= 0; i < 4; i++) {
-     clrCombo[i] = new QComboBox(this);
-     clrCombo[i]->setObjectName(QString("clrCombo")+QString(i));
-     clrCombo[i]->setGeometry(QRect(370, 40+30*i, 69, 22));
-     clrCombo[i]->addItem(QString("red"));
-     clrCombo[i]->addItem(QString("green"));
-     clrCombo[i]->addItem(QString("blue"));
-     clrCombo[i]->addItem(QString("black"));
-     clrCombo[i]->setCurrentIndex(i);
-     ChannelCombo[i] = new WideComboBox(this);
-     ChannelCombo[i]->setObjectName(QString("ChannelCombo")+QString(i));
-     ChannelCombo[i]->setGeometry(QRect(40, 40+30*i, 69, 22));
-     ChannelCombo[i]->setModel(clm);
-     ChannelCombo[i]->setCurrentIndex(0);
-     MinE[i] = new QLineEdit(this);
-     MinE[i]->setObjectName(QString("MinE")+QString(i));
-     MinE[i]->setGeometry(QRect(140, 40+30*i, 48, 20));
-     lb.setNum(MINV);
-     MinE[i]->setText(lb);
-     MaxE[i] = new QLineEdit(this);
-     MaxE[i]->setObjectName(QString("MaxE")+QString(i));
-     MaxE[i]->setGeometry(QRect(210, 40+30*i, 48, 20));
-     lb.setNum(MAXV);
-     MaxE[i]->setText(lb);
-     UnitCombo[i] = new QComboBox(this);
-     UnitCombo[i]->setObjectName(QString("UnitCombo")+QString(i));
-     UnitCombo[i]->setGeometry(QRect(280, 40+30*i, 69, 22));
-     UnitCombo[i]->addItem(QString("mV"));
-     UnitCombo[i]->addItem(QString("nA"));
-   }
-   inChnNo= 0;
-   outChnNo= 0;
+    connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
+    connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
+    ui->channel->setModel(&clm);
 
-   connect(parent, SIGNAL(channelsChanged()), clm, SLOT(updateChns()));
-   connect(parent, SIGNAL(modelRemoved(ChannelIndex)), clm, SLOT(updateChns(ChannelIndex)));
+    connect(ui->colorBtn, &QToolButton::clicked, [=](){
+        color = QColorDialog::getColor(color, this, "Choose a graph color");
+        ui->colorBtn->setStyleSheet(QString("background-color: rgb(%1,%2,%3);")
+                                    .arg(color.red()).arg(color.green()).arg(color.blue()));
+    });
+    ui->colorBtn->setStyleSheet(QString("background-color: black;"));
+
+    connect(ui->channel, SIGNAL(currentIndexChanged(int)), this, SLOT(channelIndexChanged()));
+    ui->channel->setCurrentIndex(0);
+
+    connect(ui->addBtn, &QPushButton::clicked, [=](){
+        if ( ui->channel->currentIndex() >= 0 ) {
+            GraphData p;
+            p.active = true;
+            p.chan = ui->channel->currentData().value<ChannelIndex>();
+            p.isVoltage = ui->radioVoltage->isChecked();
+            p.color = color;
+            Graphp.push_back(p);
+            reloadGraphs();
+        }
+    });
+    connect(ui->clearBtn, &QPushButton::clicked, [=](){
+        Graphp.clear();
+        reloadGraphs();
+    });
+
+    ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes);
+
+    QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+    timeTicker->setTimeFormat("%s.%z");
+    ui->plot->xAxis->setTicker(timeTicker);
+    ui->plot->axisRect()->setupFullAxesBox();
+
+    ui->plot->xAxis->setLabel("Time (s)");
+    ui->plot->xAxis->setRange(0, 10);
+    ui->plot->yAxis->setLabel("Voltage (mV)");
+    ui->plot->yAxis->setRange(-100, 50);
+    ui->plot->yAxis2->setLabel("Current (nA)");
+    ui->plot->yAxis2->setRange(-100, 100);
+    ui->plot->yAxis2->setTickLabels(true);
+
+    ui->plot->legend->setVisible(true);
+    QCPLayoutGrid *subLayout = new QCPLayoutGrid;
+    ui->plot->plotLayout()->addElement(0, 1, subLayout);
+    subLayout->addElement(0, 0, new QCPLayoutElement);
+    subLayout->addElement(1, 0, ui->plot->legend);
+    subLayout->addElement(2, 0, new QCPLayoutElement);
+    subLayout->addElement(0, 1, new QCPLayoutElement);
+    ui->plot->plotLayout()->setColumnStretchFactor(1, 0.001);
+
+    connect(ui->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->plot->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->plot, &QCustomPlot::selectionChangedByUser, [=](){
+        QList<QCPAxis *> axes = ui->plot->selectedAxes();
+        if ( axes.isEmpty() )
+           axes = ui->plot->axisRect()->axes();
+        ui->plot->axisRect()->setRangeZoomAxes(axes);
+        ui->plot->axisRect()->setRangeDragAxes(axes);
+
+    });
+    ui->plot->axisRect()->setRangeZoomAxes(ui->plot->axisRect()->axes());
+    ui->plot->axisRect()->setRangeDragAxes(ui->plot->axisRect()->axes());
+
+    connect(&dataTimer, SIGNAL(timeout()), this, SLOT(replot()));
+
+    reloadGraphs();
 }
 
-void GraphDlg::exportData(graphData &p)
+void GraphDlg::channelIndexChanged()
 {
-  double yfac[2]= { 1e3, 1e9 };
-  for (int i= 0; i < 4; i++) {
-    p.color[i]= clrCombo[i]->currentText();
-    p.chn[i] = ChannelCombo[i]->currentData().value<ChannelIndex>();
-    p.active[i] = p.chn[i].isValid && !p.chn[i].isNone;
-    p.yfac[i]= yfac[UnitCombo[i]->currentIndex()];
-    p.miny[i]= MinE[i]->text().toDouble()/p.yfac[i];
-    p.maxy[i]= MaxE[i]->text().toDouble()/p.yfac[i];
-  } 
-  p.xrange= xRangeE->text().toDouble();
-  p.dt= 1.0/dtE->text().toDouble();
-  p.xtNo= xTicksE->text().toInt();
-  p.ytNo= yTicksE->text().toInt();
+    ChannelIndex sel = ui->channel->currentData().value<ChannelIndex>();
+    ui->radioCurrent->setEnabled(sel.isVirtual);
+    ui->radioVoltage->setEnabled(sel.isVirtual);
+    if ( !sel.isVirtual ) {
+        ui->radioCurrent->setChecked(!sel.isInChn && !sel.isSG);
+        ui->radioVoltage->setChecked(sel.isInChn || sel.isSG);
+    }
 }
-  
-void GraphDlg::importData(graphData p)
+
+GraphDlg::~GraphDlg()
 {
-  QString num;
-  
-  for (int i= 0; i < 4; i++) {
-    ChannelCombo[i]->setCurrentIndex(clm->index(p.chn[i]));
-    if (p.yfac[i] == 1e3) UnitCombo[i]->setCurrentIndex(0);
-    else UnitCombo[i]->setCurrentIndex(1);
-    num.setNum(p.miny[i]*p.yfac[i]);
-    MinE[i]->setText(num);
-    num.setNum(p.maxy[i]*p.yfac[i]);
-    MaxE[i]->setText(num);
-  } 
-  num.setNum(p.xrange);
-  xRangeE->setText(num);
-  num.setNum(1.0/p.dt);
-  dtE->setText(num);
-  num.setNum(p.xtNo);
-  xTicksE->setText(num);
-  num.setNum(p.ytNo);
-  yTicksE->setText(num);
+    dataTimer.stop();
+    delete ui;
+}
+
+void GraphDlg::reloadGraphs()
+{
+    ui->plot->clearGraphs();
+    QCPGraph *graph;
+    for ( GraphData const& p : Graphp ) {
+        if ( p.isVoltage ) {
+            graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis);
+            graph->setName(QString("%1 (mV)").arg(p.chan.prettyName()));
+        } else {
+            graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
+            graph->setName(QString("%1 (nA)").arg(p.chan.prettyName()));
+        }
+        graph->setPen(QPen(p.color));
+    }
+    ui->plot->replot();
+}
+
+void GraphDlg::startPlotting(DCThread *DCT)
+{
+    if ( !isVisible() || Graphp.empty() ) {
+        for ( GraphData &p : Graphp )
+            p.active = false;
+        DCT->setGraph();
+        return;
+    }
+
+    ui->addBtn->setEnabled(false);
+    ui->clearBtn->setEnabled(false);
+    ui->samplingInterval->setEnabled(false);
+
+    reloadGraphs();
+    ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
+    q.clear();
+
+    for ( GraphData &p : Graphp ) {
+        p.active = true;
+        q.push_back(std::unique_ptr<queue_type>(new queue_type()));
+    }
+
+    DCT->setGraph(this, ui->samplingInterval->value() * 1e-3);
+
+    dataTimer.start(20); // Plotting interval at 50 Hz regardless of sampling interval
+}
+
+void GraphDlg::stopPlotting()
+{
+    dataTimer.stop();
+    ui->addBtn->setEnabled(true);
+    ui->clearBtn->setEnabled(true);
+    ui->samplingInterval->setEnabled(true);
+}
+
+void GraphDlg::replot()
+{
+    bool rangeFound;
+    QCPRange range = ui->plot->graph()->getKeyRange(rangeFound);
+
+    DataPoint point;
+    int i = 0;
+    double fac;
+    for ( auto &queue : q ) {
+        if ( Graphp[i].isVoltage )
+            fac = 1e3;
+        else
+            fac = 1e9;
+        while ( queue->pop(point) ) {
+            ui->plot->graph(i)->addData(point.t, point.value * fac);
+        }
+        ++i;
+    }
+
+    // make key axis range scroll with the data:
+    if ( rangeFound ) {
+        double xUpper = ui->plot->xAxis->range().upper;
+        if ( range.upper <= xUpper && point.t > xUpper)
+            ui->plot->xAxis->moveRange(point.t - xUpper);
+    }
+    ui->plot->replot(QCustomPlot::rpQueuedReplot);
 }

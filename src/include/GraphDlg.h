@@ -1,31 +1,42 @@
 #ifndef GRAPHDLG_H
 #define GRAPHDLG_H
 
-#include <QComboBox>
-#include "ui_GraphDlg.h"
-#include "ObjectDataTypes.h"
+#include <QDialog>
 #include "ChannelListModel.h"
-#include "WideComboBox.h"
+#include "QCustomPlot.h"
+#include "CircularFifo.h"
+#include <memory>
 
-class GraphDlg : public QDialog, private Ui::GraphDlg
+namespace Ui {
+class GraphDlg;
+}
+
+class GraphDlg : public QDialog
 {
      Q_OBJECT
+private:
+    Ui::GraphDlg *ui;
+    ChannelListModel clm;
+    QColor color;
 
-  private:
-    int myNo;
-    int inChnNo;
-    int outChnNo;      
-    QComboBox *clrCombo[4];
-    WideComboBox *ChannelCombo[4];
-    QLineEdit *MinE[4];
-    QLineEdit *MaxE[4];
-    QComboBox *UnitCombo[4];
-    ChannelListModel *clm;
+    QTimer dataTimer;
 
-  public:
-     GraphDlg(int, QWidget *parent= 0);
-     void exportData(graphData &);
-     void importData(graphData);
+private slots:
+    void replot();
+    void channelIndexChanged();
+
+public:
+     GraphDlg(QWidget *parent = 0);
+     ~GraphDlg();
+
+     struct DataPoint { double t; double value; };
+     typedef CircularFifo<DataPoint, 10000> queue_type;
+     std::vector<std::unique_ptr<queue_type>> q;
+
+public slots:
+     void startPlotting(DCThread *);
+     void stopPlotting();
+     void reloadGraphs();
 }; 
 
 #endif

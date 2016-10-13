@@ -1,6 +1,6 @@
 # StdpC project file #
 TARGET = StdpC
-QT+= widgets
+QT+= widgets printsupport
 DEPENDPATH += $$PWD/ \
     $$PWD/src \
     $$PWD/src/core \
@@ -81,7 +81,6 @@ HEADERS += \
     $$PWD/src/include/Daq.h \
     $$PWD/src/include/SimulDAQ.h \
     $$PWD/src/include/SpkGen.h \
-    $$PWD/src/include/Graph.h \
     $$PWD/src/include/GraphDlg.h \
     $$PWD/src/include/DAQDlg.h \
     $$PWD/src/include/AbSynDlg.h \
@@ -112,7 +111,9 @@ HEADERS += \
     $$PWD/src/include/Component.h \
     $$PWD/src/include/WideComboBox.h \
     $$PWD/src/include/DaqOpts.h \
-    $$PWD/src/include/DaqOptsPrototype.h
+    $$PWD/src/include/DaqOptsPrototype.h \
+    $$PWD/src/include/QCustomPlot.h \
+    $$PWD/src/include/CircularFifo.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -140,7 +141,6 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/drivers/Daq.cpp \
     $$PWD/src/drivers/SimulDAQ.cpp \
     $$PWD/src/models/SpkGen.cpp \
-    $$PWD/src/core/Graph.cpp \
     $$PWD/src/gui/GraphDlg.cpp \
     $$PWD/src/gui/DAQDlg.cpp \
     $$PWD/src/gui/AbSynDlg.cpp \
@@ -165,7 +165,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/DaqTable.cpp \
     $$PWD/src/gui/DaqWidget.cpp \
     $$PWD/src/drivers/DeviceManager.cpp \
-    $$PWD/src/gui/WideComboBox.cpp
+    $$PWD/src/gui/WideComboBox.cpp \
+    $$PWD/src/gui/QCustomPlot.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

@@ -5,10 +5,12 @@
 #include <climits>
 #include "ChannelIndex.h"
 #include "DeviceManager.h"
+#include "GraphDlg.h"
 
 #include "SimulDAQ.h" // for debugging only ...
 
-DCThread::DCThread()
+DCThread::DCThread() :
+    graph(nullptr)
 {
   stopped= true;
   finished= true;
@@ -22,6 +24,13 @@ DCThread::~DCThread()
 {
 }
 
+void DCThread::setGraph(GraphDlg *g, double dt)
+{
+    if ( stopped ) {
+        graph = g;
+        graphDt = dt;
+    }
+}
 
 void DCThread::run()
 {
@@ -63,31 +72,27 @@ void DCThread::run()
    SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
 
    // set up the graphic display channels
-   QString lb;
-   for (i= 0; i < 2; i++) {
-     grpNo[i]= 0;
-     for (int j= 0; j < 4; j++) {
-       if (Graphp[i].active[j]) {
-         ChannelIndex &dex = Graphp[i].chn[j];
-         if ( !dex.isValid || dex.isNone ) {
-             continue;
-         } else if ( dex.isSG ) {
-             grp[i][grpNo[i]]= &(SG.V);
-         } else if ( dex.isVirtual ) {
-             // Use inchan for mV units, outchan for nA units
-             grp[i][grpNo[i]] = Graphp[i].yfac[j]==1e3
-                     ? &(getInChan(dex)->V)
-                     : &(getOutChan(dex)->I);
-         } else if ( dex.isInChn ) {
-             grp[i][grpNo[i]] = &(getInChan(dex)->V);
-         } else {
-             grp[i][grpNo[i]] = &(getOutChan(dex)->I);
-         }
-         pen[i][grpNo[i]++] = j;
+   double graphDummy = 0.0;
+   if ( graph ) {
+       i = 0;
+       graphVar.resize(Graphp.size());
+       for ( GraphData &p : Graphp ) {
+           if ( !p.active || !p.chan.isValid || p.chan.isNone ) {
+               graphVar[i] = &graphDummy;
+           } else if ( p.chan.isSG ) {
+               graphVar[i] =& SG.V;
+           } else if ( p.chan.isVirtual ) {
+               graphVar[i] = p.isVoltage
+                       ? &getInChan(p.chan)->V
+                       : &getOutChan(p.chan)->I;
+           } else if ( p.chan.isInChn ) {
+               graphVar[i] =& getInChan(p.chan)->V;
+           } else {
+               graphVar[i] =& getOutChan(p.chan)->I;
+           }
+           ++i;
        }
-     }
-     lb.setNum(grpNo[i]);
-     message(QString("Added ")+lb+QString(" channels for Display"));
+       message(QString("Added %1 channels for display").arg(i));
    }
 
    csyn.clear();
@@ -248,7 +253,7 @@ void DCThread::run()
    finished= false;
    t= 0.0;
    double lastSave = t;
-   for (int i= 0; i < 2; i++) lastWrite[i]= t;
+   lastWrite = t;
    // init scripting
    if (scripting) {
      scrIter= scriptq.begin();
@@ -359,20 +364,12 @@ void DCThread::run()
              model.updateNeurons(t, dt);
 
          // Updated display
-         if ( grpNo[0] ) {
-             if (t-lastWrite[0] > Graphp[0].dt) {
-               lastWrite[0]= t;
-               for (i= 0; i < grpNo[0]; i++) {
-                 addPoint1(t, *grp[0][i], pen[0][i]);
-               }
-             }
-         }
-         if ( grpNo[1] ) {
-             if (t-lastWrite[1] > Graphp[1].dt) {
-               lastWrite[1]= t;
-               for (i= 0; i < grpNo[1]; i++) {
-                 addPoint2(t, *grp[1][i], pen[1][i]);
-               }
+         if ( graph ) {
+             if ( t - lastWrite > graphDt ) {
+                 lastWrite = t;
+                 i = 0;
+                 for ( double *val : graphVar )
+                    graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
              }
          }
 

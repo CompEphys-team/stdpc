@@ -13,7 +13,6 @@
 #include "DeviceManager.h"
 
 #include "DCThread.h"
-#include "Graph.h"
 #include "GraphDlg.h"
 
 namespace Ui {
@@ -38,12 +37,10 @@ class MyMainWindow : public QMainWindow
 
      DataSavingDlg *DSDlg;
      SpikeTimeDlg *SpkTDlg;
-     GraphDlg *graphDlg[2];
+     GraphDlg *graphDlg;
      DCThread *DCT;
 
      ChannelListModel *inChnModel, *outChnModel, *SGbdChannelModel;
-
-     Graph Graphs[2];
      
   public slots:
      void CloseToLimitWarning(QString, QString, double, double, double);

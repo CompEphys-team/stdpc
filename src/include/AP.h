@@ -11,8 +11,12 @@
 class AP;
 extern std::vector<std::unique_ptr<AP>> params;
 void initAP();
+
 std::istream &operator>>(std::istream &is, QString &str);
 std::ostream &operator<<(std::ostream &os, const QString &str);
+
+std::istream &operator>>(std::istream &is, QColor &col);
+std::ostream &operator<<(std::ostream &os, const QColor &col);
 
 /**
  * @brief Add a parameter to the global registry. See @fn initAP() for examples.

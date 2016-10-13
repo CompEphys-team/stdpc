@@ -19,6 +19,7 @@
 #include "DataSaver.h"
 #include "HHNeuron.h"
 
+class GraphDlg;
 
 class DCThread : public QThread 
 {
@@ -37,6 +38,8 @@ private:
      virtual ~DCThread();
      bool LoadScript(QString &);
      void UnloadScript();
+
+     void setGraph(GraphDlg * = nullptr, double dt = 0.0);
 
      inChannel *getInChan(ChannelIndex const& dex);
      outChannel *getOutChan(ChannelIndex const& dex);
@@ -73,14 +76,12 @@ private:
  private:
      bool initial;   
      double t;
-     double lastT;
      double dt;
-     double lastWrite[2];
-    
-     int grpNo[2];
-     int pen[2][4];
-     double *grp[2][4];
+     double lastWrite;
 
+     GraphDlg *graph;
+     QVector<double *> graphVar;
+     double graphDt;
 
      QList<QPair<double, std::function<void()>>> scriptq;
      QList<QPair<double, std::function<void()>>>::iterator scrIter;
@@ -88,8 +89,6 @@ private:
  signals:
      void error(QString message);
      void message(QString message);
-     void addPoint1(double, double, int);
-     void addPoint2(double, double, int);
      void CloseToLimit(QString, QString, double, double, double);
 
 

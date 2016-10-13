@@ -24,7 +24,7 @@ std::vector<NIDAQData> NIDAQp;
 #endif
 SGData SGp;
 
-std::vector<graphData> Graphp(2);
+std::vector<GraphData> Graphp;
 
 dataSavingParams dataSavingPs;
 

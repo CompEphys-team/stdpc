@@ -42,7 +42,7 @@ extern SGData SGp;
 
 extern dataSavingParams dataSavingPs;
 
-extern std::vector<graphData> Graphp;
+extern std::vector<GraphData> Graphp;
 
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;

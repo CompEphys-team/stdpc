@@ -5,6 +5,7 @@ using namespace std;
 
 #include <QString>
 #include <iostream>
+#include <QColor>
 #include "ChannelIndex.h"
 
 // Forward
@@ -338,18 +339,14 @@ class NIDAQData : public DAQData {
 };
 #endif
 
-typedef struct {
-  bool active[4];
-  QString color[4];
-  ChannelIndex chn[4];
-  double miny[4];
-  double maxy[4];
-  double xrange;
-  double dt;
-  int xtNo;
-  int ytNo;
-  double yfac[4];
-} graphData;
+struct GraphData {
+    bool active;
+    ChannelIndex chan;
+    bool isVoltage;
+    QColor color;
+
+    GraphData() : active(false) {}
+};
 
 typedef struct {
   bool active;

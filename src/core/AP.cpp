@@ -404,16 +404,9 @@ void initAP()
 
 
     // Graphs
-    addAP("Graphp[#].active[#]", &Graphp, &graphData::active);
-    addAP("Graphp[#].color[#]", &Graphp, &graphData::color);
-    addAP("Graphp[#].chn[#]", &Graphp, &graphData::chn);
-    addAP("Graphp[#].miny[#]", &Graphp, &graphData::miny);
-    addAP("Graphp[#].maxy[#]", &Graphp, &graphData::maxy);
-    addAP("Graphp[#].xrange", &Graphp, &graphData::xrange);
-    addAP("Graphp[#].dt", &Graphp, &graphData::dt);
-    addAP("Graphp[#].xtNo", &Graphp, &graphData::xtNo);
-    addAP("Graphp[#].ytNo", &Graphp, &graphData::ytNo);
-    addAP("Graphp[#].yfac[#]", &Graphp, &graphData::yfac);
+    addAP("Graphp[#].chan", &Graphp, &GraphData::chan);
+    addAP("Graphp[#].isVoltage", &Graphp, &GraphData::isVoltage);
+    addAP("Graphp[#].color", &Graphp, &GraphData::color);
 
 
     // Sample & hold
@@ -593,5 +586,23 @@ std::istream &operator>>(std::istream &is, QString &str)
 std::ostream &operator<<(std::ostream &os, const QString &str)
 {
     os << str.toStdString();
+    return os;
+}
+
+std::istream &operator>>(std::istream &is, QColor &col)
+{
+    std::string tmp;
+    is >> tmp;
+    QStringList v = QString::fromStdString(tmp).split(',');
+    if ( v.size() == 3 )
+        col = QColor::fromRgb(v[0].toInt(), v[1].toInt(), v[2].toInt());
+    else if ( v.size() == 4 )
+        col = QColor::fromRgb(v[0].toInt(), v[1].toInt(), v[2].toInt(), v[3].toInt());
+    return is;
+}
+
+std::ostream &operator<<(std::ostream &os, const QColor &col)
+{
+    os << col.red() << ',' << col.green() << ',' << col.blue() << ',' << col.alpha();
     return os;
 }
