@@ -21,6 +21,10 @@ private:
 
     QTimer dataTimer;
 
+    bool initial;
+    long long nPoints;
+    double t0;
+
 private slots:
     void replot();
     void channelIndexChanged();

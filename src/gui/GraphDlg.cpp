@@ -162,8 +162,15 @@ void GraphDlg::replot()
     QCPRange range = ui->plot->graph()->getKeyRange(rangeFound);
 
     DataPoint point;
+
+    if ( initial && q[0]->pop(point) ) {
+        initial = false;
+        t0 = point.t;
+    }
+
     int i = 0;
     double fac;
+    double tNow;
     for ( auto &queue : q ) {
         if ( Graphp[i].isVoltage )
             fac = 1e3;
@@ -171,7 +178,11 @@ void GraphDlg::replot()
             fac = 1e9;
         while ( queue->pop(point) ) {
             ui->plot->graph(i)->addData(point.t, point.value * fac);
+            if ( !i )
+                ++nPoints;
         }
+        if ( !i )
+            tNow = point.t;
         ++i;
     }
 
@@ -182,4 +193,6 @@ void GraphDlg::replot()
             ui->plot->xAxis->moveRange(point.t - xUpper);
     }
     ui->plot->replot(QCustomPlot::rpQueuedReplot);
+
+    ui->cycleFreq->setText(QString::number(nPoints / (tNow - t0)));
 }
