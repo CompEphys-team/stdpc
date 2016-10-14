@@ -41,6 +41,7 @@ public slots:
      void startPlotting(DCThread *);
      void stopPlotting();
      void reloadGraphs();
+     void reject();
 }; 
 
 #endif

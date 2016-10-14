@@ -104,6 +104,12 @@ GraphDlg::~GraphDlg()
     delete ui;
 }
 
+void GraphDlg::reject()
+{
+    if ( !dataTimer.isActive() )
+        QDialog::reject();
+}
+
 void GraphDlg::reloadGraphs()
 {
     ui->plot->clearGraphs();
@@ -161,7 +167,7 @@ void GraphDlg::replot()
     bool rangeFound;
     QCPRange range = ui->plot->graph()->getKeyRange(rangeFound);
 
-    DataPoint point;
+    DataPoint point {0., 0.};
 
     if ( initial && q[0]->pop(point) ) {
         initial = false;
@@ -170,7 +176,7 @@ void GraphDlg::replot()
 
     int i = 0;
     double fac;
-    double tNow;
+    double tNow = 0.;
     for ( auto &queue : q ) {
         if ( Graphp[i].isVoltage )
             fac = 1e3;
