@@ -314,6 +314,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
  
 void MyMainWindow::importData()
 {
+  Devices.clear();
   ui->DAQTable->importData();
   ui->synapseTable->importData();
   ui->currentTable->importData();
@@ -321,6 +322,7 @@ void MyMainWindow::importData()
   SpkTDlg->importData();
   DSDlg->importData();
   graphDlg->reloadGraphs();
+  updateStartButton();
 }
 
 void MyMainWindow::exportSGData() 

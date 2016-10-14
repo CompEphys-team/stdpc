@@ -19,6 +19,7 @@ public:
     ~DeviceManager();
 
     QVector<QPair<DeviceStatus, QString>> init();
+    void clear();
 
     template <typename param_type>
     DeviceStatus initSingle(QString &name, int idx, std::vector<param_type> *params);
@@ -42,7 +43,6 @@ signals:
 
 private:
     DeviceStatus _initSingle(DAQ *dev, bool active, QString &name);
-    void clear();
     ChannelIndex getDex(DAQClass type, int idx);
 
     QVector<DAQ*> sdaq;
