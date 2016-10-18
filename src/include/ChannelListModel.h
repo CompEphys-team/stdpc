@@ -17,13 +17,12 @@ public:
     enum ChannelType {
         Blank =      1,
         None =       2,
-        SpikeGen =   4,
         Virtual   =  8, // Model instances
         AnalogIn =   16,
         AnalogOut =  32,
         Prototype =  64, // Model prototypes, applies multiplexed over all instances
 
-        In = AnalogIn | SpikeGen | Virtual | Prototype,
+        In = AnalogIn | Virtual | Prototype,
         Out = AnalogOut | Virtual | Prototype
     };
 
@@ -77,8 +76,7 @@ protected:
     DAQHelper<NIDAQData> hNI;
 #endif
     ModelHelper<HHNeuronData> hHH;
-//    int nPHH;
-//    QVector<int> nVHH;
+    ModelHelper<SGData> hSG;
 
     ChannelIndex rmDevDex;
 };

@@ -11,7 +11,7 @@
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
 
-#define STDPC_PROTOCOL_VERSION 2
+#define STDPC_PROTOCOL_VERSION 3
 #define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
 extern int LOADED_PROTOCOL_VERSION;
 extern DAQClass LEGACY_DAQ_CLASS;
@@ -28,17 +28,14 @@ extern std::vector<DestexheSynData> DxheSynp;
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
-extern inChnData inSpkGenChnp;
-extern outChnData outSpkGenChnp;
-
 extern std::vector<HHNeuronData> HHNeuronp;
+extern std::vector<SGData> SGp;
 
 extern std::vector<DigiDataData> DigiDatap;
 extern std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
 extern std::vector<NIDAQData> NIDAQp;
 #endif
-extern SGData SGp;
 
 extern dataSavingParams dataSavingPs;
 

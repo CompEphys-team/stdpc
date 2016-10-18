@@ -12,17 +12,14 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-inChnData inSpkGenChnp;
-outChnData outSpkGenChnp;
-
 std::vector<HHNeuronData> HHNeuronp;
+std::vector<SGData> SGp;
 
 std::vector<DigiDataData> DigiDatap;
 std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
 std::vector<NIDAQData> NIDAQp;
 #endif
-SGData SGp;
 
 std::vector<GraphData> Graphp;
 

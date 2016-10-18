@@ -60,7 +60,6 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-     SpkGen SG;
      std::vector<ChemSyn> csyn;
      std::vector<abSyn> absyn;
      std::vector<GapJunction> esyn;
@@ -68,10 +67,10 @@ private:
      std::vector<HH> hh;
      std::vector<abHH> abhh;
 
-     inChannel inChnSG;
      outChannel outChnNone;
 
      std::vector<HHNeuronModel> hhNeuron;
+     std::vector<SpkGenPrototype> SGProto;
      
  private:
      bool initial;   

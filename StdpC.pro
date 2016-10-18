@@ -38,7 +38,6 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/GapJunctionDlg.ui \
     $$PWD/src/gui/STDPDlg.ui \
     $$PWD/src/gui/ODESTDPDlg.ui \
-    $$PWD/src/gui/SpikeTimeDlg.ui \
     $$PWD/src/gui/InputChannelDlg.ui \
     $$PWD/src/gui/GraphDlg.ui \
     $$PWD/src/gui/HHDlg.ui \
@@ -54,7 +53,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/ComponentWidget.ui \
     $$PWD/src/gui/ComponentFactoryWidget.ui \
     $$PWD/src/gui/DaqWidget.ui \
-    $$PWD/src/gui/DaqFactoryWidget.ui
+    $$PWD/src/gui/DaqFactoryWidget.ui \
+    $$PWD/src/gui/SpikeGenDlg.ui
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -64,7 +64,6 @@ HEADERS += \
     $$PWD/src/include/DCThread.h \
     $$PWD/src/include/STDPDlg.h \
     $$PWD/src/include/ODESTDPDlg.h \
-    $$PWD/src/include/SpikeTimeDlg.h \
     $$PWD/src/include/LUtables.h \
     $$PWD/src/include/InputChannelDlg.h \
     $$PWD/src/include/OutputChannelDlg.h \
@@ -113,7 +112,8 @@ HEADERS += \
     $$PWD/src/include/DaqOpts.h \
     $$PWD/src/include/DaqOptsPrototype.h \
     $$PWD/src/include/QCustomPlot.h \
-    $$PWD/src/include/CircularFifo.h
+    $$PWD/src/include/CircularFifo.h \
+    $$PWD/src/include/SpikeGenDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -124,7 +124,6 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/DCThread.cpp \
     $$PWD/src/gui/STDPDlg.cpp \
     $$PWD/src/gui/ODESTDPDlg.cpp \
-    $$PWD/src/gui/SpikeTimeDlg.cpp \
     $$PWD/src/core/LUtables.cpp \
     $$PWD/src/gui/InputChannelDlg.cpp \
     $$PWD/src/core/Global.cpp \
@@ -166,7 +165,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/DaqWidget.cpp \
     $$PWD/src/drivers/DeviceManager.cpp \
     $$PWD/src/gui/WideComboBox.cpp \
-    $$PWD/src/gui/QCustomPlot.cpp
+    $$PWD/src/gui/QCustomPlot.cpp \
+    $$PWD/src/gui/SpikeGenDlg.cpp
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

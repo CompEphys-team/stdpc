@@ -230,27 +230,6 @@ typedef struct {
   bool isBinary;
 
 } dataSavingParams;
-
-struct SGData {
-  bool active;
-  int method;
-  bool saving;
-  int LUTables;
-  double VSpike;
-  double spkTimeScaling;
-  double VRest;
-  int bdType;
-  ChannelIndex bdChannel;
-  double bdThresh;
-  int bdNUnder;
-  int bdNOver;
-  double period;
-  int SpikeNo;
-  QString STInFName;
-  std::vector<double> SpikeT;
-public:
-  SGData() : SpikeT(10) {}
-};
  
 struct inChnData {
   bool active;
@@ -377,6 +356,29 @@ struct HHNeuronData : public ModelData {
 
     typedef HHModelDlg DlgType;
     static constexpr ModelClass modelClass = ModelClass::HH;
+};
+
+class SpikeGenDlg;
+struct SGData : public ModelData {
+  bool LUTables;
+  double VSpike;
+  double spkTimeScaling;
+  double VRest;
+
+  int bdType;
+  ChannelIndex bdChannel;
+  double bdThresh;
+  double bdtUnder;
+  double bdtOver;
+
+  double period;
+  bool loopBursts;
+  std::vector<std::vector<double>> SpikeT;
+
+  SGData() : SpikeT(1, {.03,.05,.068,.088,.112,.138,.168,.204,.248,.308}) {} // other defaults in UI
+
+  typedef SpikeGenDlg DlgType;
+  static constexpr ModelClass modelClass = ModelClass::SG;
 };
 
 #endif

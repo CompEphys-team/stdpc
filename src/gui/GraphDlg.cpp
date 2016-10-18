@@ -9,7 +9,6 @@ GraphDlg::GraphDlg(QWidget *parent)
        ui(new Ui::GraphDlg),
        clm(ChannelListModel::AnalogIn
          | ChannelListModel::AnalogOut
-         | ChannelListModel::SpikeGen
          | ChannelListModel::Virtual, this),
        color("black"),
        dataTimer(this)
@@ -90,11 +89,14 @@ GraphDlg::GraphDlg(QWidget *parent)
 void GraphDlg::channelIndexChanged()
 {
     ChannelIndex sel = ui->channel->currentData().value<ChannelIndex>();
-    ui->radioCurrent->setEnabled(sel.isVirtual);
-    ui->radioVoltage->setEnabled(sel.isVirtual);
+    ui->radioCurrent->setEnabled(sel.isVirtual && sel.modelClass != ModelClass::SG);
+    ui->radioVoltage->setEnabled(sel.isVirtual && sel.modelClass != ModelClass::SG);
     if ( !sel.isVirtual ) {
-        ui->radioCurrent->setChecked(!sel.isInChn && !sel.isSG);
-        ui->radioVoltage->setChecked(sel.isInChn || sel.isSG);
+        ui->radioCurrent->setChecked(!sel.isInChn);
+        ui->radioVoltage->setChecked(sel.isInChn);
+    } else if ( sel.modelClass == ModelClass::SG ) {
+        ui->radioCurrent->setChecked(false);
+        ui->radioVoltage->setChecked(true);
     }
 }
 

@@ -15,7 +15,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
 
      DSDlg= new DataSavingDlg(this);
-     SpkTDlg= new SpikeTimeDlg;
      graphDlg = new GraphDlg(this);
 
      QVector<ComponentPrototypeBase *> prototypes;
@@ -37,6 +36,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      dprot.push_back(new DaqOptsPrototype<NIDAQDlg>("Nat'l Instruments", &NIDAQp));
 #endif
      dprot.push_back(new DaqOptsPrototype<HHModelDlg>("HH Model", &HHNeuronp));
+     dprot.push_back(new DaqOptsPrototype<SpikeGenDlg>("Spike generator", &SGp));
      ui->DAQTable->init(dprot, this);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
@@ -54,13 +54,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
          
      DCT= new DCThread();
-
-     SGbdChannelModel = new ChannelListModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual, this);
-     ui->SGbdChannelCombo->setModel(SGbdChannelModel);
-     connect(ui->SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
-     connect(ui->BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
      
-     connect(ui->SpikeTimesBut, SIGNAL(clicked()), SpkTDlg, SLOT(show()));
      connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
      connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
      
@@ -82,10 +76,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
      connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
-     connect(this, SIGNAL(channelsChanged()), SGbdChannelModel, SLOT(updateChns()));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
-     connect(this, SIGNAL(modelRemoved(ChannelIndex)), SGbdChannelModel, SLOT(updateChns(ChannelIndex)));
      
      connect(ui->actionData_display, SIGNAL(triggered(bool)), graphDlg, SLOT(show()));
 
@@ -103,7 +95,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->DAQReset, SIGNAL(clicked(bool)), ui->DAQTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-     connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
 
      connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
@@ -181,6 +172,20 @@ void MyMainWindow::updateStartButton()
                 break;
         }
     }
+    if ( !success && SGp.size() ) {
+        for ( ModelData const& p : SGp ) {
+            if ( p.active && p.inst.size() ) {
+                for ( vInstData const& inst : p.inst ) {
+                    if ( inst.active ) {
+                        success = true;
+                        break;
+                    }
+                }
+            }
+            if ( success )
+                break;
+        }
+    }
     ui->StartBut->setEnabled(success);
 }
 
@@ -199,66 +204,6 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
   fname= QString("StdpC_last.log");
   doExportLog(fname);
   event->accept();
-}
-
-void MyMainWindow::SGMethodChanged() 
-{
-//  QMessageBox::warning(this, tr("My Application"),
-//                tr("The signal for index change has been received"),
-//               QMessageBox::Close); 
-
-  int index= ui->SGMethodCombo->currentIndex();
-  int index2= ui->BurstDetectionCombo->currentIndex();
-
-  ui->SGSave->setEnabled(false);
-  ui->SGLUTableCombo->setEnabled(false);
-  ui->SpikesL->setEnabled(false);
-  ui->VSpikeE->setEnabled(false); ui->VSpikeL->setEnabled(false); ui->VSpikeU->setEnabled(false);
-  ui->WidthE->setEnabled(false); ui->WidthL->setEnabled(false); ui->WidthU->setEnabled(false);
-  ui->VRestE->setEnabled(false); ui->VRestL->setEnabled(false); ui->VRestU->setEnabled(false);
-  ui->VRestE->setEnabled(false); ui->VRestL->setEnabled(false); ui->VRestU->setEnabled(false);
-  ui->ExplicitSpikeTimesL->setEnabled(false);
-  ui->NumberE->setEnabled(false); ui->NumberL->setEnabled(false); ui->NumberU->setEnabled(false);
-  ui->PeriodE->setEnabled(false); ui->PeriodL->setEnabled(false); ui->PeriodU->setEnabled(false);
-  ui->SpikeTimesBut->setEnabled(false);
-  ui->BurstDetectionL->setEnabled(false);
-  ui->BurstDetectionCombo->setEnabled(false);
-  ui->SGbdChannelCombo->setEnabled(false); ui->ChannelL->setEnabled(false);
-  ui->ThresholdE->setEnabled(false); ui->ThresholdL->setEnabled(false); ui->ThresholdU->setEnabled(false);
-  ui->NUnderE->setEnabled(false); ui->NUnderL->setEnabled(false);
-  ui->NOverE->setEnabled(false); ui->NOverL->setEnabled(false);
-  ui->STInputFileL->setEnabled(false); ui->STInputFileE->setEnabled(false);
-  if (index == 0) ui->SGSave->setChecked(false);
-  if (index == 3) {
-    ui->SGSave->setEnabled(true); ui->STInputFileL->setEnabled(true); ui->STInputFileE->setEnabled(true);
-  }
-  else {
-    if (index > 0) {
-      ui->SGSave->setEnabled(true);
-      ui->SGLUTableCombo->setEnabled(true);
-      ui->SpikesL->setEnabled(true);
-      ui->VSpikeE->setEnabled(true); ui->VSpikeL->setEnabled(true); ui->VSpikeU->setEnabled(true);
-      ui->WidthE->setEnabled(true); ui->WidthL->setEnabled(true); ui->WidthU->setEnabled(true);
-      ui->VRestE->setEnabled(true); ui->VRestL->setEnabled(true); ui->VRestU->setEnabled(true);
-      ui->BurstDetectionL->setEnabled(true);
-      ui->BurstDetectionCombo->setEnabled(true);
-      if (index2 > 0) {
-        ui->SGbdChannelCombo->setEnabled(true); ui->ChannelL->setEnabled(true);
-        ui->ThresholdE->setEnabled(true); ui->ThresholdL->setEnabled(true); ui->ThresholdU->setEnabled(true);
-        ui->NUnderE->setEnabled(true); ui->NUnderL->setEnabled(true);
-        ui->NOverE->setEnabled(true); ui->NOverL->setEnabled(true);
-      }
-    }
-    if (index == 1) {
-      ui->ExplicitSpikeTimesL->setEnabled(true);
-      ui->NumberE->setEnabled(true); ui->NumberL->setEnabled(true); ui->NumberU->setEnabled(true);
-      ui->PeriodE->setEnabled(true); ui->PeriodL->setEnabled(true); ui->PeriodU->setEnabled(true);
-      ui->SpikeTimesBut->setEnabled(true);
-    }
-    if (index == 2) {
-      ui->STInputFileL->setEnabled(true); ui->STInputFileE->setEnabled(true);
-    }
-  }
 }
 
 void MyMainWindow::StartButClicked() 
@@ -306,9 +251,6 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->synapseTable->exportData();
   ui->currentTable->exportData();
   ui->DAQTable->exportData(ignoreDAQ);
-
-  exportSGData();
-  SpkTDlg->exportData();
   DSDlg->exportData();
 }
  
@@ -318,64 +260,9 @@ void MyMainWindow::importData()
   ui->DAQTable->importData();
   ui->synapseTable->importData();
   ui->currentTable->importData();
-  importSGData();
-  SpkTDlg->importData();
   DSDlg->importData();
   graphDlg->reloadGraphs();
   updateStartButton();
-}
-
-void MyMainWindow::exportSGData() 
-{
-  SGp.method= ui->SGMethodCombo->currentIndex();
-  SGp.active= (SGp.method > 0);
-  SGp.LUTables= ui->SGLUTableCombo->currentIndex();
-  if (SGp.active) SGp.saving= (ui->SGSave->checkState() > 0);
-  else SGp.saving= false;
-  SGp.VSpike= ui->VSpikeE->text().toDouble()/1e3;
-  SGp.spkTimeScaling= 5e3/ui->WidthE->text().toDouble();
-  SGp.VRest= ui->VRestE->text().toDouble()/1e3;
-  
-  SGp.bdType= ui->BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= ui->SGbdChannelCombo->currentData().value<ChannelIndex>();
-  SGp.bdThresh= ui->ThresholdE->text().toDouble()/1e3;
-  SGp.bdNUnder= ui->NUnderE->text().toInt();
-  SGp.bdNOver= ui->NOverE->text().toInt();
-  
-  SGp.period= ui->PeriodE->text().toDouble()/1e3;
-  SGp.SpikeNo= ui->NumberE->text().toInt();
-  
-  SGp.STInFName= ui->STInputFileE->text();
-}
-
-void MyMainWindow::importSGData() 
-{
-  QString num;
-  ui->SGMethodCombo->setCurrentIndex(SGp.method);
-  ui->SGSave->setChecked(SGp.saving);
-  ui->SGLUTableCombo->setCurrentIndex(SGp.LUTables);
-  num.setNum(SGp.VSpike*1e3);
-  ui->VSpikeE->setText(num);
-  num.setNum(5e3/SGp.spkTimeScaling);
-  ui->WidthE->setText(num);
-  num.setNum(SGp.VRest*1e3);
-  ui->VRestE->setText(num);
-  
-  ui->BurstDetectionCombo->setCurrentIndex(SGp.bdType);
-  ui->SGbdChannelCombo->setCurrentIndex(SGbdChannelModel->index(SGp.bdChannel));
-  num.setNum(SGp.bdThresh*1e3);
-  ui->ThresholdE->setText(num);
-  num.setNum(SGp.bdNUnder);
-  ui->NUnderE->setText(num);
-  num.setNum(SGp.bdNOver);
-  ui->NOverE->setText(num);
-  
-  num.setNum(SGp.period*1e3);
-  ui->PeriodE->setText(num);
-  num.setNum(SGp.SpikeNo);
-  ui->NumberE->setText(num);
-  
-  ui->STInputFileE->setText(SGp.STInFName);
 }
 
 void MyMainWindow::SaveConfig()
@@ -438,6 +325,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   mhHHp.clear();
   abHHp.clear();
   HHNeuronp.clear();
+  SGp.clear();
   SDAQp.clear();
   DigiDatap.clear();
 #ifdef NATIONAL_INSTRUMENTS

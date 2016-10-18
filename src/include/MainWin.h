@@ -7,11 +7,9 @@
 #include <QCloseEvent>
 #include <QFileDialog>
 #include "Global.h"
-#include "SpikeTimeDlg.h"
 #include "DataSavingDlg.h"
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
-
 #include "DCThread.h"
 #include "GraphDlg.h"
 
@@ -32,15 +30,12 @@ class MyMainWindow : public QMainWindow
      virtual ~MyMainWindow();
      void exportData(bool ignoreDAQ = false);
      void importData();
-     void exportSGData();
-     void importSGData();
 
      DataSavingDlg *DSDlg;
-     SpikeTimeDlg *SpkTDlg;
      GraphDlg *graphDlg;
      DCThread *DCT;
 
-     ChannelListModel *inChnModel, *outChnModel, *SGbdChannelModel;
+     ChannelListModel *inChnModel, *outChnModel;
      
   public slots:
      void CloseToLimitWarning(QString, QString, double, double, double);
@@ -54,8 +49,6 @@ class MyMainWindow : public QMainWindow
      void modelRemoved(ChannelIndex);
                  
   private slots:
-     void SGMethodChanged();
-
      void StartButClicked();
      void StopButClicked();
      

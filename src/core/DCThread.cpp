@@ -18,6 +18,12 @@ DCThread::DCThread() :
   scripting= false;
 
   dataSaver = new DataSaver();
+
+  outChnData outNoneData;
+  outNoneData.active = true;
+  outNoneData.gain = 0;
+  outNoneData.gainFac = 1.0;
+  outChnNone.init(&outNoneData);
 }
 
 DCThread::~DCThread()
@@ -42,9 +48,6 @@ void DCThread::run()
    inChannel *SampleHoldChan;
    DAQ *SampleHoldBoard;
 
-   inChnSG.init(&inSpkGenChnp);
-   outChnNone.init(&outSpkGenChnp);
-
    for ( DAQ *b : Devices.actdev )
        b->init_chans();
 
@@ -52,21 +55,9 @@ void DCThread::run()
    for ( HHNeuronData &p : HHNeuronp ) {
        hhNeuron.push_back(HHNeuronModel(&p));
    }
-
-   if (SGp.active) {
-     SG.init(&SGp, &inChnSG, this);
-     if (!SGp.active) {
-       message(QString("SpkGen: Could not open ")+SGp.STInFName+QString(" ... SpkGen disabled ..."));
-       inChnSG.V= 0.0;
-     }
-     else {
-       message(QString("SpkGen active ..."));
-     }
-   }
-   else {
-     inChnSG.V= 0.0;
-   }
-   inChnSG.active = SGp.active;
+   SGProto.clear();
+   for ( SGData &p : SGp )
+       SGProto.push_back(SpkGenPrototype(&p, this));
 
    SampleHoldChan = getInChan(SampleHoldp.trigChn);
    SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
@@ -79,8 +70,6 @@ void DCThread::run()
        for ( GraphData &p : Graphp ) {
            if ( !p.active || !p.chan.isValid || p.chan.isNone ) {
                graphVar[i] = &graphDummy;
-           } else if ( p.chan.isSG ) {
-               graphVar[i] =& SG.V;
            } else if ( p.chan.isVirtual ) {
                graphVar[i] = p.isVoltage
                        ? &getInChan(p.chan)->V
@@ -160,6 +149,15 @@ void DCThread::run()
        }
        message(QString("DynClamp: %1 HH neuron model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
    }
+   if (SGProto.size() > 0) {
+       int nModels = 0, nInst = 0;
+       for ( SpkGenPrototype &model : SGProto ) {
+           auto rep = model.numActiveInst();
+           nModels += rep.first;
+           nInst += rep.second;
+       }
+       message(QString("DynClamp: %1 Spike generator model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
+   }
 
    int sz;
    sz= tanhLU.generate();
@@ -226,9 +224,10 @@ void DCThread::run()
            inChnsToSave.append(its.second);
            outChnsToSave.append(ots.second);
        }
-       if ( SGp.saving ) {
-           headerIn.append("SpikeGenerator");
-           inChnsToSave.append(&inChnSG);
+       for ( SpkGenPrototype &m : SGProto ) {
+           QPair<QVector<QString>, QVector<inChannel*>> its = m.inChans_to_save(i);
+           headerIn.append(its.first);
+           inChnsToSave.append(its.second);
        }
 
        QVector<QString> header(1, "Time");
@@ -338,13 +337,10 @@ void DCThread::run()
          }
 
          // Dynamic clamp current generation
-         if (SGp.active) { // SpkGen active
-           SG.VUpdate(t, dt);
-           inChnSG.spike_detect(t);
-         }
-         inChnSG.active = SGp.active;
 
          for ( HHNeuronModel &model : hhNeuron )
+             model.updateChannels(t);
+         for ( SpkGenPrototype &model : SGProto )
              model.updateChannels(t);
 
          for ( ChemSyn &obj : csyn )
@@ -362,6 +358,8 @@ void DCThread::run()
 
          for ( HHNeuronModel &model : hhNeuron )
              model.updateNeurons(t, dt);
+         for ( SpkGenPrototype &model : SGProto )
+             model.updateInstances(t, dt);
 
          // Updated display
          if ( graph ) {
@@ -434,9 +432,11 @@ inChannel *DCThread::getInChan(ChannelIndex const& dex)
             if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
                 return nullptr;
             return &(hhNeuron[dex.modelID].inst[dex.instID].in);
+        case ModelClass::SG:
+            if ( (int)SGProto.size() <= dex.modelID || (int)SGProto[dex.modelID].inst.size() <= dex.instID )
+                return nullptr;
+            return &(SGProto[dex.modelID].inst[dex.instID]->in);
         }
-    } else if ( dex.isSG ) {
-        return &inChnSG;
     } else if ( dex.isAnalog && dex.isInChn ) {
         return Devices.getInChan(dex);
     }
@@ -453,6 +453,8 @@ outChannel *DCThread::getOutChan(ChannelIndex const& dex)
             if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
                 return nullptr;
             return &(hhNeuron[dex.modelID].inst[dex.instID].out);
+        case ModelClass::SG:
+            return nullptr; // No SG input channels
         }
     } else if ( dex.isNone ) {
         return &outChnNone;
@@ -472,6 +474,11 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
         case ModelClass::HH:
             if ( dex.modelID < (int)HHNeuronp.size() )
                 for ( size_t i = 0; i < HHNeuronp[dex.modelID].inst.size(); i++ )
+                    ret.push_back(dex.toInstance(i));
+            break;
+        case ModelClass::SG:
+            if ( dex.modelID < (int)SGp.size() )
+                for ( size_t i = 0; i < SGp[dex.modelID].inst.size(); i++ )
                     ret.push_back(dex.toInstance(i));
             break;
         }

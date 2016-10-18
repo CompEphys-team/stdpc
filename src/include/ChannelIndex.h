@@ -9,7 +9,7 @@
 struct inChnData;
 struct outChnData;
 
-enum class ModelClass { HH };
+enum class ModelClass { HH, SG };
 enum class DAQClass { Simul, DD1200, NI };
 
 class ChannelIndex
@@ -28,8 +28,6 @@ public:
     bool isValid;
 
     bool isNone;
-
-    bool isSG;
 
     bool isPrototype;
     bool isVirtual;

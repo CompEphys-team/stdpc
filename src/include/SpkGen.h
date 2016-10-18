@@ -1,58 +1,66 @@
 #ifndef SPKGEN_H
 #define SPKGEN_H
 
-using namespace std;
-
-#include <fstream>
 #include "Global_func.h"
 #include "ObjectDataTypes.h"
 #include "Channels.h"
 #include <QObject>
-#include <QList>
+#include <QPair>
+#include <memory>
 
-class SpkGen: public QObject 
+class SpkGen : public QObject
 {
-      Q_OBJECT
-      
-  private:
+    Q_OBJECT
+    friend class SpkGenPrototype;
+public:
+    SpkGen(SGData *, vInstData *, DCThread *);
+    ~SpkGen() {}
+
+    void update(double t, double dt);
+
+    inChannel in;
+
+signals:
+    void message(QString message);
+
+protected:
     SGData *p;
+    vInstData *instp;
+    double V;
+
     stdpc::function *theExp;
     stdpc::function *theTanh;
-    inChannel *VChn;
     inChannel *bdChn;
     bool SGactive;
     bool burstDetected;
-    int nOverThresh;
-    int nUnderThresh;
-    int readSpikeNo;
-    int burstSpikeNo;
+    double tOverThresh;
+    double tUnderThresh;
+    int burstNo;
     double ISI_time;
-    
-    QList<double> tq;
-    QList<double>::iterator titer;
-    QList<double> Vq;
-    QList<double>::iterator Viter;
-    QList<double> stq;
-    QList<int> snq;
-    QList<double>::iterator stIter;
-    QList<int>::iterator snIter;
-    ifstream is;
+    double period;
     bool initial;
-    QString lastRead;
-    
-  protected:
-    
-  public:
-    SpkGen();
-    virtual ~SpkGen();
-    void init(SGData *, inChannel *VChn, DCThread *);
-    void VUpdate(double, double);
-    double VSpike(double);
+    bool active;
 
-    double V;
-    
-  signals:
-    void message(QString message);
+    double VSpike(double t);
+};
+
+class SpkGenPrototype
+{
+public:
+    SpkGenPrototype(SGData *, DCThread *);
+    ~SpkGenPrototype() {}
+
+    void updateInstances(double t, double dt);
+    void updateChannels(double t);
+
+    std::pair<int, int> numActiveInst();
+    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save(int modelNo);
+    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save(int modelNo);
+
+    std::vector<std::shared_ptr<SpkGen>> inst;
+
+private:
+    SGData *p;
 };
 
 #endif

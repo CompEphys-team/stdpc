@@ -6,7 +6,6 @@
 ChannelIndex::ChannelIndex() :
     isValid(false),
     isNone(false),
-    isSG(false),
     isPrototype(false),
     isVirtual(false),
     modelClass(ModelClass::HH),
@@ -88,8 +87,6 @@ QString ChannelIndex::prettyName() const
         return ret;
     } else if ( isNone ) {
         ret = "None";
-    } else if ( isSG ) {
-        ret = "Spike generator";
     } else if ( isAnalog ) {
         if ( isInChn )
             ret = QString("AI %1 on ").arg(chanID);
@@ -108,6 +105,7 @@ QString ChannelIndex::prettyName() const
             ret = QString("%3 %1:%2 (model %1, instance %2)").arg(modelID).arg(instID);
         switch ( modelClass ) {
         case ModelClass::HH : ret = ret.arg("HH"); break;
+        case ModelClass::SG : ret = ret.arg("SG"); break;
         }
     } else ret = "Oops: Invalid channel index";
     return ret;
@@ -118,8 +116,6 @@ QString ChannelIndex::toString(QChar sep) const
     QString ret;
     if ( !isValid || isNone ) {
         ret = "None";
-    } else if ( isSG ) {
-        ret = "SpikeGen";
     } else if ( isAnalog ) {
         ret = QString("Analog/");
         switch ( daqClass ) {
@@ -136,12 +132,14 @@ QString ChannelIndex::toString(QChar sep) const
         ret = QString("Prototype/");
         switch ( modelClass ) {
         case ModelClass::HH : ret += "HH/"; break;
+        case ModelClass::SG : ret += "SG/"; break;
         }
         ret += QString::number(modelID);
     } else if ( isVirtual ) {
         ret += "Virtual/";
         switch ( modelClass ) {
         case ModelClass::HH : ret += "HH/"; break;
+        case ModelClass::SG : ret += "SG/"; break;
         }
         ret += QString::number(modelID) + "/" + QString::number(instID);
     }
@@ -188,31 +186,18 @@ static void legacyRescue_0(QString str, ChannelIndex &dex)
         } else if ( d->inChn.size() < d->outChn.size() && ch < (int)d->outChn.size() ) {
             dex.isAnalog = true;
             dex.isInChn = false;
-        } else if ( ch == (int)d->inChn.size() || ch == (int)d->outChn.size() ) {
-            dex.isSG = true;
-        } else if ( ch == (int)(d->inChn.size()+d->outChn.size()+1) ) { // Graph SG ?
-            dex.isSG = true;
-        } else { // Graph out ?
-            dex.isAnalog = true;
-            dex.isInChn = false;
-            dex.chanID = ch - d->inChn.size() - 1;
+        } else {
+            dex.isNone = true;
         }
         dex.isValid = true; // One hopes.
     } else if ( ch == -1 ) { // 2016-RC1 : None
         dex.isNone = true;
         dex.isValid = true;
     } else if ( ch == 1000 ) { // 2016-RC1 : SG
-        dex.isSG = true;
-        dex.isValid = true;
-    } else if ( ch >= 10000 && ch < 10000 + (int)d->inChn.size() ) { // 2016-RC1 : Graph inChn
-        dex.isAnalog = true;
-        dex.chanID = ch - 10000;
-        dex.isInChn = true;
-        dex.isValid = true;
-    } else if ( ch >= 20000 && ch < 20000 + (int)d->outChn.size() ) { // 2016-RC1 : Graph outChn
-        dex.isAnalog = true;
-        dex.chanID = ch - 20000;
-        dex.isInChn = false;
+        dex.isVirtual = true;
+        dex.modelClass = ModelClass::SG;
+        dex.modelID = 0;
+        dex.instID = 0;
         dex.isValid = true;
     } else if ( ch >= 1100000000 ) { // 2016-RC1 : HH Proto
         dex.isPrototype = true;
@@ -238,9 +223,6 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
     QStringList parts = str.split("/");
     if ( !parts.at(0).compare("None", Qt::CaseInsensitive) ) {
         dex.isNone = true;
-        dex.isValid = true;
-    } else if ( !parts.at(0).compare("SpikeGen", Qt::CaseInsensitive) ) {
-        dex.isSG = true;
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Analog", Qt::CaseInsensitive) ) {
         if ( parts.size() != 4 )
@@ -272,6 +254,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
 
         if ( !parts.at(1).compare("HH", Qt::CaseInsensitive) )
             dex.modelClass = ModelClass::HH;
+        else if ( !parts.at(1).compare("SG", Qt::CaseInsensitive) )
+            dex.modelClass = ModelClass::SG;
         else
             return is;
 
@@ -284,6 +268,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
 
         if ( !parts.at(1).compare("HH", Qt::CaseInsensitive) )
             dex.modelClass = ModelClass::HH;
+        else if ( !parts.at(1).compare("SG", Qt::CaseInsensitive) )
+            dex.modelClass = ModelClass::SG;
         else
             return is;
 
@@ -293,6 +279,15 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
         legacyRescue_0(str, dex);
+    } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION < 3 ) {
+        if ( !parts.at(0).compare("SpikeGen", Qt::CaseInsensitive) ) {
+            dex.isVirtual = true;
+            dex.modelClass = ModelClass::SG;
+            dex.modelID = 0;
+            dex.instID = 0;
+            dex.isValid = true;
+        }
+
     }
     return is;
 }
@@ -301,7 +296,6 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
 {
     return a.isValid==b.isValid &&
             a.isNone==b.isNone &&
-            a.isSG==b.isSG &&
             a.isPrototype==b.isPrototype &&
             a.isVirtual==b.isVirtual &&
             (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&

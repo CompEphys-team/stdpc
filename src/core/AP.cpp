@@ -272,22 +272,35 @@ void initAP()
 
 
     // SG
-    addAP("SGp.active", &(SGp.active));
-    addAP("SGp.method", &(SGp.method));
-    addAP("SGp.saving", &(SGp.saving));
-    addAP("SGp.LUTables", &(SGp.LUTables));
-    addAP("SGp.VSpike", &(SGp.VSpike));
-    addAP("SGp.spkTimeScaling", &(SGp.spkTimeScaling));
-    addAP("SGp.VRest", &(SGp.VRest));
-    addAP("SGp.bdType", &(SGp.bdType));
-    addAP("SGp.bdChannel", &(SGp.bdChannel));
-    addAP("SGp.bdThresh", &(SGp.bdThresh));
-    addAP("SGp.bdNUnder", &(SGp.bdNUnder));
-    addAP("SGp.bdNOver", &(SGp.bdNOver));
-    addAP("SGp.period", &(SGp.period));
-    addAP("SGp.SpikeNo", &(SGp.SpikeNo));
-    addAP("SGp.STInFName", &(SGp.STInFName));
-    addAP("SGp.SpikeT[#]", &(SGp.SpikeT));
+    AP *sgAc = addAP("SGp[#].active", &SGp, &SGData::active);
+    AP *sgLU = addAP("SGp[#].LUTables", &SGp, &SGData::LUTables);
+    AP *sgVS = addAP("SGp[#].VSpike", &SGp, &SGData::VSpike);
+    AP *sgTS = addAP("SGp[#].spkTimeScaling", &SGp, &SGData::spkTimeScaling);
+    AP *sgVR = addAP("SGp[#].VRest", &SGp, &SGData::VRest);
+    AP *sgBT = addAP("SGp[#].bdType", &SGp, &SGData::bdType);
+    AP *sgBC = addAP("SGp[#].bdChannel", &SGp, &SGData::bdChannel);
+    AP *sgBH = addAP("SGp[#].bdThresh", &SGp, &SGData::bdThresh);
+               addAP("SGp[#].bdtUnder", &SGp, &SGData::bdtUnder);
+               addAP("SGp[#].bdtOver", &SGp, &SGData::bdtOver);
+    AP *sgPd = addAP("SGp[#].period", &SGp, &SGData::period);
+               addAP("SGp[#].loopBursts", &SGp, &SGData::loopBursts);
+    AP *sgST = addAP("SGp[#].SpikeT[#][#]", &SGp, &SGData::SpikeT);
+
+               addAP("SGp[#].inst[#].active", &SGp, &SGData::inst, &vInstData::active);
+               addAP("SGp[#].inst[#].inChn.bias", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::bias);
+    AP *sgSv = addAP("SGp[#].inst[#].inChn.chnlSaving", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::chnlSaving);
+
+    addDeprecatedAP("SGp.active", sgAc);
+    addDeprecatedAP("SGp.saving", sgSv);
+    addDeprecatedAP("SGp.LUTables", sgLU);
+    addDeprecatedAP("SGp.VSpike", sgVS);
+    addDeprecatedAP("SGp.spkTimeScaling", sgTS);
+    addDeprecatedAP("SGp.VRest", sgVR);
+    addDeprecatedAP("SGp.bdType", sgBT);
+    addDeprecatedAP("SGp.bdChannel", sgBC);
+    addDeprecatedAP("SGp.bdThresh", sgBH);
+    addDeprecatedAP("SGp.period", sgPd);
+    addDeprecatedAP("SGp.SpikeT[#]", sgST, 2);
 
 
     // SDAQp

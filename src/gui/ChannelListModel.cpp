@@ -12,7 +12,8 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
 #ifdef NATIONAL_INSTRUMENTS
       hNI(DAQHelper<NIDAQData>(this)),
 #endif
-      hHH(ModelHelper<HHNeuronData>(&HHNeuronp, this))
+      hHH(ModelHelper<HHNeuronData>(&HHNeuronp, this)),
+      hSG(ModelHelper<SGData>(&SGp, this))
 {
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
     // Owner connects model removals
@@ -32,16 +33,16 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         hNI.nAO = from->hNI.nAO;
 #endif
         hHH.nInst = from->hHH.nInst;
+        hSG.nInst = from->hSG.nInst;
     } else {
         size = 0;
         if ( displayFlags & Blank )
             size++;
         if ( displayFlags & None )
             size++;
-        if ( displayFlags & SpikeGen )
-            size++;
 
         hHH.updateCount();
+        hSG.updateCount();
 
         hSimul.updateCount();
         hDD1200.updateCount();
@@ -105,9 +106,10 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
     ChannelListModel newM(displayFlags);
     newM.updateCount();
 
-    // Ignore always-unchanged Blank, None, SpikeGen
+    // Ignore always-unchanged Blank, None
 
     hHH.updateChns(currentIdx, newIdx, newM);
+    hSG.updateChns(currentIdx, newIdx, newM);
 
     hSimul.updateChns(currentIdx, newIdx, newM);
     hDD1200.updateChns(currentIdx, newIdx, newM);
@@ -270,19 +272,9 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         }
         offset++;
     }
-    if ( displayFlags & SpikeGen ) {
-        if ( row == offset ) {
-            dex.isSG = true;
-            ret.setValue(dex);
-            switch ( role ) {
-            case Qt::DisplayRole:   return QString("Spike generator");
-            case Qt::UserRole:      return ret;
-            case Qt::UserRole + 1:  return QVariant(true);
-            }
-        }
-        offset++;
-    }
     if ( hHH.data(row, role, offset, ret) )
+        return ret;
+    if ( hSG.data(row, role, offset, ret) )
         return ret;
     if ( hSimul.data(row, role, offset, ret) )
         return ret;
@@ -447,8 +439,6 @@ int ChannelListModel::index(const ChannelIndex &dex) const
         type = Prototype;
     else if ( dex.isVirtual )
         type = Virtual;
-    else if ( dex.isSG )
-        type = SpikeGen;
     else if ( dex.isNone )
         type = None;
     else if ( dex.isAnalog && !dex.isInChn ) {
@@ -473,14 +463,10 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
                 return createIndex(row, 0);
             row++;
         }
-        if ( displayFlags & SpikeGen ) {
-            if ( type & SpikeGen ) {
-                return createIndex(row, 0);
-            }
-            row++;
-        }
         QModelIndex ret;
         if ( hHH.index(dex, type, row, ret) )
+            return ret;
+        if ( hSG.index(dex, type, row, ret) )
             return ret;
         if ( hSimul.index(dex, type, row, ret) )
             return ret;
