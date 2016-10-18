@@ -22,6 +22,9 @@
      <property name="text">
       <string>Voltage</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="0" column="4">
