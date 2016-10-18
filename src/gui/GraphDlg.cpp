@@ -149,12 +149,17 @@ void GraphDlg::startPlotting(DCThread *DCT)
         q.push_back(std::unique_ptr<queue_type>(new queue_type()));
     }
 
-    DCT->setGraph(this, ui->samplingInterval->value() * 1e-3);
+    double samplingInterval = ui->samplingInterval->value();
+
+    DCT->setGraph(this, samplingInterval * 1e-3);
 
     initial = true;
     nPoints = 0;
 
-    dataTimer.start(20); // Plotting interval at 50 Hz regardless of sampling interval
+    if ( samplingInterval < 0.1 )
+        dataTimer.start(); // As fast as possible to prevent q overflows
+    else
+        dataTimer.start(20); // 50 Hz for slower sampling
 }
 
 void GraphDlg::stopPlotting()
