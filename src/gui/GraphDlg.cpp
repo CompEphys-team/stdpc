@@ -151,6 +151,9 @@ void GraphDlg::startPlotting(DCThread *DCT)
 
     DCT->setGraph(this, ui->samplingInterval->value() * 1e-3);
 
+    initial = true;
+    nPoints = 0;
+
     dataTimer.start(20); // Plotting interval at 50 Hz regardless of sampling interval
 }
 
