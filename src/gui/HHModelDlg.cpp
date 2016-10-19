@@ -142,8 +142,11 @@ void HHModelDlg::addRow(int row, QCheckBox *active,
     ui->table->setCellWidget(row, 8, iBias);
 
     vBias->setRange(-1000, 1000);
+    vBias->setDecimals(3);
     spkThr->setRange(-1000, 1000);
+    spkThr->setDecimals(3);
     iBias->setRange(-1e6, 1e6);
+    iBias->setDecimals(6);
 
     actives.insert(row, active);
     vSaves.insert(row, vSave);
