@@ -141,6 +141,7 @@ void GraphDlg::startPlotting(DCThread *DCT)
     ui->addBtn->setEnabled(false);
     ui->clearBtn->setEnabled(false);
     ui->samplingInterval->setEnabled(false);
+    ui->bufferExp->setEnabled(false);
 
     reloadGraphs();
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
@@ -172,6 +173,7 @@ void GraphDlg::stopPlotting()
     ui->addBtn->setEnabled(true);
     ui->clearBtn->setEnabled(true);
     ui->samplingInterval->setEnabled(true);
+    ui->bufferExp->setEnabled(true);
 }
 
 void GraphDlg::replot()
@@ -195,7 +197,18 @@ void GraphDlg::replot()
         else
             fac = 1e9;
         while ( queue->pop(point) ) {
-            ui->plot->graph(i)->addData(point.t, point.value * fac);
+            try {
+                ui->plot->graph(i)->addData(point.t, point.value * fac);
+            } catch ( std::bad_alloc ) {
+                // Out of memory - remove half of all data to keep going
+                double middle = range.lower + (range.upper - range.lower) / 2;
+                for ( int j = 0; j < (int)q.size(); j++ ) {
+                    ui->plot->graph(j)->data()->removeBefore(middle);
+                }
+                // Then try again
+                ui->plot->graph(i)->addData(point.t, point.value * fac);
+            }
+
             if ( !i )
                 ++nPoints;
         }

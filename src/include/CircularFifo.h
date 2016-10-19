@@ -7,6 +7,7 @@
 #define CIRCULARFIFO_H
 
 #include <atomic>
+#include <new>
 
 
 template <typename T>
@@ -20,7 +21,7 @@ public:
             try {
                 _data = new T[SIZE];
                 success = true;
-            } catch (...) {
+            } catch (std::bad_alloc) {
                 if ( SIZE == 1 )
                     throw;
                 success = false;
