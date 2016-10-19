@@ -146,9 +146,11 @@ void GraphDlg::startPlotting(DCThread *DCT)
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
     q.clear();
 
+    constexpr size_t bufferSize[] = {1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000};
+
     for ( GraphData &p : Graphp ) {
         p.active = true;
-        q.push_back(std::unique_ptr<queue_type>(new queue_type()));
+        q.push_back(std::unique_ptr<CircularFifo<DataPoint>>(new CircularFifo<DataPoint>(bufferSize[ui->bufferExp->value()])));
     }
 
     double samplingInterval = ui->samplingInterval->value();

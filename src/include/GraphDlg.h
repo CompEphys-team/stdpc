@@ -34,8 +34,7 @@ public:
      ~GraphDlg();
 
      struct DataPoint { double t; double value; };
-     typedef CircularFifo<DataPoint, 10000> queue_type;
-     std::vector<std::unique_ptr<queue_type>> q;
+     std::vector<std::unique_ptr<CircularFifo<DataPoint>>> q;
 
 public slots:
      void startPlotting(DCThread *);

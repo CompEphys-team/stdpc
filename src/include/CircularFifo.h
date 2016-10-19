@@ -9,12 +9,29 @@
 #include <atomic>
 
 
-template <typename T, size_t SIZE>
+template <typename T>
 class CircularFifo
 {
 public:
-    CircularFifo() : _read(0), _write(0) {}
-    ~CircularFifo() {}
+    CircularFifo(size_t size) : SIZE(size), _read(0), _write(0)
+    {
+        bool success = false;
+        while ( !success ) {
+            try {
+                _data = new T[SIZE];
+                success = true;
+            } catch (...) {
+                if ( SIZE == 1 )
+                    throw;
+                success = false;
+                SIZE /= 2;
+            }
+        }
+    }
+    ~CircularFifo()
+    {
+        delete _data;
+    }
 
     bool push(const T& item)
     {
@@ -50,7 +67,8 @@ private:
         return (i + 1) % SIZE;
     }
 
-    T _data[SIZE];
+    size_t SIZE;
+    T *_data;
     std::atomic<size_t> _read;
     std::atomic<size_t> _write;
 };
