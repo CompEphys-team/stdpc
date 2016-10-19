@@ -67,6 +67,8 @@ class MyMainWindow : public QMainWindow
     QFileDialog *SaveProtocolFileDlg;
     QFileDialog *LoadScriptFileDlg;    
     
+    QLabel *loadedProtocolStatus;
+
     // adjustable parameter stuff
 
     void doLoadProtocol(QString &);

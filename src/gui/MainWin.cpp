@@ -52,6 +52,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
+
+     loadedProtocolStatus = new QLabel("");
+     ui->statusbar->addPermanentWidget(loadedProtocolStatus);
          
      DCT= new DCThread();
      
@@ -340,6 +343,8 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   is.close();
 
   importData();
+
+  loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
 }
 
 
