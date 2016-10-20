@@ -153,11 +153,12 @@ void SpkGenPrototype::updateInstances(double t, double dt)
                 sg->update(t, dt);
 }
 
-void SpkGenPrototype::updateChannels(double)
+void SpkGenPrototype::updateChannels(double t)
 {
     for ( std::shared_ptr<SpkGen> const& sg : inst ) {
         if ( (sg->in.active = (p->active && sg->instp->active)) ) {
-            sg->in.V = sg->V + sg->instp->inChn.bias;
+            sg->in.V = sg->V;
+            sg->in.process(t);
         }
     }
 }

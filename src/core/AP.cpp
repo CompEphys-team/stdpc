@@ -69,6 +69,7 @@ void initAP()
     AP *CSyn_pre = addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
     AP *CSyn_pst = addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
     AP *CSyn_out = addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("CSynp[#].delay", &CSynp, &CSynData::delay);
 
     addDeprecatedAP("CSynp[#].PreSynChannel", CSyn_pre);
     addDeprecatedAP("CSynp[#].PostSynChannel", CSyn_pst);
@@ -129,6 +130,7 @@ void initAP()
     AP *abSyn_pre = addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
     AP *abSyn_pst = addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
     AP *abSyn_out = addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("abSynp[#].delay", &abSynp, &abSynData::delay);
 
     addDeprecatedAP("abSynp[#].PreSynChannel", abSyn_pre);
     addDeprecatedAP("abSynp[#].PostSynChannel", abSyn_pst);
@@ -187,6 +189,7 @@ void initAP()
     AP *DxSyn_pre = addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
     AP *DxSyn_pst = addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
     AP *DxSyn_out = addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("DxheSynp[#].delay", &DxheSynp, &DestexheSynData::delay);
 
     addDeprecatedAP("DxheSynp[#].PreSynChannel", DxSyn_pre);
     addDeprecatedAP("DxheSynp[#].PostSynChannel", DxSyn_pst);

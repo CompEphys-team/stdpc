@@ -84,6 +84,7 @@ void DCThread::run()
        message(QString("Added %1 channels for display").arg(i));
    }
 
+   bufferHelper.reset(new ChannelBufferHelper);
    csyn.clear();
    for ( CSynData &p : CSynp ) {
        if ( p.active ) {
@@ -360,6 +361,8 @@ void DCThread::run()
              model.updateNeurons(t, dt);
          for ( SpkGenPrototype &model : SGProto )
              model.updateInstances(t, dt);
+
+         bufferHelper->advance(t);
 
          // Updated display
          if ( graph ) {

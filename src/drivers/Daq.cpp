@@ -71,8 +71,7 @@ void DAQ::process_scan(double t)
     for ( int i = 0; i < actOutChnNo; i++ )
         out[outIdx[i]].I = p->outChn[outIdx[i]].bias;
     for ( int i = 0; i < actInChnNo; i++ ) {
-        in[inIdx[i]].V += p->inChn[inIdx[i]].bias;
-        in[inIdx[i]].spike_detect(t);
+        in[inIdx[i]].process(t);
     }
 }
 

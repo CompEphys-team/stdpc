@@ -3,6 +3,8 @@
 
 #include "Global.h"
 #include "AECChannel.h"
+#include "ChannelBufferHelper.h"
+#include <memory>
 
 class inChannel {
  public:
@@ -17,8 +19,19 @@ class inChannel {
      AECChannel aec;
      
      inChannel();
+     ~inChannel();
+
      void init(inChnData *);
-     void spike_detect(double);
+     void process(double);
+
+     size_t getBufferHandle(double duration, std::shared_ptr<ChannelBufferHelper> &);
+     double getBufferedV(size_t handle);
+
+private:
+     double *Vbuf;
+     size_t Vbufsize;
+     std::shared_ptr<ChannelBufferHelper> bufferHelper;
+
 };
 
 

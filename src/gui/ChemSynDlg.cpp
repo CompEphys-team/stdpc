@@ -114,6 +114,7 @@ void ChemSynDlg::exportData(CSynData &p)
   p.Vpost= VpostE->text().toDouble()*1e-3;
   p.Mgfac= MgfacE->text().toDouble();
   p.Mgexpo= MgexpoE->text().toDouble();
+  p.delay = delay->value() * 1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
   STDP->exportData(p.ST);
@@ -162,6 +163,7 @@ void ChemSynDlg::importData(CSynData p)
   MgfacE->setText(num);
   num.setNum(p.Mgexpo);
   MgexpoE->setText(num);
+  delay->setValue(p.delay * 1e3);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
   // ST plasticity
   STDP->importData(p.ST);

@@ -76,6 +76,7 @@ void abSynDlg::exportData(abSynData &p)
   p.bR= bRE->text().toDouble()*1e3;
   p.fixVpost= fixVpostCombo->currentIndex();
   p.Vpost= VpostE->text().toDouble()*1e-3;
+  p.delay = delay->value() * 1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
   STDP->exportData(p.ST);
@@ -109,6 +110,7 @@ void abSynDlg::importData(abSynData p)
   fixVpostCombo->setCurrentIndex(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
+  delay->setValue(p.delay * 1e3);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
   // ST plasticity
   STDP->importData(p.ST);

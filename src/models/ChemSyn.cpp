@@ -9,6 +9,7 @@ ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment a) :
     post(t->getInChan(a.PostSynChannel)),
     out(t->getOutChan(a.OutSynChannel)),
     a(a),
+    buffered(false),
     Sinf(0.0),
     S(0.0),
     hinf(1.0),
@@ -16,7 +17,6 @@ ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment a) :
     h(1.0),
     g(p->gSyn),
     gfac(1.0)
-
 {
     if (p->LUTables) {
         theExp= &expLU;
@@ -38,6 +38,11 @@ ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment a) :
         D= p->ODE.InitialD;
         Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
         Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( p->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(p->delay, t->bufferHelper);
+        buffered = true;
     }
 }
 
@@ -85,17 +90,19 @@ void ChemSyn::currentUpdate(double t, double dt)
   S+= (Sinf - S)/tmp*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
   if (S < 0.0) S= 0.0;
+
+  double preV = buffered ? pre->getBufferedV(bufferHandle) : pre->V;
   
-  if (pre->V > p->VThresh)
-    Sinf= (*theTanh)((pre->V - p->VThresh)/p->VSlope);
+  if (preV > p->VThresh)
+    Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
   else Sinf= 0.0;
 
   if(p->STD){
     // Linear Euler:
     h+= (hinf - h)/tauh*dt;   // use previous values of hinf, h, tauh
-    tmp= (*theExpSigmoid)((pre->V - p->STDVThresh)/p->STDVSlope); 
+    tmp= (*theExpSigmoid)((preV - p->STDVThresh)/p->STDVSlope);
     hinf= p->STDAmpl*tmp;
-    tmp= (*theExpSigmoid)((pre->V - p->STDtauVThresh)/p->STDtauVSlope); 
+    tmp= (*theExpSigmoid)((preV - p->STDtauVThresh)/p->STDtauVSlope);
     tauh= p->STDtau0 - p->STDtauAmpl*tmp;
   }
   else h= 1.0;
@@ -206,6 +213,6 @@ void ChemSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

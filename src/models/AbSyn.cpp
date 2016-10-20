@@ -9,6 +9,7 @@ abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment a) :
     post(t->getInChan(a.PostSynChannel)),
     out(t->getOutChan(a.OutSynChannel)),
     a(a),
+    buffered(false),
     S(0.0),
     R(0.0),
     g(p->gSyn)
@@ -33,6 +34,11 @@ abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment a) :
       D= p->ODE.InitialD;
       Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
       Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( p->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(p->delay, t->bufferHelper);
+        buffered = true;
     }
 }
 
@@ -75,7 +81,7 @@ void abSyn::currentUpdate(double t, double dt)
   
   // calculate synaptic current
   dS= (1.0 - S)*p->aS*R - S*p->bS;
-  dR= (1.0 - R)*p->aR*(*theExpSigmoid)((pre->V-p->VaR)/p->saR) - R*p->bR;
+  dR= (1.0 - R)*p->aR*(*theExpSigmoid)(((buffered ? pre->getBufferedV(bufferHandle) : pre->V)-p->VaR)/p->saR) - R*p->bR;
   // Linear Euler:
   S+= dS*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
@@ -186,6 +192,6 @@ void abSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

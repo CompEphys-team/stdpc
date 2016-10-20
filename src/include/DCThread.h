@@ -19,6 +19,8 @@
 #include "DataSaver.h"
 #include "HHNeuron.h"
 
+#include "ChannelBufferHelper.h"
+
 class GraphDlg;
 
 class DCThread : public QThread 
@@ -71,6 +73,8 @@ private:
 
      std::vector<HHNeuronModel> hhNeuron;
      std::vector<SpkGenPrototype> SGProto;
+
+     std::shared_ptr<ChannelBufferHelper> bufferHelper;
      
  private:
      bool initial;   

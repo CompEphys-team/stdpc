@@ -16,6 +16,9 @@ class ChemSyn {
     outChannel *out;
     SynapseAssignment a;
 
+    size_t bufferHandle;
+    bool buffered;
+
     double P_f(double);
     double D_f(double);
     double invGFilter(double);

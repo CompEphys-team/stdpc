@@ -9,6 +9,7 @@ DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment a)
     post(t->getInChan(a.PostSynChannel)),
     out(t->getOutChan(a.OutSynChannel)),
     a(a),
+    buffered(false),
     S(0.0),
     tlast(-1.0e10),
     g(p->gSyn)
@@ -33,6 +34,11 @@ DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment a)
         D= p->ODE.InitialD;
         Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
         Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( p->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(p->delay, t->bufferHelper);
+        buffered = true;
     }
 }
 
@@ -79,7 +85,7 @@ void DestexheSyn::currentUpdate(double t, double dt)
     // continue release from an old spike
     dS= p->alpha*(1.0-S) - p->beta*S;
   } else {
-    if (pre->V > p->Vpre) {
+    if ((buffered ? pre->getBufferedV(bufferHandle) : pre->V) > p->Vpre) {
       // new spike ... start releasing
       tlast= t;
       dS= p->alpha*(1.0-S) - p->beta*S;
@@ -195,6 +201,6 @@ void DestexheSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

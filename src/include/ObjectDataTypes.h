@@ -98,6 +98,7 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  double delay;
 } CSynData;
 
 typedef struct {
@@ -117,6 +118,7 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  double delay;
 } abSynData;
 
 typedef struct {
@@ -134,6 +136,7 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  double delay;
 } DestexheSynData;
 
 typedef struct {
