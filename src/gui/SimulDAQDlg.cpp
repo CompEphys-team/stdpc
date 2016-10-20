@@ -32,16 +32,20 @@ bool SimulDAQDlg::exportData(bool forceInit)
   bool change= false;
   bool devOK = true;
   uint inChnNo = SDAQp[idx].inChn.size(), outChnNo = SDAQp[idx].outChn.size();
-  getEntry(SDAQp[idx].inFileName, InputFileE->text(), change);
-  getEntry(SDAQp[idx].outFileName, OutputFileE->text(), change);
   getEntry(inChnNo, inChannelE->text().toUInt(), change);
   getEntry(outChnNo, outChannelE->text().toUInt(), change);
-  getEntry(SDAQp[idx].inTFac, inTFacE->text().toDouble(), change);
-  getEntry(SDAQp[idx].outDt, outDtE->text().toDouble()*1e-3, change);
   if ( change ) {
       SDAQp[idx].inChn.resize(inChnNo);
       SDAQp[idx].outChn.resize(outChnNo);
+      for ( inChnData &i : SDAQp[idx].inChn )
+          i.active = true;
+      for ( outChnData &i : SDAQp[idx].outChn )
+          i.active = true;
   }
+  getEntry(SDAQp[idx].inFileName, InputFileE->text(), change);
+  getEntry(SDAQp[idx].outFileName, OutputFileE->text(), change);
+  getEntry(SDAQp[idx].inTFac, inTFacE->text().toDouble(), change);
+  getEntry(SDAQp[idx].outDt, outDtE->text().toDouble()*1e-3, change);
   inDlg->exportData();
   outDlg->exportData();
   if ( change || forceInit ) {

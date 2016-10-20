@@ -280,11 +280,7 @@ class SDAQData : public DAQData {
         outFileName("StdpcOut1.dat"),
         inTFac(1),
         outDt(0.001)
-    {
-        inChn.resize(2);
-        outChn.resize(1);
-        inChn[0].active = inChn[1].active = outChn[0].active = true;
-    }
+    {}
 
     typedef SimulDAQ DaqType;
     typedef SimulDAQDlg DlgType;
