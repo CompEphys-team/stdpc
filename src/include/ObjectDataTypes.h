@@ -340,7 +340,6 @@ struct vInstData {
 
 struct ModelData {
     bool active;
-    std::vector<vInstData> inst;
     ModelData() : active(false), removed(false) {}
 
     bool removed; // Internal use only (set to true when reversibly deleted in the GUI)
@@ -351,10 +350,16 @@ struct HHNeuronData : public ModelData {
     double C;
     double gLeak;
     double ELeak;
+    std::vector<vInstData> inst;
     HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
 
     typedef HHModelDlg DlgType;
     static constexpr ModelClass modelClass = ModelClass::HH;
+};
+
+struct SgInstData : public vInstData {
+    ChannelIndex bdChannel;
+    double bdThresh;
 };
 
 class SpikeGenDlg;
@@ -365,14 +370,14 @@ struct SGData : public ModelData {
   double VRest;
 
   int bdType;
-  ChannelIndex bdChannel;
-  double bdThresh;
   double bdtUnder;
   double bdtOver;
 
   double period;
   bool loopBursts;
   std::vector<std::vector<double>> SpikeT;
+
+  std::vector<SgInstData> inst;
 
   typedef SpikeGenDlg DlgType;
   static constexpr ModelClass modelClass = ModelClass::SG;

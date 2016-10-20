@@ -281,8 +281,6 @@ void initAP()
     AP *sgTS = addAP("SGp[#].spkTimeScaling", &SGp, &SGData::spkTimeScaling);
     AP *sgVR = addAP("SGp[#].VRest", &SGp, &SGData::VRest);
     AP *sgBT = addAP("SGp[#].bdType", &SGp, &SGData::bdType);
-    AP *sgBC = addAP("SGp[#].bdChannel", &SGp, &SGData::bdChannel);
-    AP *sgBH = addAP("SGp[#].bdThresh", &SGp, &SGData::bdThresh);
                addAP("SGp[#].bdtUnder", &SGp, &SGData::bdtUnder);
                addAP("SGp[#].bdtOver", &SGp, &SGData::bdtOver);
     AP *sgPd = addAP("SGp[#].period", &SGp, &SGData::period);
@@ -292,6 +290,8 @@ void initAP()
                addAP("SGp[#].inst[#].active", &SGp, &SGData::inst, &vInstData::active);
                addAP("SGp[#].inst[#].inChn.bias", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::bias);
     AP *sgSv = addAP("SGp[#].inst[#].inChn.chnlSaving", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::chnlSaving);
+    AP *sgBC = addAP("SGp[#].inst[#].bdChannel", &SGp, &SGData::inst, &SgInstData::bdChannel);
+    AP *sgBH = addAP("SGp[#].inst[#].bdThresh", &SGp, &SGData::inst, &SgInstData::bdThresh);
 
     addDeprecatedAP("SGp.active", sgAc);
     addDeprecatedAP("SGp.saving", sgSv);
@@ -301,7 +301,9 @@ void initAP()
     addDeprecatedAP("SGp.VRest", sgVR);
     addDeprecatedAP("SGp.bdType", sgBT);
     addDeprecatedAP("SGp.bdChannel", sgBC);
+    addDeprecatedAP("SGp[#].bdChannel", sgBC);
     addDeprecatedAP("SGp.bdThresh", sgBH);
+    addDeprecatedAP("SGp[#].bdThresh", sgBH);
     addDeprecatedAP("SGp.period", sgPd);
     addDeprecatedAP("SGp.SpikeT[#]", sgST, 2);
 

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include "WideComboBox.h"
 #include "ObjectDataTypes.h"
 #include "ChannelListModel.h"
 
@@ -42,10 +43,12 @@ private:
     ChannelListModel clm;
 
     QVector<QCheckBox*> actives, vSaves;
-    QVector<QDoubleSpinBox*> vBiases;
-    QMetaObject::Connection activec, vSavec, vBiasc;
+    QVector<QDoubleSpinBox*> vBiases, bdThresholds;
+    QVector<WideComboBox*> bdChannels;
+    QMetaObject::Connection activec, vSavec, vBiasc, bdChannelc, bdThresholdc;
 
-    void addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias);
+    void addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias,
+                    WideComboBox *bdChannel, QDoubleSpinBox *bdThresh);
     void setCellCheckBox(int row, int column, QCheckBox *box);
 
     QDoubleSpinBox *makeSTCell(int row, int col);

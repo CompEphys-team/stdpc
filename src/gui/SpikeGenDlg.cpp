@@ -3,12 +3,13 @@
 #include "Global.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QHBoxLayout>
 #include <fstream>
 
 SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SpikeGenDlg),
-    clm(ChannelListModel::AnalogIn | ChannelListModel::Virtual, this)
+    clm(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::None, this)
 {
     ui->setupUi(this);
     label = ui->titleLabel->text();
@@ -17,11 +18,18 @@ SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
     ui->instTable->setHorizontalHeaderLabels({"Active",
                                               "",
                                               "Save",
-                                              "Bias (mV)"});
+                                              "Bias (mV)",
+                                              "",
+                                              "Burst detect\nchannel",
+                                              "Burst detect\nthreshold (mV)"
+                                             });
     ui->instTable->setColumnWidth(0, 40);
     ui->instTable->setColumnWidth(1, 10);
-    ui->instTable->setColumnWidth(2, 80);
+    ui->instTable->setColumnWidth(2, 60);
     ui->instTable->setColumnWidth(3, 80);
+    ui->instTable->setColumnWidth(4, 10);
+    ui->instTable->setColumnWidth(5, 80);
+    ui->instTable->setColumnWidth(6, 80);
     growInstTable(false);
 
     connect(ui->btnLoadST, &QPushButton::clicked, [this](bool){
@@ -71,7 +79,6 @@ SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
         ui->bdGroupW->setEnabled(i > 0);
     });
 
-    ui->SGbdChannelCombo->setModel(&clm);
     connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
     connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
 
@@ -101,8 +108,6 @@ void SpikeGenDlg::importData()
     ui->VRest->setValue(SGp[idx].VRest * 1e3);
 
     ui->BurstDetectionCombo->setCurrentIndex(SGp[idx].bdType);
-    ui->SGbdChannelCombo->setCurrentIndex(clm.index(SGp[idx].bdChannel));
-    ui->Threshold->setValue(SGp[idx].bdThresh * 1e3);
     ui->tUnder->setValue(SGp[idx].bdtUnder * 1e3);
     ui->tOver->setValue(SGp[idx].bdtOver * 1e3);
 
@@ -112,20 +117,27 @@ void SpikeGenDlg::importData()
     importST(SGp[idx].SpikeT);
 
     QCheckBox *active, *vSave;
-    QDoubleSpinBox *vBias;
+    QDoubleSpinBox *vBias, *bdThreshold;
+    WideComboBox *bdChannel;
     actives.clear();
     vSaves.clear();
     vBiases.clear();
+    bdChannels.clear();
+    bdThresholds.clear();
     ui->instTable->setRowCount(0);
     int row = 0;
-    for ( vInstData const& inst : SGp[idx].inst ) {
+    for ( SgInstData const& inst : SGp[idx].inst ) {
         active = new QCheckBox();
         vSave = new QCheckBox();
         vBias = new QDoubleSpinBox();
-        addInstRow(row++, active, vSave, vBias);
+        bdChannel = new WideComboBox();
+        bdThreshold = new QDoubleSpinBox();
+        addInstRow(row++, active, vSave, vBias, bdChannel, bdThreshold);
         active->setChecked(inst.active);
         vSave->setChecked(inst.inChn.chnlSaving);
         vBias->setValue(inst.inChn.bias * 1e3);
+        bdChannel->setCurrentIndex(clm.index(inst.bdChannel));
+        bdThreshold->setValue(inst.bdThresh * 1e3);
     }
     growInstTable(false);
 }
@@ -186,8 +198,6 @@ void SpikeGenDlg::exportData(bool)
     SGp[idx].VRest = ui->VRest->value() / 1e3;
 
     SGp[idx].bdType = ui->BurstDetectionCombo->currentIndex();
-    SGp[idx].bdChannel = ui->SGbdChannelCombo->currentData().value<ChannelIndex>();
-    SGp[idx].bdThresh = ui->Threshold->value() / 1e3;
     SGp[idx].bdtUnder = ui->tUnder->value() / 1e3;
     SGp[idx].bdtOver = ui->tOver->value() / 1e3;
 
@@ -199,13 +209,16 @@ void SpikeGenDlg::exportData(bool)
     // Ensure any changes (sorting, dropping rows) are reflected in the UI
     importST(SGp[idx].SpikeT);
 
-    vInstData inst;
+    SgInstData inst;
+    int nRows = ui->instTable->rowCount() - 1;
     SGp[idx].inst.clear();
-    SGp[idx].inst.reserve(ui->instTable->rowCount() - 1);
-    for ( int i = 0; i < ui->instTable->rowCount() - 1; i++ ) {
+    SGp[idx].inst.reserve(nRows);
+    for ( int i = 0; i < nRows; i++ ) {
         inst.active = actives[i]->isChecked();
         inst.inChn.chnlSaving = vSaves[i]->isChecked();
         inst.inChn.bias = vBiases[i]->value() * 1e-3;
+        inst.bdChannel = bdChannels[i]->currentData().value<ChannelIndex>();
+        inst.bdThresh = bdThresholds[i]->value() * 1e-3;
         SGp[idx].inst.push_back(inst);
     }
 
@@ -259,7 +272,8 @@ void SpikeGenDlg::reject()
     QDialog::reject();
 }
 
-void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias)
+void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias,
+                             WideComboBox *bdChannel, QDoubleSpinBox *bdThresh)
 {
     ui->instTable->insertRow(row);
     ui->instTable->setRowHeight(row, 25);
@@ -274,9 +288,16 @@ void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoub
     ui->instTable->setCellWidget(row, 3, vBias);
     vBias->setRange(-1000, 1000);
 
+    ui->instTable->setCellWidget(row, 5, bdChannel);
+    bdChannel->setModel(&clm);
+    ui->instTable->setCellWidget(row, 6, bdThresh);
+    bdThresh->setRange(-1000, 1000);
+
     actives.insert(row, active);
     vSaves.insert(row, vSave);
     vBiases.insert(row, vBias);
+    bdChannels.insert(row, bdChannel);
+    bdThresholds.insert(row, bdThresh);
 }
 
 void SpikeGenDlg::setCellCheckBox(int row, int column, QCheckBox *box)
@@ -295,6 +316,8 @@ void SpikeGenDlg::growInstTable(bool reactive)
     disconnect(activec);
     disconnect(vSavec);
     disconnect(vBiasc);
+    disconnect(bdChannelc);
+    disconnect(bdThresholdc);
 
     if ( reactive && !actives.empty() )
         actives.last()->setChecked(true);
@@ -302,10 +325,14 @@ void SpikeGenDlg::growInstTable(bool reactive)
     QCheckBox *active = new QCheckBox();
     QCheckBox *vSave = new QCheckBox();
     QDoubleSpinBox *vBias = new QDoubleSpinBox();
+    WideComboBox *bdChannel = new WideComboBox();
+    QDoubleSpinBox *bdThresh = new QDoubleSpinBox();
 
-    addInstRow(ui->instTable->rowCount(), active, vSave, vBias);
+    addInstRow(ui->instTable->rowCount(), active, vSave, vBias, bdChannel, bdThresh);
 
     activec = connect(active, SIGNAL(stateChanged(int)), this, SLOT(growInstTable()));
     vSavec = connect(vSave, SIGNAL(stateChanged(int)), this, SLOT(growInstTable()));
     vBiasc = connect(vBias, SIGNAL(valueChanged(double)), this, SLOT(growInstTable()));
+    bdChannelc = connect(bdChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(growInstTable()));
+    bdThresholdc = connect(bdThresh, SIGNAL(valueChanged(double)), this, SLOT(growInstTable()));
 }

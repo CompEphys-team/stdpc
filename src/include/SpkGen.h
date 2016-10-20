@@ -13,7 +13,7 @@ class SpkGen : public QObject
     Q_OBJECT
     friend class SpkGenPrototype;
 public:
-    SpkGen(SGData *, vInstData *, DCThread *);
+    SpkGen(SGData *, SgInstData *, DCThread *);
     ~SpkGen() {}
 
     void update(double t, double dt);
@@ -25,7 +25,7 @@ signals:
 
 protected:
     SGData *p;
-    vInstData *instp;
+    SgInstData *instp;
     double V;
 
     stdpc::function *theExp;

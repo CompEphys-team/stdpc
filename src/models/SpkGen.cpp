@@ -2,11 +2,11 @@
 #include "DCThread.h"
 
 
-SpkGen::SpkGen(SGData *p, vInstData *instp, DCThread *DCT) :
+SpkGen::SpkGen(SGData *p, SgInstData *instp, DCThread *DCT) :
     p(p),
     instp(instp),
     V(p->VRest),
-    bdChn(DCT->getInChan(p->bdChannel)),
+    bdChn(DCT->getInChan(instp->bdChannel)),
     SGactive(p->bdType == 0),
     burstDetected(false),
     tOverThresh(0.),
@@ -44,11 +44,11 @@ void SpkGen::update(double t, double dt)
         ISI_time += dt;
     }
 
-    if (p->bdType > 0 && !SGactive) { // taking care of the burst detection options
+    if (p->bdType > 0 && !SGactive && bdChn ) { // taking care of the burst detection options
                                       // burst detection hasn't been completed yet ... spike generation inactive
         if (burstDetected) { // burst (first crossing) was detected, waiting for opposite crossing
-            if (((p->bdType == 1) && (bdChn->V > p->bdThresh)) ||
-                ((p->bdType == 2) && (bdChn->V < p->bdThresh))) {
+            if (((p->bdType == 1) && (bdChn->V > instp->bdThresh)) ||
+                ((p->bdType == 2) && (bdChn->V < instp->bdThresh))) {
                 tUnderThresh += dt;     // "under" and "over" only phrases for first and second cond.
                 if (tUnderThresh > p->bdtUnder) {
                     SGactive = true;
@@ -59,8 +59,8 @@ void SpkGen::update(double t, double dt)
                 }
             }
         } else {  // burst (first crossing) not yet detected ...
-            if (((p->bdType == 1) && (bdChn->V < p->bdThresh)) ||
-                ((p->bdType == 2) && (bdChn->V > p->bdThresh))) {
+            if (((p->bdType == 1) && (bdChn->V < instp->bdThresh)) ||
+                ((p->bdType == 2) && (bdChn->V > instp->bdThresh))) {
                 tOverThresh += dt;
                 if (tOverThresh > p->bdtOver) {
                     tUnderThresh = 0.;
@@ -141,7 +141,7 @@ SpkGenPrototype::SpkGenPrototype(SGData *p, DCThread *DCT) :
     p(p)
 {
     inst.reserve(p->inst.size());
-    for ( vInstData &a : p->inst )
+    for ( SgInstData &a : p->inst )
         inst.push_back(std::make_shared<SpkGen>(p, &a, DCT));
 }
 

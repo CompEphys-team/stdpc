@@ -176,7 +176,7 @@ void MyMainWindow::updateStartButton()
         }
     }
     if ( !success && SGp.size() ) {
-        for ( ModelData const& p : SGp ) {
+        for ( SGData const& p : SGp ) {
             if ( p.active && p.inst.size() ) {
                 for ( vInstData const& inst : p.inst ) {
                     if ( inst.active ) {
