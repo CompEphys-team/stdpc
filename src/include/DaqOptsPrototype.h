@@ -73,6 +73,9 @@ public:
     void exportData(bool ignoreDAQ = false)
     {
         if ( !ignoreDAQ || !DaqDlg::isDAQ::value ) {
+            if ( !DaqDlg::isDAQ::value )
+                while ( params->size() && params->back().removed )
+                    params->erase(params->end() - 1);
             params->resize(inst.size());
             for ( DaqOptsBase *c : inst )
                 c->exportData();

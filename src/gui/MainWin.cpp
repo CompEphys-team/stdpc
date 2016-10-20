@@ -270,6 +270,8 @@ void MyMainWindow::importData()
 
 void MyMainWindow::SaveConfig()
 {
+  ui->DAQTable->exportData();
+
   ofstream os("StdpC.conf");
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
