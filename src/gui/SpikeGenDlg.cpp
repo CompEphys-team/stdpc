@@ -74,6 +74,9 @@ SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
     ui->SGbdChannelCombo->setModel(&clm);
     connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
     connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
+
+    std::vector<std::vector<double>> defaults(1, {.03,.05,.068,.088,.112,.138,.168,.204,.248,.308});
+    importST(defaults);
 }
 
 

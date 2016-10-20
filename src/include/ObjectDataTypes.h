@@ -378,8 +378,6 @@ struct SGData : public ModelData {
   bool loopBursts;
   std::vector<std::vector<double>> SpikeT;
 
-  SGData() : SpikeT(1, {.03,.05,.068,.088,.112,.138,.168,.204,.248,.308}) {} // other defaults in UI
-
   typedef SpikeGenDlg DlgType;
   static constexpr ModelClass modelClass = ModelClass::SG;
 };
