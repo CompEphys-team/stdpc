@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StdpC 2016 RC1</string>
+   <string>StdpC 2016 RC2a</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="HHBox">
