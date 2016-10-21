@@ -126,6 +126,11 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>DeviceNameE</tabstop>
+  <tabstop>inChannels</tabstop>
+  <tabstop>outChannels</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

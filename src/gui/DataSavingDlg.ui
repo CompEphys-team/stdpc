@@ -199,6 +199,14 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>enabledE</tabstop>
+  <tabstop>leFileName</tabstop>
+  <tabstop>browseButton</tabstop>
+  <tabstop>leSavingFreq</tabstop>
+  <tabstop>cbSavingFormat</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

@@ -1204,6 +1204,47 @@
    <header>WideComboBox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbCompOn_1</tabstop>
+  <tabstop>leGenOutChannelNum_1</tabstop>
+  <tabstop>leGenSamplingRate_1</tabstop>
+  <tabstop>CopyChannelCheckBox_1</tabstop>
+  <tabstop>leGenCopyChannelNum_1</tabstop>
+  <tabstop>leElecMaxCurrent_1</tabstop>
+  <tabstop>leElecMinCurrent_1</tabstop>
+  <tabstop>leElecLevelNum_1</tabstop>
+  <tabstop>leElecInjLen_1</tabstop>
+  <tabstop>elecMeasButton_1</tabstop>
+  <tabstop>leMembIStep_1</tabstop>
+  <tabstop>leMembRepNum_1</tabstop>
+  <tabstop>leMembInjLen_1</tabstop>
+  <tabstop>membMeasButton_1</tabstop>
+  <tabstop>leHyperpolCurr_1</tabstop>
+  <tabstop>leCalInjAmp_1</tabstop>
+  <tabstop>leCalInjLen_1</tabstop>
+  <tabstop>leCalFKLen_1</tabstop>
+  <tabstop>leCalEKLen_1</tabstop>
+  <tabstop>calibrateButton_1</tabstop>
+  <tabstop>leElecMeasRes_1</tabstop>
+  <tabstop>leElecResStd_1</tabstop>
+  <tabstop>leElecCalibRes_1</tabstop>
+  <tabstop>leElecMeasTime_1</tabstop>
+  <tabstop>leElecTimeStd_1</tabstop>
+  <tabstop>leElecCalibTime_1</tabstop>
+  <tabstop>leCellMeasRes_1</tabstop>
+  <tabstop>leCellResStd_1</tabstop>
+  <tabstop>leCellCalibRes_1</tabstop>
+  <tabstop>leCellMeasTime_1</tabstop>
+  <tabstop>leCellTimeStd_1</tabstop>
+  <tabstop>leCellCalibTime_1</tabstop>
+  <tabstop>leAverSamplRate_1</tabstop>
+  <tabstop>leSTDSamplingRate_1</tabstop>
+  <tabstop>leStdPerMeanRate_1</tabstop>
+  <tabstop>leMinSRate_1</tabstop>
+  <tabstop>leDesPerMinRate_1</tabstop>
+  <tabstop>leMaxSTime_1</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

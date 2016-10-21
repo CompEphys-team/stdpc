@@ -488,6 +488,24 @@
    <header>DaqTable.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>StartBut</tabstop>
+  <tabstop>StopBut</tabstop>
+  <tabstop>MessageWindow</tabstop>
+  <tabstop>DAQTable</tabstop>
+  <tabstop>DAQClear</tabstop>
+  <tabstop>DAQReset</tabstop>
+  <tabstop>synapseTable</tabstop>
+  <tabstop>SynActivate</tabstop>
+  <tabstop>SynDeactivate</tabstop>
+  <tabstop>SynClear</tabstop>
+  <tabstop>SynReset</tabstop>
+  <tabstop>currentTable</tabstop>
+  <tabstop>HHActivate</tabstop>
+  <tabstop>HHDeactivate</tabstop>
+  <tabstop>HHClear</tabstop>
+  <tabstop>HHReset</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

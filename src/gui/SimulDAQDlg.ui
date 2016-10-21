@@ -308,6 +308,18 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>InputFileE</tabstop>
+  <tabstop>InputFileB</tabstop>
+  <tabstop>OutputFileE</tabstop>
+  <tabstop>OutputFileB</tabstop>
+  <tabstop>inChannelE</tabstop>
+  <tabstop>outChannelE</tabstop>
+  <tabstop>inTFacE</tabstop>
+  <tabstop>outDtE</tabstop>
+  <tabstop>inChannels</tabstop>
+  <tabstop>outChannels</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

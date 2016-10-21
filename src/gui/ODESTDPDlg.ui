@@ -816,6 +816,24 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>InitialPE</tabstop>
+  <tabstop>InitialDE</tabstop>
+  <tabstop>gammaE</tabstop>
+  <tabstop>betaPE</tabstop>
+  <tabstop>betaDE</tabstop>
+  <tabstop>etaE</tabstop>
+  <tabstop>highPE</tabstop>
+  <tabstop>lowPE</tabstop>
+  <tabstop>highDE</tabstop>
+  <tabstop>lowDE</tabstop>
+  <tabstop>gMaxE</tabstop>
+  <tabstop>gMidE</tabstop>
+  <tabstop>gSlopeE</tabstop>
+  <tabstop>sigmoidTableCombo</tabstop>
+  <tabstop>sigmoidTableDgE</tabstop>
+  <tabstop>sigmoidTableMaxEntryE</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

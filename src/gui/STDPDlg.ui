@@ -1057,6 +1057,24 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>AMinusE</tabstop>
+  <tabstop>tauMinusE</tabstop>
+  <tabstop>APlusE</tabstop>
+  <tabstop>tauPlusE</tabstop>
+  <tabstop>ExponentE</tabstop>
+  <tabstop>ShiftE</tabstop>
+  <tabstop>HistoryE</tabstop>
+  <tabstop>TableCombo</tabstop>
+  <tabstop>tableDtE</tabstop>
+  <tabstop>tableDgMinE</tabstop>
+  <tabstop>gMaxE</tabstop>
+  <tabstop>gMidE</tabstop>
+  <tabstop>gSlopeE</tabstop>
+  <tabstop>sigmoidTableCombo</tabstop>
+  <tabstop>sigmoidTableDgE</tabstop>
+  <tabstop>sigmoidTableMaxEntryE</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

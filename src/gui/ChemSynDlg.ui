@@ -6,1065 +6,716 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
+    <width>451</width>
     <height>636</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Chemical Synapse</string>
   </property>
-  <widget class="QDialogButtonBox" name="ResCloseBox">
-   <property name="geometry">
-    <rect>
-     <x>200</x>
-     <y>600</y>
-     <width>160</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Close</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="ChemSynDlgLabel">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>205</x>
-     <y>20</y>
-     <width>151</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="styleSheet">
-    <string/>
-   </property>
-   <property name="frameShape">
-    <enum>QFrame::Panel</enum>
-   </property>
-   <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
-   </property>
-   <property name="lineWidth">
-    <number>1</number>
-   </property>
-   <property name="midLineWidth">
-    <number>0</number>
-   </property>
-   <property name="text">
-    <string>Chemical Synapse %1</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>24</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>gSyn</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_5">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>230</y>
-     <width>24</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VSyn</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_6">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>260</y>
-     <width>34</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tauSyn</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="gSynE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>200</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>10.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="VSynE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>230</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>0.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="tauSynE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>260</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>10</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="VThreshE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>290</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>-20.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="VSlopeE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>320</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>25.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_7">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>290</y>
-     <width>39</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VThresh</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_8">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>320</y>
-     <width>32</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VSlope</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_9">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>200</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>nS</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_10">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>230</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_11">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>260</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ms</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_12">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>290</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_13">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>320</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_14">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>170</y>
-     <width>52</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Standard</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_15">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>170</y>
-     <width>131</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Short Term Depression</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDVSlopeE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>300</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>10</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDAmplL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>240</y>
-     <width>47</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Amplitude</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDtauAmplE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>360</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>25.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDVThreshL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>270</y>
-     <width>39</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VThresh</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtauAmplL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>360</y>
-     <width>41</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tauAmpl</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDVSlopeL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>300</y>
-     <width>32</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>VSlope</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDVThreshU">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>270</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDVThreshE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>270</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>0.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDAmplE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>240</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDVSlopeU">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>300</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtau0U">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>330</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ms</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDtau0E">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>330</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>-20.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtau0L">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>330</y>
-     <width>22</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tau0</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtauVThreshL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>390</y>
-     <width>55</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tauVThresh</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtauVThreshU">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>390</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDtauVThreshE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>390</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>25.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtauVSlopeU">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>420</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="STDtauVSlopeL">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>420</y>
-     <width>48</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>tauVSlope</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="STDtauVSlopeE">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>270</x>
-     <y>420</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>25.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_18">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>360</y>
-     <width>52</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>fix Vpost</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="fixVpostCombo">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>380</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Off</string>
-    </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <item row="7" column="1">
+    <widget class="QLineEdit" name="VSlopeE">
+     <property name="text">
+      <string>25.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>Fixed</string>
-    </property>
+   <item row="7" column="2">
+    <widget class="QLabel" name="label_13">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
    </item>
-  </widget>
-  <widget class="QLabel" name="label_29">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>410</y>
-     <width>27</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Vpost</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_30">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>410</y>
-     <width>16</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>mV</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="VpostE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>410</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>0.0</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_31">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>540</y>
-     <width>52</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Plasticity</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="PlasticityCombo">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>560</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>None</string>
-    </property>
+   <item row="7" column="4">
+    <widget class="QLabel" name="STDtau0L">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>tau0</string>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>Spike STDP</string>
-    </property>
+   <item row="7" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDtau0E">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>-20.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>ODE STDP</string>
-    </property>
+   <item row="7" column="8">
+    <widget class="QLabel" name="STDtau0U">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>ms</string>
+     </property>
+    </widget>
    </item>
-  </widget>
-  <widget class="QPushButton" name="PlastParaBut">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>590</y>
-     <width>121</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Parameters</string>
-   </property>
-  </widget>
-  <widget class="Line" name="line">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>200</y>
-     <width>20</width>
-     <height>241</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Vertical</enum>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="STDCombo">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>200</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Off</string>
-    </property>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_18">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>fix Vpost</string>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>On</string>
-    </property>
+   <item row="8" column="4">
+    <widget class="QLabel" name="STDtauAmplL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>tauAmpl</string>
+     </property>
+    </widget>
    </item>
-  </widget>
-  <widget class="QComboBox" name="LUCombo">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>560</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>8</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <item>
-    <property name="text">
-     <string>Direct Functions</string>
-    </property>
+   <item row="8" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDtauAmplE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>25.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>LookupTables</string>
-    </property>
+   <item row="9" column="0" colspan="2">
+    <widget class="QComboBox" name="fixVpostCombo">
+     <item>
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fixed</string>
+      </property>
+     </item>
+    </widget>
    </item>
-  </widget>
-  <widget class="QLabel" name="MethodL">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>540</y>
-     <width>69</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Method</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="MgBlockCombo">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>470</y>
-     <width>121</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <item>
-    <property name="text">
-     <string>Off</string>
-    </property>
+   <item row="9" column="4" colspan="2">
+    <widget class="QLabel" name="STDtauVThreshL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>tauVThresh</string>
+     </property>
+    </widget>
    </item>
-   <item>
-    <property name="text">
-     <string>Fixed</string>
-    </property>
+   <item row="9" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDtauVThreshE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>25.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
    </item>
-  </widget>
-  <widget class="QLabel" name="MgfacL">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>500</y>
-     <width>51</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Mg factor</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="MgfacE">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>500</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>0.5602</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="MgBlockL">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>450</y>
-     <width>52</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Mg Block</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="MgexpoL">
-   <property name="geometry">
-    <rect>
-     <x>170</x>
-     <y>500</y>
-     <width>71</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Mg exponent</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="MgexpoE">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>500</y>
-     <width>61</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>-0.062</string>
-   </property>
-   <property name="maxLength">
-    <number>8</number>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLabel" name="MgexpoU">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>500</y>
-     <width>31</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>1/V</string>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_16">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>131</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <weight>75</weight>
-     <bold>true</bold>
-    </font>
-   </property>
-   <property name="text">
-    <string>Channel assignments</string>
-   </property>
-  </widget>
-  <widget class="AssignmentWidget&lt;SynapseAssignment&gt;" name="assignments">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>351</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <attribute name="horizontalHeaderStretchLastSection">
-    <bool>true</bool>
-   </attribute>
-   <attribute name="verticalHeaderVisible">
-    <bool>false</bool>
-   </attribute>
-  </widget>
+   <item row="9" column="8">
+    <widget class="QLabel" name="STDtauVThreshU">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_29">
+     <property name="text">
+      <string>Vpost</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="QLineEdit" name="VpostE">
+     <property name="text">
+      <string>0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2">
+    <widget class="QLabel" name="label_30">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="4" colspan="2">
+    <widget class="QLabel" name="STDtauVSlopeL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>tauVSlope</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDtauVSlopeE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>25.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="8">
+    <widget class="QLabel" name="STDtauVSlopeU">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="MethodL">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Method</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="tauSynE">
+     <property name="text">
+      <string>10</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="2">
+    <widget class="QComboBox" name="LUCombo">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <item>
+      <property name="text">
+       <string>Direct Functions</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>LookupTables</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>VSlope</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label_16">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Channel assignments</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="4" colspan="5">
+    <widget class="QLabel" name="ChemSynDlgLabel">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string/>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Panel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
+     <property name="midLineWidth">
+      <number>0</number>
+     </property>
+     <property name="text">
+      <string>Chemical Synapse %1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="9">
+    <widget class="AssignmentWidget&lt;SynapseAssignment&gt;" name="assignments">
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_14">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Standard</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="4" colspan="4">
+    <widget class="QLabel" name="label_15">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Short Term Depression</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>gSyn</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="gSynE">
+     <property name="text">
+      <string>10.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>nS</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3" rowspan="8">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="4" colspan="4">
+    <widget class="QComboBox" name="STDCombo">
+     <item>
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>On</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>VSyn</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="VSynE">
+     <property name="text">
+      <string>0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="4" colspan="2">
+    <widget class="QLabel" name="STDAmplL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Amplitude</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDAmplE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>1.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>tauSyn</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>ms</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QLabel" name="STDVThreshL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>VThresh</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDVThreshE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="8">
+    <widget class="QLabel" name="STDVThreshU">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>VThresh</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="VThreshE">
+     <property name="text">
+      <string>-20.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4">
+    <widget class="QLabel" name="STDVSlopeL">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>VSlope</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="6" colspan="2">
+    <widget class="QLineEdit" name="STDVSlopeE">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>10</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="8">
+    <widget class="QLabel" name="STDVSlopeU">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="4">
+    <widget class="QLabel" name="MgBlockL">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Mg Block</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="4" colspan="4">
+    <widget class="QComboBox" name="MgBlockCombo">
+     <item>
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fixed</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_31">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Plasticity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="4">
+    <widget class="QLabel" name="MgfacL">
+     <property name="text">
+      <string>Mg factor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="4">
+    <widget class="QLabel" name="MgexpoL">
+     <property name="text">
+      <string>Mg exponent</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="8">
+    <widget class="QLabel" name="MgexpoU">
+     <property name="text">
+      <string>1/V</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="6" colspan="2">
+    <widget class="QLineEdit" name="MgexpoE">
+     <property name="text">
+      <string>-0.062</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="6" colspan="2">
+    <widget class="QLineEdit" name="MgfacE">
+     <property name="text">
+      <string>0.5602</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="2">
+    <widget class="QComboBox" name="PlasticityCombo">
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Spike STDP</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ODE STDP</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="15" column="0" colspan="2">
+    <widget class="QPushButton" name="PlastParaBut">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Parameters</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="6" colspan="3">
+    <widget class="QDialogButtonBox" name="ResCloseBox">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1073,6 +724,30 @@
    <header location="global">AssignmentWidget.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>assignments</tabstop>
+  <tabstop>gSynE</tabstop>
+  <tabstop>VSynE</tabstop>
+  <tabstop>tauSynE</tabstop>
+  <tabstop>VThreshE</tabstop>
+  <tabstop>VSlopeE</tabstop>
+  <tabstop>fixVpostCombo</tabstop>
+  <tabstop>VpostE</tabstop>
+  <tabstop>LUCombo</tabstop>
+  <tabstop>PlasticityCombo</tabstop>
+  <tabstop>PlastParaBut</tabstop>
+  <tabstop>STDCombo</tabstop>
+  <tabstop>STDAmplE</tabstop>
+  <tabstop>STDVThreshE</tabstop>
+  <tabstop>STDVSlopeE</tabstop>
+  <tabstop>STDtau0E</tabstop>
+  <tabstop>STDtauAmplE</tabstop>
+  <tabstop>STDtauVThreshE</tabstop>
+  <tabstop>STDtauVSlopeE</tabstop>
+  <tabstop>MgBlockCombo</tabstop>
+  <tabstop>MgfacE</tabstop>
+  <tabstop>MgexpoE</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
