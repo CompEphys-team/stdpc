@@ -9,9 +9,10 @@ HHDlg::HHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *paren
      label = HHDlgLabel->text();
      setIndex(no);
 
-     QVector<Dropdown<CurrentAssignment>> vec;
-     vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::VChannel, in, "V in", 95));
-     vec.push_back(Dropdown<CurrentAssignment>(&CurrentAssignment::IChannel, out, "I out", 95));
+     QVector<AssignmentCellBase<CurrentAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 95, in));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 95, out));
      assignments->init(vec);
 }
 

@@ -9,11 +9,12 @@ GapJunctionDlg::GapJunctionDlg(int no, ChannelListModel *in, ChannelListModel *o
      label = gapJunctDlgLabel->text();
      setIndex(no);
 
-     QVector<Dropdown<GapJunctionAssignment>> vec;
-     vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::preInChannel, in, "Presyn V", 95));
-     vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::preOutChannel, out, "Presyn I", 95));
-     vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::postInChannel, in, "Postsyn V", 95));
-     vec.push_back(Dropdown<GapJunctionAssignment>(&GapJunctionAssignment::postOutChannel, out, "Postsyn I", 95));
+     QVector<AssignmentCellBase<GapJunctionAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<GapJunctionAssignment>(&GapJunctionAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::preInChannel, "Presyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::preOutChannel, "Presyn I", 95, out));
+     vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::postInChannel, "Postsyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::postOutChannel, "Postsyn I", 95, out));
      assignments->init(vec);
 }
 

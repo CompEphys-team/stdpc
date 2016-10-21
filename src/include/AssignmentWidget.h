@@ -3,26 +3,9 @@
 
 #include <QTableWidget>
 #include <QCheckBox>
-#include "WideComboBox.h"
 #include "ChannelListModel.h"
 #include "ObjectDataTypes.h"
-
-template <class Assignment>
-struct Dropdown
-{
-    Dropdown(){}
-    Dropdown(ChannelIndex Assignment::* c, ChannelListModel *m, QString const& l, int w) :
-        channel(c), model(m), label(l), columnWidth(w)
-    {}
-
-    ChannelIndex Assignment::* channel;
-    ChannelListModel *model;
-    QString label;
-    int columnWidth;
-
-    QMetaObject::Connection connection;
-    QVector<WideComboBox *> combo;
-};
+#include "AssignmentCell.h"
 
 
 class AssignmentWidgetQ : public QTableWidget
@@ -33,7 +16,7 @@ public:
     ~AssignmentWidgetQ() {}
 
 protected slots:
-    virtual void grow(bool = true) {}
+    virtual void addRow(int = -1) {}
 };
 
 
@@ -42,23 +25,71 @@ class AssignmentWidget : public AssignmentWidgetQ
 {
 public:
     AssignmentWidget(QWidget *parent = 0) : AssignmentWidgetQ(parent) {}
-    ~AssignmentWidget() {}
+    ~AssignmentWidget()
+    {
+        for ( AssignmentCellBase<Assignment> *d : cell )
+            delete d;
+    }
 
-    void init(QVector<Dropdown<Assignment>> &);
+    void init(QVector<AssignmentCellBase<Assignment>*> &cells)
+    {
+        cell = cells;
+        QStringList labels;
+        setColumnCount(cell.size());
+        int i = 0;
+        for ( AssignmentCellBase<Assignment> *d : cell ) {
+            setColumnWidth(i++, d->columnWidth);
+            labels.append(d->label);
+            connect(d, SIGNAL(grow()), this, SLOT(addRow()));
+        }
+        setHorizontalHeaderLabels(labels);
+        addRow();
+    }
 
-    void importData(std::vector<Assignment> const&);
-    void exportData(std::vector<Assignment> &);
+    void importData(std::vector<Assignment> const& p)
+    {
+        for ( AssignmentCellBase<Assignment> *d : cell ) {
+            d->clear();
+        }
+        setRowCount(0);
+
+        int i = 0;
+        for ( Assignment const& a : p ) {
+            addRow(i);
+            for ( AssignmentCellBase<Assignment> *d : cell ) {
+                d->importData(i, a);
+            }
+            ++i;
+        }
+
+        addRow();
+    }
+
+    void exportData(std::vector<Assignment> &p)
+    {
+        Assignment a;
+        p.clear();
+        for ( int i = 0; i < rowCount() - 1; i++ ) {
+            for ( AssignmentCellBase<Assignment> *d : cell )
+                d->exportData(i, a);
+            p.push_back(a);
+        }
+    }
 
 private:
-    QMetaObject::Connection boxc;
-    QVector<QCheckBox *> boxes;
-
-    QVector<Dropdown<Assignment>> drops;
-
-    void addRow(int row, QCheckBox *box);
+    QVector<AssignmentCellBase<Assignment> *> cell;
 
 protected:
-    void grow(bool reactive = true);
+    void addRow(int row = -1)
+    {
+        if ( row < 0 )
+            row = rowCount();
+        insertRow(row);
+        int i = 0;
+        for ( AssignmentCellBase<Assignment> *d : cell ) {
+            setCellWidget(row, i++, d->extend(row));
+        }
+    }
 };
 
 #endif // ASSIGNMENTWIDGET_H

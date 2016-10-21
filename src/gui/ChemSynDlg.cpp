@@ -17,10 +17,11 @@ ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWid
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
      connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));
 
-     QVector<Dropdown<SynapseAssignment>> vec;
-     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PreSynChannel, in, "Presyn V", 95));
-     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::PostSynChannel, in, "Postsyn V", 95));
-     vec.push_back(Dropdown<SynapseAssignment>(&SynapseAssignment::OutSynChannel, out, "Postsyn I", 95));
+     QVector<AssignmentCellBase<SynapseAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PreSynChannel, "Presyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PostSynChannel, "Postsyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::OutSynChannel, "Postsyn I", 95, out));
      assignments->init(vec);
 }
 

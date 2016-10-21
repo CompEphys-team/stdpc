@@ -114,7 +114,8 @@ HEADERS += \
     $$PWD/src/include/QCustomPlot.h \
     $$PWD/src/include/CircularFifo.h \
     $$PWD/src/include/SpikeGenDlg.h \
-    $$PWD/src/include/ChannelBufferHelper.h
+    $$PWD/src/include/ChannelBufferHelper.h \
+    $$PWD/src/include/AssignmentCell.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -158,7 +159,6 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/HHNeuron.cpp \
     $$PWD/src/gui/HHModelDlg.cpp \
     $$PWD/src/core/ChannelIndex.cpp \
-    $$PWD/src/gui/AssignmentWidget.cpp \
     $$PWD/src/gui/ComponentTable.cpp \
     $$PWD/src/gui/ComponentWidget.cpp \
     $$PWD/src/drivers/Clock.cpp \
