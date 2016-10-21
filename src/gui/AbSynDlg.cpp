@@ -1,4 +1,4 @@
-
+#include <QDoubleSpinBox>
 #include "AbSynDlg.h"
 #include <QMessageBox>
 
@@ -21,6 +21,12 @@ abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget 
      vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PreSynChannel, "Presyn V", 95, in));
      vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PostSynChannel, "Postsyn V", 95, in));
      vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::OutSynChannel, "Postsyn I", 95, out));
+     AssignmentCellDouble<SynapseAssignment> *tmp = new AssignmentCellDouble<SynapseAssignment>
+             (&SynapseAssignment::delay, "Delay (ms)", 95);
+     tmp->setRange(0., 1000.);
+     tmp->setDecimals(3);
+     tmp->setFactor(1e-3);
+     vec.push_back(tmp);
      assignments->init(vec);
 }
 
@@ -77,7 +83,6 @@ void abSynDlg::exportData(abSynData &p)
   p.bR= bRE->text().toDouble()*1e3;
   p.fixVpost= fixVpostCombo->currentIndex();
   p.Vpost= VpostE->text().toDouble()*1e-3;
-  p.delay = delay->value() * 1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
   STDP->exportData(p.ST);
@@ -111,7 +116,6 @@ void abSynDlg::importData(abSynData p)
   fixVpostCombo->setCurrentIndex(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
-  delay->setValue(p.delay * 1e3);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
   // ST plasticity
   STDP->importData(p.ST);

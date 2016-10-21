@@ -517,25 +517,25 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Curr
 template <typename T>
 void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, SynapseAssignment &a)
 {
-    SynapseAssignment tmp;
-    tmp.actP = &a.active;
+    std::vector<ChannelIndex> preSynInst = getChanIndices(a.PreSynChannel);
+    std::vector<ChannelIndex> postSynInst = getChanIndices(a.PostSynChannel);
+    std::vector<ChannelIndex> outSynInst = getChanIndices(a.OutSynChannel);
+    inChannel *preC, *postC;
+    outChannel *outC;
+
     if ( a.PostSynChannel == a.OutSynChannel ) {
-        for ( ChannelIndex post : getChanIndices(a.PostSynChannel) ) {
-            tmp.PostSynChannel = post;
-            tmp.OutSynChannel = post;
-            for ( ChannelIndex pre : getChanIndices(a.PreSynChannel) ) {
-                tmp.PreSynChannel = pre;
-                inst.push_back(T(&p, this, tmp));
+        for ( ChannelIndex post : postSynInst ) {
+            for ( ChannelIndex pre : preSynInst ) {
+                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) )
+                    inst.push_back(T(&p, this, a, preC, postC, outC));
             }
         }
     } else {
-        for ( ChannelIndex post : getChanIndices(a.PostSynChannel) ) {
-            tmp.PostSynChannel = post;
-            for ( ChannelIndex out : getChanIndices(a.OutSynChannel) ) {
-                tmp.OutSynChannel = out;
-                for ( ChannelIndex pre : getChanIndices(a.PreSynChannel) ) {
-                    tmp.PreSynChannel = pre;
-                    inst.push_back(T(&p, this, tmp));
+        for ( ChannelIndex post : postSynInst ) {
+            for ( ChannelIndex out : outSynInst ) {
+                for ( ChannelIndex pre : preSynInst ) {
+                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) )
+                        inst.push_back(T(&p, this, a, preC, postC, outC));
                 }
             }
         }

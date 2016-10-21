@@ -13,10 +13,10 @@ class DCThread;
 
 struct SynapseAssignment {
     bool active;
-    bool *actP;
     ChannelIndex PreSynChannel;
     ChannelIndex PostSynChannel;
     ChannelIndex OutSynChannel;
+    double delay;
 };
 
 struct GapJunctionAssignment {
@@ -98,7 +98,6 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  double delay;
 } CSynData;
 
 typedef struct {
@@ -118,7 +117,6 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  double delay;
 } abSynData;
 
 typedef struct {
@@ -136,7 +134,6 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
-  double delay;
 } DestexheSynData;
 
 typedef struct {

@@ -14,7 +14,7 @@ class ChemSyn {
     inChannel *pre;
     inChannel *post;
     outChannel *out;
-    SynapseAssignment a;
+    SynapseAssignment &a;
 
     size_t bufferHandle;
     bool buffered;
@@ -39,7 +39,7 @@ class ChemSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    ChemSyn(CSynData *, DCThread *, SynapseAssignment);
+    ChemSyn(CSynData *, DCThread *, SynapseAssignment &, inChannel *pre, inChannel *post, outChannel *out);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);

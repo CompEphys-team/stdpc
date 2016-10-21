@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>498</height>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>280</x>
-     <y>460</y>
+     <y>420</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -608,48 +608,6 @@
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>
-  </widget>
-  <widget class="QLabel" name="label_2">
-   <property name="geometry">
-    <rect>
-     <x>160</x>
-     <y>420</y>
-     <width>91</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Presynaptic delay</string>
-   </property>
-  </widget>
-  <widget class="QDoubleSpinBox" name="delay">
-   <property name="geometry">
-    <rect>
-     <x>250</x>
-     <y>420</y>
-     <width>62</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="decimals">
-    <number>3</number>
-   </property>
-   <property name="maximum">
-    <double>1000.000000000000000</double>
-   </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>320</x>
-     <y>420</y>
-     <width>21</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>ms</string>
-   </property>
   </widget>
  </widget>
  <customwidgets>
