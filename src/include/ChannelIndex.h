@@ -15,7 +15,9 @@ enum class DAQClass { Simul, DD1200, NI };
 class ChannelIndex
 {
 public:
-    ChannelIndex();
+    ChannelIndex(bool validNone = false);
+    ChannelIndex(DAQClass dClass, int dID = 0, bool isIn = true, int cID = 0);
+    ChannelIndex(ModelClass mClass, int mID = 0, int iID = 0); // iID = -1 to get a Prototype
 
     ChannelIndex toInstance(int instID) const;
 

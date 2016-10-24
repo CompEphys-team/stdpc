@@ -3,9 +3,9 @@
 #include <QChar>
 #include "Global.h"
 
-ChannelIndex::ChannelIndex() :
-    isValid(false),
-    isNone(false),
+ChannelIndex::ChannelIndex(bool validNone) :
+    isValid(validNone),
+    isNone(validNone),
     isPrototype(false),
     isVirtual(false),
     modelClass(ModelClass::HH),
@@ -18,6 +18,29 @@ ChannelIndex::ChannelIndex() :
     chanID(0)
 {
 }
+
+ChannelIndex::ChannelIndex(DAQClass dClass, int dID, bool isIn, int cID) :
+    isValid(true),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(false),
+    isAnalog(true),
+    daqClass(dClass),
+    devID(dID),
+    isInChn(isIn),
+    chanID(cID)
+{}
+
+ChannelIndex::ChannelIndex(ModelClass mClass, int mID, int iID) :
+    isValid(true),
+    isNone(false),
+    isPrototype(iID == -1),
+    isVirtual(iID >= 0),
+    modelClass(mClass),
+    modelID(mID),
+    instID(iID == -1 ? 0 : iID),
+    isAnalog(false)
+{}
 
 ChannelIndex ChannelIndex::toInstance(int instID) const
 {

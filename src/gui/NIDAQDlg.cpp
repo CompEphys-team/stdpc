@@ -16,11 +16,7 @@ void NIDAQDlg::setIndex(int no)
 {
     idx = no;
     DAQLabel->setText(label.arg(no));
-    ChannelIndex dex;
-    dex.isValid = true;
-    dex.isAnalog = true;
-    dex.daqClass = DAQClass::NI;
-    dex.devID = no;
+    ChannelIndex dex(DAQClass::NI, no);
     board = Devices.getDevice(dex);
     inDlg->dex = dex;
     emit channelsChanged();

@@ -151,12 +151,7 @@ private:
         params->erase(params->begin() + idx);
         del.removed = true;
         params->push_back(del);
-        ChannelIndex dex;
-        dex.isValid = true;
-        dex.isPrototype = true;
-        dex.modelClass = DaqDlg::param_type::modelClass;
-        dex.modelID = idx;
-        emit removedModel(dex);
+        emit removedModel(ChannelIndex(DaqDlg::param_type::modelClass, idx, -1));
     }
 };
 

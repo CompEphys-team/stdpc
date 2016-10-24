@@ -164,7 +164,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/drivers/Clock.cpp \
     $$PWD/src/gui/DaqTable.cpp \
     $$PWD/src/gui/DaqWidget.cpp \
-    $$PWD/src/drivers/DeviceManager.cpp \
+    $$PWD/src/core/DeviceManager.cpp \
     $$PWD/src/gui/WideComboBox.cpp \
     $$PWD/src/gui/QCustomPlot.cpp \
     $$PWD/src/gui/SpikeGenDlg.cpp \

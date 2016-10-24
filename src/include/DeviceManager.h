@@ -43,7 +43,6 @@ signals:
 
 private:
     DeviceStatus _initSingle(DAQ *dev, bool active, QString &name);
-    ChannelIndex getDex(DAQClass type, int idx);
 
     QVector<DAQ*> sdaq;
     QVector<DAQ*> dd1200;

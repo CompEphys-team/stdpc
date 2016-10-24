@@ -49,7 +49,7 @@ void DeviceManager::remove(int idx, std::vector<param_type> *params)
         swap((*params)[i-1], (*params)[i]);
     for ( int i = idx; i < vec.size(); i++ )
         vec[idx]->devID = i;
-    emit removedDevice(getDex(param_type::daqClass, idx));
+    emit removedDevice(ChannelIndex(param_type::daqClass, idx));
 }
 
 template <>
@@ -183,14 +183,4 @@ outChannel *DeviceManager::getOutChan(const ChannelIndex &dex)
         }
     }
     return nullptr;
-}
-
-ChannelIndex DeviceManager::getDex(DAQClass type, int idx)
-{
-    ChannelIndex dex;
-    dex.isValid = true;
-    dex.isAnalog = true;
-    dex.daqClass = type;
-    dex.devID = idx;
-    return dex;
 }

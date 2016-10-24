@@ -99,9 +99,6 @@ void ChannelListModel::ModelHelper<T>::updateCount()
 void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 {
     rmDevDex = removeDeviceDex;
-    ChannelIndex dex, blank;
-    blank.isValid = true;
-    dex = blank;
     QModelIndexList currentIdx, newIdx;
     ChannelListModel newM(displayFlags);
     newM.updateCount();
@@ -127,14 +124,10 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 template <typename T>
 void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
 {
-    ChannelIndex dex;
     bool mvDev;
     int mvOffset = 0;
-    dex.isValid = true;
     if ( parent->displayFlags & AnalogIn ) {
-        dex.isAnalog = true;
-        dex.isInChn = true;
-        dex.daqClass = T::daqClass;
+        ChannelIndex dex(T::daqClass, 0, true);
         for ( dex.devID = 0; dex.devID < nAI.size(); dex.devID++ ) {
             mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
                     && parent->rmDevDex.daqClass == T::daqClass
@@ -156,9 +149,7 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
 
     mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
-        dex.isAnalog = true;
-        dex.isInChn = false;
-        dex.daqClass = T::daqClass;
+        ChannelIndex dex(T::daqClass, 0, false);
         for ( dex.devID = 0; dex.devID < nAO.size(); dex.devID++ ) {
             mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
                     && parent->rmDevDex.daqClass == T::daqClass
@@ -182,14 +173,10 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
 template <typename T>
 void ChannelListModel::ModelHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
 {
-    ChannelIndex dex, blank;
     bool rmModel;
     int mvOffset = 0;
-    blank.isValid = true;
-    blank.modelClass = T::modelClass;
-    dex = blank;
     if ( parent->displayFlags & Prototype ) {
-        dex.isPrototype = true;
+        ChannelIndex dex(T::modelClass, 0, -1);
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
             currentIdx.append(parent->index(dex, Prototype));
             if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
@@ -206,9 +193,8 @@ void ChannelListModel::ModelHelper<T>::updateChns(QModelIndexList &currentIdx, Q
     }
 
     mvOffset = 0;
-    dex = blank;
     if ( parent->displayFlags & Virtual ) {
-        dex.isVirtual = true;
+        ChannelIndex dex(T::modelClass);
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
             rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
                     && parent->rmDevDex.modelClass == T::modelClass
@@ -237,11 +223,8 @@ int ChannelListModel::rowCount(const QModelIndex &) const
 QVariant ChannelListModel::data(const QModelIndex &index, int role) const
 {
     QVariant ret;
-    ChannelIndex dex;
-    dex.isValid = true;
     if ( !index.isValid() && role == Qt::UserRole ) {
-        dex.isNone = true;
-        ret.setValue(dex);
+        ret.setValue(ChannelIndex(true));
         return ret;
     }
     if (!index.isValid() || !(role==Qt::DisplayRole || role>=Qt::UserRole))
@@ -250,8 +233,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     int offset = 0, row = index.row();
     if ( displayFlags & Blank ) {
         if ( row == offset ) {
-            dex.isNone = true;
-            ret.setValue(dex);
+            ret.setValue(ChannelIndex(true));
             switch ( role ) {
             case Qt::DisplayRole:   return QString();
             case Qt::UserRole:      return ret;
@@ -262,8 +244,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     }
     if ( displayFlags & None ) {
         if ( row == offset ) {
-            dex.isNone = true;
-            ret.setValue(dex);
+            ret.setValue(ChannelIndex(true));
             switch ( role ) {
             case Qt::DisplayRole:   return QString("None");
             case Qt::UserRole:      return ret;
@@ -286,8 +267,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
 #endif
 
     if ( role == Qt::UserRole ) {
-        dex.isNone = true;
-        ret.setValue(dex);
+        ret.setValue(ChannelIndex(true));
         return ret;
     } else {
         return QVariant();
@@ -297,12 +277,8 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
 template <typename T>
 bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
 {
-    ChannelIndex dex;
     bool rmDev;
     int mvOffset = 0;
-    dex.isValid = true;
-    dex.isAnalog = true;
-    dex.daqClass = T::daqClass;
     if ( parent->displayFlags & AnalogIn ) {
         for ( int i = 0; i < nAI.size(); i++ ) {
             // parent->rmDevDex comes through parent->updateChns(rmDevDex), called when a device is removed.
@@ -320,9 +296,7 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                     ret = QVariant();
                     return true;
                 }
-                dex.devID = i - mvOffset; // Display value: Adjusted index
-                dex.isInChn = true;
-                dex.chanID = row - offset;
+                ChannelIndex dex(T::daqClass, i - mvOffset, true, row - offset); // DevID display value: Adjusted index
                 DAQData *p = Devices.get<T>()[dex.devID]->params(); // Outside world: Adjusted index
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                         return true;
@@ -347,10 +321,8 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
                     ret = QVariant();
                     return true;
                 }
-                DAQData *p = Devices.get<T>()[i - mvOffset]->params();
-                dex.devID = i - mvOffset;
-                dex.isInChn = false;
-                dex.chanID = row - offset;
+                ChannelIndex dex(T::daqClass, i - mvOffset, false, row - offset);
+                DAQData *p = Devices.get<T>()[dex.devID]->params();
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                          return true;
                 case Qt::UserRole:      ret.setValue(dex);                               return true;
@@ -368,10 +340,6 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
 template <typename T>
 bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
 {
-    ChannelIndex dex, blank;
-    blank.isValid = true;
-    blank.modelClass = T::modelClass;
-    dex = blank;
     int mvOffset = 0;
     if ( parent->displayFlags & Prototype ) {
         if ( row-offset < nInst.size() ) {
@@ -383,8 +351,7 @@ bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVar
                     mvOffset = 1;
                 }
             }
-            dex.isPrototype = true;
-            dex.modelID = row - offset - mvOffset;
+            ChannelIndex dex(T::modelClass, row - offset - mvOffset, -1);
             switch ( role ) {
             case Qt::DisplayRole:   ret = dex.prettyName();              return true;
             case Qt::UserRole:      ret.setValue(dex);                   return true;
@@ -396,7 +363,6 @@ bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVar
 
     bool rmModel;
     mvOffset = 0;
-    dex = blank;
     if ( parent->displayFlags & Virtual ) {
         for ( int i = 0; i < nInst.size(); i++ ) {
             rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
@@ -407,9 +373,7 @@ bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVar
                     ret = QVariant();
                     return true;
                 }
-                dex.isVirtual = true;
-                dex.modelID = i - mvOffset;
-                dex.instID = row-offset;
+                ChannelIndex dex(T::modelClass, i - mvOffset, row - offset);
                 T *p = &(*params)[dex.modelID];
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                        return true;

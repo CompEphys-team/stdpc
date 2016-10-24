@@ -115,12 +115,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
   short int i;
   actInChnNo= chnNo;
 
-  ChannelIndex dex;
-  dex.isValid = true;
-  dex.isAnalog = true;
-  dex.daqClass = DAQClass::NI;
-  dex.devID = devID;
-  dex.isInChn = true;
+  ChannelIndex dex(DAQClass::Simul, devID, true);
 
   for(i= 0; i < actInChnNo; i++)
   {
@@ -195,12 +190,7 @@ void SimulDAQ::get_single_scan(inChannel *in)
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
 {
-  ChannelIndex dex;
-  dex.isValid = true;
-  dex.isAnalog = true;
-  dex.daqClass = DAQClass::NI;
-  dex.devID = devID;
-  dex.isInChn = false;
+  ChannelIndex dex(DAQClass::Simul, devID, false);
 
   short int i;
   actOutChnNo= chnNo;
