@@ -336,6 +336,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
 #ifdef NATIONAL_INSTRUMENTS
   NIDAQp.clear();
 #endif
+  Graphp.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
