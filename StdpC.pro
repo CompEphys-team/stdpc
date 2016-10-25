@@ -22,6 +22,8 @@ CONFIG += qt \
     thread \
     debug_and_release
 
+CONFIG(release, debug|release): DEFINES += NDEBUG
+
 static {
     QMAKE_LFLAGS += -static
 }

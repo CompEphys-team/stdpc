@@ -331,6 +331,8 @@ void DCThread::run()
          }
          //--------------- Data saving end ---------------------//
 
+         bufferHelper->advance(t);
+
          if ( processAnalogs ) {
              for ( DAQ *b : Devices.actdev )
                  b->process_scan(t);
@@ -361,8 +363,6 @@ void DCThread::run()
              model.updateNeurons(t, dt);
          for ( SpkGenPrototype &model : SGProto )
              model.updateInstances(t, dt);
-
-         bufferHelper->advance(t);
 
          // Updated display
          if ( graph ) {

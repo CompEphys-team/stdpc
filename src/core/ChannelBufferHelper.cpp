@@ -1,4 +1,5 @@
 #include "ChannelBufferHelper.h"
+#include <cassert>
 
 ChannelBufferHelper::ChannelBufferHelper() :
     tbuf(nullptr),
@@ -22,28 +23,106 @@ void ChannelBufferHelper::advance(double t)
 
     size_t idx;
     double expectedT;
-    size_t mv;
+    bool up, down;
 
     for ( BufferHandler &h : handler ) {
         if ( h.initial ) {
-            h.offset = currentIndex;
-            if ( h.duration >= t ) {
+            h.offset = currentIndex - 1;
+            if ( t >= h.duration ) {
                 h.initial = false;
             }
-        } else {
-            idx = index(currentIndex - h.offset);
+        } else if ( _absOffset < tbufsize ) {
+            // Boundary conditions apply. General case with comments below
+            // Note that the very first point recorded is at _absOffset == 1
+            idx = currentIndex - h.offset; // 1 >= h.offset >= currentIndex is given, no need to wrap around
             expectedT = t - h.duration;
-            if ( tbuf[idx] > expectedT ) {
-                for ( mv = 1; mv < tbufsize - h.offset - 1; mv++ )
-                    if ( tbuf[index(idx - mv)] <= expectedT )
-                        break;
-                h.offset += mv-1;
-            } else if ( tbuf[idx] < expectedT ) {
-                for ( mv = 1; mv < h.offset; mv++ )
-                    if ( tbuf[index(idx + mv)] >= expectedT )
-                        break;
-                h.offset -= mv;
+            up = tbuf[idx] < expectedT;
+            down = !up;
+            while ( up != down && (up || idx > 1) && (down || idx < currentIndex) ) {
+                if ( tbuf[idx] > expectedT ) {
+                    down = true;
+                    idx--;
+                } else if ( tbuf[idx] < expectedT ) {
+                    down = false;
+                    idx++;
+                } else {
+                    break;
+                }
             }
+
+            // Edge cases
+            if ( up && !down && idx == currentIndex ) {
+                idx--;
+                down = true;
+            } else if ( !up && down && idx == 1 ) {
+                idx++;
+                down = false;
+            }
+
+            // Rounding
+            if ( up && down ) {
+                if ( expectedT - tbuf[idx] > tbuf[idx+1] - expectedT )
+                    idx++;
+            } else if ( !up && !down ) {
+                if ( expectedT - tbuf[idx-1] < tbuf[idx] - expectedT )
+                    idx--;
+            }
+
+            assert(idx >= 1);
+            assert(idx <= currentIndex);
+            h.offset = currentIndex - idx;
+        } else {
+            // Add tbufsize to let idx wrap around the buffer without having to use further addition/%
+            idx = tbufsize + currentIndex - h.offset;
+            expectedT = t - h.duration;
+            up = tbuf[index(idx)] < expectedT;
+            down = !up;
+            //      Don't change direction
+            //                    Come closer, or stay clear of the far end of the allowable range ]currI, currI+bufsz]
+            //                                                  Go farther, or stay clear of the near end
+            while ( up != down && (up || idx > currentIndex+1) && (down || idx < tbufsize + currentIndex) ) {
+                if ( tbuf[index(idx)] > expectedT) {
+                    down = true;
+                    idx--;
+                } else if ( tbuf[index(idx)] < expectedT ) {
+                    down = false;
+                    idx++;
+                } else { // tbuf[index(idx)] == expectedT
+                    break;
+                }
+            }
+
+            // Redirect edge cases:
+            if ( up && !down && idx == tbufsize + currentIndex ) {
+            // Either h.offset==0, or tbuf[index(idx-1)] < expectedT; in either case, idx is at the near end
+            // => Let case (up && down) below take care of sorting out whether idx should be at the end or one short
+                idx--;
+                down = true;
+            } else if ( !up && down && idx == currentIndex+1 ) {
+            // Either h.offset==tbufsize-1, or tbuf[index(idx+1)] > expectedT; in either case, idx is at the far end
+            // => Let case (!up && !down) below take care ...
+                idx++;
+                down = false;
+            }
+
+            // Rounding
+            if ( up && down ) { // tbuf[index(idx)] < expectedT < tbuf[index(idx+1)] :
+                                // (or expectedT > tbuf[index(idx+1)], if redirected edge case)
+                if ( expectedT - tbuf[index(idx)] > tbuf[index(idx+1)] - expectedT )
+                // expectedT is closer to tbuf[index(idx+1)]
+                    idx++;
+            } else if ( !up && !down ) { // tbuf[index(idx-1)] < expectedT < tbuf[index(idx)] :
+                                         // (or tbuf[index(idx-1)] > expectedT, if redirected edge case)
+                if ( expectedT - tbuf[index(idx-1)] < tbuf[index(idx)] - expectedT )
+                // expectedT is closer to tbuf[index(idx-1)]
+                    idx--;
+            }
+            // other cases:
+            // no edge, up != down : Precise match, expectedT == tbuf[index(idx)]; no adjustments needed
+
+            assert(idx > currentIndex);             // ==> h.offset < tbufsize
+            assert(idx <= tbufsize + currentIndex); // ==> h.offset >= 0
+            h.offset = tbufsize + currentIndex - idx;
         }
     }
 }

@@ -76,7 +76,7 @@ void DestexheSyn::currentUpdate(double t, double dt)
 {
   static double rt, dS;
 
-  if ( !p->active || !a.active || !pre->active || !post->active || !out->active )
+  if ( !p->active || !a.active || !pre->active || !post->active || !out->active || t < a.delay )
       return;
   
   // calculate synaptic current
