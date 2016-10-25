@@ -93,8 +93,8 @@ private:
      void error(QString message);
      void message(QString message);
      void CloseToLimit(QString, QString, double, double, double);
-
-
+     void updateRate(int Hz);
+     void done();
 };
 
 

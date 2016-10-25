@@ -53,6 +53,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
 
+     rateIndicator = new QLabel("Ready");
+     ui->statusbar->addPermanentWidget(rateIndicator);
      loadedProtocolStatus = new QLabel("");
      ui->statusbar->addPermanentWidget(loadedProtocolStatus);
          
@@ -98,7 +100,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->DAQReset, SIGNAL(clicked(bool)), ui->DAQTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-
+     connect(DCT, &DCThread::updateRate, [this](int rate){
+         rateIndicator->setText(QString("Update rate: %1 Hz").arg(rate));
+     });
+     connect(DCT, &DCThread::done, [this](){
+         rateIndicator->setText("Ready");
+     });
      connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
      initAP();
@@ -228,6 +235,7 @@ void MyMainWindow::StartButClicked()
   exportData();
 
   graphDlg->startPlotting(DCT);
+  rateIndicator->setText("Started");
   DCT->start();
 }
 

@@ -68,6 +68,7 @@ class MyMainWindow : public QMainWindow
     QFileDialog *LoadScriptFileDlg;    
     
     QLabel *loadedProtocolStatus;
+    QLabel *rateIndicator;
 
     // adjustable parameter stuff
 

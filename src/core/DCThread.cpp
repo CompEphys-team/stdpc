@@ -41,7 +41,8 @@ void DCThread::setGraph(GraphDlg *g, double dt)
 void DCThread::run()
 {
    double savingPeriod= 1.0;
-
+   int rateCounter = 0;
+   double lastRateReport = 0.;
    static int i;
    static double evt;
    bool SampleHoldOn= false;
@@ -374,6 +375,13 @@ void DCThread::run()
              }
          }
 
+         ++rateCounter;
+         if ( t - lastRateReport > 1 ) {
+             lastRateReport = t;
+             emit updateRate(rateCounter);
+             rateCounter = 0;
+         }
+
          // Scripting
          if (t >= evt) { // event needs doing
            scrIter->second();
@@ -421,7 +429,7 @@ void DCThread::run()
    }
 
    finished= true;
-
+   emit done();
 }
 
 
