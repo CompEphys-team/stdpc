@@ -78,6 +78,12 @@ SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
     connect(ui->BurstDetectionCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int i){
         ui->bdGroupW->setEnabled(i > 0);
     });
+    connect(ui->tOContiguous, &QCheckBox::stateChanged, [this](int){
+        ui->bdStrict->setEnabled(ui->tOContiguous->isChecked() && ui->tUContiguous->isChecked());
+    });
+    connect(ui->tUContiguous, &QCheckBox::stateChanged, [this](int){
+        ui->bdStrict->setEnabled(ui->tOContiguous->isChecked() && ui->tUContiguous->isChecked());
+    });
 
     connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
     connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
@@ -110,6 +116,9 @@ void SpikeGenDlg::importData()
     ui->BurstDetectionCombo->setCurrentIndex(SGp[idx].bdType);
     ui->tUnder->setValue(SGp[idx].bdtUnder * 1e3);
     ui->tOver->setValue(SGp[idx].bdtOver * 1e3);
+    ui->tUContiguous->setChecked(SGp[idx].bdtUnderCont);
+    ui->tOContiguous->setChecked(SGp[idx].bdtOverCont);
+    ui->bdStrict->setChecked(SGp[idx].bdStrictlyCont);
 
     ui->Period->setValue(SGp[idx].period * 1e3);
     ui->Loop->setChecked(SGp[idx].loopBursts);
@@ -200,6 +209,9 @@ void SpikeGenDlg::exportData(bool)
     SGp[idx].bdType = ui->BurstDetectionCombo->currentIndex();
     SGp[idx].bdtUnder = ui->tUnder->value() / 1e3;
     SGp[idx].bdtOver = ui->tOver->value() / 1e3;
+    SGp[idx].bdtUnderCont = ui->tUContiguous->isChecked();
+    SGp[idx].bdtOverCont = ui->tOContiguous->isChecked();
+    SGp[idx].bdStrictlyCont = ui->bdStrict->isChecked();
 
     SGp[idx].period = ui->Period->value() / 1e3;
     SGp[idx].loopBursts = ui->Loop->isChecked();

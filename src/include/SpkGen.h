@@ -35,6 +35,7 @@ protected:
     bool burstDetected;
     double tOverThresh;
     double tUnderThresh;
+    bool onThreshold;
     int burstNo;
     double ISI_time;
     double period;

@@ -283,6 +283,9 @@ void initAP()
     AP *sgBT = addAP("SGp[#].bdType", &SGp, &SGData::bdType);
                addAP("SGp[#].bdtUnder", &SGp, &SGData::bdtUnder);
                addAP("SGp[#].bdtOver", &SGp, &SGData::bdtOver);
+               addAP("SGp[#].bdtUnderCont", &SGp, &SGData::bdtUnderCont);
+               addAP("SGp[#].bdtOverCont", &SGp, &SGData::bdtOverCont);
+               addAP("SGp[#].bdStrictlyCont", &SGp, &SGData::bdStrictlyCont);
     AP *sgPd = addAP("SGp[#].period", &SGp, &SGData::period);
                addAP("SGp[#].loopBursts", &SGp, &SGData::loopBursts);
     AP *sgST = addAP("SGp[#].SpikeT[#][#]", &SGp, &SGData::SpikeT);

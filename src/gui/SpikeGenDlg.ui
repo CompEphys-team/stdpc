@@ -349,16 +349,16 @@
       <property name="geometry">
        <rect>
         <x>170</x>
-        <y>110</y>
+        <y>100</y>
         <width>161</width>
-        <height>121</height>
+        <height>141</height>
        </rect>
       </property>
       <widget class="QLabel" name="NOverL">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>70</y>
          <width>39</width>
          <height>16</height>
         </rect>
@@ -400,7 +400,7 @@
        <property name="geometry">
         <rect>
          <x>140</x>
-         <y>40</y>
+         <y>70</y>
          <width>16</width>
          <height>16</height>
         </rect>
@@ -413,7 +413,7 @@
        <property name="geometry">
         <rect>
          <x>70</x>
-         <y>40</y>
+         <y>70</y>
          <width>61</width>
          <height>22</height>
         </rect>
@@ -438,6 +438,48 @@
         <string>ms</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="tUContiguous">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>40</y>
+         <width>81</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Contiguous</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="tOContiguous">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>100</y>
+         <width>81</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Contiguous</string>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="bdStrict">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>111</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Strictly contiguous</string>
+       </property>
+      </widget>
      </widget>
      <zorder>bdGroupW</zorder>
      <zorder>SpikesL</zorder>
@@ -455,12 +497,6 @@
      <zorder>VSpike</zorder>
      <zorder>Width</zorder>
      <zorder>VRest</zorder>
-     <zorder>WidthU_3</zorder>
-     <zorder>tOver</zorder>
-     <zorder>WidthU_2</zorder>
-     <zorder>NUnderL</zorder>
-     <zorder>NOverL</zorder>
-     <zorder>tUnder</zorder>
     </widget>
    </item>
    <item row="0" column="5">

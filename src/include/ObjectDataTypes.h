@@ -369,6 +369,9 @@ struct SGData : public ModelData {
   int bdType;
   double bdtUnder;
   double bdtOver;
+  bool bdtUnderCont;
+  bool bdtOverCont;
+  bool bdStrictlyCont;
 
   double period;
   bool loopBursts;

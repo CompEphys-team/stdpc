@@ -11,6 +11,7 @@ SpkGen::SpkGen(SGData *p, SgInstData *instp, DCThread *DCT) :
     burstDetected(false),
     tOverThresh(0.),
     tUnderThresh(0.),
+    onThreshold(false),
     burstNo(0),
     ISI_time(0.),
     period(p->period),
@@ -57,6 +58,19 @@ void SpkGen::update(double t, double dt)
                     ISI_time = 0.0;
                     period = p->SpikeT[burstNo].back() + (20.0/p->spkTimeScaling);
                 }
+            } else if ( p->bdtUnderCont ) {
+                if ( !onThreshold &&
+                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
+                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
+                    onThreshold = true;
+                } else {
+                    onThreshold = false;
+                    tUnderThresh = 0.;
+                    if ( p->bdStrictlyCont ) {
+                        tOverThresh = 0.;
+                        burstDetected = false;
+                    }
+                }
             }
         } else {  // burst (first crossing) not yet detected ...
             if (((p->bdType == 1) && (bdChn->V < instp->bdThresh)) ||
@@ -65,6 +79,15 @@ void SpkGen::update(double t, double dt)
                 if (tOverThresh > p->bdtOver) {
                     tUnderThresh = 0.;
                     burstDetected = true;
+                }
+            } else if ( p->bdtOverCont ) {
+                if ( !onThreshold &&
+                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
+                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
+                    onThreshold = true;
+                } else {
+                    onThreshold = false;
+                    tOverThresh = 0.;
                 }
             }
         }
