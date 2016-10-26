@@ -1,5 +1,6 @@
 #include "Global.h"
 #include "DeviceManager.h"
+#include "ModelManager.h"
 
 int LOADED_PROTOCOL_VERSION;
 DAQClass LEGACY_DAQ_CLASS;
@@ -35,3 +36,4 @@ expSigmoidLUtable expSigmoidLU;
 
 Clock DAQClock;
 DeviceManager Devices;
+ModelManager Models;

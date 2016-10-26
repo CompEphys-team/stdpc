@@ -1,43 +1,33 @@
 #ifndef HHNEURON_H
 #define HHNEURON_H
 
-#include "ObjectDataTypes.h"
-#include "Channels.h"
-#include <QPair>
+#include "Model.h"
+#include "Global.h"
 
-class HHNeuron
+class HHNeuron : public Model
 {
-friend class HHNeuronModel;
 public:
-    HHNeuron(HHNeuronData *, vInstData *);
+    HHNeuron(ModelPrototype *parent, int instID, DCThread *DCT);
+    void updateIn(double t);
+    void updateOut(double t);
     void update(double t, double dt);
 
-    inChannel in;
-    outChannel out;
-    double V;
-
 protected:
-    HHNeuronData *p;
-    vInstData *instp;
+    double V;
 };
 
 
-class HHNeuronModel
+class HHNeuronModel : public ModelPrototype
 {
 public:
-    HHNeuronModel(HHNeuronData *p);
+    HHNeuronModel(int modelID) : ModelPrototype(modelID) {}
+    ~HHNeuronModel() {}
 
-    void updateNeurons(double t, double dt);
-    void updateChannels(double t);
+    void init(DCThread *);
 
-    std::pair<int, int> numActiveInst();
-    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save(int modelNo);
-    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save(int modelNo);
-
-    std::vector<HHNeuron> inst;
-
-private:
-    HHNeuronData *p;
+    inline ModelData &params() const { return HHNeuronp[modelID]; }
+    inline ModelClass modelClass() const { return HHNeuronData::modelClass; }
+    inline QString prefix() const { return "HH"; }
 };
 
 #endif // HHNEURON_H

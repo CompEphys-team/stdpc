@@ -5,6 +5,7 @@
 #include <climits>
 #include "ChannelIndex.h"
 #include "DeviceManager.h"
+#include "ModelManager.h"
 #include "GraphDlg.h"
 
 #include "SimulDAQ.h" // for debugging only ...
@@ -52,13 +53,12 @@ void DCThread::run()
    for ( DAQ *b : Devices.actdev )
        b->init_chans();
 
-   hhNeuron.clear();
-   for ( HHNeuronData &p : HHNeuronp ) {
-       hhNeuron.push_back(HHNeuronModel(&p));
-   }
-   SGProto.clear();
-   for ( SGData &p : SGp )
-       SGProto.push_back(SpkGenPrototype(&p, this));
+   // Populate Models in absence of UI doing it
+   for ( size_t i = 0; i < HHNeuronp.size(); i++ )
+       Models.initSingle(HHNeuronp, i);
+   for ( size_t i = 0; i < SGp.size(); i++ )
+       Models.initSingle(SGp, i);
+   Models.initActive(this);
 
    SampleHoldChan = getInChan(SampleHoldp.trigChn);
    SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
@@ -142,24 +142,8 @@ void DCThread::run()
    if (dsyn.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) ").arg(dsyn.size()));
    if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
    if (abhh.size() > 0) message(QString("DynClamp: %1 abHH conductance(s) ...").arg(abhh.size()));
-   if (hhNeuron.size() > 0) {
-       int nModels = 0, nInst = 0;
-       for ( HHNeuronModel &model : hhNeuron ) {
-           auto rep = model.numActiveInst();
-           nModels += rep.first;
-           nInst += rep.second;
-       }
-       message(QString("DynClamp: %1 HH neuron model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
-   }
-   if (SGProto.size() > 0) {
-       int nModels = 0, nInst = 0;
-       for ( SpkGenPrototype &model : SGProto ) {
-           auto rep = model.numActiveInst();
-           nModels += rep.first;
-           nInst += rep.second;
-       }
-       message(QString("DynClamp: %1 Spike generator model(s) with %2 total instance(s) ").arg(nModels).arg(nInst));
-   }
+   for ( auto const& m : Models.active() )
+       message(m->getStatus());
 
    int sz;
    sz= tanhLU.generate();
@@ -217,19 +201,13 @@ void DCThread::run()
            inChnsToSave.append(its.second);
            outChnsToSave.append(ots.second);
        }
-       int i = 0;
-       for ( HHNeuronModel &m : hhNeuron ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = m.inChans_to_save(i);
-           QPair<QVector<QString>, QVector<outChannel*>> ots = m.outChans_to_save(i++);
+       for ( auto const& m : Models.active() ) {
+           QPair<QVector<QString>, QVector<inChannel*>> its = m->inChans_to_save();
+           QPair<QVector<QString>, QVector<outChannel*>> ots = m->outChans_to_save();
            headerIn.append(its.first);
            headerOut.append(ots.first);
            inChnsToSave.append(its.second);
            outChnsToSave.append(ots.second);
-       }
-       for ( SpkGenPrototype &m : SGProto ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = m.inChans_to_save(i);
-           headerIn.append(its.first);
-           inChnsToSave.append(its.second);
        }
 
        QVector<QString> header(1, "Time");
@@ -342,10 +320,8 @@ void DCThread::run()
 
          // Dynamic clamp current generation
 
-         for ( HHNeuronModel &model : hhNeuron )
-             model.updateChannels(t);
-         for ( SpkGenPrototype &model : SGProto )
-             model.updateChannels(t);
+         for ( auto const& m : Models.active() )
+             m->updateChannels(t);
 
          for ( ChemSyn &obj : csyn )
              obj.currentUpdate(t, dt);
@@ -360,10 +336,8 @@ void DCThread::run()
          for ( abHH &obj : abhh )
              obj.currentUpdate(t, dt);
 
-         for ( HHNeuronModel &model : hhNeuron )
-             model.updateNeurons(t, dt);
-         for ( SpkGenPrototype &model : SGProto )
-             model.updateInstances(t, dt);
+         for ( auto const& m : Models.active() )
+             m->updateInstances(t, dt);
 
          // Updated display
          if ( graph ) {
@@ -423,6 +397,8 @@ void DCThread::run()
        b->reset_chans();
    }
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
+   for ( auto const& m : Models.active() )
+       m->reset();
 
    if ( saving ) {
        dataSaver->EndDataSaving();
@@ -438,16 +414,7 @@ inChannel *DCThread::getInChan(ChannelIndex const& dex)
     if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
     } else if ( dex.isVirtual ) {
-        switch ( dex.modelClass ) {
-        case ModelClass::HH:
-            if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
-                return nullptr;
-            return &(hhNeuron[dex.modelID].inst[dex.instID].in);
-        case ModelClass::SG:
-            if ( (int)SGProto.size() <= dex.modelID || (int)SGProto[dex.modelID].inst.size() <= dex.instID )
-                return nullptr;
-            return &(SGProto[dex.modelID].inst[dex.instID]->in);
-        }
+        return Models.getInChan(dex);
     } else if ( dex.isAnalog && dex.isInChn ) {
         return Devices.getInChan(dex);
     }
@@ -459,14 +426,7 @@ outChannel *DCThread::getOutChan(ChannelIndex const& dex)
     if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
     } else if ( dex.isVirtual ) {
-        switch ( dex.modelClass ) {
-        case ModelClass::HH:
-            if ( (int)hhNeuron.size() <= dex.modelID || (int)hhNeuron[dex.modelID].inst.size() <= dex.instID )
-                return nullptr;
-            return &(hhNeuron[dex.modelID].inst[dex.instID].out);
-        case ModelClass::SG:
-            return nullptr; // No SG input channels
-        }
+        return Models.getOutChan(dex);
     } else if ( dex.isNone ) {
         return &outChnNone;
     } else if ( dex.isAnalog && !dex.isInChn ) {
@@ -481,18 +441,9 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
     if ( !dex.isValid ) {
         return ret;
     } else if ( dex.isPrototype ) {
-        switch ( dex.modelClass ) {
-        case ModelClass::HH:
-            if ( dex.modelID < (int)HHNeuronp.size() )
-                for ( size_t i = 0; i < HHNeuronp[dex.modelID].inst.size(); i++ )
-                    ret.push_back(dex.toInstance(i));
-            break;
-        case ModelClass::SG:
-            if ( dex.modelID < (int)SGp.size() )
-                for ( size_t i = 0; i < SGp[dex.modelID].inst.size(); i++ )
-                    ret.push_back(dex.toInstance(i));
-            break;
-        }
+        if ( Models.all().at(dex.modelClass).size() > dex.modelID )
+            for ( size_t i = 0, end = Models.all().at(dex.modelClass)[dex.modelID]->params().numInst(); i < end; i++ )
+                ret.push_back(dex.toInstance(i));
     } else {
         ret.push_back(dex);
     }

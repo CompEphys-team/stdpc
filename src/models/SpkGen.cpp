@@ -2,9 +2,10 @@
 #include "DCThread.h"
 
 
-SpkGen::SpkGen(SGData *p, SgInstData *instp, DCThread *DCT) :
-    p(p),
-    instp(instp),
+SpkGen::SpkGen(ModelPrototype *parent, int instID, DCThread *DCT) :
+    Model(parent, instID, DCT),
+    p(static_cast<const SGData *>(&(parent->params()))),
+    instp(static_cast<const SgInstData *>(&params())),
     V(p->VRest),
     bdChn(DCT->getInChan(instp->bdChannel)),
     SGactive(p->bdType == 0),
@@ -18,8 +19,8 @@ SpkGen::SpkGen(SGData *p, SgInstData *instp, DCThread *DCT) :
     initial(true),
     active(true)
 {
-    in.init(&instp->inChn);
     in.V = V;
+    out.save = out.active = false;
     if (p->LUTables) {
         theExp= &expLU;
         expLU.require(-50.0, 50.0, 0.02);
@@ -29,8 +30,12 @@ SpkGen::SpkGen(SGData *p, SgInstData *instp, DCThread *DCT) :
         theExp= &expFunc;
         theTanh= &tanhFunc;
     }
+}
 
-    connect(this, SIGNAL(message(QString)), DCT, SIGNAL(message(QString)));
+void SpkGen::updateIn(double t)
+{
+    in.V = V;
+    in.process(t);
 }
 
 void SpkGen::update(double t, double dt)
@@ -98,7 +103,7 @@ void SpkGen::update(double t, double dt)
         // routine that calculates the membrane potential of the CN taking
         // in account all the spikes (superimposing) the voltage due to each spike
         V = 0.0;
-        for ( double &tSpike : p->SpikeT[burstNo] )
+        for ( double const& tSpike : p->SpikeT[burstNo] )
             V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
         V *= p->VSpike;
         V += p->VRest;
@@ -160,57 +165,10 @@ double SpkGen::VSpike(double t){
 }
 
 
-SpkGenPrototype::SpkGenPrototype(SGData *p, DCThread *DCT) :
-    p(p)
+void SpkGenPrototype::init(DCThread *DCT)
 {
-    inst.reserve(p->inst.size());
-    for ( SgInstData &a : p->inst )
-        inst.push_back(std::make_shared<SpkGen>(p, &a, DCT));
-}
-
-void SpkGenPrototype::updateInstances(double t, double dt)
-{
-    if ( p->active )
-        for ( std::shared_ptr<SpkGen> const& sg : inst )
-            if ( sg->active && sg->instp->active )
-                sg->update(t, dt);
-}
-
-void SpkGenPrototype::updateChannels(double t)
-{
-    for ( std::shared_ptr<SpkGen> const& sg : inst ) {
-        if ( (sg->in.active = (p->active && sg->instp->active)) ) {
-            sg->in.V = sg->V;
-            sg->in.process(t);
-        }
-    }
-}
-
-std::pair<int, int> SpkGenPrototype::numActiveInst()
-{
-    int nInst = 0;
-    for ( std::shared_ptr<SpkGen> const& sg : inst )
-        if ( sg->instp->active )
-            nInst++;
-    return std::pair<int, int>(p->active, nInst);
-}
-
-QPair<QVector<QString>, QVector<inChannel *>> SpkGenPrototype::inChans_to_save(int modelNo)
-{
-    QVector<QString> labels;
-    QVector<inChannel*> chans;
-    int i = 0;
-    for ( std::shared_ptr<SpkGen> const& sg : inst ) {
-        if ( sg->in.save ) {
-            labels.push_back(QString("SG_%1_V%2").arg(modelNo).arg(i));
-            chans.push_back(&sg->in);
-        }
-        ++i;
-    }
-    return qMakePair(labels, chans);
-}
-
-QPair<QVector<QString>, QVector<outChannel *>> SpkGenPrototype::outChans_to_save(int)
-{
-    return QPair<QVector<QString>, QVector<outChannel *>>();
+    inst.reserve(params().numInst());
+    for ( size_t i = 0; i < params().numInst(); i++ )
+        if ( params().instance(i).active )
+            inst.emplace_back(new SpkGen(this, i, DCT));
 }

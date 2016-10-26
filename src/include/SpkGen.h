@@ -1,31 +1,24 @@
 #ifndef SPKGEN_H
 #define SPKGEN_H
 
+#include "Model.h"
 #include "Global_func.h"
-#include "ObjectDataTypes.h"
-#include "Channels.h"
-#include <QObject>
-#include <QPair>
-#include <memory>
+#include "Global.h"
 
-class SpkGen : public QObject
+class SpkGen : public Model
 {
-    Q_OBJECT
-    friend class SpkGenPrototype;
 public:
-    SpkGen(SGData *, SgInstData *, DCThread *);
+    SpkGen(ModelPrototype *, int, DCThread *);
     ~SpkGen() {}
+
+    void updateIn(double t);
+    inline void updateOut(double) {}
 
     void update(double t, double dt);
 
-    inChannel in;
-
-signals:
-    void message(QString message);
-
 protected:
-    SGData *p;
-    SgInstData *instp;
+    const SGData * const p;
+    const SgInstData * const instp;
     double V;
 
     stdpc::function *theExp;
@@ -45,23 +38,17 @@ protected:
     double VSpike(double t);
 };
 
-class SpkGenPrototype
+class SpkGenPrototype : public ModelPrototype
 {
 public:
-    SpkGenPrototype(SGData *, DCThread *);
+    SpkGenPrototype(int modelID) : ModelPrototype(modelID) {}
     ~SpkGenPrototype() {}
 
-    void updateInstances(double t, double dt);
-    void updateChannels(double t);
+    void init(DCThread *);
 
-    std::pair<int, int> numActiveInst();
-    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save(int modelNo);
-    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save(int modelNo);
-
-    std::vector<std::shared_ptr<SpkGen>> inst;
-
-private:
-    SGData *p;
+    inline ModelData &params() const { return SGp[modelID]; }
+    inline ModelClass modelClass() const { return SGData::modelClass; }
+    inline QString prefix() const { return "SG"; }
 };
 
 #endif
