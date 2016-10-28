@@ -76,6 +76,8 @@ void DCThread::run()
    // set up the graphic display channels
    double graphDummy = 0.0;
    if ( graph ) {
+       inChannel *itmp;
+       outChannel *otmp;
        i = 0;
        graphVar.resize(Graphp.size());
        for ( GraphData &p : Graphp ) {
@@ -83,12 +85,12 @@ void DCThread::run()
                graphVar[i] = &graphDummy;
            } else if ( p.chan.isVirtual ) {
                graphVar[i] = p.isVoltage
-                       ? &getInChan(p.chan)->V
-                       : &getOutChan(p.chan)->I;
+                       ? &((itmp = getInChan(p.chan)) ? itmp->V : graphDummy)
+                       : &((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy);
            } else if ( p.chan.isInChn ) {
-               graphVar[i] =& getInChan(p.chan)->V;
+               graphVar[i] =& ((itmp = getInChan(p.chan)) ? itmp->V : graphDummy);
            } else {
-               graphVar[i] =& getOutChan(p.chan)->I;
+               graphVar[i] =& ((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy);
            }
            ++i;
        }
