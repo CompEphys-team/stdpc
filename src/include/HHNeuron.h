@@ -8,12 +8,12 @@ class HHNeuron : public Model
 {
 public:
     HHNeuron(ModelPrototype *parent, int instID, DCThread *DCT);
-    void updateIn(double t);
-    void updateOut(double t);
-    void update(double t, double dt);
+
+    void RK4(double t, double dt, size_t n);
 
 protected:
     double V;
+    double kV[4], Vi;
 };
 
 

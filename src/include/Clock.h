@@ -14,6 +14,7 @@ public:
 
     void reset_RTC();
     double get_RTC();
+    double get_RTC_const();
 
     double wait_till_elapsed(double target_dt);
 
@@ -24,6 +25,10 @@ private:
   double sysT;
   double clock_frequency;
   double clock_cycle;
+
+
+  LARGE_INTEGER inT;
+  double lastT;
 };
 
 #endif // CLOCK_H

@@ -30,12 +30,28 @@ void ModelPrototype::updateChannels(double t)
     }
 }
 
-void ModelPrototype::updateInstances(double t, double dt)
+void ModelPrototype::retainCurrent(double t)
+{
+    if ( params().active )
+        for ( std::shared_ptr<Model> &m : inst )
+            if ( m->params().active )
+                m->retainCurrent(t);
+}
+
+void ModelPrototype::restoreCurrent(double t)
+{
+    if ( params().active )
+        for ( std::shared_ptr<Model> &m : inst )
+            if ( m->params().active )
+                m->restoreCurrent(t);
+}
+
+void ModelPrototype::RK4(double t, double dt, size_t n)
 {
     if ( params().active )
         for ( std::shared_ptr<Model> &m : inst )
             if ( params().instance(m->id()).active )
-                m->update(t, dt);
+                m->RK4(t, dt, n);
 }
 
 QString ModelPrototype::getStatus() const

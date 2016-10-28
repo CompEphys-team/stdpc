@@ -50,6 +50,16 @@ void DCThread::run()
    inChannel *SampleHoldChan;
    DAQ *SampleHoldBoard;
 
+   // RK4 step size adaptation variables:
+   constexpr int tDepth = 100;
+   int tDepthUsed = -1;
+   double tFull[tDepth] = {}, tComp[tDepth] = {};
+   double sumTFull = 0., sumTComp = 0.;
+   int tFullOff = 0, tCompOff = 0;
+   double meanTComp, meanDT;
+   double subDT, subT, tLoop;
+   int nSubsteps;
+
    for ( DAQ *b : Devices.actdev )
        b->init_chans();
 
@@ -86,28 +96,32 @@ void DCThread::run()
    }
 
    bufferHelper.reset(new ChannelBufferHelper);
-   csyn.clear();
+
+   csynPre.clear();
+   csynPost.clear();
    for ( CSynData &p : CSynp ) {
        if ( p.active ) {
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   instantiate(csyn, p, a);
+                   instantiate(csynPre, csynPost, p, a);
        }
    }
-   absyn.clear();
+   absynPre.clear();
+   absynPost.clear();
    for ( abSynData &p : abSynp ) {
        if ( p.active ) {
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   instantiate(absyn, p, a);
+                   instantiate(absynPre, absynPost, p, a);
        }
    }
-   dsyn.clear();
+   dsynPre.clear();
+   dsynPost.clear();
    for ( DestexheSynData &p : DxheSynp ) {
        if ( p.active ) {
            for ( SynapseAssignment &a : p.assign )
                if ( a.active )
-                   instantiate(dsyn, p, a);
+                   instantiate(dsynPre, dsynPost, p, a);
        }
    }
    esyn.clear();
@@ -118,30 +132,37 @@ void DCThread::run()
                    instantiate(esyn, p, a);
        }
    }
-   hh.clear();
+   hhPre.clear();
+   hhIn.clear();
    for ( mhHHData &p : mhHHp ) {
        if ( p.active ) {
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   instantiate(hh, p, a);
+                   instantiate(hhPre, hhIn, p, a);
            }
        }
    }
-   abhh.clear();
+   abhhPre.clear();
+   abhhIn.clear();
    for ( abHHData &p : abHHp ) {
        if ( p.active ) {
            for ( CurrentAssignment &a : p.assign ) {
                if ( a.active )
-                   instantiate(abhh, p, a);
+                   instantiate(abhhPre, abhhIn, p, a);
            }
        }
    }
-   if (csyn.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) ").arg(csyn.size()));
-   if (absyn.size() > 0) message(QString("DynClamp: %1 ab synapse(s) ").arg(absyn.size()));
+   if (csynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(csynPre.size()));
+   if (csynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(csynPost.size()));
+   if (absynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
+   if (absynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(absynPost.size()));
    if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
-   if (dsyn.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) ").arg(dsyn.size()));
-   if (hh.size() > 0) message(QString("DynClamp: %1 HH conductance(s) ").arg(hh.size()));
-   if (abhh.size() > 0) message(QString("DynClamp: %1 abHH conductance(s) ...").arg(abhh.size()));
+   if (dsynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(dsynPre.size()));
+   if (dsynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(dsynPost.size()));
+   if (hhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(hhPre.size()));
+   if (hhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(hhIn.size()));
+   if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
+   if (abhhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(abhhIn.size()));
    for ( auto const& m : Models.active() )
        message(m->getStatus());
 
@@ -240,9 +261,11 @@ void DCThread::run()
    }
    else evt= 1e10;
 
-   DAQClock.reset_RTC();
    for ( DAQ *b : Devices.actdev )
        b->start();
+
+   // Reset clock AFTER the time-consuming device start to get a more precise t0
+   DAQClock.reset_RTC();
 
    // Dynamic clamp loop begins
    while (!stopped) {
@@ -289,7 +312,93 @@ void DCThread::run()
          }
      }
 
-     //--------------- Data saving ------------------------//
+         bufferHelper->advance(t);
+
+         if ( processAnalogs ) {
+             for ( DAQ *b : Devices.actdev )
+                 b->process_scan(t);
+             processAnalogs = false;
+         }
+         for ( auto const& m : Models.active() )
+             m->updateChannels(t);
+
+         // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
+         for ( ChemSyn &obj : csynPre )
+             obj.currentUpdate(t, dt);
+         for ( abSyn &obj : absynPre )
+             obj.currentUpdate(t, dt);
+         for ( DestexheSyn &obj : dsynPre )
+             obj.currentUpdate(t, dt);
+         for ( GapJunction &obj : esyn )
+             obj.currentUpdate(t, dt);
+
+         for ( HH &obj : hhPre )
+             obj.currentUpdate(t, dt);
+         for ( abHH &obj : abhhPre )
+             obj.currentUpdate(t, dt);
+
+         // Dynamic clamp: models (d2d currents)
+         if ( Models.active().size() ) { // Runge-Kutta 4
+             for ( auto const& m : Models.active() )
+                 m->retainCurrent(t);
+
+             if ( tDepthUsed < 100 ) {
+                 if ( ++tDepthUsed ) {
+                     meanTComp = sumTComp/tDepthUsed;
+                     meanDT = sumTFull/tDepthUsed;
+                }
+             } else {
+                 meanTComp = sumTComp/tDepth;
+                 meanDT = sumTFull/tDepth;
+             }
+             if ( tDepthUsed > 10 && meanTComp / dt < 0.5 * meanTComp / meanDT ) { // dt is unusually large
+                 // Compute in substeps such that the entire computation takes roughly its usual fraction of the cycle time
+                 nSubsteps = (int)(dt/meanDT);
+                 subDT = dt/nSubsteps;
+             } else {
+                 nSubsteps = 1;
+                 subDT = dt;
+             }
+
+             for ( i = 0, subT = t; i < nSubsteps; i++, subT+=subDT ) {
+                 tLoop = DAQClock.get_RTC_const();
+
+                 for ( auto const& m : Models.active() )
+                     m->restoreCurrent(subT);
+
+                 for ( size_t rkStep = 0; rkStep < 4; rkStep++ ) {
+                     double rkDT = rkStep < 2 ? subDT/2 : subDT;
+
+                     for ( HH &obj : hhIn )
+                         obj.RK4(subT, rkDT, rkStep);
+                     for ( abHH &obj : abhhIn )
+                         obj.RK4(subT, rkDT, rkStep);
+
+                     for ( auto const& m : Models.active() )
+                         m->RK4(subT, rkDT, rkStep);
+                 }
+
+                 tLoop = DAQClock.get_RTC_const() - tLoop;
+
+                 tComp[tCompOff] = tLoop;
+                 tCompOff = (tCompOff+1) % tDepth;
+                 sumTComp = sumTComp - tComp[tCompOff] + tLoop;
+             }
+
+             tFull[tFullOff] = dt;
+             tFullOff = (tFullOff+1) % tDepth;
+             sumTFull = sumTFull - tFull[tFullOff] + dt;
+         } // end RK4
+
+         // Dynamic clamp: d2a synapses
+         for ( ChemSyn &obj : csynPost )
+             obj.currentUpdate(t, dt);
+         for ( abSyn &obj : absynPost )
+             obj.currentUpdate(t, dt);
+         for ( DestexheSyn &obj : dsynPost )
+             obj.currentUpdate(t, dt);
+
+         //--------------- Data saving ------------------------//
          if ( saving && dataSavingPs.enabled ) {
            if ( t >= lastSave + savingPeriod )
            {
@@ -310,35 +419,6 @@ void DCThread::run()
          }
          //--------------- Data saving end ---------------------//
 
-         bufferHelper->advance(t);
-
-         if ( processAnalogs ) {
-             for ( DAQ *b : Devices.actdev )
-                 b->process_scan(t);
-             processAnalogs = false;
-         }
-
-         // Dynamic clamp current generation
-
-         for ( auto const& m : Models.active() )
-             m->updateChannels(t);
-
-         for ( ChemSyn &obj : csyn )
-             obj.currentUpdate(t, dt);
-         for ( abSyn &obj : absyn )
-             obj.currentUpdate(t, dt);
-         for ( DestexheSyn &obj : dsyn )
-             obj.currentUpdate(t, dt);
-         for ( GapJunction &obj : esyn )
-             obj.currentUpdate(t, dt);
-         for ( HH &obj : hh )
-             obj.currentUpdate(t, dt);
-         for ( abHH &obj : abhh )
-             obj.currentUpdate(t, dt);
-
-         for ( auto const& m : Models.active() )
-             m->updateInstances(t, dt);
-
          // Updated display
          if ( graph ) {
              if ( t - lastWrite > graphDt ) {
@@ -349,6 +429,7 @@ void DCThread::run()
              }
          }
 
+         // Rate update
          ++rateCounter;
          if ( t - lastRateReport > 1 ) {
              lastRateReport = t;
@@ -451,7 +532,8 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
 }
 
 template <class T>
-void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, CurrentAssignment &a)
+void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &inModel,
+                           typename T::param_type &p, CurrentAssignment &a)
 {
     CurrentAssignment tmp;
     tmp.actP = &a.active;
@@ -460,21 +542,22 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Curr
         for ( ChannelIndex VIChan : getChanIndices(a.VChannel) ) {
             tmp.VChannel = VIChan;
             tmp.IChannel = VIChan;
-            inst.push_back(T(&p, this, tmp));
+            inModel.push_back(T(&p, this, tmp));
         }
-    } else {
+    } else { // NOTE: These channels are assumed to be analog only, although technically, a/d combos are permitted
         for ( ChannelIndex VChan : getChanIndices(a.VChannel) ) {
             tmp.VChannel = VChan;
             for ( ChannelIndex IChan : getChanIndices(a.IChannel) ) {
                 tmp.IChannel = IChan;
-                inst.push_back(T(&p, this, tmp));
+                preModel.push_back(T(&p, this, tmp));
             }
         }
     }
 }
 
 template <typename T>
-void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, SynapseAssignment &a)
+void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
+                           typename T::param_type &p, SynapseAssignment &a)
 {
     std::vector<ChannelIndex> preSynInst = getChanIndices(a.PreSynChannel);
     std::vector<ChannelIndex> postSynInst = getChanIndices(a.PostSynChannel);
@@ -485,16 +568,26 @@ void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, Syna
     if ( a.PostSynChannel == a.OutSynChannel ) {
         for ( ChannelIndex post : postSynInst ) {
             for ( ChannelIndex pre : preSynInst ) {
-                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) )
-                    inst.push_back(T(&p, this, a, preC, postC, outC));
+                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) ) {
+                    T tmp(&p, this, a, preC, postC, outC);
+                    if ( pre.isVirtual && post.isAnalog )
+                        postModel.push_back(tmp);
+                    else
+                        preModel.push_back(tmp);
+                }
             }
         }
     } else {
         for ( ChannelIndex post : postSynInst ) {
             for ( ChannelIndex out : outSynInst ) {
                 for ( ChannelIndex pre : preSynInst ) {
-                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) )
-                        inst.push_back(T(&p, this, a, preC, postC, outC));
+                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) ) {
+                        T tmp(&p, this, a, preC, postC, outC);
+                        if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
+                            postModel.push_back(tmp);
+                        else
+                            preModel.push_back(tmp);
+                    }
                 }
             }
         }

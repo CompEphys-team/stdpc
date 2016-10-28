@@ -11,10 +11,11 @@ public:
     SpkGen(ModelPrototype *, int, DCThread *);
     ~SpkGen() {}
 
-    void updateIn(double t);
+    // Override processing on unused out
     inline void updateOut(double) {}
 
     void update(double t, double dt);
+    void RK4(double,double,size_t);
 
 protected:
     const SGData * const p;
@@ -45,6 +46,10 @@ public:
     ~SpkGenPrototype() {}
 
     void init(DCThread *);
+
+    // Override processing on unused Model::out
+    inline void retainCurrent(double) {}
+    inline void restoreCurrent(double) {}
 
     inline ModelData &params() const { return SGp[modelID]; }
     inline ModelClass modelClass() const { return SGData::modelClass; }

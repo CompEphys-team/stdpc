@@ -19,7 +19,7 @@ SpkGen::SpkGen(ModelPrototype *parent, int instID, DCThread *DCT) :
     initial(true),
     active(true)
 {
-    in.V = V;
+    in.V = V + instp->inChn.bias;
     out.save = out.active = false;
     if (p->LUTables) {
         theExp= &expLU;
@@ -32,10 +32,15 @@ SpkGen::SpkGen(ModelPrototype *parent, int instID, DCThread *DCT) :
     }
 }
 
-void SpkGen::updateIn(double t)
+void SpkGen::RK4(double t, double dt, size_t n)
 {
-    in.V = V;
-    in.process(t);
+    /// Cheapskate RK, because SG isn't really a candidate for it
+    /// Note the 2*dt, which is the actual full step length for this RK cycle
+    /// Note also that burst detection may be slightly inaccurate if the bd channel is another model
+    if ( n == 0 )
+        update(t, 2*dt);
+    // Need neither further changes on `in` (nobody touches its voltage),
+    // nor on `out` (it's inactive anyway)
 }
 
 void SpkGen::update(double t, double dt)
@@ -127,7 +132,7 @@ void SpkGen::update(double t, double dt)
     } else {
         V = p->VRest;
     }
-    in.V = V;
+    in.V = V + instp->inChn.bias;
 }
 
 // how to generate a spike

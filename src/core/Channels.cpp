@@ -31,8 +31,6 @@ void inChannel::init(inChnData *inp)
 
 void inChannel::process(double t)
 {
-  V += p->bias;
-
   if (p->spkDetect) {
     if (spiking) {
       startSpiking= false;

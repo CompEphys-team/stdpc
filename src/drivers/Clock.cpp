@@ -23,9 +23,7 @@ void Clock::reset_RTC()
 //---------------------------------------------------------------------------
 double Clock::get_RTC()
 {
-  static LARGE_INTEGER inT;
-  static double dt, lastT;
-
+  static double dt;
   QueryPerformanceCounter(&inT);
   lastT= sysT;
   sysT= ((double) inT.LowPart)/clock_frequency;
@@ -34,6 +32,16 @@ double Clock::get_RTC()
   t+= dt;
 
   return dt;
+}
+
+double Clock::get_RTC_const()
+{
+    static double mySysT, dt;
+    QueryPerformanceCounter(&inT);
+    mySysT = ((double) inT.LowPart)/clock_frequency;
+    dt = mySysT - lastT;
+    if ( dt < 0.0 ) dt += clock_cycle;
+    return dt;
 }
 
 

@@ -48,9 +48,9 @@ private:
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
      template <typename T>
-     void instantiate(std::vector<T> &, typename T::param_type &, CurrentAssignment &);
+     void instantiate(std::vector<T> &pre, std::vector<T> &in, typename T::param_type &, CurrentAssignment &);
      template <typename T>
-     void instantiate(std::vector<T> &, typename T::param_type &, SynapseAssignment &);
+     void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, SynapseAssignment &);
      template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
 
@@ -62,12 +62,20 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-     std::vector<ChemSyn> csyn;
-     std::vector<abSyn> absyn;
+     std::vector<ChemSyn> csynPre;
+     std::vector<ChemSyn> csynPost;
+     std::vector<abSyn> absynPre;
+     std::vector<abSyn> absynPost;
+
      std::vector<GapJunction> esyn;
-     std::vector<DestexheSyn> dsyn;
-     std::vector<HH> hh;
-     std::vector<abHH> abhh;
+
+     std::vector<DestexheSyn> dsynPre;
+     std::vector<DestexheSyn> dsynPost;
+
+     std::vector<HH> hhPre;
+     std::vector<HH> hhIn;
+     std::vector<abHH> abhhPre;
+     std::vector<abHH> abhhIn;
 
      outChannel outChnNone;
 

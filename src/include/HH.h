@@ -17,6 +17,7 @@ class HH
     
   protected:
     double m, h;
+    double km[4], kh[4], mi, hi;
     double minf, taum, hinf, tauh;
     double I;
     inChannel *pre;
@@ -26,6 +27,7 @@ class HH
   public:
     HH(mhHHData *p, DCThread *t, CurrentAssignment a);
     void currentUpdate(double, double);
+    void RK4(double, double, size_t);
 
     typedef mhHHData param_type;
 };

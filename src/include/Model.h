@@ -18,12 +18,24 @@ public:
     Model(ModelPrototype *parent, int instID, DCThread *DCT);
     virtual ~Model() {}
 
-    /// Process channels
-    virtual void updateIn(double t) = 0;
-    virtual void updateOut(double t) = 0;
+    /// Process channels:
+    /// Applies bias to out.I and calls in.process(t).
+    virtual inline void updateIn(double t) { in.process(t); }
+    virtual inline void updateOut(double /*t*/) { out.I = params().outChn.bias; }
 
-    /// Integrate inputs, prepare outputs
-    virtual void update(double t, double dt) = 0;
+    /// Retain out.I (which includes bias + any a2d contributions) prior to entering RK4 iterations
+    virtual inline void retainCurrent(double /*t*/) { retainedI = out.I; }
+
+    /// Reset out.I to the retained value at the start of each new RK4 iteration (note: full iteration, not step)
+    virtual inline void restoreCurrent(double /*t*/) { out.I = retainedI; }
+
+    /// Compute Runke-Kutta step n (n = 0..3), in this order:
+    ///  - Compute k_n based on the previous intermediate state (= null state, when n=0)
+    ///  - Provide output to channels based on the previous intermediate state
+    ///  - Update intermediate state based on k_n and null state
+    ///  - at n=3, update null state based on k_{0..3} (nullstate += (k0 + 2k1 + 2k2 + k3)/6 * dt)
+    /// Note, out.I must be reset to the retained value at the end of every step, except for the last one (n=3).
+    virtual void RK4(double t, double dt, size_t n) = 0;
 
     vInstData &params() const;
     inline int id() const { return instID; }
@@ -37,6 +49,8 @@ signals:
 protected:
     const ModelPrototype *parent;
     const int instID;
+
+    double retainedI;
 };
 
 
@@ -64,8 +78,14 @@ public:
     /// Processes associated channels via Model::updateIn(t) and Model::updateOut(t)
     virtual void updateChannels(double t);
 
-    /// Integrates all inputs and prepares all outputs via Model::update(t,dt)
-    virtual void updateInstances(double t, double dt);
+    /// Delegates to Model::retainCurrent(t)
+    virtual void retainCurrent(double t);
+
+    /// Delegates to Model::restoreCurrent(t)
+    virtual void restoreCurrent(double t);
+
+    /// Delegates to Model::RK4(t,dt,n)
+    virtual void RK4(double t, double dt, size_t n);
 
     QString getStatus() const;
     QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save() const;
