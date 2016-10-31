@@ -6,6 +6,7 @@
 #include <QComboBox>
 #include "ChannelIndex.h"
 #include "ObjectDataTypes.h"
+#include "ModelManager.h"
 
 class ChannelListModel : public QAbstractListModel
 {
@@ -54,18 +55,17 @@ protected:
         QVector<int> nAI, nAO;
     };
 
-    template <typename T>
     class ModelHelper {
     private:
         ChannelListModel *const parent;
-        std::vector<T> *params;
+        ModelProxy *proxy;
     public:
-        ModelHelper(std::vector<T> *params, ChannelListModel *parent) : parent(parent), params(params), nInst(0) {}
+        ModelHelper(ModelProxy *proxy, ChannelListModel *parent) : parent(parent), proxy(proxy), nInst(0) {}
         void updateCount();
         void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
         bool data(int row, int role, int &offset, QVariant &ret) const;
         bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
-        QVector<int> nInst;
+        std::vector<size_t> nInst;
     };
 
     const int displayFlags;
@@ -75,8 +75,7 @@ protected:
 #ifdef NATIONAL_INSTRUMENTS
     DAQHelper<NIDAQData> hNI;
 #endif
-    ModelHelper<HHNeuronData> hHH;
-    ModelHelper<SGData> hSG;
+    std::vector<ModelHelper> modelHelpers;
 
     ChannelIndex rmDevDex;
 };

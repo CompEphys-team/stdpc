@@ -284,7 +284,7 @@ void MyMainWindow::SaveConfig()
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
   QString D("DigiDatap"), S("SDAQp"), N("NIDAQp");
-  for ( std::unique_ptr<AP> const& ap : params ) {
+  for ( std::unique_ptr<AP> const& ap : AP::params() ) {
       if ( ap->name().startsWith(D) || ap->name().startsWith(S) || ap->name().startsWith(N) ) {
           ap->write(os);
       }
@@ -314,7 +314,7 @@ void MyMainWindow::doSaveProtocol(QString &fname)
 
   exportData();
 
-  for ( auto const& ap : params ) {
+  for ( auto const& ap : AP::params() ) {
       ap->write(os);
   }
 

@@ -1,6 +1,31 @@
 #include "HHNeuron.h"
+#include "ModelManager.h"
+#include "AP.h"
 
-HHNeuron::HHNeuron(ModelPrototype *parent, int instID, DCThread *DCT) :
+/// Construct a single self-registering proxy
+static HHNeuronProxy prox;
+std::vector<HHNeuronData> HHNeuronProxy::p;
+ModelProxy *HHNeuronModel::proxy() const { return &prox; }
+ModelPrototype *HHNeuronProxy::createPrototype(int modelID) { return new HHNeuronModel(modelID); }
+
+HHNeuronProxy::HHNeuronProxy()
+{
+    ModelManager::RegisterModel(modelClass(), this);
+    addAP("HHNeuronp[#].active", &HHNeuronProxy::p, &HHNeuronData::active);
+    addAP("HHNeuronp[#].C", &HHNeuronProxy::p, &HHNeuronData::C);
+    addAP("HHNeuronp[#].gLeak", &HHNeuronProxy::p, &HHNeuronData::gLeak);
+    addAP("HHNeuronp[#].ELeak", &HHNeuronProxy::p, &HHNeuronData::ELeak);
+    addAP("HHNeuronp[#].inst[#].active", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::active);
+    addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
+    addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
+    addAP("HHNeuronp[#].inst[#].inChn.bias", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::bias);
+    addAP("HHNeuronp[#].inst[#].inChn.chnlSaving", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::chnlSaving);
+    addAP("HHNeuronp[#].inst[#].outChn.bias", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::outChn, &outChnData::bias);
+    addAP("HHNeuronp[#].inst[#].outChn.chnlSaving", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::outChn, &outChnData::chnlSaving);
+}
+
+
+HHNeuron::HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     Model(parent, instID, DCT),
     V(-0.06)
 {

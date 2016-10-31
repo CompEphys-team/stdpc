@@ -1,14 +1,25 @@
 #ifndef SPKGEN_H
 #define SPKGEN_H
 
-#include "Model.h"
 #include "Global_func.h"
 #include "Global.h"
+#include "ModelManager.h"
+
+class SpkGenProxy : public ModelProxy {
+public:
+    SpkGenProxy();
+    inline ModelData &param(size_t i) { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline QString modelClass() { return "SG"; }
+    ModelPrototype *createPrototype(int modelID);
+
+    static std::vector<SGData> p;
+};
 
 class SpkGen : public Model
 {
 public:
-    SpkGen(ModelPrototype *, int, DCThread *);
+    SpkGen(ModelPrototype *, size_t, DCThread *);
     ~SpkGen() {}
 
     // Override processing on unused out
@@ -42,7 +53,7 @@ protected:
 class SpkGenPrototype : public ModelPrototype
 {
 public:
-    SpkGenPrototype(int modelID) : ModelPrototype(modelID) {}
+    SpkGenPrototype(size_t modelID) : ModelPrototype(modelID) {}
     ~SpkGenPrototype() {}
 
     void init(DCThread *);
@@ -52,7 +63,7 @@ public:
     inline void restoreCurrent(double) {}
 
     inline ModelData &params() const { return SGp[modelID]; }
-    inline ModelClass modelClass() const { return SGData::modelClass; }
+    inline ModelProxy *proxy() const;
     inline QString prefix() const { return "SG"; }
 };
 

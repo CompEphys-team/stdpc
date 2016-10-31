@@ -1,7 +1,7 @@
 #include "Model.h"
 #include "DCThread.h"
 
-Model::Model(ModelPrototype *parent, int instID, DCThread *DCT) :
+Model::Model(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     parent(parent),
     instID(instID)
 {

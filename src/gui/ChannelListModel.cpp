@@ -10,11 +10,11 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
       hSimul(DAQHelper<SDAQData>(this)),
       hDD1200(DAQHelper<DigiDataData>(this)),
 #ifdef NATIONAL_INSTRUMENTS
-      hNI(DAQHelper<NIDAQData>(this)),
+      hNI(DAQHelper<NIDAQData>(this))
 #endif
-      hHH(ModelHelper<HHNeuronData>(&HHNeuronp, this)),
-      hSG(ModelHelper<SGData>(&SGp, this))
 {
+    for ( ModelProxy *proxy : ModelManager::Register )
+        modelHelpers.push_back(ModelHelper(proxy, this));
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
     // Owner connects model removals
 }
@@ -24,6 +24,9 @@ void ChannelListModel::updateCount(ChannelListModel *from)
     if ( from ) {
         size = from->size;
 
+        for ( size_t i = 0; i < modelHelpers.size(); i++ )
+            modelHelpers[i].nInst = from->modelHelpers[i].nInst;
+
         hSimul.nAI = from->hSimul.nAI;
         hSimul.nAO = from->hSimul.nAO;
         hDD1200.nAI = from->hDD1200.nAI;
@@ -32,8 +35,6 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         hNI.nAI = from->hNI.nAI;
         hNI.nAO = from->hNI.nAO;
 #endif
-        hHH.nInst = from->hHH.nInst;
-        hSG.nInst = from->hSG.nInst;
     } else {
         size = 0;
         if ( displayFlags & Blank )
@@ -41,8 +42,8 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         if ( displayFlags & None )
             size++;
 
-        hHH.updateCount();
-        hSG.updateCount();
+        for ( ModelHelper &h : modelHelpers )
+            h.updateCount();
 
         hSimul.updateCount();
         hDD1200.updateCount();
@@ -73,12 +74,11 @@ void ChannelListModel::DAQHelper<T>::updateCount()
     }
 }
 
-template <typename T>
-void ChannelListModel::ModelHelper<T>::updateCount()
+void ChannelListModel::ModelHelper::updateCount()
 {
     int s = 0;
-    for ( T const& p : *params ) // Don't include removed models.
-        if ( !p.removed )        // They're at the end of the vector, but let's not be complicated.
+    for ( size_t i = 0; i < proxy->size(); i++ ) // Don't include removed models.
+        if ( !proxy->param(i).removed )          // They're at the end of the vector, but let's not be complicated.
             s++;
     nInst.resize(s);
     if ( parent->displayFlags & Prototype ) {
@@ -86,11 +86,10 @@ void ChannelListModel::ModelHelper<T>::updateCount()
     }
     if ( parent->displayFlags & Virtual ) {
         int i = 0;
-        for ( T const& p: *params ) {
-            if ( !p.removed ) {
-                s = p.inst.size();
-                nInst[i++] = s;
-                parent->size += s;
+        for ( size_t j = 0; j < proxy->size(); j++ ) {
+            if ( !proxy->param(j).removed ) {
+                nInst[i++] = proxy->param(j).numInst();
+                parent->size += proxy->param(j).numInst();
             }
         }
     }
@@ -105,8 +104,8 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 
     // Ignore always-unchanged Blank, None
 
-    hHH.updateChns(currentIdx, newIdx, newM);
-    hSG.updateChns(currentIdx, newIdx, newM);
+    for ( ModelHelper &h : modelHelpers )
+        h.updateChns(currentIdx, newIdx, newM);
 
     hSimul.updateChns(currentIdx, newIdx, newM);
     hDD1200.updateChns(currentIdx, newIdx, newM);
@@ -170,18 +169,15 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
     }
 }
 
-template <typename T>
-void ChannelListModel::ModelHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
+void ChannelListModel::ModelHelper::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
 {
     bool rmModel;
     int mvOffset = 0;
     if ( parent->displayFlags & Prototype ) {
-        ChannelIndex dex(T::modelClass, 0, -1);
+        ChannelIndex dex(ChannelIndex::Prototype, proxy->modelClass());
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
             currentIdx.append(parent->index(dex, Prototype));
-            if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
-                 && parent->rmDevDex.modelClass == T::modelClass
-                 && parent->rmDevDex.modelID == dex.modelID ) {
+            if ( parent->rmDevDex == ChannelIndex(ChannelIndex::Prototype, proxy->modelClass(), dex.modelID) ) {
                 newIdx.append(QModelIndex());
                 mvOffset = 1;
             } else {
@@ -194,11 +190,9 @@ void ChannelListModel::ModelHelper<T>::updateChns(QModelIndexList &currentIdx, Q
 
     mvOffset = 0;
     if ( parent->displayFlags & Virtual ) {
-        ChannelIndex dex(T::modelClass);
+        ChannelIndex dex(ChannelIndex::Virtual, proxy->modelClass());
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
-            rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
-                    && parent->rmDevDex.modelClass == T::modelClass
-                    && parent->rmDevDex.modelID == dex.modelID;
+            rmModel = parent->rmDevDex == ChannelIndex(ChannelIndex::Prototype, proxy->modelClass(), dex.modelID);
             for ( dex.instID = 0; dex.instID < nInst[dex.modelID]; dex.instID++ ) {
                 currentIdx.append(parent->index(dex, Virtual));
                 if ( rmModel ) {
@@ -253,10 +247,9 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         }
         offset++;
     }
-    if ( hHH.data(row, role, offset, ret) )
-        return ret;
-    if ( hSG.data(row, role, offset, ret) )
-        return ret;
+    for ( ModelHelper const& h : modelHelpers )
+        if ( h.data(row, role, offset, ret) )
+            return ret;
     if ( hSimul.data(row, role, offset, ret) )
         return ret;
     if ( hDD1200.data(row, role, offset, ret) )
@@ -337,25 +330,24 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
     return false;
 }
 
-template <typename T>
-bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
+bool ChannelListModel::ModelHelper::data(int row, int role, int &offset, QVariant &ret) const
 {
     int mvOffset = 0;
     if ( parent->displayFlags & Prototype ) {
-        if ( row-offset < nInst.size() ) {
-            if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype && parent->rmDevDex.modelClass == T::modelClass ) {
-                if ( parent->rmDevDex.modelID == row-offset ) {
+        if ( row-offset < (int)nInst.size() ) {
+            if ( parent->rmDevDex.isValid && parent->rmDevDex.isPrototype && parent->rmDevDex.modelClass == proxy->modelClass() ) {
+                if ( (int)parent->rmDevDex.modelID == row-offset ) {
                     ret = QVariant();
                     return true;
-                } else if ( parent->rmDevDex.modelID < row-offset ) {
+                } else if ( (int)parent->rmDevDex.modelID < row-offset ) {
                     mvOffset = 1;
                 }
             }
-            ChannelIndex dex(T::modelClass, row - offset - mvOffset, -1);
+            ChannelIndex dex(ChannelIndex::Prototype, proxy->modelClass(), row - offset - mvOffset);
             switch ( role ) {
-            case Qt::DisplayRole:   ret = dex.prettyName();              return true;
-            case Qt::UserRole:      ret.setValue(dex);                   return true;
-            case Qt::UserRole + 1:  ret = (*params)[dex.modelID].active; return true;
+            case Qt::DisplayRole:   ret = dex.prettyName();                 return true;
+            case Qt::UserRole:      ret.setValue(dex);                      return true;
+            case Qt::UserRole + 1:  ret = proxy->param(dex.modelID).active; return true;
             }
         }
         offset += nInst.size();
@@ -364,21 +356,19 @@ bool ChannelListModel::ModelHelper<T>::data(int row, int role, int &offset, QVar
     bool rmModel;
     mvOffset = 0;
     if ( parent->displayFlags & Virtual ) {
-        for ( int i = 0; i < nInst.size(); i++ ) {
-            rmModel = parent->rmDevDex.isValid && parent->rmDevDex.isPrototype
-                    && parent->rmDevDex.modelClass == T::modelClass
-                    && parent->rmDevDex.modelID == i;
-            if ( row-offset < nInst[i] ) {
+        for ( size_t i = 0; i < nInst.size(); i++ ) {
+            rmModel = parent->rmDevDex == ChannelIndex(ChannelIndex::Prototype, proxy->modelClass(), i);
+            if ( row-offset < (int)nInst[i] ) {
                 if ( rmModel ) {
                     ret = QVariant();
                     return true;
                 }
-                ChannelIndex dex(T::modelClass, i - mvOffset, row - offset);
-                T *p = &(*params)[dex.modelID];
+                ChannelIndex dex(ChannelIndex::Virtual, proxy->modelClass(), i - mvOffset, row - offset);
+                ModelData &p = proxy->param(dex.modelID);
                 switch ( role ) {
-                case Qt::DisplayRole:   ret = dex.prettyName();                        return true;
-                case Qt::UserRole:      ret.setValue(dex);                             return true;
-                case Qt::UserRole + 1:  ret = p->active && p->inst[dex.instID].active; return true;
+                case Qt::DisplayRole:   ret = dex.prettyName();                          return true;
+                case Qt::UserRole:      ret.setValue(dex);                               return true;
+                case Qt::UserRole + 1:  ret = p.active && p.instance(dex.instID).active; return true;
                 }
             }
             offset += nInst[i];
@@ -428,10 +418,9 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
             row++;
         }
         QModelIndex ret;
-        if ( hHH.index(dex, type, row, ret) )
-            return ret;
-        if ( hSG.index(dex, type, row, ret) )
-            return ret;
+        for ( ModelHelper const& h : modelHelpers )
+            if ( h.index(dex, type, row, ret) )
+                return ret;
         if ( hSimul.index(dex, type, row, ret) )
             return ret;
         if ( hDD1200.index(dex, type, row, ret) )
@@ -470,21 +459,20 @@ bool ChannelListModel::DAQHelper<T>::index(const ChannelIndex &dex, ChannelType 
     return false;
 }
 
-template <typename T>
-bool ChannelListModel::ModelHelper<T>::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
+bool ChannelListModel::ModelHelper::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
 {
     if ( parent->displayFlags & Prototype ) {
-        if ( type & Prototype && dex.modelClass == T::modelClass ) {
-            if ( dex.modelID >= 0 && dex.modelID < nInst.size() )
+        if ( type & Prototype && dex.modelClass == proxy->modelClass() ) {
+            if ( dex.modelID < nInst.size() )
                 ret = parent->createIndex(dex.modelID + offset, 0);
             return true;
         }
         offset += nInst.size();
     }
     if ( parent->displayFlags & Virtual ) {
-        for ( int i = 0; i < nInst.size(); i++ ) {
-            if ( type & Virtual && dex.modelClass == T::modelClass && dex.modelID == i ) {
-                if ( dex.instID >= 0 && dex.instID < nInst[i] )
+        for ( size_t i = 0; i < nInst.size(); i++ ) {
+            if ( type & Virtual && dex.modelClass == proxy->modelClass() && dex.modelID == i ) {
+                if ( dex.instID < nInst[i] )
                     ret = parent->createIndex(dex.instID + offset, 0);
                 return true;
             }

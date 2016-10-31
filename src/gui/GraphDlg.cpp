@@ -89,12 +89,12 @@ GraphDlg::GraphDlg(QWidget *parent)
 void GraphDlg::channelIndexChanged()
 {
     ChannelIndex sel = ui->channel->currentData().value<ChannelIndex>();
-    ui->radioCurrent->setEnabled(sel.isVirtual && sel.modelClass != ModelClass::SG);
-    ui->radioVoltage->setEnabled(sel.isVirtual && sel.modelClass != ModelClass::SG);
+    ui->radioCurrent->setEnabled(sel.isVirtual && sel.modelClass != "SG");
+    ui->radioVoltage->setEnabled(sel.isVirtual && sel.modelClass != "SG");
     if ( !sel.isVirtual ) {
         ui->radioCurrent->setChecked(!sel.isInChn);
         ui->radioVoltage->setChecked(sel.isInChn);
-    } else if ( sel.modelClass == ModelClass::SG ) {
+    } else if ( sel.modelClass == "SG" ) {
         ui->radioCurrent->setChecked(false);
         ui->radioVoltage->setChecked(true);
     }

@@ -9,7 +9,6 @@
 #include <memory>
 
 class AP;
-extern std::vector<std::unique_ptr<AP>> params;
 void initAP();
 
 std::istream &operator>>(std::istream &is, QString &str);
@@ -89,7 +88,7 @@ public:
      */
     virtual void write(std::ostream &os) = 0;
 
-    static AP* find(QString rawName, std::vector<std::unique_ptr<AP>> *vec = &params)
+    static AP* find(QString rawName, std::vector<std::unique_ptr<AP>> *vec = &params())
     {
         rawName.replace(QRegularExpression("\\[\\d+\\]"), "[#]");
         std::vector<std::unique_ptr<AP>>::iterator it;
@@ -101,6 +100,8 @@ public:
     }
 
     inline QString const& name() { return _name; }
+
+    static inline std::vector<std::unique_ptr<AP>> &params() { static std::vector<std::unique_ptr<AP>> p; return p; }
 
 protected:
     AP(QString &name) : _name(name) {}
@@ -356,12 +357,12 @@ inline AP* addAP(std::vector<std::unique_ptr<AP>> &vec, QString name, T *head, T
 
 template <typename T, typename... Tail>
 inline AP* addAP(QString name, T *head, Tail... tail) {
-    return addAP(params, name, head, tail...);
+    return addAP(AP::params(), name, head, tail...);
 }
 
 inline AP* addDeprecatedAP(QString name, AP *target, int nIgnore) {
-    params.push_back(std::unique_ptr<AP>(new APDeprec(name, target, nIgnore)));
-    return params.back().get();
+    AP::params().push_back(std::unique_ptr<AP>(new APDeprec(name, target, nIgnore)));
+    return AP::params().back().get();
 }
 
 #endif // AP_H

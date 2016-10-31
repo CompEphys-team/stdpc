@@ -13,8 +13,11 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-std::vector<HHNeuronData> HHNeuronp;
-std::vector<SGData> SGp;
+
+#include "HHNeuron.h"
+#include "SpkGen.h"
+std::vector<HHNeuronData> &HHNeuronp = HHNeuronProxy::p;
+std::vector<SGData> &SGp = SpkGenProxy::p;
 
 std::vector<DigiDataData> DigiDatap;
 std::vector<SDAQData> SDAQp;

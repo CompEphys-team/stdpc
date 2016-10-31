@@ -9,13 +9,14 @@
 #include <QObject>
 #include "Channels.h"
 
+class ModelProxy;
 class ModelPrototype;
 
 class Model : public QObject
 {
     Q_OBJECT
 public:
-    Model(ModelPrototype *parent, int instID, DCThread *DCT);
+    Model(ModelPrototype *parent, size_t instID, DCThread *DCT);
     virtual ~Model() {}
 
     /// Process channels:
@@ -38,7 +39,7 @@ public:
     virtual void RK4(double t, double dt, size_t n) = 0;
 
     vInstData &params() const;
-    inline int id() const { return instID; }
+    inline size_t id() const { return instID; }
 
     inChannel in;
     outChannel out;
@@ -48,7 +49,7 @@ signals:
 
 protected:
     const ModelPrototype *parent;
-    const int instID;
+    const size_t instID;
 
     double retainedI;
 };
@@ -57,7 +58,7 @@ protected:
 class ModelPrototype
 {
 public:
-    ModelPrototype(int modelID) : modelID(modelID) {}
+    ModelPrototype(size_t modelID) : modelID(modelID) {}
     virtual ~ModelPrototype() {}
 
     /// Prepare for action: Populate inst with newly constructed Models
@@ -66,8 +67,8 @@ public:
     /// Return a reference to the specific parameter set used for this model
     virtual ModelData &params() const = 0;
 
-    /// Return this model's ModelClass value
-    virtual ModelClass modelClass() const = 0;
+    /// Return this model's registered proxy (ideally, point to a static local instance)
+    virtual ModelProxy *proxy() const = 0;
 
     /// Return a (unique) prefix to identify this model class
     virtual QString prefix() const = 0;
@@ -94,7 +95,7 @@ public:
     inline std::vector<std::shared_ptr<Model>> const& instances() const { return inst; }
 
 protected:
-    int modelID;
+    size_t modelID;
     std::vector<std::shared_ptr<Model>> inst;
 
     friend class ModelManager;

@@ -359,6 +359,7 @@ struct HHNeuronData : public ModelData {
     typedef HHNeuronModel ModelType;
     typedef HHModelDlg DlgType;
     static constexpr ModelClass modelClass = ModelClass::HH;
+
 };
 
 struct SgInstData : public vInstData {

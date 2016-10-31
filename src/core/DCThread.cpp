@@ -64,10 +64,9 @@ void DCThread::run()
        b->init_chans();
 
    // Populate Models in absence of UI doing it
-   for ( size_t i = 0; i < HHNeuronp.size(); i++ )
-       Models.initSingle(HHNeuronp, i);
-   for ( size_t i = 0; i < SGp.size(); i++ )
-       Models.initSingle(SGp, i);
+   for ( ModelProxy *proxy : ModelManager::Register )
+       for ( size_t j = 0; j < proxy->size(); j++ )
+           Models.initSingle(proxy, j);
    Models.initActive(this);
 
    SampleHoldChan = getInChan(SampleHoldp.trigChn);
@@ -524,8 +523,8 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
     if ( !dex.isValid ) {
         return ret;
     } else if ( dex.isPrototype ) {
-        if ( Models.all().at(dex.modelClass).size() > dex.modelID )
-            for ( size_t i = 0, end = Models.all().at(dex.modelClass)[dex.modelID]->params().numInst(); i < end; i++ )
+        if ( Models.all().value(dex.modelClass).size() > (int)dex.modelID )
+            for ( size_t i = 0, end = Models.all().value(dex.modelClass)[dex.modelID]->params().numInst(); i < end; i++ )
                 ret.push_back(dex.toInstance(i));
     } else {
         ret.push_back(dex);

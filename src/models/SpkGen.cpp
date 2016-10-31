@@ -1,8 +1,55 @@
 #include "SpkGen.h"
 #include "DCThread.h"
+#include "ModelManager.h"
+#include "AP.h"
+
+/// Construct a single self-registering proxy
+static SpkGenProxy prox;
+std::vector<SGData> SpkGenProxy::p;
+ModelProxy *SpkGenPrototype::proxy() const { return &prox; }
+ModelPrototype *SpkGenProxy::createPrototype(int modelID) { return new SpkGenPrototype(modelID); }
+
+SpkGenProxy::SpkGenProxy()
+{
+    ModelManager::RegisterModel(modelClass(), this);
+    AP *sgAc = addAP("SGp[#].active", &SpkGenProxy::p, &SGData::active);
+    AP *sgLU = addAP("SGp[#].LUTables", &SpkGenProxy::p, &SGData::LUTables);
+    AP *sgVS = addAP("SGp[#].VSpike", &SpkGenProxy::p, &SGData::VSpike);
+    AP *sgTS = addAP("SGp[#].spkTimeScaling", &SpkGenProxy::p, &SGData::spkTimeScaling);
+    AP *sgVR = addAP("SGp[#].VRest", &SpkGenProxy::p, &SGData::VRest);
+    AP *sgBT = addAP("SGp[#].bdType", &SpkGenProxy::p, &SGData::bdType);
+               addAP("SGp[#].bdtUnder", &SpkGenProxy::p, &SGData::bdtUnder);
+               addAP("SGp[#].bdtOver", &SpkGenProxy::p, &SGData::bdtOver);
+               addAP("SGp[#].bdtUnderCont", &SpkGenProxy::p, &SGData::bdtUnderCont);
+               addAP("SGp[#].bdtOverCont", &SpkGenProxy::p, &SGData::bdtOverCont);
+               addAP("SGp[#].bdStrictlyCont", &SpkGenProxy::p, &SGData::bdStrictlyCont);
+    AP *sgPd = addAP("SGp[#].period", &SpkGenProxy::p, &SGData::period);
+               addAP("SGp[#].loopBursts", &SpkGenProxy::p, &SGData::loopBursts);
+    AP *sgST = addAP("SGp[#].SpikeT[#][#]", &SpkGenProxy::p, &SGData::SpikeT);
+
+               addAP("SGp[#].inst[#].active", &SpkGenProxy::p, &SGData::inst, &vInstData::active);
+               addAP("SGp[#].inst[#].inChn.bias", &SpkGenProxy::p, &SGData::inst, &vInstData::inChn, &inChnData::bias);
+    AP *sgSv = addAP("SGp[#].inst[#].inChn.chnlSaving", &SpkGenProxy::p, &SGData::inst, &vInstData::inChn, &inChnData::chnlSaving);
+    AP *sgBC = addAP("SGp[#].inst[#].bdChannel", &SpkGenProxy::p, &SGData::inst, &SgInstData::bdChannel);
+    AP *sgBH = addAP("SGp[#].inst[#].bdThresh", &SpkGenProxy::p, &SGData::inst, &SgInstData::bdThresh);
+
+    addDeprecatedAP("SGp.active", sgAc);
+    addDeprecatedAP("SGp.saving", sgSv);
+    addDeprecatedAP("SGp.LUTables", sgLU);
+    addDeprecatedAP("SGp.VSpike", sgVS);
+    addDeprecatedAP("SGp.spkTimeScaling", sgTS);
+    addDeprecatedAP("SGp.VRest", sgVR);
+    addDeprecatedAP("SGp.bdType", sgBT);
+    addDeprecatedAP("SGp.bdChannel", sgBC);
+    addDeprecatedAP("SGp[#].bdChannel", sgBC);
+    addDeprecatedAP("SGp.bdThresh", sgBH);
+    addDeprecatedAP("SGp[#].bdThresh", sgBH);
+    addDeprecatedAP("SGp.period", sgPd);
+    addDeprecatedAP("SGp.SpikeT[#]", sgST, 2);
+}
 
 
-SpkGen::SpkGen(ModelPrototype *parent, int instID, DCThread *DCT) :
+SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     Model(parent, instID, DCT),
     p(static_cast<const SGData *>(&(parent->params()))),
     instp(static_cast<const SgInstData *>(&params())),

@@ -1,12 +1,8 @@
 #include "AP.h"
 #include "Global.h"
 
-std::vector<std::unique_ptr<AP>> params;
-
 void initAP()
 {
-    params.clear();
-
     // CSynp STPlast
     addAP("CSynp[#].ST.AMinus", &CSynp, &CSynData::ST, &STPlast::AMinus);
     addAP("CSynp[#].ST.tauMinus", &CSynp, &CSynData::ST, &STPlast::tauMinus);
@@ -274,43 +270,6 @@ void initAP()
     addDeprecatedAP("abHHp[#].IChannel", abHH_I);
 
 
-    // SG
-    AP *sgAc = addAP("SGp[#].active", &SGp, &SGData::active);
-    AP *sgLU = addAP("SGp[#].LUTables", &SGp, &SGData::LUTables);
-    AP *sgVS = addAP("SGp[#].VSpike", &SGp, &SGData::VSpike);
-    AP *sgTS = addAP("SGp[#].spkTimeScaling", &SGp, &SGData::spkTimeScaling);
-    AP *sgVR = addAP("SGp[#].VRest", &SGp, &SGData::VRest);
-    AP *sgBT = addAP("SGp[#].bdType", &SGp, &SGData::bdType);
-               addAP("SGp[#].bdtUnder", &SGp, &SGData::bdtUnder);
-               addAP("SGp[#].bdtOver", &SGp, &SGData::bdtOver);
-               addAP("SGp[#].bdtUnderCont", &SGp, &SGData::bdtUnderCont);
-               addAP("SGp[#].bdtOverCont", &SGp, &SGData::bdtOverCont);
-               addAP("SGp[#].bdStrictlyCont", &SGp, &SGData::bdStrictlyCont);
-    AP *sgPd = addAP("SGp[#].period", &SGp, &SGData::period);
-               addAP("SGp[#].loopBursts", &SGp, &SGData::loopBursts);
-    AP *sgST = addAP("SGp[#].SpikeT[#][#]", &SGp, &SGData::SpikeT);
-
-               addAP("SGp[#].inst[#].active", &SGp, &SGData::inst, &vInstData::active);
-               addAP("SGp[#].inst[#].inChn.bias", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::bias);
-    AP *sgSv = addAP("SGp[#].inst[#].inChn.chnlSaving", &SGp, &SGData::inst, &vInstData::inChn, &inChnData::chnlSaving);
-    AP *sgBC = addAP("SGp[#].inst[#].bdChannel", &SGp, &SGData::inst, &SgInstData::bdChannel);
-    AP *sgBH = addAP("SGp[#].inst[#].bdThresh", &SGp, &SGData::inst, &SgInstData::bdThresh);
-
-    addDeprecatedAP("SGp.active", sgAc);
-    addDeprecatedAP("SGp.saving", sgSv);
-    addDeprecatedAP("SGp.LUTables", sgLU);
-    addDeprecatedAP("SGp.VSpike", sgVS);
-    addDeprecatedAP("SGp.spkTimeScaling", sgTS);
-    addDeprecatedAP("SGp.VRest", sgVR);
-    addDeprecatedAP("SGp.bdType", sgBT);
-    addDeprecatedAP("SGp.bdChannel", sgBC);
-    addDeprecatedAP("SGp[#].bdChannel", sgBC);
-    addDeprecatedAP("SGp.bdThresh", sgBH);
-    addDeprecatedAP("SGp[#].bdThresh", sgBH);
-    addDeprecatedAP("SGp.period", sgPd);
-    addDeprecatedAP("SGp.SpikeT[#]", sgST, 2);
-
-
     // SDAQp
     addAP("SDAQp[#].active", &SDAQp, &SDAQData::active);
     addAP("SDAQp[#].inFileName", &SDAQp, &SDAQData::inFileName);
@@ -401,20 +360,6 @@ void initAP()
     addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
     addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
 #endif
-
-
-    // HHNeuronp
-    addAP("HHNeuronp[#].active", &HHNeuronp, &HHNeuronData::active);
-    addAP("HHNeuronp[#].C", &HHNeuronp, &HHNeuronData::C);
-    addAP("HHNeuronp[#].gLeak", &HHNeuronp, &HHNeuronData::gLeak);
-    addAP("HHNeuronp[#].ELeak", &HHNeuronp, &HHNeuronData::ELeak);
-    addAP("HHNeuronp[#].inst[#].active", &HHNeuronp, &HHNeuronData::inst, &vInstData::active);
-    addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
-    addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
-    addAP("HHNeuronp[#].inst[#].inChn.bias", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::bias);
-    addAP("HHNeuronp[#].inst[#].inChn.chnlSaving", &HHNeuronp, &HHNeuronData::inst, &vInstData::inChn, &inChnData::chnlSaving);
-    addAP("HHNeuronp[#].inst[#].outChn.bias", &HHNeuronp, &HHNeuronData::inst, &vInstData::outChn, &outChnData::bias);
-    addAP("HHNeuronp[#].inst[#].outChn.chnlSaving", &HHNeuronp, &HHNeuronData::inst, &vInstData::outChn, &outChnData::chnlSaving);
 
 
     // Data saving

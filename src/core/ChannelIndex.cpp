@@ -2,13 +2,14 @@
 #include <QStringList>
 #include <QChar>
 #include "Global.h"
+#include "ModelManager.h"
 
 ChannelIndex::ChannelIndex(bool validNone) :
     isValid(validNone),
     isNone(validNone),
     isPrototype(false),
     isVirtual(false),
-    modelClass(ModelClass::HH),
+    modelClass(""),
     modelID(0),
     instID(0),
     isAnalog(false),
@@ -36,13 +37,32 @@ ChannelIndex::ChannelIndex(ModelClass mClass, int mID, int iID) :
     isNone(false),
     isPrototype(iID == -1),
     isVirtual(iID >= 0),
-    modelClass(mClass),
     modelID(mID),
     instID(iID == -1 ? 0 : iID),
     isAnalog(false)
+{
+    switch ( mClass ) {
+    case ModelClass::HH : modelClass = "HH"; break;
+    case ModelClass::SG : modelClass = "SG"; break;
+    }
+}
+
+ChannelIndex::ChannelIndex(ChannelIndex::ctorType type, QString typeClass, size_t first, size_t second, bool isInChn) :
+    isValid(true),
+    isNone(type==None),
+    isPrototype(type==Prototype),
+    isVirtual(type==Virtual),
+    modelClass(typeClass),
+    modelID(first),
+    instID(second),
+    isAnalog(type==Analog),
+    daqClass(DAQClass::Simul /*NYI: typeClass */),
+    devID(first),
+    isInChn(isInChn),
+    chanID(second)
 {}
 
-ChannelIndex ChannelIndex::toInstance(int instID) const
+ChannelIndex ChannelIndex::toInstance(size_t instID) const
 {
     if ( !isPrototype || !isValid )
         return *this;
@@ -123,13 +143,9 @@ QString ChannelIndex::prettyName() const
         ret += QString(", device %1").arg(devID);
     } else if ( isPrototype || isVirtual ) {
         if ( isPrototype )
-            ret = QString("%2 %1:all (model %1, all instances)").arg(modelID);
+            ret = QString("%1 %2:all (model %2, all instances)").arg(modelClass).arg(modelID);
         else
-            ret = QString("%3 %1:%2 (model %1, instance %2)").arg(modelID).arg(instID);
-        switch ( modelClass ) {
-        case ModelClass::HH : ret = ret.arg("HH"); break;
-        case ModelClass::SG : ret = ret.arg("SG"); break;
-        }
+            ret = QString("%1 %2:%3 (model %2, instance %3)").arg(modelClass).arg(modelID).arg(instID);
     } else ret = "Oops: Invalid channel index";
     return ret;
 }
@@ -152,19 +168,9 @@ QString ChannelIndex::toString(QChar sep) const
         else
             ret += "ao" + QString::number(chanID);
     } else if ( isPrototype ) {
-        ret = QString("Prototype/");
-        switch ( modelClass ) {
-        case ModelClass::HH : ret += "HH/"; break;
-        case ModelClass::SG : ret += "SG/"; break;
-        }
-        ret += QString::number(modelID);
+        ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
-        ret += "Virtual/";
-        switch ( modelClass ) {
-        case ModelClass::HH : ret += "HH/"; break;
-        case ModelClass::SG : ret += "SG/"; break;
-        }
-        ret += QString::number(modelID) + "/" + QString::number(instID);
+        ret = QString("Virtual/%1/%2/%3").arg(modelClass).arg(modelID).arg(instID);
     }
     if ( sep != QChar('/') )
         ret.replace('/', sep);
@@ -218,18 +224,18 @@ static void legacyRescue_0(QString str, ChannelIndex &dex)
         dex.isValid = true;
     } else if ( ch == 1000 ) { // 2016-RC1 : SG
         dex.isVirtual = true;
-        dex.modelClass = ModelClass::SG;
+        dex.modelClass = "SG";
         dex.modelID = 0;
         dex.instID = 0;
         dex.isValid = true;
     } else if ( ch >= 1100000000 ) { // 2016-RC1 : HH Proto
         dex.isPrototype = true;
-        dex.modelClass = ModelClass::HH;
+        dex.modelClass = "HH";
         dex.modelID = ((ch - 1100000000) / 100000) - 1;
         dex.isValid = true;
     } else if ( ch >= 100000000 ) { // 2016-RC1 : HH Inst
         dex.isVirtual = true;
-        dex.modelClass = ModelClass::HH;
+        dex.modelClass = "HH";
         dex.modelID = ((ch - 100000000) / 100000) - 1;
         dex.instID = ch % 100000;
         dex.isValid = true;
@@ -275,37 +281,33 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         if ( parts.size() != 3 )
             return is;
 
-        if ( !parts.at(1).compare("HH", Qt::CaseInsensitive) )
-            dex.modelClass = ModelClass::HH;
-        else if ( !parts.at(1).compare("SG", Qt::CaseInsensitive) )
-            dex.modelClass = ModelClass::SG;
+        if ( ModelManager::Register.contains(parts.at(1)) )
+            dex.modelClass = parts.at(1);
         else
             return is;
 
         dex.isPrototype = true;
-        dex.modelID = parts.at(2).toInt();
+        dex.modelID = parts.at(2).toUInt();
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Virtual", Qt::CaseInsensitive) ) {
         if ( parts.size() != 4 )
             return is;
 
-        if ( !parts.at(1).compare("HH", Qt::CaseInsensitive) )
-            dex.modelClass = ModelClass::HH;
-        else if ( !parts.at(1).compare("SG", Qt::CaseInsensitive) )
-            dex.modelClass = ModelClass::SG;
+        if ( ModelManager::Register.contains(parts.at(1)) )
+            dex.modelClass = parts.at(1);
         else
             return is;
 
         dex.isVirtual = true;
-        dex.modelID = parts.at(2).toInt();
-        dex.instID = parts.at(3).toInt();
+        dex.modelID = parts.at(2).toUInt();
+        dex.instID = parts.at(3).toUInt();
         dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
         legacyRescue_0(str, dex);
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION < 3 ) {
         if ( !parts.at(0).compare("SpikeGen", Qt::CaseInsensitive) ) {
             dex.isVirtual = true;
-            dex.modelClass = ModelClass::SG;
+            dex.modelClass = "SG";
             dex.modelID = 0;
             dex.instID = 0;
             dex.isValid = true;
