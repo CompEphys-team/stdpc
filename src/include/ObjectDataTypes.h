@@ -339,13 +339,9 @@ struct ModelData {
     bool active;
     virtual vInstData &instance(size_t i) = 0;
     virtual size_t numInst() const = 0;
-    ModelData() : active(false), removed(false) {}
-
-    bool removed; // Internal use only (set to true when reversibly deleted in the GUI)
+    ModelData() : active(false) {}
 };
 
-class HHModelDlg;
-class HHNeuronModel;
 struct HHNeuronData : public ModelData {
     double C;
     double gLeak;
@@ -355,11 +351,6 @@ struct HHNeuronData : public ModelData {
     inline vInstData &instance(size_t i) { return inst[i]; }
     inline size_t numInst() const { return inst.size(); }
     HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
-
-    typedef HHNeuronModel ModelType;
-    typedef HHModelDlg DlgType;
-    static constexpr ModelClass modelClass = ModelClass::HH;
-
 };
 
 struct SgInstData : public vInstData {
@@ -367,8 +358,6 @@ struct SgInstData : public vInstData {
     double bdThresh;
 };
 
-class SpkGenPrototype;
-class SpikeGenDlg;
 struct SGData : public ModelData {
   bool LUTables;
   double VSpike;
@@ -390,10 +379,6 @@ struct SGData : public ModelData {
 
   inline vInstData &instance(size_t i) { return inst[i]; }
   inline size_t numInst() const { return inst.size(); }
-
-  typedef SpkGenPrototype ModelType;
-  typedef SpikeGenDlg DlgType;
-  static constexpr ModelClass modelClass = ModelClass::SG;
 };
 
 #endif

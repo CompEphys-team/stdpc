@@ -76,10 +76,6 @@ public:
 
             static_cast<MyMainWindow*>(parent)->updateDeviceStatus(future.result(), name);
             _widget->statusChanged(future.result());
-        } else {
-            connect(dlg, SIGNAL(modelStatusChanged()), parent, SLOT(updateStartButton()));
-            connect(this, SIGNAL(removedModel(ChannelIndex)), parent, SIGNAL(modelRemoved(ChannelIndex)));
-            static_cast<MyMainWindow*>(parent)->channelsChanged();
         }
     }
 
@@ -88,7 +84,7 @@ public:
         delete dlg;
     }
 
-    inline void removeDevice(size_t idx) { _removeDevice(idx); }
+    inline void removeDevice(size_t idx) { Devices.remove(idx, params); }
 
     void importData()
     {
@@ -134,25 +130,6 @@ public:
     DaqDlg *dlg;
     size_t idx;
     DaqWidget *_widget;
-
-private:
-    template <typename... DoNotSpecify, typename T = DaqDlg>
-    typename std::enable_if<T::isDAQ::value>::type _removeDevice(int idx)
-    {
-        static_assert(sizeof...(DoNotSpecify)==0, "Do not specify template arguments!");
-        Devices.remove(idx, params);
-    }
-
-    template <typename... DoNotSpecify, typename T = DaqDlg>
-    typename std::enable_if<!T::isDAQ::value>::type _removeDevice(int idx)
-    {
-        static_assert(sizeof...(DoNotSpecify)==0, "Do not specify template arguments!");
-        typename DaqDlg::param_type del = (*params)[idx];
-        params->erase(params->begin() + idx);
-        del.removed = true;
-        params->push_back(del);
-        emit removedModel(ChannelIndex(DaqDlg::param_type::modelClass, idx, -1));
-    }
 };
 
 #endif // DAQOPTS_H

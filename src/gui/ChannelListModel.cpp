@@ -76,21 +76,14 @@ void ChannelListModel::DAQHelper<T>::updateCount()
 
 void ChannelListModel::ModelHelper::updateCount()
 {
-    int s = 0;
-    for ( size_t i = 0; i < proxy->size(); i++ ) // Don't include removed models.
-        if ( !proxy->param(i).removed )          // They're at the end of the vector, but let's not be complicated.
-            s++;
-    nInst.resize(s);
+    nInst.resize(proxy->size());
     if ( parent->displayFlags & Prototype ) {
         parent->size += nInst.size();
     }
     if ( parent->displayFlags & Virtual ) {
-        int i = 0;
-        for ( size_t j = 0; j < proxy->size(); j++ ) {
-            if ( !proxy->param(j).removed ) {
-                nInst[i++] = proxy->param(j).numInst();
-                parent->size += proxy->param(j).numInst();
-            }
+        for ( size_t i = 0; i < proxy->size(); i++ ) {
+            nInst[i] = proxy->param(i).numInst();
+            parent->size += proxy->param(i).numInst();
         }
     }
 }
