@@ -4,6 +4,7 @@
 #include "AP.h"
 #include <windows.h>
 #include <QScrollBar>
+#include "ModelOpts.h"
 
 MyMainWindow::MyMainWindow(QWidget *parent)
      : QMainWindow(parent),
@@ -35,8 +36,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 #ifdef NATIONAL_INSTRUMENTS
      dprot.push_back(new DaqOptsPrototype<NIDAQDlg>("Nat'l Instruments", &NIDAQp));
 #endif
-     dprot.push_back(new DaqOptsPrototype<HHModelDlg>("HH Model", &HHNeuronp));
-     dprot.push_back(new DaqOptsPrototype<SpikeGenDlg>("Spike generator", &SGp));
+     for ( ModelProxy *proxy : ModelManager::Register )
+         dprot.push_back(new ModelOptsPrototype(proxy));
      ui->DAQTable->init(dprot, this);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
@@ -167,36 +168,7 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
 
 void MyMainWindow::updateStartButton()
 {
-    bool success = !Devices.actdev.empty();
-    if ( !success && HHNeuronp.size() ) {
-        for ( HHNeuronData const& p : HHNeuronp ) {
-            if ( p.active && p.inst.size() ) {
-                for ( vInstData const& inst : p.inst ) {
-                    if ( inst.active ) {
-                        success = true;
-                        break;
-                    }
-                }
-            }
-            if ( success )
-                break;
-        }
-    }
-    if ( !success && SGp.size() ) {
-        for ( SGData const& p : SGp ) {
-            if ( p.active && p.inst.size() ) {
-                for ( vInstData const& inst : p.inst ) {
-                    if ( inst.active ) {
-                        success = true;
-                        break;
-                    }
-                }
-            }
-            if ( success )
-                break;
-        }
-    }
-    ui->StartBut->setEnabled(success);
+    ui->StartBut->setEnabled(!Devices.actdev.empty() || Models.empty());
 }
 
 
@@ -337,8 +309,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   DxheSynp.clear();
   mhHHp.clear();
   abHHp.clear();
-  HHNeuronp.clear();
-  SGp.clear();
+  Models.clear();
   SDAQp.clear();
   DigiDatap.clear();
 #ifdef NATIONAL_INSTRUMENTS

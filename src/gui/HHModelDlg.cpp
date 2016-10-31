@@ -1,16 +1,16 @@
 #include "HHModelDlg.h"
 #include "ui_HHModelDlg.h"
-#include "Global.h"
+#include "HHNeuron.h"
 
 /// Developer's note: In the interest of channel index stability, do not allow removing/reordering rows
 
-HHModelDlg::HHModelDlg(int idx, QWidget *parent) :
-    QDialog(parent),
+HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
+    ModelDlg(idx, parent),
     ui(new Ui::HHModelDlg)
 {
     ui->setupUi(this);
     label = ui->titleLabel->text();
-    setIndex(idx);
+    ui->titleLabel->setText(label.arg(idx));
     ui->table->setHorizontalHeaderLabels({"Active",
                                           "",
                                           "VChan\nSave",
@@ -34,11 +34,10 @@ HHModelDlg::HHModelDlg(int idx, QWidget *parent) :
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addMultiple()));
 }
 
-void HHModelDlg::setIndex(int no)
+void HHModelDlg::setIndex(size_t no)
 {
-    idx = no;
     ui->titleLabel->setText(label.arg(no));
-    emit channelsChanged();
+    ModelDlg::setIndex(no);
 }
 
 HHModelDlg::~HHModelDlg()
@@ -61,7 +60,7 @@ void HHModelDlg::importData()
     iBiases.clear();
     ui->table->setRowCount(0);
 
-    for ( vInstData const& inst : HHNeuronp[idx].inst ) {
+    for ( vInstData const& inst : HHNeuronProxy::p[idx].inst ) {
         active = new QCheckBox();
         vSave = new QCheckBox();
         vBias = new QDoubleSpinBox();
@@ -80,16 +79,16 @@ void HHModelDlg::importData()
     }
     growTable(false);
 
-    ui->C->setValue(HHNeuronp[idx].C * 1e9);
-    ui->gLeak->setValue(HHNeuronp[idx].gLeak * 1e9);
-    ui->ELeak->setValue(HHNeuronp[idx].ELeak * 1e3);
+    ui->C->setValue(HHNeuronProxy::p[idx].C * 1e9);
+    ui->gLeak->setValue(HHNeuronProxy::p[idx].gLeak * 1e9);
+    ui->ELeak->setValue(HHNeuronProxy::p[idx].ELeak * 1e3);
 }
 
-void HHModelDlg::exportData(bool)
+void HHModelDlg::exportData()
 {
     vInstData inst;
-    HHNeuronp[idx].inst.clear();
-    HHNeuronp[idx].inst.reserve(ui->table->rowCount() - 1);
+    HHNeuronProxy::p[idx].inst.clear();
+    HHNeuronProxy::p[idx].inst.reserve(ui->table->rowCount() - 1);
     for ( int i = 0; i < ui->table->rowCount() - 1; i++ ) {
         inst.active = actives[i]->isChecked();
         inst.inChn.chnlSaving = vSaves[i]->isChecked();
@@ -98,26 +97,14 @@ void HHModelDlg::exportData(bool)
         inst.inChn.spkDetectThresh = spkThrs[i]->value() * 1e-3;
         inst.outChn.chnlSaving = iSaves[i]->isChecked();
         inst.outChn.bias = iBiases[i]->value() * 1e-9;
-        HHNeuronp[idx].inst.push_back(inst);
+        HHNeuronProxy::p[idx].inst.push_back(inst);
     }
 
-    HHNeuronp[idx].C = ui->C->value() * 1e-9;
-    HHNeuronp[idx].gLeak = ui->gLeak->value() * 1e-9;
-    HHNeuronp[idx].ELeak = ui->ELeak->value() * 1e-3;
+    HHNeuronProxy::p[idx].C = ui->C->value() * 1e-9;
+    HHNeuronProxy::p[idx].gLeak = ui->gLeak->value() * 1e-9;
+    HHNeuronProxy::p[idx].ELeak = ui->ELeak->value() * 1e-3;
     emit channelsChanged();
     emit modelStatusChanged();
-}
-
-void HHModelDlg::accept()
-{
-    exportData();
-    QDialog::accept();
-}
-
-void HHModelDlg::reject()
-{
-    importData();
-    QDialog::reject();
 }
 
 void HHModelDlg::addRow(int row, QCheckBox *active,

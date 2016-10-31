@@ -29,9 +29,6 @@ extern std::vector<DestexheSynData> DxheSynp;
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
-extern std::vector<HHNeuronData> &HHNeuronp;
-extern std::vector<SGData> &SGp;
-
 extern std::vector<DigiDataData> DigiDatap;
 extern std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS

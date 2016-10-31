@@ -1,44 +1,31 @@
 #ifndef SPIKEGENDLG_H
 #define SPIKEGENDLG_H
 
-#include <QDialog>
+#include "ModelDlg.h"
 #include <QCheckBox>
 #include <QDoubleSpinBox>
 #include "WideComboBox.h"
-#include "ObjectDataTypes.h"
 #include "ChannelListModel.h"
 
 namespace Ui {
 class SpikeGenDlg;
 }
 
-class SpikeGenDlg : public QDialog
+class SpikeGenDlg : public ModelDlg
 {
     Q_OBJECT
 
 public:
-    explicit SpikeGenDlg(int idx, QWidget *parent = 0);
+    explicit SpikeGenDlg(size_t idx, QWidget *parent = 0);
     ~SpikeGenDlg();
 
     void importData();
-    void exportData(bool = false);
-    void setIndex(int);
-
-    typedef SGData param_type;
-    typedef std::false_type isDAQ;
-
-public slots:
-    void accept();
-    void reject();
-
-signals:
-    void channelsChanged();
-    void modelStatusChanged();
+    void exportData();
+    void setIndex(size_t);
 
 private:
     Ui::SpikeGenDlg *ui;
     QString label;
-    int idx;
 
     ChannelListModel clm;
 

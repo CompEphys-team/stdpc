@@ -4,16 +4,23 @@
 #include <QObject>
 #include <QVector>
 #include <QHash>
+#include <QDialog>
 #include <memory>
 #include "Model.h"
-#include "ObjectDataTypes.h"
+#include "ModelDlg.h"
 
 class ModelProxy {
 public:
     virtual ModelData& param(size_t i) = 0;
     virtual size_t size() = 0;
+    virtual void resize(size_t) = 0;
+    virtual void remove(size_t) = 0;
+
     virtual QString modelClass() = 0;
-    virtual ModelPrototype *createPrototype(int modelID) = 0;
+    virtual inline QString prettyName() { return modelClass(); }
+
+    virtual ModelPrototype *createPrototype(size_t modelID) = 0;
+    virtual ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr) = 0;
 };
 
 
@@ -38,15 +45,14 @@ public:
     /// Initialise all active models for end use
     void initActive(DCThread *);
 
-    /// Remove all models e.g. in preparation for parameter import
+    /// Remove all models and parameter sets e.g. in preparation for parameter import
     void clear();
+
+    /// Returns false if at least one registered parameter set is active (active prototype with at least one active instance)
+    bool empty() const;
 
     /// Create a model of the given type from proxy->param(idx)
     void initSingle(ModelProxy *proxy, size_t idx);
-
-    /// Remove a model from active use, freeing its space and moving up all subsequent models of the same type.
-    /// Emits removedModel with an appropriate ChannelIndex
-    //void remove(QString type, size_t idx);
 
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);

@@ -1,38 +1,25 @@
 #ifndef HHMODELDLG_H
 #define HHMODELDLG_H
 
-#include <QDialog>
+#include "ModelDlg.h"
 #include <QCheckBox>
 #include <QDoubleSpinBox>
-#include "ObjectDataTypes.h"
 
 namespace Ui {
 class HHModelDlg;
 }
-enum class DeviceStatus;
 
-class HHModelDlg : public QDialog
+class HHModelDlg : public ModelDlg
 {
     Q_OBJECT
 
 public:
-    explicit HHModelDlg(int idx, QWidget *parent = 0);
+    explicit HHModelDlg(size_t idx, QWidget *parent = 0);
     ~HHModelDlg();
 
     void importData();
-    void exportData(bool = false);
-    void setIndex(int);
-
-    typedef HHNeuronData param_type;
-    typedef false_type isDAQ;
-
-public slots:
-    void accept();
-    void reject();
-
-signals:
-    void channelsChanged();
-    void modelStatusChanged();
+    void exportData();
+    void setIndex(size_t);
 
 private:
     Ui::HHModelDlg *ui;
@@ -40,7 +27,6 @@ private:
     QVector<QDoubleSpinBox*> vBiases, spkThrs, iBiases;
     QMetaObject::Connection activec, vSavec, vBiasc, spkDc, spkThrc, iSavec, iBiasc;
 
-    int idx;
     QString label;
 
     void addRow(int row, QCheckBox *active,

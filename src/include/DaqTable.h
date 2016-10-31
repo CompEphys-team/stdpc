@@ -10,9 +10,6 @@
 #include "NIDAQDlg.h"
 #endif
 
-#include "HHModelDlg.h"
-#include "SpikeGenDlg.h"
-
 
 class DaqTable : public QTableWidget
 {

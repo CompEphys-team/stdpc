@@ -8,8 +8,14 @@ public:
     HHNeuronProxy();
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
     inline QString modelClass() { return "HH"; }
-    inline ModelPrototype *createPrototype(int modelID);
+    inline QString prettyName() { return "HH Model"; }
+
+    inline ModelPrototype *createPrototype(size_t modelID);
+    inline ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
 
     static std::vector<HHNeuronData> p;
 };

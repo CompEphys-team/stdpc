@@ -13,12 +13,6 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-
-#include "HHNeuron.h"
-#include "SpkGen.h"
-std::vector<HHNeuronData> &HHNeuronp = HHNeuronProxy::p;
-std::vector<SGData> &SGp = SpkGenProxy::p;
-
 std::vector<DigiDataData> DigiDatap;
 std::vector<SDAQData> SDAQp;
 #ifdef NATIONAL_INSTRUMENTS

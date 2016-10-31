@@ -119,7 +119,9 @@ HEADERS += \
     $$PWD/src/include/ChannelBufferHelper.h \
     $$PWD/src/include/AssignmentCell.h \
     $$PWD/src/include/ModelManager.h \
-    $$PWD/src/include/Model.h
+    $$PWD/src/include/Model.h \
+    $$PWD/src/include/ModelOpts.h \
+    $$PWD/src/include/ModelDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -174,7 +176,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/SpikeGenDlg.cpp \
     $$PWD/src/core/ChannelBufferHelper.cpp \
     $$PWD/src/core/ModelManager.cpp \
-    $$PWD/src/models/Model.cpp
+    $$PWD/src/models/Model.cpp \
+    $$PWD/src/gui/ModelOpts.cpp
+
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
 nidaqmx {

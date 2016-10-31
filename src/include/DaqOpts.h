@@ -14,12 +14,12 @@ class DaqOptsBase : public QObject
 public:
     DaqOptsBase(QWidget *parent) : QObject(parent) {}
     virtual ~DaqOptsBase() {}
-    virtual void removeDevice(int idx) = 0;
+    virtual void removeDevice(size_t idx) = 0;
 
     virtual void importData() = 0;
     virtual void exportData() = 0;
 
-    virtual void setIndex(int i) = 0;
+    virtual void setIndex(size_t i) = 0;
 
     virtual DaqWidget *widget() = 0;
     virtual void regenerateWidget() = 0;
@@ -35,13 +35,13 @@ template <class DaqDlg>
 class DaqOpts : public DaqOptsBase
 {
 public:
-    DaqOpts(QWidget *parent, QString const& label, std::vector<typename DaqDlg::param_type> *params, int idx) :
+    DaqOpts(QWidget *parent, QString const& label, std::vector<typename DaqDlg::param_type> *params, size_t idx) :
         DaqOptsBase(parent),
         label(label),
         params(params),
         idx(idx)
     {
-        if ( idx >= (int)params->size() ) {
+        if ( idx >= params->size() ) {
             params->resize(idx+1);
             (*params)[idx].active = false;
         }
@@ -88,7 +88,7 @@ public:
         delete dlg;
     }
 
-    inline void removeDevice(int idx) { _removeDevice(idx); }
+    inline void removeDevice(size_t idx) { _removeDevice(idx); }
 
     void importData()
     {
@@ -98,13 +98,13 @@ public:
 
     void exportData()
     {
-        if ( idx >= (int) params->size() )
+        if ( idx >= params->size() )
             params->resize(idx+1);
         (*params)[idx].active = _widget->active->isChecked();
         dlg->exportData();
     }
 
-    void setIndex(int i)
+    void setIndex(size_t i)
     {
         idx = i;
         _widget->setLabel(label + " " + QString::number(idx));
@@ -132,7 +132,7 @@ public:
     QString label;
     std::vector<typename DaqDlg::param_type> *params;
     DaqDlg *dlg;
-    int idx;
+    size_t idx;
     DaqWidget *_widget;
 
 private:

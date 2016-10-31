@@ -10,14 +10,12 @@
 #include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
-#include "SpkGen.h"
 #include "DigiData.h"
 #include "SimulDAQ.h"
 #ifdef NATIONAL_INSTRUMENTS
 #include "Nidaq.h"
 #endif
 #include "DataSaver.h"
-#include "HHNeuron.h"
 
 #include "ChannelBufferHelper.h"
 
@@ -78,9 +76,6 @@ private:
      std::vector<abHH> abhhIn;
 
      outChannel outChnNone;
-
-     std::vector<HHNeuronModel> hhNeuron;
-     std::vector<SpkGenPrototype> SGProto;
 
      std::shared_ptr<ChannelBufferHelper> bufferHelper;
      

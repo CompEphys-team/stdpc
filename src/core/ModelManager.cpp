@@ -12,6 +12,9 @@ void ModelManager::clear()
 {
     activeModels.clear();
     allModels.clear();
+    for ( ModelProxy *proxy : Register )
+        while ( proxy->size() )
+            proxy->remove(proxy->size());
 }
 
 void ModelManager::initSingle(ModelProxy *proxy, size_t idx)
@@ -41,23 +44,16 @@ void ModelManager::initSingle(ModelProxy *proxy, size_t idx)
     }
 }
 
-//void ModelManager::remove(QString type, size_t idx)
-//{
-//    if ( !allModels.contains(type) || allModels[type].size() <= (int)idx )
-//        return;
-
-//    for ( int i = 0; i < activeModels.size(); i++ )
-//        if ( activeModels[i]->proxy()->modelClass() == type && activeModels[i]->modelID == idx )
-//            activeModels.remove(i);
-
-//    if ( allModels.value(type).size() > (int)idx ) {
-//        allModels[type][idx]->proxy()->remove(idx);
-//        allModels[type].remove(idx);
-//        for ( size_t i = idx; (int)i < allModels[type].size(); i++ )
-//            allModels[type][i]->modelID = i;
-//        emit removedModel(ChannelIndex(ChannelIndex::Prototype, type, idx));
-//    }
-//}
+bool ModelManager::empty() const
+{
+    for ( ModelProxy *proxy : Register )
+        for ( size_t i = 0; i < proxy->size(); i++ )
+            if ( proxy->param(i).active )
+                for ( size_t j = 0; j < proxy->param(i).numInst(); j++ )
+                    if ( proxy->param(i).instance(j).active )
+                        return true;
+    return false;
+}
 
 inChannel *ModelManager::getInChan(const ChannelIndex &dex)
 {

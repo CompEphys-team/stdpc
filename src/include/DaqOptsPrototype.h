@@ -6,8 +6,7 @@
 class DaqOptsPrototypeBase
 {
 public:
-    DaqOptsPrototypeBase(QString label) :
-        label(label),
+    DaqOptsPrototypeBase() :
         inst()
     {}
 
@@ -17,7 +16,9 @@ public:
             delete c;
     }
 
-    virtual DaqOptsBase *create(int idx, QWidget *parent) = 0;
+    virtual QString label() = 0;
+
+    virtual DaqOptsBase *create(size_t idx, QWidget *parent) = 0;
     virtual void createAll(QWidget *parent) = 0;
 
     void clearInactive()
@@ -38,7 +39,6 @@ public:
 
     virtual void exportData(bool ignoreDAQ = false) = 0;
 
-    QString label;
     QVector<DaqOptsBase *> inst;
 };
 
@@ -47,14 +47,16 @@ class DaqOptsPrototype : public DaqOptsPrototypeBase
 {
 public:
     DaqOptsPrototype(QString const& label, std::vector<typename DaqDlg::param_type> *params) :
-        DaqOptsPrototypeBase(label),
+        _label(label),
         params(params)
     {}
     ~DaqOptsPrototype() {}
 
-    DaqOptsBase *create(int idx, QWidget *parent)
+    inline QString label() { return _label; }
+
+    DaqOptsBase *create(size_t idx, QWidget *parent)
     {
-        DaqOpts<DaqDlg> *c = new DaqOpts<DaqDlg>(parent, label, params, idx);
+        DaqOpts<DaqDlg> *c = new DaqOpts<DaqDlg>(parent, _label, params, idx);
         inst.push_back(c);
         return c;
     }
@@ -83,6 +85,7 @@ public:
     }
 
 private:
+    QString _label;
     std::vector<typename DaqDlg::param_type> *params;
 };
 

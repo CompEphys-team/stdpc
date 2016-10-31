@@ -1,20 +1,19 @@
 #include "SpikeGenDlg.h"
 #include "ui_SpikeGenDlg.h"
-#include "Global.h"
+#include "SpkGen.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QHBoxLayout>
 #include <fstream>
 
-SpikeGenDlg::SpikeGenDlg(int idx, QWidget *parent) :
-    QDialog(parent),
+SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
+    ModelDlg(idx, parent),
     ui(new Ui::SpikeGenDlg),
     clm(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::None, this)
 {
     ui->setupUi(this);
     label = ui->titleLabel->text();
-    setIndex(idx);
-
+    ui->titleLabel->setText(label.arg(idx));
     ui->instTable->setHorizontalHeaderLabels({"Active",
                                               "",
                                               "Save",
@@ -99,31 +98,30 @@ SpikeGenDlg::~SpikeGenDlg()
     delete ui;
 }
 
-void SpikeGenDlg::setIndex(int no)
+void SpikeGenDlg::setIndex(size_t no)
 {
-    idx = no;
     ui->titleLabel->setText(label.arg(no));
-    emit channelsChanged();
+    ModelDlg::setIndex(no);
 }
 
 void SpikeGenDlg::importData()
 {
-    ui->SGLUTableCombo->setCurrentIndex(SGp[idx].LUTables);
-    ui->VSpike->setValue(SGp[idx].VSpike * 1e3);
-    ui->Width->setValue(5e3 / SGp[idx].spkTimeScaling);
-    ui->VRest->setValue(SGp[idx].VRest * 1e3);
+    ui->SGLUTableCombo->setCurrentIndex(SpkGenProxy::p[idx].LUTables);
+    ui->VSpike->setValue(SpkGenProxy::p[idx].VSpike * 1e3);
+    ui->Width->setValue(5e3 / SpkGenProxy::p[idx].spkTimeScaling);
+    ui->VRest->setValue(SpkGenProxy::p[idx].VRest * 1e3);
 
-    ui->BurstDetectionCombo->setCurrentIndex(SGp[idx].bdType);
-    ui->tUnder->setValue(SGp[idx].bdtUnder * 1e3);
-    ui->tOver->setValue(SGp[idx].bdtOver * 1e3);
-    ui->tUContiguous->setChecked(SGp[idx].bdtUnderCont);
-    ui->tOContiguous->setChecked(SGp[idx].bdtOverCont);
-    ui->bdStrict->setChecked(SGp[idx].bdStrictlyCont);
+    ui->BurstDetectionCombo->setCurrentIndex(SpkGenProxy::p[idx].bdType);
+    ui->tUnder->setValue(SpkGenProxy::p[idx].bdtUnder * 1e3);
+    ui->tOver->setValue(SpkGenProxy::p[idx].bdtOver * 1e3);
+    ui->tUContiguous->setChecked(SpkGenProxy::p[idx].bdtUnderCont);
+    ui->tOContiguous->setChecked(SpkGenProxy::p[idx].bdtOverCont);
+    ui->bdStrict->setChecked(SpkGenProxy::p[idx].bdStrictlyCont);
 
-    ui->Period->setValue(SGp[idx].period * 1e3);
-    ui->Loop->setChecked(SGp[idx].loopBursts);
+    ui->Period->setValue(SpkGenProxy::p[idx].period * 1e3);
+    ui->Loop->setChecked(SpkGenProxy::p[idx].loopBursts);
 
-    importST(SGp[idx].SpikeT);
+    importST(SpkGenProxy::p[idx].SpikeT);
 
     QCheckBox *active, *vSave;
     QDoubleSpinBox *vBias, *bdThreshold;
@@ -135,7 +133,7 @@ void SpikeGenDlg::importData()
     bdThresholds.clear();
     ui->instTable->setRowCount(0);
     int row = 0;
-    for ( SgInstData const& inst : SGp[idx].inst ) {
+    for ( SgInstData const& inst : SpkGenProxy::p[idx].inst ) {
         active = new QCheckBox();
         vSave = new QCheckBox();
         vBias = new QDoubleSpinBox();
@@ -199,39 +197,39 @@ QDoubleSpinBox *SpikeGenDlg::makeSTCell(int row, int col)
     return cell;
 }
 
-void SpikeGenDlg::exportData(bool)
+void SpikeGenDlg::exportData()
 {
-    SGp[idx].LUTables = ui->SGLUTableCombo->currentIndex();
-    SGp[idx].VSpike = ui->VSpike->value() / 1e3;
-    SGp[idx].spkTimeScaling = 5e3 / ui->Width->value();
-    SGp[idx].VRest = ui->VRest->value() / 1e3;
+    SpkGenProxy::p[idx].LUTables = ui->SGLUTableCombo->currentIndex();
+    SpkGenProxy::p[idx].VSpike = ui->VSpike->value() / 1e3;
+    SpkGenProxy::p[idx].spkTimeScaling = 5e3 / ui->Width->value();
+    SpkGenProxy::p[idx].VRest = ui->VRest->value() / 1e3;
 
-    SGp[idx].bdType = ui->BurstDetectionCombo->currentIndex();
-    SGp[idx].bdtUnder = ui->tUnder->value() / 1e3;
-    SGp[idx].bdtOver = ui->tOver->value() / 1e3;
-    SGp[idx].bdtUnderCont = ui->tUContiguous->isChecked();
-    SGp[idx].bdtOverCont = ui->tOContiguous->isChecked();
-    SGp[idx].bdStrictlyCont = ui->bdStrict->isChecked();
+    SpkGenProxy::p[idx].bdType = ui->BurstDetectionCombo->currentIndex();
+    SpkGenProxy::p[idx].bdtUnder = ui->tUnder->value() / 1e3;
+    SpkGenProxy::p[idx].bdtOver = ui->tOver->value() / 1e3;
+    SpkGenProxy::p[idx].bdtUnderCont = ui->tUContiguous->isChecked();
+    SpkGenProxy::p[idx].bdtOverCont = ui->tOContiguous->isChecked();
+    SpkGenProxy::p[idx].bdStrictlyCont = ui->bdStrict->isChecked();
 
-    SGp[idx].period = ui->Period->value() / 1e3;
-    SGp[idx].loopBursts = ui->Loop->isChecked();
+    SpkGenProxy::p[idx].period = ui->Period->value() / 1e3;
+    SpkGenProxy::p[idx].loopBursts = ui->Loop->isChecked();
 
     if ( ui->STTable->rowCount() && ui->STTable->columnCount() ) // Don't export initially empty table
-        exportST(SGp[idx].SpikeT);
+        exportST(SpkGenProxy::p[idx].SpikeT);
     // Ensure any changes (sorting, dropping rows) are reflected in the UI
-    importST(SGp[idx].SpikeT);
+    importST(SpkGenProxy::p[idx].SpikeT);
 
     SgInstData inst;
     int nRows = ui->instTable->rowCount() - 1;
-    SGp[idx].inst.clear();
-    SGp[idx].inst.reserve(nRows);
+    SpkGenProxy::p[idx].inst.clear();
+    SpkGenProxy::p[idx].inst.reserve(nRows);
     for ( int i = 0; i < nRows; i++ ) {
         inst.active = actives[i]->isChecked();
         inst.inChn.chnlSaving = vSaves[i]->isChecked();
         inst.inChn.bias = vBiases[i]->value() * 1e-3;
         inst.bdChannel = bdChannels[i]->currentData().value<ChannelIndex>();
         inst.bdThresh = bdThresholds[i]->value() * 1e-3;
-        SGp[idx].inst.push_back(inst);
+        SpkGenProxy::p[idx].inst.push_back(inst);
     }
 
     emit channelsChanged();
@@ -270,18 +268,6 @@ void SpikeGenDlg::exportST(std::vector<std::vector<double>> &vec)
             ++emptyRows;
     }
     vec.resize(row - emptyRows);
-}
-
-void SpikeGenDlg::accept()
-{
-    exportData();
-    QDialog::accept();
-}
-
-void SpikeGenDlg::reject()
-{
-    importData();
-    QDialog::reject();
 }
 
 void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias,

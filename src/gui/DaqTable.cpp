@@ -18,7 +18,7 @@ void DaqTable::makeFactory()
     factory = new DaqFactoryWidget(this);
     connect(factory->button, SIGNAL(clicked(bool)), this, SLOT(addDaqOpts()));
     for ( DaqOptsPrototypeBase *p : proto )
-        factory->combo->addItem(p->label);
+        factory->combo->addItem(p->label());
 }
 
 void DaqTable::init(QVector<DaqOptsPrototypeBase *> prototypes, QWidget *parent)

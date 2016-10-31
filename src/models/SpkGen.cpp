@@ -2,12 +2,14 @@
 #include "DCThread.h"
 #include "ModelManager.h"
 #include "AP.h"
+#include "SpikeGenDlg.h"
 
 /// Construct a single self-registering proxy
 static SpkGenProxy prox;
 std::vector<SGData> SpkGenProxy::p;
 ModelProxy *SpkGenPrototype::proxy() const { return &prox; }
-ModelPrototype *SpkGenProxy::createPrototype(int modelID) { return new SpkGenPrototype(modelID); }
+ModelPrototype *SpkGenProxy::createPrototype(size_t modelID) { return new SpkGenPrototype(modelID); }
+ModelDlg *SpkGenProxy::createDialog(size_t modelID, QWidget *parent) { return new SpikeGenDlg(modelID, parent); }
 
 SpkGenProxy::SpkGenProxy()
 {

@@ -2,7 +2,6 @@
 #define SPKGEN_H
 
 #include "Global_func.h"
-#include "Global.h"
 #include "ModelManager.h"
 
 class SpkGenProxy : public ModelProxy {
@@ -10,8 +9,14 @@ public:
     SpkGenProxy();
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
     inline QString modelClass() { return "SG"; }
-    ModelPrototype *createPrototype(int modelID);
+    inline QString prettyName() { return "Spike generator"; }
+
+    ModelPrototype *createPrototype(size_t modelID);
+    ModelDlg *createDialog(size_t modelID, QWidget *parent);
 
     static std::vector<SGData> p;
 };
@@ -62,7 +67,7 @@ public:
     inline void retainCurrent(double) {}
     inline void restoreCurrent(double) {}
 
-    inline ModelData &params() const { return SGp[modelID]; }
+    inline ModelData &params() const { return SpkGenProxy::p[modelID]; }
     inline ModelProxy *proxy() const;
     inline QString prefix() const { return "SG"; }
 };
