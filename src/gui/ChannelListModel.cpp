@@ -1,18 +1,14 @@
 #include "ChannelListModel.h"
 #include "Global.h"
 #include "ChannelIndex.h"
-#include "DeviceManager.h"
 
 ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
     : QAbstractListModel(parent),
       displayFlags(displayFlags),
-      size(0),
-      hSimul(DAQHelper<SDAQData>(this)),
-      hDD1200(DAQHelper<DigiDataData>(this)),
-#ifdef NATIONAL_INSTRUMENTS
-      hNI(DAQHelper<NIDAQData>(this))
-#endif
+      size(0)
 {
+    for ( DAQProxy *proxy : DeviceManager::Register() )
+        daqHelpers.push_back(DAQHelper(proxy, this));
     for ( ModelProxy *proxy : ModelManager::Register )
         modelHelpers.push_back(ModelHelper(proxy, this));
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
@@ -26,15 +22,10 @@ void ChannelListModel::updateCount(ChannelListModel *from)
 
         for ( size_t i = 0; i < modelHelpers.size(); i++ )
             modelHelpers[i].nInst = from->modelHelpers[i].nInst;
-
-        hSimul.nAI = from->hSimul.nAI;
-        hSimul.nAO = from->hSimul.nAO;
-        hDD1200.nAI = from->hDD1200.nAI;
-        hDD1200.nAO = from->hDD1200.nAO;
-#ifdef NATIONAL_INSTRUMENTS
-        hNI.nAI = from->hNI.nAI;
-        hNI.nAO = from->hNI.nAO;
-#endif
+        for ( size_t i = 0; i < daqHelpers.size(); i++ ) {
+            daqHelpers[i].nAI = from->daqHelpers[i].nAI;
+            daqHelpers[i].nAO = from->daqHelpers[i].nAO;
+        }
     } else {
         size = 0;
         if ( displayFlags & Blank )
@@ -44,30 +35,25 @@ void ChannelListModel::updateCount(ChannelListModel *from)
 
         for ( ModelHelper &h : modelHelpers )
             h.updateCount();
-
-        hSimul.updateCount();
-        hDD1200.updateCount();
-#ifdef NATIONAL_INSTRUMENTS
-        hNI.updateCount();
-#endif
+        for ( DAQHelper &h : daqHelpers )
+            h.updateCount();
     }
 }
 
-template <typename T>
-void ChannelListModel::DAQHelper<T>::updateCount()
+void ChannelListModel::DAQHelper::updateCount()
 {
     if ( parent->displayFlags & AnalogIn ) {
         nAI.clear();
-        for ( DAQ *daq : Devices.get<T>() ) {
-            int s = daq->params()->inChn.size();
+        for ( size_t i = 0; i < proxy->size(); i++ ) {
+            int s = proxy->param(i).inChn.size();
             nAI.push_back(s);
             parent->size += s;
         }
     }
     if ( parent->displayFlags & AnalogOut ) {
         nAO.clear();
-        for ( DAQ *daq : Devices.get<T>() ) {
-            int s = daq->params()->outChn.size();
+        for ( size_t i = 0; i < proxy->size(); i++ ) {
+            int s = proxy->param(i).outChn.size();
             nAO.push_back(s);
             parent->size += s;
         }
@@ -99,12 +85,8 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 
     for ( ModelHelper &h : modelHelpers )
         h.updateChns(currentIdx, newIdx, newM);
-
-    hSimul.updateChns(currentIdx, newIdx, newM);
-    hDD1200.updateChns(currentIdx, newIdx, newM);
-#ifdef NATIONAL_INSTRUMENTS
-    hNI.updateChns(currentIdx, newIdx, newM);
-#endif
+    for ( DAQHelper &h : daqHelpers )
+        h.updateChns(currentIdx, newIdx, newM);
 
     emit layoutAboutToBeChanged();
     updateCount(&newM);
@@ -113,20 +95,17 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
     emit layoutChanged();
 }
 
-template <typename T>
-void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
+void ChannelListModel::DAQHelper::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
 {
-    bool mvDev;
+    bool rmDev;
     int mvOffset = 0;
     if ( parent->displayFlags & AnalogIn ) {
-        ChannelIndex dex(T::daqClass, 0, true);
+        ChannelIndex dex(ChannelIndex::Analog, proxy->daqClass(), 0, 0, true);
         for ( dex.devID = 0; dex.devID < nAI.size(); dex.devID++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
-                    && parent->rmDevDex.daqClass == T::daqClass
-                    && parent->rmDevDex.devID == dex.devID;
+            rmDev = parent->rmDevDex == ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), dex.devID);
             for ( dex.chanID = 0; dex.chanID < nAI[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogIn));
-                if ( mvDev ) {
+                if ( rmDev ) {
                     newIdx.append(QModelIndex());
                 } else {
                     dex.devID -= mvOffset;
@@ -134,21 +113,19 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
                     dex.devID += mvOffset;
                 }
             }
-            if ( mvDev )
+            if ( rmDev )
                 mvOffset = 1;
         }
     }
 
     mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
-        ChannelIndex dex(T::daqClass, 0, false);
+        ChannelIndex dex(ChannelIndex::Analog, proxy->daqClass(), 0, 0, false);
         for ( dex.devID = 0; dex.devID < nAO.size(); dex.devID++ ) {
-            mvDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
-                    && parent->rmDevDex.daqClass == T::daqClass
-                    && parent->rmDevDex.devID == dex.devID;
+            rmDev = parent->rmDevDex == ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), dex.devID);
             for ( dex.chanID = 0; dex.chanID < nAO[dex.devID]; dex.chanID++ ) {
                 currentIdx.append(parent->index(dex, AnalogOut));
-                if ( mvDev ) {
+                if ( rmDev ) {
                     newIdx.append(QModelIndex());
                 } else {
                     dex.devID -= mvOffset;
@@ -156,7 +133,7 @@ void ChannelListModel::DAQHelper<T>::updateChns(QModelIndexList &currentIdx, QMo
                     dex.devID += mvOffset;
                 }
             }
-            if ( mvDev )
+            if ( rmDev )
                 mvOffset = 1;
         }
     }
@@ -243,14 +220,9 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     for ( ModelHelper const& h : modelHelpers )
         if ( h.data(row, role, offset, ret) )
             return ret;
-    if ( hSimul.data(row, role, offset, ret) )
-        return ret;
-    if ( hDD1200.data(row, role, offset, ret) )
-        return ret;
-#ifdef NATIONAL_INSTRUMENTS
-    if ( hNI.data(row, role, offset, ret) )
-        return ret;
-#endif
+    for ( DAQHelper const& h : daqHelpers )
+        if ( h.data(row, role, offset, ret) )
+            return ret;
 
     if ( role == Qt::UserRole ) {
         ret.setValue(ChannelIndex(true));
@@ -260,13 +232,12 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-template <typename T>
-bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVariant &ret) const
+bool ChannelListModel::DAQHelper::data(int row, int role, int &offset, QVariant &ret) const
 {
     bool rmDev;
     int mvOffset = 0;
     if ( parent->displayFlags & AnalogIn ) {
-        for ( int i = 0; i < nAI.size(); i++ ) {
+        for ( size_t i = 0; i < nAI.size(); i++ ) {
             // parent->rmDevDex comes through parent->updateChns(rmDevDex), called when a device is removed.
             // During the update process, data(...) is called while ChannelListModel internals and the caller
             // (i.e. the dropdown's ListView) are stale, but the outside world (i.e. Devices, params) has already changed.
@@ -274,16 +245,14 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
             // its later siblings down into its space.
             // Correctness of data returned probably isn't too important, as this occurs /before/ the model is
             // fully updated, but let's give it the new values anyway, just in case it sticks.
-            rmDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
-                    && parent->rmDevDex.daqClass == T::daqClass
-                    && parent->rmDevDex.devID == i;
-            if ( row-offset < nAI[i] ) { // Caller and internal: Stale index
+            rmDev = parent->rmDevDex == ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), i);
+            if ( row-offset < (int)nAI[i] ) { // Caller and internal: Stale index
                 if ( rmDev ) { // Stale caller meets removed device: Return rubbish
                     ret = QVariant();
                     return true;
                 }
-                ChannelIndex dex(T::daqClass, i - mvOffset, true, row - offset); // DevID display value: Adjusted index
-                DAQData *p = Devices.get<T>()[dex.devID]->params(); // Outside world: Adjusted index
+                ChannelIndex dex(ChannelIndex::Analog, proxy->daqClass(), i - mvOffset, row - offset, true); // DevID display value: Adjusted index
+                DAQData *p = Devices.all()[proxy->daqClass()][dex.devID]->params(); // Outside world: Adjusted index
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                         return true;
                 case Qt::UserRole:      ret.setValue(dex);                              return true;
@@ -298,17 +267,15 @@ bool ChannelListModel::DAQHelper<T>::data(int row, int role, int &offset, QVaria
 
     mvOffset = 0;
     if ( parent->displayFlags & AnalogOut ) {
-        for ( int i = 0; i < nAO.size(); i++ ) {
-            rmDev = parent->rmDevDex.isValid && parent->rmDevDex.isAnalog
-                    && parent->rmDevDex.daqClass == T::daqClass
-                    && parent->rmDevDex.devID == i;
-            if ( row-offset < nAO[i] ) {
+        for ( size_t i = 0; i < nAO.size(); i++ ) {
+            rmDev = parent->rmDevDex == ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), i);
+            if ( row-offset < (int)nAO[i] ) {
                 if ( rmDev ) {
                     ret = QVariant();
                     return true;
                 }
-                ChannelIndex dex(T::daqClass, i - mvOffset, false, row - offset);
-                DAQData *p = Devices.get<T>()[dex.devID]->params();
+                ChannelIndex dex(ChannelIndex::Analog, proxy->daqClass(), i - mvOffset, row - offset, false);
+                DAQData *p = Devices.all()[proxy->daqClass()][dex.devID]->params();
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                          return true;
                 case Qt::UserRole:      ret.setValue(dex);                               return true;
@@ -414,25 +381,19 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
         for ( ModelHelper const& h : modelHelpers )
             if ( h.index(dex, type, row, ret) )
                 return ret;
-        if ( hSimul.index(dex, type, row, ret) )
-            return ret;
-        if ( hDD1200.index(dex, type, row, ret) )
-            return ret;
-#ifdef NATIONAL_INSTRUMENTS
-        if ( hNI.index(dex, type, row, ret) )
-            return ret;
-#endif
+        for ( DAQHelper const& h : daqHelpers )
+            if ( h.index(dex, type, row, ret) )
+                return ret;
     }
     return QModelIndex();
 }
 
-template <typename T>
-bool ChannelListModel::DAQHelper<T>::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
+bool ChannelListModel::DAQHelper::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
 {
     if ( parent->displayFlags & AnalogIn ) {
-        for ( int i = 0; i < nAI.size(); i++ ) {
-            if ( type & AnalogIn && dex.daqClass == T::daqClass && dex.devID == i ) {
-                if ( dex.chanID >= 0 && dex.chanID < nAI[i] )
+        for ( size_t i = 0; i < nAI.size(); i++ ) {
+            if ( type & AnalogIn && dex.daqClass == proxy->daqClass() && dex.devID == i ) {
+                if ( dex.chanID < nAI[i] )
                     ret = parent->createIndex(dex.chanID + offset, 0);
                 return true;
             }
@@ -440,9 +401,9 @@ bool ChannelListModel::DAQHelper<T>::index(const ChannelIndex &dex, ChannelType 
         }
     }
     if ( parent->displayFlags & AnalogOut ) {
-        for ( int i = 0; i < nAO.size(); i++ ) {
-            if ( type & AnalogOut && dex.daqClass == T::daqClass && dex.devID == i ) {
-                if ( dex.chanID >= 0 && dex.chanID < nAO[i] )
+        for ( size_t i = 0; i < nAO.size(); i++ ) {
+            if ( type & AnalogOut && dex.daqClass == proxy->daqClass() && dex.devID == i ) {
+                if ( dex.chanID < nAO[i] )
                     ret = parent->createIndex(dex.chanID + offset, 0);
                 return true;
             }

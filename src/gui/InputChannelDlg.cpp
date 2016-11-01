@@ -220,7 +220,7 @@ void InputChannelDlg::exportData()
     p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
     p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
     p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
-    calib[i]->setEnabled(board->initialized && p->inChn[i].active && dex.daqClass != DAQClass::Simul);
+    calib[i]->setEnabled(board->initialized && p->inChn[i].active && dex.daqClass != "SimulDAQ");
   }
 }
 

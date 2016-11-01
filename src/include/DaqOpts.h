@@ -56,7 +56,7 @@ public:
             QFutureWatcher<DeviceStatus> watcher;
             connect(&watcher, SIGNAL(finished()), &loadMsg, SLOT(reject()));
             future = QtConcurrent::run(
-                        &Devices, DeviceManager::initSingle<typename DaqDlg::param_type>, std::ref(name), idx, params);
+                        &Devices, &DeviceManager::initSingle, std::ref(name), DeviceManager::Register()[DaqDlg::param_type::daqClass()], idx);
             watcher.setFuture(future);
             loadMsg.exec();
             future.waitForFinished();
@@ -84,7 +84,7 @@ public:
         delete dlg;
     }
 
-    inline void removeDevice(size_t idx) { Devices.remove(idx, params); }
+    inline void removeDevice(size_t idx) { Devices.remove(DeviceManager::Register()[DaqDlg::param_type::daqClass()], idx); }
 
     void importData()
     {

@@ -270,98 +270,6 @@ void initAP()
     addDeprecatedAP("abHHp[#].IChannel", abHH_I);
 
 
-    // SDAQp
-    addAP("SDAQp[#].active", &SDAQp, &SDAQData::active);
-    addAP("SDAQp[#].inFileName", &SDAQp, &SDAQData::inFileName);
-    addAP("SDAQp[#].outFileName", &SDAQp, &SDAQData::outFileName);
-    addAP("SDAQp[#].inTFac", &SDAQp, &SDAQData::inTFac);
-    addAP("SDAQp[#].outDt", &SDAQp, &SDAQData::outDt);
-    addAP("SDAQp[#].inChn[#].active", &SDAQp, &SDAQData::inChn, &inChnData::active);
-    addAP("SDAQp[#].inChn[#].gain", &SDAQp, &SDAQData::inChn, &inChnData::gain);
-    addAP("SDAQp[#].inChn[#].gainFac", &SDAQp, &SDAQData::inChn, &inChnData::gainFac);
-    addAP("SDAQp[#].inChn[#].spkDetect", &SDAQp, &SDAQData::inChn, &inChnData::spkDetect);
-    addAP("SDAQp[#].inChn[#].spkDetectThresh", &SDAQp, &SDAQData::inChn, &inChnData::spkDetectThresh);
-    addAP("SDAQp[#].inChn[#].bias", &SDAQp, &SDAQData::inChn, &inChnData::bias);
-    addAP("SDAQp[#].inChn[#].chnlSaving", &SDAQp, &SDAQData::inChn, &inChnData::chnlSaving);
-    addAP("SDAQp[#].outChn[#].active", &SDAQp, &SDAQData::outChn, &outChnData::active);
-    addAP("SDAQp[#].outChn[#].gain", &SDAQp, &SDAQData::outChn, &outChnData::gain);
-    addAP("SDAQp[#].outChn[#].gainFac", &SDAQp, &SDAQData::outChn, &outChnData::gainFac);
-    addAP("SDAQp[#].outChn[#].bias", &SDAQp, &SDAQData::outChn, &outChnData::bias);
-    addAP("SDAQp[#].outChn[#].chnlSaving", &SDAQp, &SDAQData::outChn, &outChnData::chnlSaving);
-    // Ignore unused inChnData::calib
-
-
-    // DigiDatap
-    addAP("DigiDatap[#].active", &DigiDatap, &DigiDataData::active);
-    addAP("DigiDatap[#].baseAddress", &DigiDatap, &DigiDataData::baseAddress);
-    addAP("DigiDatap[#].syncIOMask", &DigiDatap, &DigiDataData::syncIOMask);
-    addAP("DigiDatap[#].inChn[#].active", &DigiDatap, &DigiDataData::inChn, &inChnData::active);
-    addAP("DigiDatap[#].inChn[#].gain", &DigiDatap, &DigiDataData::inChn, &inChnData::gain);
-    addAP("DigiDatap[#].inChn[#].gainFac", &DigiDatap, &DigiDataData::inChn, &inChnData::gainFac);
-    addAP("DigiDatap[#].inChn[#].spkDetect", &DigiDatap, &DigiDataData::inChn, &inChnData::spkDetect);
-    addAP("DigiDatap[#].inChn[#].spkDetectThresh", &DigiDatap, &DigiDataData::inChn, &inChnData::spkDetectThresh);
-    addAP("DigiDatap[#].inChn[#].bias", &DigiDatap, &DigiDataData::inChn, &inChnData::bias);
-    addAP("DigiDatap[#].inChn[#].chnlSaving", &DigiDatap, &DigiDataData::inChn, &inChnData::chnlSaving);
-    addAP("DigiDatap[#].outChn[#].active", &DigiDatap, &DigiDataData::outChn, &outChnData::active);
-    addAP("DigiDatap[#].outChn[#].gain", &DigiDatap, &DigiDataData::outChn, &outChnData::gain);
-    addAP("DigiDatap[#].outChn[#].gainFac", &DigiDatap, &DigiDataData::outChn, &outChnData::gainFac);
-    addAP("DigiDatap[#].outChn[#].bias", &DigiDatap, &DigiDataData::outChn, &outChnData::bias);
-    addAP("DigiDatap[#].outChn[#].chnlSaving", &DigiDatap, &DigiDataData::outChn, &outChnData::chnlSaving);
-
-    addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
-    addAP("DigiDatap[#].inChn[#].calib.copyChn", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
-    addAP("DigiDatap[#].inChn[#].calib.samplingRate", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
-    addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
-    addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
-    addAP("DigiDatap[#].inChn[#].calib.iMinElec", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
-    addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
-    addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
-    addAP("DigiDatap[#].inChn[#].calib.iMembStep", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
-    addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
-    addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
-    addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
-    addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
-    addAP("DigiDatap[#].inChn[#].calib.injCalLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
-    addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
-    addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &DigiDatap, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
-
-
-#ifdef NATIONAL_INSTRUMENTS
-    // NIDAQp
-    addAP("NIDAQp[#].active", &NIDAQp, &NIDAQData::active);
-    addAP("NIDAQp[#].deviceName", &NIDAQp, &NIDAQData::deviceName);
-    addAP("NIDAQp[#].inChn[#].active", &NIDAQp, &NIDAQData::inChn, &inChnData::active);
-    addAP("NIDAQp[#].inChn[#].gain", &NIDAQp, &NIDAQData::inChn, &inChnData::gain);
-    addAP("NIDAQp[#].inChn[#].gainFac", &NIDAQp, &NIDAQData::inChn, &inChnData::gainFac);
-    addAP("NIDAQp[#].inChn[#].spkDetect", &NIDAQp, &NIDAQData::inChn, &inChnData::spkDetect);
-    addAP("NIDAQp[#].inChn[#].spkDetectThresh", &NIDAQp, &NIDAQData::inChn, &inChnData::spkDetectThresh);
-    addAP("NIDAQp[#].inChn[#].bias", &NIDAQp, &NIDAQData::inChn, &inChnData::bias);
-    addAP("NIDAQp[#].inChn[#].chnlSaving", &NIDAQp, &NIDAQData::inChn, &inChnData::chnlSaving);
-    addAP("NIDAQp[#].outChn[#].active", &NIDAQp, &NIDAQData::outChn, &outChnData::active);
-    addAP("NIDAQp[#].outChn[#].gain", &NIDAQp, &NIDAQData::outChn, &outChnData::gain);
-    addAP("NIDAQp[#].outChn[#].gainFac", &NIDAQp, &NIDAQData::outChn, &outChnData::gainFac);
-    addAP("NIDAQp[#].outChn[#].bias", &NIDAQp, &NIDAQData::outChn, &outChnData::bias);
-    addAP("NIDAQp[#].outChn[#].chnlSaving", &NIDAQp, &NIDAQData::outChn, &outChnData::chnlSaving);
-
-    addAP("NIDAQp[#].inChn[#].calib.copyChnOn", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
-    addAP("NIDAQp[#].inChn[#].calib.copyChn", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
-    addAP("NIDAQp[#].inChn[#].calib.samplingRate", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
-    addAP("NIDAQp[#].inChn[#].calib.outputChannelNumber", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
-    addAP("NIDAQp[#].inChn[#].calib.iMaxElec", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
-    addAP("NIDAQp[#].inChn[#].calib.iMinElec", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
-    addAP("NIDAQp[#].inChn[#].calib.numberOfLevels", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
-    addAP("NIDAQp[#].inChn[#].calib.injLenPerLevel", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
-    addAP("NIDAQp[#].inChn[#].calib.iMembStep", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
-    addAP("NIDAQp[#].inChn[#].calib.numberOfRepeats", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
-    addAP("NIDAQp[#].inChn[#].calib.injLenPerRepeat", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
-    addAP("NIDAQp[#].inChn[#].calib.hyperpolCurr", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
-    addAP("NIDAQp[#].inChn[#].calib.injCalAmp", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
-    addAP("NIDAQp[#].inChn[#].calib.injCalLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
-    addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
-    addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &NIDAQp, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
-#endif
-
-
     // Data saving
     addAP("dataSavingPs.enabled", &(dataSavingPs.enabled));
     addAP("dataSavingPs.fileName", &(dataSavingPs.fileName));
@@ -409,6 +317,11 @@ std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
     return ret;
 }
 
+#include "SimulDAQ.h"
+#include "DigiData.h"
+#ifdef NATIONAL_INSTRUMENTS
+#include "Nidaq.h"
+#endif
 bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 {
     QString name, header;
@@ -464,16 +377,16 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         if ( syncio )
             deprec.push_back(std::unique_ptr<AP>(new APDeprec("DigiDatap.syncIOMask", syncio, 1)));
 
-        SDAQp.insert(SDAQp.begin(), sdaq);
+        SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
         if ( sdaq.active )
-            LEGACY_DAQ_CLASS = DAQClass::Simul;
-        DigiDatap.insert(DigiDatap.begin(), dd);
+            LEGACY_DAQ_CLASS = "SimulDAQ";
+        DigiDataProxy::p.insert(DigiDataProxy::p.begin(), dd);
         if ( dd.active )
-            LEGACY_DAQ_CLASS = DAQClass::DD1200;
+            LEGACY_DAQ_CLASS = "DigiData1200";
 #ifdef NATIONAL_INSTRUMENTS
         if ( nidaq.active ) {
-            NIDAQp.insert(NIDAQp.begin(), nidaq);
-            LEGACY_DAQ_CLASS = DAQClass::NI;
+            NIDAQProxy::p.insert(NIDAQProxy::p.begin(), nidaq);
+            LEGACY_DAQ_CLASS = "NIDAQ";
         }
 #endif
         if ( !is.good() )

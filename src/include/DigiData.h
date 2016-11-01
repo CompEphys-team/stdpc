@@ -2,8 +2,7 @@
 #define DIGIDATA_H
 
 #include "Pt_ioctl_tn.h"
-#include "Channels.h"
-#include "Daq.h"
+#include "DeviceManager.h"
 
 // we need to translate commands because we are using portTalkX instead of the Borland IOport
 
@@ -74,6 +73,23 @@
 #define COUNTS                  2048.0
 
 
+class DigiDataProxy : public DAQProxy {
+public:
+    DigiDataProxy();
+    inline DAQData &param(size_t i) { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString daqClass() { return "DigiData1200"; }
+    inline QString prettyName() { return "DigiData 1200(A)"; }
+
+    inline DAQ *createDAQ(size_t devID);
+    /* NYI: inline DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr); */
+
+    static std::vector<DigiDataData> p;
+};
+
 class DigiData: public DAQ
 {
   private:
@@ -98,7 +114,7 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData(int devID);
+    DigiData(size_t devID);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
@@ -113,7 +129,8 @@ class DigiData: public DAQ
     short int* inChnGain;
     short int* DACEnable;
 
-    virtual inline DAQData *params() { return &DigiDatap[devID]; }
+    virtual inline DAQData *params() { return &DigiDataProxy::p[devID]; }
+    virtual DAQProxy *proxy() const;
     virtual QString prefix();
     
     // actually activated stuff

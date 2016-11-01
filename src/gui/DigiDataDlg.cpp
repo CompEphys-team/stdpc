@@ -8,6 +8,7 @@ DigiDataDlg::DigiDataDlg(int no, QWidget *parent) : DAQDlg(no, parent)
     setupUi(this);
     label = DAQLabel->text();
     setIndex(no);
+    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::DD1200, idx));
     inDlg->init(board);
     outDlg->init(board);
 }
@@ -17,7 +18,6 @@ void DigiDataDlg::setIndex(int no)
     idx = no;
     DAQLabel->setText(label.arg(no));
     ChannelIndex dex(DAQClass::DD1200, no);
-    board = Devices.getDevice(dex);
     inDlg->dex = dex;
     emit channelsChanged();
 }
@@ -77,8 +77,9 @@ void DigiDataDlg::reject()
 DeviceStatus DigiDataDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle(name, idx, &DigiDatap);
+    DeviceStatus status = Devices.initSingle(name, Devices.Register()["DigiData"], idx);
     emit deviceStatusChanged(status, name);
+    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::DD1200, idx));
     inDlg->init(board);
     outDlg->init(board);
     didInit = true;

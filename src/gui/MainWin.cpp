@@ -168,7 +168,7 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
 
 void MyMainWindow::updateStartButton()
 {
-    ui->StartBut->setEnabled(!Devices.actdev.empty() || Models.empty());
+    ui->StartBut->setEnabled(!Devices.active().empty() || Models.empty());
 }
 
 
@@ -239,7 +239,6 @@ void MyMainWindow::exportData(bool ignoreDAQ)
  
 void MyMainWindow::importData()
 {
-  Devices.clear();
   ui->DAQTable->importData();
   ui->synapseTable->importData();
   ui->currentTable->importData();
@@ -310,11 +309,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   mhHHp.clear();
   abHHp.clear();
   Models.clear();
-  SDAQp.clear();
-  DigiDatap.clear();
-#ifdef NATIONAL_INSTRUMENTS
-  NIDAQp.clear();
-#endif
+  Devices.clear();
   Graphp.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {

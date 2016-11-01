@@ -42,10 +42,10 @@ public:
     size_t instID;
 
     bool isAnalog;
-    DAQClass daqClass;
-    int devID;
+    QString daqClass;
+    size_t devID;
     bool isInChn;
-    int chanID;
+    size_t chanID;
 
     friend std::ostream &operator<<(std::ostream &os, ChannelIndex const&);
     friend std::istream &operator>>(std::istream &is, ChannelIndex &);

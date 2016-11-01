@@ -1,15 +1,29 @@
 #ifndef NIDAQ_H
 #define NIDAQ_H
 
-using namespace std;
-
-#include "Channels.h"
-#include "Daq.h"
+#include "DeviceManager.h"
 
 #include <NIDAQmx.h>
 
 #define MAXRANGES 64
 #define MAXCHANNELS 64
+
+class NIDAQProxy : public DAQProxy {
+public:
+    NIDAQProxy();
+    inline DAQData &param(size_t i) { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString daqClass() { return "NIDAQ"; }
+    inline QString prettyName() { return "Nat'l Instruments"; }
+
+    inline DAQ *createDAQ(size_t devID);
+    /* NYI: inline DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr); */
+
+    static std::vector<NIDAQData> p;
+};
 
 class NIDAQ: public DAQ
 {
@@ -27,7 +41,7 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ(int devID);
+    NIDAQ(size_t devID);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
@@ -40,7 +54,8 @@ class NIDAQ: public DAQ
     virtual void write_analog_out();
     virtual void reset_board();
 
-    virtual inline DAQData *params() { return &NIDAQp[devID]; }
+    virtual inline DAQData *params() { return &NIDAQProxy::p[devID]; }
+    virtual DAQProxy *proxy() const;
     virtual QString prefix();
 };
 

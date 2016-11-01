@@ -14,7 +14,7 @@
 #define STDPC_PROTOCOL_VERSION 3
 #define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
 extern int LOADED_PROTOCOL_VERSION;
-extern DAQClass LEGACY_DAQ_CLASS;
+extern QString LEGACY_DAQ_CLASS;
 
 // Forward
 class DeviceManager;
@@ -29,10 +29,10 @@ extern std::vector<DestexheSynData> DxheSynp;
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
-extern std::vector<DigiDataData> DigiDatap;
-extern std::vector<SDAQData> SDAQp;
+extern std::vector<DigiDataData> &DigiDatap;
+extern std::vector<SDAQData> &SDAQp;
 #ifdef NATIONAL_INSTRUMENTS
-extern std::vector<NIDAQData> NIDAQp;
+extern std::vector<NIDAQData> &NIDAQp;
 #endif
 
 extern dataSavingParams dataSavingPs;

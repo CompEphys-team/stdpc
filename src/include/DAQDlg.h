@@ -25,7 +25,6 @@ protected:
     int idx;
     InputChannelDlg *inDlg;
     OutputChannelDlg *outDlg;
-    DAQ *board;
     bool didInit;
 }; 
 

@@ -7,6 +7,7 @@
 #include "ChannelIndex.h"
 #include "ObjectDataTypes.h"
 #include "ModelManager.h"
+#include "DeviceManager.h"
 
 class ChannelListModel : public QAbstractListModel
 {
@@ -42,17 +43,17 @@ public slots:
 protected:
     void updateCount(ChannelListModel *from = nullptr);
 
-    template <typename T>
     class DAQHelper {
     private:
         ChannelListModel *const parent;
+        DAQProxy *const proxy;
     public:
-        DAQHelper(ChannelListModel *parent) : parent(parent), nAI(0), nAO(0) {}
+        DAQHelper(DAQProxy *proxy, ChannelListModel *parent) : parent(parent), proxy(proxy), nAI(0), nAO(0) {}
         void updateCount();
         void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
         bool data(int row, int role, int &offset, QVariant &ret) const;
         bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
-        QVector<int> nAI, nAO;
+        std::vector<size_t> nAI, nAO;
     };
 
     class ModelHelper {
@@ -70,11 +71,8 @@ protected:
 
     const int displayFlags;
     int size;
-    DAQHelper<SDAQData> hSimul;
-    DAQHelper<DigiDataData> hDD1200;
-#ifdef NATIONAL_INSTRUMENTS
-    DAQHelper<NIDAQData> hNI;
-#endif
+
+    std::vector<DAQHelper> daqHelpers;
     std::vector<ModelHelper> modelHelpers;
 
     ChannelIndex rmDevDex;

@@ -3,6 +3,7 @@
 #include <QChar>
 #include "Global.h"
 #include "ModelManager.h"
+#include "DeviceManager.h"
 
 ChannelIndex::ChannelIndex(bool validNone) :
     isValid(validNone),
@@ -13,7 +14,7 @@ ChannelIndex::ChannelIndex(bool validNone) :
     modelID(0),
     instID(0),
     isAnalog(false),
-    daqClass(DAQClass::Simul),
+    daqClass(""),
     devID(0),
     isInChn(false),
     chanID(0)
@@ -26,11 +27,16 @@ ChannelIndex::ChannelIndex(DAQClass dClass, int dID, bool isIn, int cID) :
     isPrototype(false),
     isVirtual(false),
     isAnalog(true),
-    daqClass(dClass),
     devID(dID),
     isInChn(isIn),
     chanID(cID)
-{}
+{
+    switch ( dClass ) {
+    case DAQClass::DD1200 : daqClass = "DigiData1200"; break;
+    case DAQClass::NI :     daqClass = "NIDAQ";        break;
+    case DAQClass::Simul :  daqClass = "SimulDAQ";     break;
+    }
+}
 
 ChannelIndex::ChannelIndex(ModelClass mClass, int mID, int iID) :
     isValid(true),
@@ -56,7 +62,7 @@ ChannelIndex::ChannelIndex(ChannelIndex::ctorType type, QString typeClass, size_
     modelID(first),
     instID(second),
     isAnalog(type==Analog),
-    daqClass(DAQClass::Simul /*NYI: typeClass */),
+    daqClass(typeClass),
     devID(first),
     isInChn(isInChn),
     chanID(second)
@@ -77,24 +83,9 @@ inChnData *ChannelIndex::getInChnData() const
 {
     if ( !isValid || !isAnalog || !isInChn )
         return nullptr;
-    switch ( daqClass ) {
-    case DAQClass::Simul :
-        if ( SDAQp.empty() || (int)SDAQp.size() <= devID || (int)SDAQp[devID].inChn.size() <= chanID )
-            return nullptr;
-        return &(SDAQp[devID].inChn[chanID]);
-    case DAQClass::DD1200 :
-        if ( DigiDatap.empty() || (int)DigiDatap.size() <= devID || (int)DigiDatap[devID].inChn.size() <= chanID )
-            return nullptr;
-        return &(DigiDatap[devID].inChn[chanID]);
-    case DAQClass::NI :
-#ifdef NATIONAL_INSTRUMENTS
-        if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].inChn.size() <= chanID )
-            return nullptr;
-        return &(NIDAQp[devID].inChn[chanID]);
-#endif
-    default:
-        return nullptr;
-    }
+    DAQProxy *proxy = DeviceManager::Register().value(daqClass);
+    if ( proxy && proxy->size() > devID && proxy->param(devID).inChn.size() > chanID )
+        return &(proxy->param(devID).inChn[chanID]);
     return nullptr;
 }
 
@@ -102,24 +93,9 @@ outChnData *ChannelIndex::getOutChnData() const
 {
     if ( !isValid || !isAnalog || isInChn )
         return nullptr;
-    switch ( daqClass ) {
-    case DAQClass::Simul :
-        if ( SDAQp.empty() || (int)SDAQp.size() <= devID || (int)SDAQp[devID].outChn.size() <= chanID )
-            return nullptr;
-        return &(SDAQp[devID].outChn[chanID]);
-    case DAQClass::DD1200 :
-        if ( DigiDatap.empty() || (int)DigiDatap.size() <= devID || (int)DigiDatap[devID].outChn.size() <= chanID )
-            return nullptr;
-        return &(DigiDatap[devID].outChn[chanID]);
-    case DAQClass::NI :
-#ifdef NATIONAL_INSTRUMENTS
-        if ( NIDAQp.empty() || (int)NIDAQp.size() <= devID || (int)NIDAQp[devID].outChn.size() <= chanID )
-            return nullptr;
-        return &(NIDAQp[devID].outChn[chanID]);
-#endif
-    default:
-        return nullptr;
-    }
+    DAQProxy *proxy = DeviceManager::Register().value(daqClass);
+    if ( proxy && proxy->size() > devID && proxy->param(devID).outChn.size() > chanID )
+        return &(proxy->param(devID).outChn[chanID]);
     return nullptr;
 }
 
@@ -131,16 +107,7 @@ QString ChannelIndex::prettyName() const
     } else if ( isNone ) {
         ret = "None";
     } else if ( isAnalog ) {
-        if ( isInChn )
-            ret = QString("AI %1 on ").arg(chanID);
-        else
-            ret = QString("AO %1 on ").arg(chanID);
-        switch ( daqClass ) {
-        case DAQClass::Simul :  ret += "SimulDAQ";         break;
-        case DAQClass::DD1200 : ret += "DigiData 1200(A)"; break;
-        case DAQClass::NI :     ret += "NI";               break;
-        }
-        ret += QString(", device %1").arg(devID);
+        ret = QString("%1 %2 on %3, device %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(daqClass).arg(devID);
     } else if ( isPrototype || isVirtual ) {
         if ( isPrototype )
             ret = QString("%1 %2:all (model %2, all instances)").arg(modelClass).arg(modelID);
@@ -156,17 +123,7 @@ QString ChannelIndex::toString(QChar sep) const
     if ( !isValid || isNone ) {
         ret = "None";
     } else if ( isAnalog ) {
-        ret = QString("Analog/");
-        switch ( daqClass ) {
-        case DAQClass::Simul :  ret += "SimulDAQ/";      break;
-        case DAQClass::DD1200 : ret += "DigiData1200/";  break;
-        case DAQClass::NI :     ret += "NIDAQ/";         break;
-        }
-        ret += QString::number(devID) + "/";
-        if ( isInChn )
-            ret += "ai" + QString::number(chanID);
-        else
-            ret += "ao" + QString::number(chanID);
+        ret = QString("Analog/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "ai" : "ao").arg(chanID);
     } else if ( isPrototype ) {
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
@@ -193,15 +150,7 @@ static void legacyRescue_0(QString str, ChannelIndex &dex)
     int ch = str.toInt(&ok);
     if ( !ok )
         return;
-    DAQData *d;
-    switch ( LEGACY_DAQ_CLASS ) {
-    case DAQClass::Simul :  d =& SDAQp[0];     break;
-    case DAQClass::DD1200 : d =& DigiDatap[0]; break;
-#ifdef NATIONAL_INSTRUMENTS
-    case DAQClass::NI :     d =& NIDAQp[0];    break;
-#endif
-    default: return;
-    }
+    DAQData *d =& DeviceManager::Register()[LEGACY_DAQ_CLASS]->param(0);
     dex.daqClass = LEGACY_DAQ_CLASS;
     dex.devID = 0;
     if ( ch >= 0 && ch <= (int)(d->inChn.size()+d->outChn.size()+1) ) { // Pre-2016
@@ -257,12 +206,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         if ( parts.size() != 4 )
             return is;
 
-        if ( !parts.at(1).compare("SimulDAQ", Qt::CaseInsensitive) )
-            dex.daqClass = DAQClass::Simul;
-        else if ( !parts.at(1).compare("DigiData1200", Qt::CaseInsensitive) )
-            dex.daqClass = DAQClass::DD1200;
-        else if ( !parts.at(1).compare("NIDAQ", Qt::CaseInsensitive) )
-            dex.daqClass = DAQClass::NI;
+        if ( DeviceManager::Register().contains(parts.at(1)) )
+            dex.daqClass = parts.at(2);
         else
             return is;
 
@@ -274,8 +219,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
             return is;
 
         dex.isAnalog = true;
-        dex.devID = parts.at(2).toInt();
-        dex.chanID = parts.at(3).mid(2).toInt();
+        dex.devID = parts.at(2).toUInt();
+        dex.chanID = parts.at(3).mid(2).toUInt();
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Prototype", Qt::CaseInsensitive) ) {
         if ( parts.size() != 3 )
@@ -312,7 +257,6 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
             dex.instID = 0;
             dex.isValid = true;
         }
-
     }
     return is;
 }

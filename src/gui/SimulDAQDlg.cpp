@@ -9,6 +9,7 @@ SimulDAQDlg::SimulDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
   setupUi(this);
   label = DAQLabel->text();
   setIndex(no);
+  DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::Simul, idx));
   inDlg->init(board);
   outDlg->init(board);
 }
@@ -18,7 +19,6 @@ void SimulDAQDlg::setIndex(int no)
     idx = no;
     DAQLabel->setText(label.arg(no));
     ChannelIndex dex(DAQClass::Simul, no);
-    board = Devices.getDevice(dex);
     inDlg->dex = dex;
     emit channelsChanged();
 }
@@ -94,8 +94,9 @@ void SimulDAQDlg::reject()
 DeviceStatus SimulDAQDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle(name, idx, &SDAQp);
+    DeviceStatus status = Devices.initSingle(name, Devices.Register()["SimulDAQ"], idx);
     emit deviceStatusChanged(status, name);
+    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::Simul, idx));
     inDlg->init(board);
     outDlg->init(board);
     didInit = true;

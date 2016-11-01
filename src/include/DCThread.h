@@ -10,11 +10,6 @@
 #include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
-#include "DigiData.h"
-#include "SimulDAQ.h"
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
 #include "DataSaver.h"
 
 #include "ChannelBufferHelper.h"

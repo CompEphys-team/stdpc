@@ -1,6 +1,6 @@
 #include "Daq.h"
 
-DAQ::DAQ(int devID) :
+DAQ::DAQ(size_t devID) :
     devID(devID),
     t(DAQClock.t)
 {

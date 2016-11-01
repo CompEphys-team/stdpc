@@ -8,8 +8,6 @@
 #include "ModelManager.h"
 #include "GraphDlg.h"
 
-#include "SimulDAQ.h" // for debugging only ...
-
 DCThread::DCThread() :
     graph(nullptr)
 {
@@ -60,7 +58,7 @@ void DCThread::run()
    double subDT, subT, tLoop;
    int nSubsteps;
 
-   for ( DAQ *b : Devices.actdev )
+   for ( auto &b : Devices.active() )
        b->init_chans();
 
    // Populate Models in absence of UI doing it
@@ -177,7 +175,7 @@ void DCThread::run()
 
    // Checking validity of AEC channels
    QVector<AECChannel*> aecChannels;
-   for ( DAQ *b : Devices.actdev ) {
+   for ( auto &b : Devices.active() ) {
        for ( AECChannel *aec : b->aecChans() ) {
            DAQ *outB = Devices.getDevice(aec->outChnNum);
            outChannel *outC = getOutChan(aec->outChnNum);
@@ -215,7 +213,7 @@ void DCThread::run()
        outChnsToSave.clear();
        QVector<QString> headerIn, headerOut;
 
-       for ( DAQ *b : Devices.actdev ) {
+       for ( auto &b : Devices.active() ) {
            QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
            QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
            headerIn.append(its.first);
@@ -262,7 +260,7 @@ void DCThread::run()
    }
    else evt= 1e10;
 
-   for ( DAQ *b : Devices.actdev )
+   for ( auto &b : Devices.active() )
        b->start();
 
    // Reset clock AFTER the time-consuming device start to get a more precise t0
@@ -274,7 +272,7 @@ void DCThread::run()
 
      if (!SampleHoldOn) {
        // --- Read --- //
-         for ( DAQ *b : Devices.actdev )
+         for ( auto &b : Devices.active() )
              b->get_scan();
        // --- Read end --- //
 
@@ -316,7 +314,7 @@ void DCThread::run()
          bufferHelper->advance(t);
 
          if ( processAnalogs ) {
-             for ( DAQ *b : Devices.actdev )
+             for ( auto &b : Devices.active() )
                  b->process_scan(t);
              processAnalogs = false;
          }
@@ -450,7 +448,7 @@ void DCThread::run()
 
          // Check channel limits
          DAQ::ChannelLimitWarning w;
-         for ( DAQ *b : Devices.actdev ) {
+         for ( auto &b : Devices.active() ) {
              if ( b->check_limits(!limitWarningEmitted, w) )
                  emit CloseToLimit(w.what, w.chan_label, w.loLim, w.hiLim, w.value);
          }
@@ -464,7 +462,7 @@ void DCThread::run()
      }
 
      // --- Write --- //
-     for ( DAQ *b : Devices.actdev )
+     for ( auto &b : Devices.active() )
          b->write_analog_out();
      // --- Write end --- //
 
@@ -474,7 +472,7 @@ void DCThread::run()
 
 
    // In the end, let's do the cleanup
-   for ( DAQ *b : Devices.actdev ) {
+   for ( auto &b : Devices.active() ) {
        b->reset_board();
        b->reset_chans();
    }

@@ -3,7 +3,7 @@
 #include "ModelManager.h"
 
 int LOADED_PROTOCOL_VERSION;
-DAQClass LEGACY_DAQ_CLASS;
+QString LEGACY_DAQ_CLASS;
 
 std::vector<CSynData> CSynp;
 std::vector<abSynData> abSynp;
@@ -13,10 +13,13 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-std::vector<DigiDataData> DigiDatap;
-std::vector<SDAQData> SDAQp;
+#include "DigiData.h"
+#include "SimulDAQ.h"
+std::vector<DigiDataData> &DigiDatap = DigiDataProxy::p;
+std::vector<SDAQData> &SDAQp = SimulDAQProxy::p;
 #ifdef NATIONAL_INSTRUMENTS
-std::vector<NIDAQData> NIDAQp;
+#include "Nidaq.h"
+std::vector<NIDAQData> &NIDAQp = NIDAQProxy::p;
 #endif
 
 std::vector<GraphData> Graphp;

@@ -5,6 +5,8 @@
 #include "Channels.h"
 #include <QPair>
 
+class DAQProxy;
+
 class DAQ {
   private:
     LARGE_INTEGER intClock_frequency;
@@ -21,7 +23,7 @@ class DAQ {
     QVector<QString> outChnLabels;
 
   public:
-    DAQ(int devID);
+    DAQ(size_t devID);
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;
@@ -33,10 +35,11 @@ class DAQ {
     virtual void reset_board()= 0;
 
     virtual DAQData *params() = 0;
+    virtual DAQProxy *proxy() const = 0;
 
     void init_chans(); // Sets up scan list, analog out list
     void reset_chans();
-    void process_scan(double t); // Applies bias, detects spikes
+    void process_scan(double t); // detects spikes, updates channel buffer
     QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save();
     QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save();
     QVector<AECChannel*> aecChans();
@@ -46,7 +49,7 @@ class DAQ {
 
     virtual QString prefix() = 0;
 
-    int devID;
+    size_t devID;
 
     const double &t;
 

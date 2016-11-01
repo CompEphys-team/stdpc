@@ -1,11 +1,57 @@
 #include "DigiData.h"
 #include "limits.h"
+#include "AP.h"
 
 // DigiData 1200 device driver
 
+/// Construct a single self-registering proxy
+static DigiDataProxy prox;
+std::vector<DigiDataData> DigiDataProxy::p;
+DAQProxy *DigiData::proxy() const { return &prox; }
+DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID); }
+/* NYI: DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, parent); } */
+
+DigiDataProxy::DigiDataProxy()
+{
+    DeviceManager::RegisterDAQ(daqClass(), this);
+
+    addAP("DigiDatap[#].active", &DigiDataProxy::p, &DigiDataData::active);
+    addAP("DigiDatap[#].baseAddress", &DigiDataProxy::p, &DigiDataData::baseAddress);
+    addAP("DigiDatap[#].syncIOMask", &DigiDataProxy::p, &DigiDataData::syncIOMask);
+    addAP("DigiDatap[#].inChn[#].active", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::active);
+    addAP("DigiDatap[#].inChn[#].gain", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::gain);
+    addAP("DigiDatap[#].inChn[#].gainFac", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::gainFac);
+    addAP("DigiDatap[#].inChn[#].spkDetect", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::spkDetect);
+    addAP("DigiDatap[#].inChn[#].spkDetectThresh", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::spkDetectThresh);
+    addAP("DigiDatap[#].inChn[#].bias", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::bias);
+    addAP("DigiDatap[#].inChn[#].chnlSaving", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::chnlSaving);
+    addAP("DigiDatap[#].outChn[#].active", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::active);
+    addAP("DigiDatap[#].outChn[#].gain", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::gain);
+    addAP("DigiDatap[#].outChn[#].gainFac", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::gainFac);
+    addAP("DigiDatap[#].outChn[#].bias", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::bias);
+    addAP("DigiDatap[#].outChn[#].chnlSaving", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::chnlSaving);
+
+    addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
+    addAP("DigiDatap[#].inChn[#].calib.copyChn", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
+    addAP("DigiDatap[#].inChn[#].calib.samplingRate", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
+    addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
+    addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
+    addAP("DigiDatap[#].inChn[#].calib.iMinElec", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
+    addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
+    addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
+    addAP("DigiDatap[#].inChn[#].calib.iMembStep", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
+    addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
+    addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
+    addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
+    addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
+    addAP("DigiDatap[#].inChn[#].calib.injCalLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
+    addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
+    addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
+}
+
 //---------------------------------------------------------------------------
 
-DigiData::DigiData(int devID) :
+DigiData::DigiData(size_t devID) :
     DAQ(devID)
 {
   inChnNo= 16;
@@ -81,7 +127,7 @@ DigiData::~DigiData()
 
 void DigiData::init()
 {
-   short int base= DigiDatap[devID].baseAddress;
+   short int base= DigiDataProxy::p[devID].baseAddress;
    base_address=       base;
    DAC_data=           base | DACDATA;
    ADC_data=           base | ADCDATA;
@@ -219,7 +265,7 @@ void DigiData::write_analog_out()
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
     int_I= ((short int) (out[outIdx[i]].I*outGainFac[i]))*16;
-    int_I|= DigiDatap[devID].syncIOMask; // write synchronous digital IO
+    int_I|= DigiDataProxy::p[devID].syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
   } 

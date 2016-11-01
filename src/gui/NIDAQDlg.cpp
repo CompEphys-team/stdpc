@@ -8,6 +8,7 @@ NIDAQDlg::NIDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
     setupUi(this);
     label = DAQLabel->text();
     setIndex(no);
+    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::NI, idx));
     inDlg->init(board);
     outDlg->init(board);
 }
@@ -17,7 +18,6 @@ void NIDAQDlg::setIndex(int no)
     idx = no;
     DAQLabel->setText(label.arg(no));
     ChannelIndex dex(DAQClass::NI, no);
-    board = Devices.getDevice(dex);
     inDlg->dex = dex;
     emit channelsChanged();
 }
@@ -69,8 +69,9 @@ void NIDAQDlg::reject()
 DeviceStatus NIDAQDlg::initDAQ()
 {
     QString name;
-    DeviceStatus status = Devices.initSingle(name, idx, &NIDAQp);
+    DeviceStatus status = Devices.initSingle(name, Devices.Register()["NIDAQ"], idx);
     emit deviceStatusChanged(status, name);
+    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::NI, idx));
     inDlg->init(board);
     outDlg->init(board);
     didInit = true;

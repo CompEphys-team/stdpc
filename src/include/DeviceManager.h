@@ -3,11 +3,23 @@
 
 #include <QObject>
 #include <QVector>
-#include "SimulDAQ.h"
-#include "DigiData.h"
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
+#include <QHash>
+#include <memory>
+#include "Daq.h"
+
+class DAQProxy {
+public:
+    virtual DAQData& param(size_t i) = 0;
+    virtual size_t size() = 0;
+    virtual void resize(size_t) = 0;
+    virtual void remove(size_t) = 0;
+
+    virtual QString daqClass() = 0;
+    virtual inline QString prettyName() { return daqClass(); }
+
+    virtual DAQ *createDAQ(size_t devID) = 0;
+    /* NYI: virtual DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr) = 0; */
+};
 
 enum class DeviceStatus { Active, Inactive, Failed };
 
@@ -16,39 +28,31 @@ class DeviceManager : public QObject
     Q_OBJECT
 public:
     DeviceManager() {}
-    ~DeviceManager();
+    ~DeviceManager() {}
 
-    QVector<QPair<DeviceStatus, QString>> init();
     void clear();
 
-    template <typename param_type>
-    DeviceStatus initSingle(QString &name, int idx, std::vector<param_type> *params);
+    DeviceStatus initSingle(QString &name, DAQProxy *proxy, size_t idx);
 
     /// Remove a device from active use, freeing its space and moving up all subsequent devices of the same type.
-    /// In the interest of undoability, the corresponding parameters are moved to the end of the param vector.
-    template <typename param_type>
-    void remove(int idx, std::vector<param_type> *params);
+    void remove(DAQProxy *proxy, size_t idx);
 
     DAQ *getDevice(ChannelIndex const&);
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);
 
-    template <typename param_type>
-    QVector<DAQ *> &get();
+    inline QVector<std::shared_ptr<DAQ>> &active() { return activeDAQ; }
+    inline QHash<QString, QVector<std::shared_ptr<DAQ>>> const& all() const { return allDAQ; }
 
-    QVector<DAQ *> actdev;
+    static inline QHash<QString, DAQProxy*> &Register() { static QHash<QString, DAQProxy*> r; return r; }
+    static inline void RegisterDAQ(QString daqClass, DAQProxy *proxy) { Register()[daqClass] = proxy; }
 
 signals:
     void removedDevice(ChannelIndex dex);
 
 private:
-    DeviceStatus _initSingle(DAQ *dev, bool active, QString &name);
-
-    QVector<DAQ*> sdaq;
-    QVector<DAQ*> dd1200;
-#ifdef NATIONAL_INSTRUMENTS
-    QVector<DAQ*> nidaq;
-#endif
+    QVector<std::shared_ptr<DAQ>> activeDAQ;
+    QHash<QString, QVector<std::shared_ptr<DAQ>>> allDAQ;
 };
 
 #endif // DEVICEMANAGER_H

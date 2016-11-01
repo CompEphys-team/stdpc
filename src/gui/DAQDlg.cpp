@@ -4,7 +4,6 @@ DAQDlg::DAQDlg(int no, QWidget *parent) :
     QDialog(parent),
     idx(no),
     inDlg(new InputChannelDlg(this)),
-    outDlg(new OutputChannelDlg(this)),
-    board(nullptr)
+    outDlg(new OutputChannelDlg(this))
 {
 }

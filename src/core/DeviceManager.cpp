@@ -2,78 +2,35 @@
 #include "Clock.h"
 #include "Global.h"
 
-DeviceManager::~DeviceManager()
-{
-    clear();
-}
-
 void DeviceManager::clear()
 {
-    actdev.clear();
-    for ( DAQ *d : sdaq )
-        delete d;
-    sdaq.clear();
-    for ( DAQ *d : dd1200 )
-        delete d;
-    dd1200.clear();
-#ifdef NATIONAL_INSTRUMENTS
-    for ( DAQ *d : nidaq )
-        delete d;
-    nidaq.clear();
-#endif
+    activeDAQ.clear();
+    allDAQ.clear();
+    for ( DAQProxy *proxy : Register() )
+        while ( proxy->size() )
+            proxy->remove(proxy->size());
 }
 
-template <typename param_type>
-DeviceStatus DeviceManager::initSingle(QString &name, int idx, std::vector<param_type> *params)
+DeviceStatus DeviceManager::initSingle(QString &name, DAQProxy *proxy, size_t idx)
 {
-    QVector<DAQ*> &vec = get<param_type>();
-    if ( idx < vec.size() ) {
-        actdev.removeAll(vec[idx]);
-        vec[idx]->~DAQ();
-        vec[idx] = new(vec[idx]) typename param_type::DaqType(idx);
-    } else {
-        vec.push_back(new typename param_type::DaqType(idx));
-    }
-    return _initSingle(vec[idx], (*params)[idx].active, name);
-}
+    QString const& dc = proxy->daqClass();
 
-template <typename param_type>
-void DeviceManager::remove(int idx, std::vector<param_type> *params)
-{
-    QVector<DAQ*> &vec = get<param_type>();
-    actdev.removeAll(vec[idx]);
-    delete vec[idx];
-    vec.remove(idx);
-    using std::swap;
-    for ( int i = idx+1; i < (int)params->size(); i++ )
-        swap((*params)[i-1], (*params)[i]);
-    for ( int i = idx; i < vec.size(); i++ )
-        vec[idx]->devID = i;
-    emit removedDevice(ChannelIndex(param_type::daqClass, idx));
-}
+    // Clear existing active device
+    for ( int i = 0; i < activeDAQ.size(); i++ )
+        if ( activeDAQ[i]->proxy()->daqClass() == dc && activeDAQ[i]->devID == idx )
+            activeDAQ.remove(i);
 
-template <>
-QVector<DAQ *> &DeviceManager::get<SDAQData>() { return sdaq; }
-template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<SDAQData>*);
-template void DeviceManager::remove(int,std::vector<SDAQData>*);
+    // Ensure enough space in allDAQ
+    if ( allDAQ[dc].size() <= (int)idx )
+        allDAQ[dc].resize(idx+1);
 
-template <>
-QVector<DAQ *> &DeviceManager::get<DigiDataData>() { return dd1200; }
-template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<DigiDataData>*);
-template void DeviceManager::remove(int,std::vector<DigiDataData>*);
+    // Assign new to allDAQ
+    allDAQ[dc][idx].reset(proxy->createDAQ(idx));
 
-#ifdef NATIONAL_INSTRUMENTS
-template <>
-QVector<DAQ *> &DeviceManager::get<NIDAQData>() { return nidaq; }
-template DeviceStatus DeviceManager::initSingle(QString&,int,std::vector<NIDAQData>*);
-template void DeviceManager::remove(int,std::vector<NIDAQData>*);
-#endif
-
-DeviceStatus DeviceManager::_initSingle(DAQ *dev, bool active, QString &name)
-{
-    if ( active ) {
-        if ( dev->initialize_board(name) ) {
-            actdev.push_back(dev);
+    // Assign to activeDAQ if appropriate
+    if ( proxy->param(idx).active ) {
+        if ( allDAQ[dc][idx]->initialize_board(name) ) {
+            activeDAQ.push_back(allDAQ[dc][idx]);
             return DeviceStatus::Active;
         } else {
             return DeviceStatus::Failed;
@@ -83,104 +40,52 @@ DeviceStatus DeviceManager::_initSingle(DAQ *dev, bool active, QString &name)
     }
 }
 
-QVector<QPair<DeviceStatus, QString>> DeviceManager::init()
+void DeviceManager::remove(DAQProxy *proxy, size_t idx)
 {
-    QVector<QPair<DeviceStatus, QString>> ret(
-                SDAQp.size()
-                + DigiDatap.size()
-#ifdef NATIONAL_INSTRUMENTS
-                + NIDAQp.size()
-#endif
-                );
-    int r = 0;
-    clear();
-    for ( size_t i = 0; i < SDAQp.size(); i++ ) {
-        ret[r].first = initSingle(ret[r].second, i, &SDAQp);
-        ++r;
+    QString const& dc = proxy->daqClass();
+    if ( !allDAQ.contains(dc) )
+        return;
+
+    for ( int i = 0; i < activeDAQ.size(); i++ )
+        if ( activeDAQ[i]->proxy()->daqClass() == dc && activeDAQ[i]->devID == idx )
+            activeDAQ.remove(i);
+
+    QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dc];
+    if ( vec.size() > (int)idx ) {
+        vec.remove(idx);
+        proxy->remove(idx);
+        for ( int i = idx; i < vec.size(); i++ )
+            vec[i]->devID = i;
+        emit removedDevice(ChannelIndex(ChannelIndex::Analog, dc, idx));
     }
-    for ( size_t i = 0; i < DigiDatap.size(); i++ ) {
-        ret[r].first = initSingle(ret[r].second, i, &DigiDatap);
-        ++r;
-    }
-#ifdef NATIONAL_INSTRUMENTS
-    for ( size_t i = 0; i < NIDAQp.size(); i++ ) {
-        ret[r].first = initSingle(ret[r].second, i, &NIDAQp);
-        ++r;
-    }
-#endif
-    return ret;
 }
 
 DAQ *DeviceManager::getDevice(const ChannelIndex &dex)
 {
     if ( !dex.isValid || !dex.isAnalog )
         return nullptr;
-    switch ( dex.daqClass ) {
-    case DAQClass::Simul :
-        if ( sdaq.empty() || (int)sdaq.size() <= dex.devID )
-            return nullptr;
-        return sdaq[dex.devID];
-    case DAQClass::DD1200 :
-        if ( dd1200.empty() || (int)dd1200.size() <= dex.devID )
-            return nullptr;
-        return dd1200[dex.devID];
-    case DAQClass::NI :
-#ifdef NATIONAL_INSTRUMENTS
-        if ( nidaq.empty() || (int)nidaq.size() <= dex.devID )
-            return nullptr;
-        return nidaq[dex.devID];
-#endif
-    default:
-        return nullptr;
-    }
+    QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dex.daqClass];
+    if ( vec.size() > (int)dex.devID )
+        return vec[dex.devID].get();
+    return nullptr;
 }
 
 inChannel *DeviceManager::getInChan(const ChannelIndex &dex)
 {
-    if ( dex.isAnalog && dex.isInChn ) {
-        switch ( dex.daqClass ) {
-        case DAQClass::Simul :
-            if ( sdaq.empty() || (int)sdaq.size() <= dex.devID || sdaq[dex.devID]->in.size() <= dex.chanID )
-                return nullptr;
-            return &(sdaq[dex.devID]->in[dex.chanID]);
-        case DAQClass::DD1200 :
-            if ( dd1200.empty() || (int)dd1200.size() <= dex.devID || dd1200[dex.devID]->in.size() <= dex.chanID )
-                return nullptr;
-            return &(dd1200[dex.devID]->in[dex.chanID]);
-        case DAQClass::NI :
-#ifdef NATIONAL_INSTRUMENTS
-            if ( nidaq.empty() || (int)nidaq.size() <= dex.devID || nidaq[dex.devID]->in.size() <= dex.chanID )
-                return nullptr;
-            return &(nidaq[dex.devID]->in[dex.chanID]);
-#endif
-        default:
-            return nullptr;
-        }
+    if ( dex.isValid && dex.isAnalog && dex.isInChn ) {
+        QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dex.daqClass];
+        if ( vec.size() > (int)dex.devID && vec[dex.devID]->in.size() > (int)dex.chanID )
+            return &(vec[dex.devID]->in[dex.chanID]);
     }
     return nullptr;
 }
 
 outChannel *DeviceManager::getOutChan(const ChannelIndex &dex)
 {
-    if ( dex.isAnalog && !dex.isInChn ) {
-        switch ( dex.daqClass ) {
-        case DAQClass::Simul :
-            if ( sdaq.empty() || (int)sdaq.size() <= dex.devID || sdaq[dex.devID]->out.size() <= dex.chanID )
-                return nullptr;
-            return &(sdaq[dex.devID]->out[dex.chanID]);
-        case DAQClass::DD1200 :
-            if ( dd1200.empty() || (int)dd1200.size() <= dex.devID || dd1200[dex.devID]->out.size() <= dex.chanID )
-                return nullptr;
-            return &(dd1200[dex.devID]->out[dex.chanID]);
-        case DAQClass::NI :
-#ifdef NATIONAL_INSTRUMENTS
-            if ( nidaq.empty() || (int)nidaq.size() <= dex.devID || nidaq[dex.devID]->out.size() <= dex.chanID )
-                return nullptr;
-            return &(nidaq[dex.devID]->out[dex.chanID]);
-#endif
-        default:
-            return nullptr;
-        }
+    if ( dex.isValid && dex.isAnalog && !dex.isInChn ) {
+        QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dex.daqClass];
+        if ( vec.size() > (int)dex.devID && vec[dex.devID]->out.size() > (int)dex.chanID )
+            return &(vec[dex.devID]->out[dex.chanID]);
     }
     return nullptr;
 }

@@ -281,7 +281,7 @@ class SDAQData : public DAQData {
 
     typedef SimulDAQ DaqType;
     typedef SimulDAQDlg DlgType;
-    static constexpr DAQClass daqClass = DAQClass::Simul;
+    static QString daqClass() { return "SimulDAQ"; }
 };
 
 class DigiData;
@@ -297,7 +297,7 @@ class DigiDataData : public DAQData {
 
     typedef DigiData DaqType;
     typedef DigiDataDlg DlgType;
-    static constexpr DAQClass daqClass = DAQClass::DD1200;
+    static QString daqClass() { return "DigiData1200"; }
 };
 
 #ifdef NATIONAL_INSTRUMENTS
@@ -310,7 +310,7 @@ class NIDAQData : public DAQData {
 
     typedef NIDAQ DaqType;
     typedef NIDAQDlg DlgType;
-    static constexpr DAQClass daqClass = DAQClass::NI;
+    static QString daqClass() { return "NIDAQ"; }
 };
 #endif
 

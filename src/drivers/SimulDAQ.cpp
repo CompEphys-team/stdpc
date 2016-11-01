@@ -2,9 +2,42 @@
 #include "limits.h"
 #include <QFileInfo>
 #include <QDir>
+#include "AP.h"
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
-SimulDAQ::SimulDAQ(int devID) :
+/// Construct a single self-registering proxy
+static SimulDAQProxy prox;
+std::vector<SDAQData> SimulDAQProxy::p;
+DAQProxy *SimulDAQ::proxy() const { return &prox; }
+DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID); }
+/* NYI: DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, parent); } */
+
+SimulDAQProxy::SimulDAQProxy()
+{
+    DeviceManager::RegisterDAQ(daqClass(), this);
+
+    addAP("SDAQp[#].active", &SimulDAQProxy::p, &SDAQData::active);
+    addAP("SDAQp[#].inFileName", &SimulDAQProxy::p, &SDAQData::inFileName);
+    addAP("SDAQp[#].outFileName", &SimulDAQProxy::p, &SDAQData::outFileName);
+    addAP("SDAQp[#].inTFac", &SimulDAQProxy::p, &SDAQData::inTFac);
+    addAP("SDAQp[#].outDt", &SimulDAQProxy::p, &SDAQData::outDt);
+    addAP("SDAQp[#].inChn[#].active", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::active);
+    addAP("SDAQp[#].inChn[#].gain", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::gain);
+    addAP("SDAQp[#].inChn[#].gainFac", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::gainFac);
+    addAP("SDAQp[#].inChn[#].spkDetect", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::spkDetect);
+    addAP("SDAQp[#].inChn[#].spkDetectThresh", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::spkDetectThresh);
+    addAP("SDAQp[#].inChn[#].bias", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::bias);
+    addAP("SDAQp[#].inChn[#].chnlSaving", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::chnlSaving);
+    addAP("SDAQp[#].outChn[#].active", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::active);
+    addAP("SDAQp[#].outChn[#].gain", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::gain);
+    addAP("SDAQp[#].outChn[#].gainFac", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::gainFac);
+    addAP("SDAQp[#].outChn[#].bias", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::bias);
+    addAP("SDAQp[#].outChn[#].chnlSaving", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::chnlSaving);
+}
+
+//---------------------------------------------------------------------------
+
+SimulDAQ::SimulDAQ(size_t devID) :
     DAQ(devID),
     tOff(0.0)
 {
@@ -65,11 +98,11 @@ bool SimulDAQ::initialize_board(QString &name)
   name= QString("SimulDAQ files ");
 
   intq.clear();
-  is.open(SDAQp[devID].inFileName.toLatin1());
+  is.open(SimulDAQProxy::p[devID].inFileName.toLatin1());
   is >> t;
   t0= t;
   while (is.good()) {
-    intq.append((t-t0) * SDAQp[devID].inTFac);
+    intq.append((t-t0) * SimulDAQProxy::p[devID].inTFac);
     for (int i= 0; i < inChnNo; i++) {
       is >> data;
       inq[i].append(data);
@@ -96,7 +129,7 @@ bool SimulDAQ::initialize_board(QString &name)
   if (os.is_open()) os.close();
 
   qt_ntfs_permission_lookup++;
-  QFileInfo fInfo(SDAQp[devID].outFileName.toLatin1());
+  QFileInfo fInfo(SimulDAQProxy::p[devID].outFileName.toLatin1());
   if ( !fInfo.dir().isReadable() || (fInfo.exists() && !fInfo.isWritable()) ) {
     name=QString("SimulDAQ output files ");
     success= false;
@@ -201,7 +234,7 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     outChnLabels[outIdx[i]] = dex.toString();
   }
   if (os.is_open()) os.close();
-  os.open(SDAQp[devID].outFileName.toLatin1());
+  os.open(SimulDAQProxy::p[devID].outFileName.toLatin1());
   lastWrite= 0.0;
 }
 
@@ -211,7 +244,7 @@ void SimulDAQ::write_analog_out()
 //  double dt;
   
 //  dt= get_RTC();
-  if (t > lastWrite + SDAQp[devID].outDt) {
+  if (t > lastWrite + SimulDAQProxy::p[devID].outDt) {
     lastWrite= t;
     outtq.append(t);
     for (int i= 0; i < outChnNo; i++) {
