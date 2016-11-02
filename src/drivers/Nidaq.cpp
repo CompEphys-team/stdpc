@@ -16,41 +16,42 @@ DAQProxy *NIDAQ::proxy() const { return &prox; }
 DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID); }
 DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, &prox, parent); }
 
-NIDAQProxy::NIDAQProxy()
+NIDAQProxy::NIDAQProxy() :
+    regAP {
+        addAP("NIDAQp[#].active", &p, &NIDAQData::active),
+        addAP("NIDAQp[#].deviceName", &p, &NIDAQData::deviceName),
+        addAP("NIDAQp[#].inChn[#].active", &p, &NIDAQData::inChn, &inChnData::active),
+        addAP("NIDAQp[#].inChn[#].gain", &p, &NIDAQData::inChn, &inChnData::gain),
+        addAP("NIDAQp[#].inChn[#].gainFac", &p, &NIDAQData::inChn, &inChnData::gainFac),
+        addAP("NIDAQp[#].inChn[#].spkDetect", &p, &NIDAQData::inChn, &inChnData::spkDetect),
+        addAP("NIDAQp[#].inChn[#].spkDetectThresh", &p, &NIDAQData::inChn, &inChnData::spkDetectThresh),
+        addAP("NIDAQp[#].inChn[#].bias", &p, &NIDAQData::inChn, &inChnData::bias),
+        addAP("NIDAQp[#].inChn[#].chnlSaving", &p, &NIDAQData::inChn, &inChnData::chnlSaving),
+        addAP("NIDAQp[#].outChn[#].active", &p, &NIDAQData::outChn, &outChnData::active),
+        addAP("NIDAQp[#].outChn[#].gain", &p, &NIDAQData::outChn, &outChnData::gain),
+        addAP("NIDAQp[#].outChn[#].gainFac", &p, &NIDAQData::outChn, &outChnData::gainFac),
+        addAP("NIDAQp[#].outChn[#].bias", &p, &NIDAQData::outChn, &outChnData::bias),
+        addAP("NIDAQp[#].outChn[#].chnlSaving", &p, &NIDAQData::outChn, &outChnData::chnlSaving),
+
+        addAP("NIDAQp[#].inChn[#].calib.copyChnOn", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn),
+        addAP("NIDAQp[#].inChn[#].calib.copyChn", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChn),
+        addAP("NIDAQp[#].inChn[#].calib.samplingRate", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::samplingRate),
+        addAP("NIDAQp[#].inChn[#].calib.outputChannelNumber", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber),
+        addAP("NIDAQp[#].inChn[#].calib.iMaxElec", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec),
+        addAP("NIDAQp[#].inChn[#].calib.iMinElec", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMinElec),
+        addAP("NIDAQp[#].inChn[#].calib.numberOfLevels", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels),
+        addAP("NIDAQp[#].inChn[#].calib.injLenPerLevel", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel),
+        addAP("NIDAQp[#].inChn[#].calib.iMembStep", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMembStep),
+        addAP("NIDAQp[#].inChn[#].calib.numberOfRepeats", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats),
+        addAP("NIDAQp[#].inChn[#].calib.injLenPerRepeat", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat),
+        addAP("NIDAQp[#].inChn[#].calib.hyperpolCurr", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr),
+        addAP("NIDAQp[#].inChn[#].calib.injCalAmp", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp),
+        addAP("NIDAQp[#].inChn[#].calib.injCalLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalLen),
+        addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen),
+        addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen)
+    }
 {
     DeviceManager::RegisterDAQ(daqClass(), this);
-
-    addAP("NIDAQp[#].active", &NIDAQProxy::p, &NIDAQData::active);
-    addAP("NIDAQp[#].deviceName", &NIDAQProxy::p, &NIDAQData::deviceName);
-    addAP("NIDAQp[#].inChn[#].active", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::active);
-    addAP("NIDAQp[#].inChn[#].gain", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::gain);
-    addAP("NIDAQp[#].inChn[#].gainFac", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::gainFac);
-    addAP("NIDAQp[#].inChn[#].spkDetect", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::spkDetect);
-    addAP("NIDAQp[#].inChn[#].spkDetectThresh", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::spkDetectThresh);
-    addAP("NIDAQp[#].inChn[#].bias", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::bias);
-    addAP("NIDAQp[#].inChn[#].chnlSaving", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::chnlSaving);
-    addAP("NIDAQp[#].outChn[#].active", &NIDAQProxy::p, &NIDAQData::outChn, &outChnData::active);
-    addAP("NIDAQp[#].outChn[#].gain", &NIDAQProxy::p, &NIDAQData::outChn, &outChnData::gain);
-    addAP("NIDAQp[#].outChn[#].gainFac", &NIDAQProxy::p, &NIDAQData::outChn, &outChnData::gainFac);
-    addAP("NIDAQp[#].outChn[#].bias", &NIDAQProxy::p, &NIDAQData::outChn, &outChnData::bias);
-    addAP("NIDAQp[#].outChn[#].chnlSaving", &NIDAQProxy::p, &NIDAQData::outChn, &outChnData::chnlSaving);
-
-    addAP("NIDAQp[#].inChn[#].calib.copyChnOn", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
-    addAP("NIDAQp[#].inChn[#].calib.copyChn", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
-    addAP("NIDAQp[#].inChn[#].calib.samplingRate", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
-    addAP("NIDAQp[#].inChn[#].calib.outputChannelNumber", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
-    addAP("NIDAQp[#].inChn[#].calib.iMaxElec", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
-    addAP("NIDAQp[#].inChn[#].calib.iMinElec", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
-    addAP("NIDAQp[#].inChn[#].calib.numberOfLevels", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
-    addAP("NIDAQp[#].inChn[#].calib.injLenPerLevel", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
-    addAP("NIDAQp[#].inChn[#].calib.iMembStep", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
-    addAP("NIDAQp[#].inChn[#].calib.numberOfRepeats", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
-    addAP("NIDAQp[#].inChn[#].calib.injLenPerRepeat", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
-    addAP("NIDAQp[#].inChn[#].calib.hyperpolCurr", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
-    addAP("NIDAQp[#].inChn[#].calib.injCalAmp", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
-    addAP("NIDAQp[#].inChn[#].calib.injCalLen", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
-    addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
-    addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &NIDAQProxy::p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
 }
 
 //---------------------------------------------------------------------------

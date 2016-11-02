@@ -251,12 +251,9 @@ void MyMainWindow::SaveConfig()
   ofstream os("StdpC.conf");
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
-  QString D("DigiDatap"), S("SDAQp"), N("NIDAQp");
-  for ( std::unique_ptr<AP> const& ap : AP::params() ) {
-      if ( ap->name().startsWith(D) || ap->name().startsWith(S) || ap->name().startsWith(N) ) {
+  for ( DAQProxy *proxy : DeviceManager::Register() )
+      for ( AP *ap : proxy->coreAPs() )
           ap->write(os);
-      }
-  }
 
   os.close();
 }

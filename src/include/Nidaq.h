@@ -28,6 +28,9 @@ public:
     DAQ *createDAQ(size_t devID);
     DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr);
 
+    std::vector<AP*> regAP;
+    inline const std::vector<AP*> &coreAPs() const { return regAP; }
+
     static std::vector<NIDAQData> p;
 };
 

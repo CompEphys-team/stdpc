@@ -13,27 +13,28 @@ DAQProxy *SimulDAQ::proxy() const { return &prox; }
 DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID); }
 DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
 
-SimulDAQProxy::SimulDAQProxy()
+SimulDAQProxy::SimulDAQProxy() :
+    regAP {
+        addAP("SDAQp[#].active", &p, &SDAQData::active),
+        addAP("SDAQp[#].inFileName", &p, &SDAQData::inFileName),
+        addAP("SDAQp[#].outFileName", &p, &SDAQData::outFileName),
+        addAP("SDAQp[#].inTFac", &p, &SDAQData::inTFac),
+        addAP("SDAQp[#].outDt", &p, &SDAQData::outDt),
+        addAP("SDAQp[#].inChn[#].active", &p, &SDAQData::inChn, &inChnData::active),
+        addAP("SDAQp[#].inChn[#].gain", &p, &SDAQData::inChn, &inChnData::gain),
+        addAP("SDAQp[#].inChn[#].gainFac", &p, &SDAQData::inChn, &inChnData::gainFac),
+        addAP("SDAQp[#].inChn[#].spkDetect", &p, &SDAQData::inChn, &inChnData::spkDetect),
+        addAP("SDAQp[#].inChn[#].spkDetectThresh", &p, &SDAQData::inChn, &inChnData::spkDetectThresh),
+        addAP("SDAQp[#].inChn[#].bias", &p, &SDAQData::inChn, &inChnData::bias),
+        addAP("SDAQp[#].inChn[#].chnlSaving", &p, &SDAQData::inChn, &inChnData::chnlSaving),
+        addAP("SDAQp[#].outChn[#].active", &p, &SDAQData::outChn, &outChnData::active),
+        addAP("SDAQp[#].outChn[#].gain", &p, &SDAQData::outChn, &outChnData::gain),
+        addAP("SDAQp[#].outChn[#].gainFac", &p, &SDAQData::outChn, &outChnData::gainFac),
+        addAP("SDAQp[#].outChn[#].bias", &p, &SDAQData::outChn, &outChnData::bias),
+        addAP("SDAQp[#].outChn[#].chnlSaving", &p, &SDAQData::outChn, &outChnData::chnlSaving)
+    }
 {
     DeviceManager::RegisterDAQ(daqClass(), this);
-
-    addAP("SDAQp[#].active", &SimulDAQProxy::p, &SDAQData::active);
-    addAP("SDAQp[#].inFileName", &SimulDAQProxy::p, &SDAQData::inFileName);
-    addAP("SDAQp[#].outFileName", &SimulDAQProxy::p, &SDAQData::outFileName);
-    addAP("SDAQp[#].inTFac", &SimulDAQProxy::p, &SDAQData::inTFac);
-    addAP("SDAQp[#].outDt", &SimulDAQProxy::p, &SDAQData::outDt);
-    addAP("SDAQp[#].inChn[#].active", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::active);
-    addAP("SDAQp[#].inChn[#].gain", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::gain);
-    addAP("SDAQp[#].inChn[#].gainFac", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::gainFac);
-    addAP("SDAQp[#].inChn[#].spkDetect", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::spkDetect);
-    addAP("SDAQp[#].inChn[#].spkDetectThresh", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::spkDetectThresh);
-    addAP("SDAQp[#].inChn[#].bias", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::bias);
-    addAP("SDAQp[#].inChn[#].chnlSaving", &SimulDAQProxy::p, &SDAQData::inChn, &inChnData::chnlSaving);
-    addAP("SDAQp[#].outChn[#].active", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::active);
-    addAP("SDAQp[#].outChn[#].gain", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::gain);
-    addAP("SDAQp[#].outChn[#].gainFac", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::gainFac);
-    addAP("SDAQp[#].outChn[#].bias", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::bias);
-    addAP("SDAQp[#].outChn[#].chnlSaving", &SimulDAQProxy::p, &SDAQData::outChn, &outChnData::chnlSaving);
 }
 
 //---------------------------------------------------------------------------

@@ -12,42 +12,43 @@ DAQProxy *DigiData::proxy() const { return &prox; }
 DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID); }
 DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
 
-DigiDataProxy::DigiDataProxy()
+DigiDataProxy::DigiDataProxy() :
+    regAP {
+        addAP("DigiDatap[#].active", &p, &DigiDataData::active),
+        addAP("DigiDatap[#].baseAddress", &p, &DigiDataData::baseAddress),
+        addAP("DigiDatap[#].syncIOMask", &p, &DigiDataData::syncIOMask),
+        addAP("DigiDatap[#].inChn[#].active", &p, &DigiDataData::inChn, &inChnData::active),
+        addAP("DigiDatap[#].inChn[#].gain", &p, &DigiDataData::inChn, &inChnData::gain),
+        addAP("DigiDatap[#].inChn[#].gainFac", &p, &DigiDataData::inChn, &inChnData::gainFac),
+        addAP("DigiDatap[#].inChn[#].spkDetect", &p, &DigiDataData::inChn, &inChnData::spkDetect),
+        addAP("DigiDatap[#].inChn[#].spkDetectThresh", &p, &DigiDataData::inChn, &inChnData::spkDetectThresh),
+        addAP("DigiDatap[#].inChn[#].bias", &p, &DigiDataData::inChn, &inChnData::bias),
+        addAP("DigiDatap[#].inChn[#].chnlSaving", &p, &DigiDataData::inChn, &inChnData::chnlSaving),
+        addAP("DigiDatap[#].outChn[#].active", &p, &DigiDataData::outChn, &outChnData::active),
+        addAP("DigiDatap[#].outChn[#].gain", &p, &DigiDataData::outChn, &outChnData::gain),
+        addAP("DigiDatap[#].outChn[#].gainFac", &p, &DigiDataData::outChn, &outChnData::gainFac),
+        addAP("DigiDatap[#].outChn[#].bias", &p, &DigiDataData::outChn, &outChnData::bias),
+        addAP("DigiDatap[#].outChn[#].chnlSaving", &p, &DigiDataData::outChn, &outChnData::chnlSaving),
+
+        addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn),
+        addAP("DigiDatap[#].inChn[#].calib.copyChn", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn),
+        addAP("DigiDatap[#].inChn[#].calib.samplingRate", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate),
+        addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber),
+        addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec),
+        addAP("DigiDatap[#].inChn[#].calib.iMinElec", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec),
+        addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels),
+        addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel),
+        addAP("DigiDatap[#].inChn[#].calib.iMembStep", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep),
+        addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats),
+        addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat),
+        addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr),
+        addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp),
+        addAP("DigiDatap[#].inChn[#].calib.injCalLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen),
+        addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen),
+        addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen),
+    }
 {
     DeviceManager::RegisterDAQ(daqClass(), this);
-
-    addAP("DigiDatap[#].active", &DigiDataProxy::p, &DigiDataData::active);
-    addAP("DigiDatap[#].baseAddress", &DigiDataProxy::p, &DigiDataData::baseAddress);
-    addAP("DigiDatap[#].syncIOMask", &DigiDataProxy::p, &DigiDataData::syncIOMask);
-    addAP("DigiDatap[#].inChn[#].active", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::active);
-    addAP("DigiDatap[#].inChn[#].gain", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::gain);
-    addAP("DigiDatap[#].inChn[#].gainFac", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::gainFac);
-    addAP("DigiDatap[#].inChn[#].spkDetect", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::spkDetect);
-    addAP("DigiDatap[#].inChn[#].spkDetectThresh", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::spkDetectThresh);
-    addAP("DigiDatap[#].inChn[#].bias", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::bias);
-    addAP("DigiDatap[#].inChn[#].chnlSaving", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::chnlSaving);
-    addAP("DigiDatap[#].outChn[#].active", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::active);
-    addAP("DigiDatap[#].outChn[#].gain", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::gain);
-    addAP("DigiDatap[#].outChn[#].gainFac", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::gainFac);
-    addAP("DigiDatap[#].outChn[#].bias", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::bias);
-    addAP("DigiDatap[#].outChn[#].chnlSaving", &DigiDataProxy::p, &DigiDataData::outChn, &outChnData::chnlSaving);
-
-    addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn);
-    addAP("DigiDatap[#].inChn[#].calib.copyChn", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn);
-    addAP("DigiDatap[#].inChn[#].calib.samplingRate", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate);
-    addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber);
-    addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec);
-    addAP("DigiDatap[#].inChn[#].calib.iMinElec", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec);
-    addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels);
-    addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel);
-    addAP("DigiDatap[#].inChn[#].calib.iMembStep", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep);
-    addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats);
-    addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat);
-    addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr);
-    addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp);
-    addAP("DigiDatap[#].inChn[#].calib.injCalLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen);
-    addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen);
-    addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &DigiDataProxy::p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen);
 }
 
 //---------------------------------------------------------------------------

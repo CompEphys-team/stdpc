@@ -6,6 +6,7 @@
 #include <QHash>
 #include <memory>
 #include "Daq.h"
+#include "AP.h"
 
 class DAQDlg;
 
@@ -32,6 +33,9 @@ public:
 
     /// Create a new device dialog
     virtual DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr) = 0;
+
+    /// Return a collection of core AP-registered params that should be saved to StdpC.conf on exit
+    virtual const std::vector<AP*> &coreAPs() const = 0;
 };
 
 enum class DeviceStatus { Active, Inactive, Failed };
