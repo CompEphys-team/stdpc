@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMap>
 #include <QHash>
 #include <QDialog>
 #include <memory>
@@ -62,7 +63,7 @@ public:
     inline QVector<std::shared_ptr<ModelPrototype>> const& active() const { return activeModels; }
     inline map_type const& all() const { return allModels; }
 
-    static QHash<QString, ModelProxy*> &Register() { static QHash<QString, ModelProxy*> r; return r; }
+    static QMap<QString, ModelProxy*> &Register() { static QMap<QString, ModelProxy*> r; return r; }
     static inline void RegisterModel(QString modelName, ModelProxy *proxy) { Register()[modelName] = proxy; }
 
 private:

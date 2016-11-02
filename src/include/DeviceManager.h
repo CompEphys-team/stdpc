@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector>
+#include <QMap>
 #include <QHash>
 #include <memory>
 #include "Daq.h"
@@ -61,7 +62,7 @@ public:
     inline QVector<std::shared_ptr<DAQ>> &active() { return activeDAQ; }
     inline QHash<QString, QVector<std::shared_ptr<DAQ>>> const& all() const { return allDAQ; }
 
-    static inline QHash<QString, DAQProxy*> &Register() { static QHash<QString, DAQProxy*> r; return r; }
+    static inline QMap<QString, DAQProxy*> &Register() { static QMap<QString, DAQProxy*> r; return r; }
     static inline void RegisterDAQ(QString daqClass, DAQProxy *proxy) { Register()[daqClass] = proxy; }
 
 signals:
