@@ -23,7 +23,7 @@ class DAQ {
     QVector<QString> outChnLabels;
 
   public:
-    DAQ(size_t devID);
+    DAQ(size_t devID, DAQProxy *proxy);
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;
@@ -34,8 +34,7 @@ class DAQ {
     virtual void write_analog_out()= 0;
     virtual void reset_board()= 0;
 
-    virtual DAQData *params() = 0;
-    virtual DAQProxy *proxy() const = 0;
+    DAQData *params();
 
     void init_chans(); // Sets up scan list, analog out list
     void reset_chans();
@@ -48,6 +47,7 @@ class DAQ {
     bool check_limits(bool checkV_and_warn, ChannelLimitWarning &w);
 
     size_t devID;
+    DAQProxy *proxy;
 
     const double &t;
 

@@ -12,8 +12,7 @@
 /// Construct a single self-registering proxy
 static NIDAQProxy prox;
 std::vector<NIDAQData> NIDAQProxy::p;
-DAQProxy *NIDAQ::proxy() const { return &prox; }
-DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID); }
+DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID, &prox); }
 DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, &prox, parent); }
 
 NIDAQProxy::NIDAQProxy() :
@@ -56,8 +55,8 @@ NIDAQProxy::NIDAQProxy() :
 
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ(size_t devID) :
-    DAQ(devID)
+NIDAQ::NIDAQ(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy)
 {
   char data[1024];
   float64 fdata[128];

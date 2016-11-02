@@ -8,8 +8,7 @@
 /// Construct a single self-registering proxy
 static DigiDataProxy prox;
 std::vector<DigiDataData> DigiDataProxy::p;
-DAQProxy *DigiData::proxy() const { return &prox; }
-DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID); }
+DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, &prox); }
 DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
 
 DigiDataProxy::DigiDataProxy() :
@@ -53,8 +52,8 @@ DigiDataProxy::DigiDataProxy() :
 
 //---------------------------------------------------------------------------
 
-DigiData::DigiData(size_t devID) :
-    DAQ(devID)
+DigiData::DigiData(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy)
 {
   inChnNo= 16;
   inIdx= new short int[inChnNo];

@@ -50,7 +50,7 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ(size_t devID);
+    NIDAQ(size_t devID, DAQProxy *proxy);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
@@ -62,9 +62,6 @@ class NIDAQ: public DAQ
     virtual void get_single_scan(inChannel *);
     virtual void write_analog_out();
     virtual void reset_board();
-
-    virtual inline DAQData *params() { return &NIDAQProxy::p[devID]; }
-    virtual DAQProxy *proxy() const;
 };
 
 #endif

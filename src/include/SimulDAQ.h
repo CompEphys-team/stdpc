@@ -42,7 +42,7 @@ public:
 class SimulDAQ: public DAQ
 {
   public:
-    SimulDAQ(size_t devID);
+    SimulDAQ(size_t devID, DAQProxy *proxy);
     virtual ~SimulDAQ();
     virtual bool initialize_board(QString &);
     virtual void start();
@@ -52,9 +52,6 @@ class SimulDAQ: public DAQ
     virtual void get_single_scan(inChannel *);
     virtual void write_analog_out();
     virtual void reset_board();
-
-    virtual inline DAQData *params() { return &SimulDAQProxy::p[devID]; }
-    virtual DAQProxy *proxy() const;
 
     ifstream is;
     ofstream os;  

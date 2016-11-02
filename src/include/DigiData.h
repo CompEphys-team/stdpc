@@ -129,7 +129,7 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData(size_t devID);
+    DigiData(size_t devID, DAQProxy *proxy);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
@@ -143,9 +143,6 @@ class DigiData: public DAQ
     virtual void reset_board();
     short int* inChnGain;
     short int* DACEnable;
-
-    virtual inline DAQData *params() { return &DigiDataProxy::p[devID]; }
-    virtual DAQProxy *proxy() const;
     
     // actually activated stuff
 };

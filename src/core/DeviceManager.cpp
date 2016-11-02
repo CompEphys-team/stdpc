@@ -17,7 +17,7 @@ DeviceStatus DeviceManager::initSingle(QString &name, DAQProxy *proxy, size_t id
 
     // Clear existing active device
     for ( int i = 0; i < activeDAQ.size(); i++ )
-        if ( activeDAQ[i]->proxy()->daqClass() == dc && activeDAQ[i]->devID == idx )
+        if ( activeDAQ[i]->proxy->daqClass() == dc && activeDAQ[i]->devID == idx )
             activeDAQ.remove(i);
 
     // Ensure enough space in allDAQ
@@ -47,7 +47,7 @@ void DeviceManager::remove(DAQProxy *proxy, size_t idx)
         return;
 
     for ( int i = 0; i < activeDAQ.size(); i++ )
-        if ( activeDAQ[i]->proxy()->daqClass() == dc && activeDAQ[i]->devID == idx )
+        if ( activeDAQ[i]->proxy->daqClass() == dc && activeDAQ[i]->devID == idx )
             activeDAQ.remove(i);
 
     QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dc];

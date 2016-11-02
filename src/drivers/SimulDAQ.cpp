@@ -9,8 +9,7 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 /// Construct a single self-registering proxy
 static SimulDAQProxy prox;
 std::vector<SDAQData> SimulDAQProxy::p;
-DAQProxy *SimulDAQ::proxy() const { return &prox; }
-DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID); }
+DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, &prox); }
 DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
 
 SimulDAQProxy::SimulDAQProxy() :
@@ -39,8 +38,8 @@ SimulDAQProxy::SimulDAQProxy() :
 
 //---------------------------------------------------------------------------
 
-SimulDAQ::SimulDAQ(size_t devID) :
-    DAQ(devID),
+SimulDAQ::SimulDAQ(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy),
     tOff(0.0)
 {
   inChnNo= params()->inChn.size();
