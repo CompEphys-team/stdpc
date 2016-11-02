@@ -1,9 +1,9 @@
 #include "ModelOpts.h"
+#include "MainWin.h"
 
 ModelOpts::ModelOpts(QWidget *parent, ModelProxy *proxy, size_t idx) :
-    DaqOptsBase(parent),
-    proxy(proxy),
-    idx(idx)
+    DaqOptsBase(parent, idx),
+    proxy(proxy)
 {
     if ( idx >= proxy->size() ) {
         proxy->resize(idx+1);

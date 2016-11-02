@@ -1,42 +1,30 @@
 #ifndef SIMULDAQDLG_H
 #define SIMULDAQDLG_H
 
-
 #include "ui_SimulDAQDlg.h"
-#include "ObjectDataTypes.h"
 #include "DAQDlg.h"
-#include "Global.h"
-#include "ChannelListModel.h"
 
 class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
 {
-     Q_OBJECT
+    Q_OBJECT
 
-  public:
-     SimulDAQDlg(int no, QWidget *parent= 0);
-     bool exportData(bool forceInit = false);
+public:
+     SimulDAQDlg(size_t idx, QWidget *parent= 0);
+     void exportData(bool forceInit = false);
      void importData();
-     void setIndex(int);
-
-     typedef SDAQData param_type;
-     
-  public slots:
-     void accept();
-     void reject();
-     void open();
+     void setIndex(size_t);
 
 private slots:
-     void on_inChannels_clicked();
-     void on_outChannels_clicked();
-
      void on_InputFileB_clicked();
-
      void on_OutputFileB_clicked();
 
 protected:
-    DeviceStatus initDAQ();
+     void backup();
+     void restoreBackup();
 
-     SDAQData backup;
+     DAQProxy *proxy() const;
+
+     SDAQData bak;
      QString label;
 };
 

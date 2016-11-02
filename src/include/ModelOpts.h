@@ -1,7 +1,8 @@
 #ifndef MODELOPTS_H
 #define MODELOPTS_H
 
-#include "DaqOptsPrototype.h"
+#include "DaqOptsBase.h"
+#include "ModelManager.h"
 
 class ModelOpts : public DaqOptsBase
 {
@@ -21,7 +22,6 @@ protected:
 
     ModelProxy *proxy;
     ModelDlg *dlg;
-    size_t idx;
     DaqWidget *_widget;
 };
 

@@ -7,6 +7,8 @@
 #include <memory>
 #include "Daq.h"
 
+class DAQDlg;
+
 class DAQProxy {
 public:
     virtual DAQData& param(size_t i) = 0;
@@ -18,7 +20,7 @@ public:
     virtual inline QString prettyName() { return daqClass(); }
 
     virtual DAQ *createDAQ(size_t devID) = 0;
-    /* NYI: virtual DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr) = 0; */
+    virtual DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr) = 0;
 };
 
 enum class DeviceStatus { Active, Inactive, Failed };

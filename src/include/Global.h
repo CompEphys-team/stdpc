@@ -29,12 +29,6 @@ extern std::vector<DestexheSynData> DxheSynp;
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
-extern std::vector<DigiDataData> &DigiDatap;
-extern std::vector<SDAQData> &SDAQp;
-#ifdef NATIONAL_INSTRUMENTS
-extern std::vector<NIDAQData> &NIDAQp;
-#endif
-
 extern dataSavingParams dataSavingPs;
 
 extern std::vector<GraphData> Graphp;

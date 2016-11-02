@@ -1,4 +1,5 @@
 #include "DaqTable.h"
+#include "MainWin.h"
 
 DaqTable::DaqTable(QWidget *parent) :
     QTableWidget(parent)

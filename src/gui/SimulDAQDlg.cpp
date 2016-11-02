@@ -1,119 +1,69 @@
 #include "SimulDAQDlg.h"
 #include "Tools.cpp"
 #include "SimulDAQ.h"
-#include "DeviceManager.h"
 #include <QFileDialog>
 
-SimulDAQDlg::SimulDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
+SimulDAQDlg::SimulDAQDlg(size_t idx, QWidget *parent) :
+    DAQDlg(idx, Devices.getDevice(ChannelIndex(ChannelIndex::Analog, SimulDAQProxy::daqClassStatic(), idx)), parent)
 {
   setupUi(this);
+  connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+  connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
   label = DAQLabel->text();
-  setIndex(no);
-  DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::Simul, idx));
-  inDlg->init(board);
-  outDlg->init(board);
+  setIndex(idx);
 }
 
-void SimulDAQDlg::setIndex(int no)
+void SimulDAQDlg::setIndex(size_t no)
 {
-    idx = no;
     DAQLabel->setText(label.arg(no));
-    ChannelIndex dex(DAQClass::Simul, no);
-    inDlg->dex = dex;
-    emit channelsChanged();
+    DAQDlg::setIndex(no);
 }
 
-bool SimulDAQDlg::exportData(bool forceInit)
+void SimulDAQDlg::exportData(bool forceInit)
 {
   bool change= false;
-  bool devOK = true;
-  uint inChnNo = SDAQp[idx].inChn.size(), outChnNo = SDAQp[idx].outChn.size();
+  uint inChnNo = SimulDAQProxy::p[idx].inChn.size(), outChnNo = SimulDAQProxy::p[idx].outChn.size();
   getEntry(inChnNo, inChannelE->text().toUInt(), change);
   getEntry(outChnNo, outChannelE->text().toUInt(), change);
   if ( change ) {
-      SDAQp[idx].inChn.resize(inChnNo);
-      SDAQp[idx].outChn.resize(outChnNo);
-      for ( inChnData &i : SDAQp[idx].inChn )
+      SimulDAQProxy::p[idx].inChn.resize(inChnNo);
+      SimulDAQProxy::p[idx].outChn.resize(outChnNo);
+      for ( inChnData &i : SimulDAQProxy::p[idx].inChn )
           i.active = true;
-      for ( outChnData &i : SDAQp[idx].outChn )
+      for ( outChnData &i : SimulDAQProxy::p[idx].outChn )
           i.active = true;
   }
-  getEntry(SDAQp[idx].inFileName, InputFileE->text(), change);
-  getEntry(SDAQp[idx].outFileName, OutputFileE->text(), change);
-  getEntry(SDAQp[idx].inTFac, inTFacE->text().toDouble(), change);
-  getEntry(SDAQp[idx].outDt, outDtE->text().toDouble()*1e-3, change);
-  inDlg->exportData();
-  outDlg->exportData();
-  if ( change || forceInit ) {
-      devOK = initDAQ() != DeviceStatus::Failed;
-      inDlg->importData();
-      outDlg->importData();
-  }
-  return devOK;
+  getEntry(SimulDAQProxy::p[idx].inFileName, InputFileE->text(), change);
+  getEntry(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
+  getEntry(SimulDAQProxy::p[idx].inTFac, inTFacE->text().toDouble(), change);
+  getEntry(SimulDAQProxy::p[idx].outDt, outDtE->text().toDouble()*1e-3, change);
+
+  DAQDlg::exportData(change || forceInit);
 }
 
 void SimulDAQDlg::importData()
 {
   QString num;
-  InputFileE->setText(SDAQp[idx].inFileName);
-  OutputFileE->setText(SDAQp[idx].outFileName);
-  inChannelE->setText(QString::number(SDAQp[idx].inChn.size()));
-  outChannelE->setText(QString::number(SDAQp[idx].outChn.size()));
-  num.setNum(SDAQp[idx].inTFac);
+  InputFileE->setText(SimulDAQProxy::p[idx].inFileName);
+  OutputFileE->setText(SimulDAQProxy::p[idx].outFileName);
+  inChannelE->setText(QString::number(SimulDAQProxy::p[idx].inChn.size()));
+  outChannelE->setText(QString::number(SimulDAQProxy::p[idx].outChn.size()));
+  num.setNum(SimulDAQProxy::p[idx].inTFac);
   inTFacE->setText(num);
-  num.setNum(SDAQp[idx].outDt*1e3);
+  num.setNum(SimulDAQProxy::p[idx].outDt*1e3);
   outDtE->setText(num);
 
-  inDlg->importData();
-  outDlg->importData();
+  DAQDlg::importData();
 }
 
-void SimulDAQDlg::open()
+void SimulDAQDlg::backup()
 {
-    didInit = false;
-    backup = SDAQp[idx];
-    QDialog::open();
+    bak = SimulDAQProxy::p[idx];
 }
 
-void SimulDAQDlg::accept()
+void SimulDAQDlg::restoreBackup()
 {
-  exportData();
-  QDialog::accept();
-}
-
-void SimulDAQDlg::reject()
-{
-  SDAQp[idx] = backup;
-  if ( didInit )
-      initDAQ();
-  importData();
-  QDialog::reject();
-}
-
-
-DeviceStatus SimulDAQDlg::initDAQ()
-{
-    QString name;
-    DeviceStatus status = Devices.initSingle(name, Devices.Register()["SimulDAQ"], idx);
-    emit deviceStatusChanged(status, name);
-    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::Simul, idx));
-    inDlg->init(board);
-    outDlg->init(board);
-    didInit = true;
-    return status;
-}
-
-
-void SimulDAQDlg::on_inChannels_clicked()
-{
-    exportData();
-    inDlg->open();
-}
-
-void SimulDAQDlg::on_outChannels_clicked()
-{
-    exportData();
-    outDlg->open();
+  SimulDAQProxy::p[idx] = bak;
 }
 
 void SimulDAQDlg::on_InputFileB_clicked()

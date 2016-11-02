@@ -1,91 +1,42 @@
 #include "NIDAQDlg.h"
 #include "Tools.cpp"
 #include "Nidaq.h"
-#include "DeviceManager.h"
 
-NIDAQDlg::NIDAQDlg(int no, QWidget *parent) : DAQDlg(no, parent)
+NIDAQDlg::NIDAQDlg(size_t idx, QWidget *parent) :
+    DAQDlg(idx, Devices.getDevice(ChannelIndex(ChannelIndex::Analog, NIDAQProxy::daqClassStatic(), idx)), parent)
 {
     setupUi(this);
+    connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+    connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
     label = DAQLabel->text();
-    setIndex(no);
-    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::NI, idx));
-    inDlg->init(board);
-    outDlg->init(board);
+    setIndex(idx);
 }
 
-void NIDAQDlg::setIndex(int no)
+void NIDAQDlg::setIndex(size_t no)
 {
-    idx = no;
     DAQLabel->setText(label.arg(no));
-    ChannelIndex dex(DAQClass::NI, no);
-    inDlg->dex = dex;
-    emit channelsChanged();
+    DAQDlg::setIndex(no);
 }
 
-bool NIDAQDlg::exportData(bool forceInit)
+void NIDAQDlg::exportData(bool forceInit)
 {
     bool change= false;
-    bool devOK = true;
-    getEntry(NIDAQp[idx].deviceName, DeviceNameE->text(), change);
-    inDlg->exportData();
-    outDlg->exportData();
-    if ( change || forceInit ) {
-        devOK = initDAQ() != DeviceStatus::Failed;
-        inDlg->importData();
-        outDlg->importData();
-    }
-    return devOK;
+    getEntry(NIDAQProxy::p[idx].deviceName, DeviceNameE->text(), change);
+    DAQDlg::exportData(change || forceInit);
 }
 
 void NIDAQDlg::importData()
 {
-    DeviceNameE->setText(NIDAQp[idx].deviceName);
-    inDlg->importData();
-    outDlg->importData();
+    DeviceNameE->setText(NIDAQProxy::p[idx].deviceName);
+    DAQDlg::importData();
 }
 
-void NIDAQDlg::open()
+void NIDAQDlg::backup()
 {
-    didInit = false;
-    backup = NIDAQp[idx];
-    QDialog::open();
+    bak = NIDAQProxy::p[idx];
 }
 
-void NIDAQDlg::accept()
+void NIDAQDlg::restoreBackup()
 {
-    exportData();
-    QDialog::accept();
-}
-
-void NIDAQDlg::reject()
-{
-    NIDAQp[idx] = backup;
-    if ( didInit )
-        initDAQ();
-    importData();
-    QDialog::reject();
-}
-
-DeviceStatus NIDAQDlg::initDAQ()
-{
-    QString name;
-    DeviceStatus status = Devices.initSingle(name, Devices.Register()["NIDAQ"], idx);
-    emit deviceStatusChanged(status, name);
-    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::NI, idx));
-    inDlg->init(board);
-    outDlg->init(board);
-    didInit = true;
-    return status;
-}
-
-void NIDAQDlg::on_inChannels_clicked()
-{
-    exportData();
-    inDlg->open();
-}
-
-void NIDAQDlg::on_outChannels_clicked()
-{
-    exportData();
-    outDlg->open();
+    NIDAQProxy::p[idx] = bak;
 }

@@ -1,100 +1,48 @@
 #include "DigiDataDlg.h"
 #include "Tools.cpp"
 #include "DigiData.h"
-#include "DeviceManager.h"
 
-DigiDataDlg::DigiDataDlg(int no, QWidget *parent) : DAQDlg(no, parent)
+DigiDataDlg::DigiDataDlg(size_t idx, QWidget *parent) :
+    DAQDlg(idx, Devices.getDevice(ChannelIndex(ChannelIndex::Analog, DigiDataProxy::daqClassStatic(), idx)), parent)
 {
     setupUi(this);
+    connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+    connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
     label = DAQLabel->text();
-    setIndex(no);
-    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::DD1200, idx));
-    inDlg->init(board);
-    outDlg->init(board);
+    setIndex(idx);
 }
 
-void DigiDataDlg::setIndex(int no)
+void DigiDataDlg::setIndex(size_t no)
 {
-    idx = no;
     DAQLabel->setText(label.arg(no));
-    ChannelIndex dex(DAQClass::DD1200, no);
-    inDlg->dex = dex;
-    emit channelsChanged();
+    DAQDlg::setIndex(no);
 }
 
-bool DigiDataDlg::exportData(bool forceInit)
+void DigiDataDlg::exportData(bool forceInit)
 {
     bool change= false;
     bool success;
-    bool devOK = true;
-
     short int tmp= (short int) BaseAddressE->text().toInt(&success,16);
     if (success) {
-        getEntry(DigiDatap[idx].baseAddress, tmp, change);
+        getEntry(DigiDataProxy::p[idx].baseAddress, tmp, change);
     }
-    inDlg->exportData();
-    outDlg->exportData();
-    if ( change || forceInit ) {
-        devOK = initDAQ() != DeviceStatus::Failed;
-        inDlg->importData();
-        outDlg->importData();
-    }
-    return devOK;
+    DAQDlg::exportData(forceInit || change);
 }
 
 void DigiDataDlg::importData()
 {
     QString num;
-    num.setNum(DigiDatap[idx].baseAddress,16);
+    num.setNum(DigiDataProxy::p[idx].baseAddress,16);
     BaseAddressE->setText(num);
-    inDlg->importData();
-    outDlg->importData();
+    DAQDlg::importData();
 }
 
-void DigiDataDlg::open()
+void DigiDataDlg::backup()
 {
-    didInit = false;
-    backup = DigiDatap[idx];
-    QDialog::open();
+    bak = DigiDataProxy::p[idx];
 }
 
-void DigiDataDlg::accept()
+void DigiDataDlg::restoreBackup()
 {
-    exportData();
-    QDialog::accept();
-}
-
-void DigiDataDlg::reject()
-{
-    DigiDatap[idx] = backup;
-    if ( didInit )
-        initDAQ();
-    importData();
-    QDialog::reject();
-}
-
-
-DeviceStatus DigiDataDlg::initDAQ()
-{
-    QString name;
-    DeviceStatus status = Devices.initSingle(name, Devices.Register()["DigiData"], idx);
-    emit deviceStatusChanged(status, name);
-    DAQ *board = Devices.getDevice(ChannelIndex(DAQClass::DD1200, idx));
-    inDlg->init(board);
-    outDlg->init(board);
-    didInit = true;
-    return status;
-}
-
-
-void DigiDataDlg::on_inChannels_clicked()
-{
-    exportData();
-    inDlg->open();
-}
-
-void DigiDataDlg::on_outChannels_clicked()
-{
-    exportData();
-    outDlg->open();
+    DigiDataProxy::p[idx] = bak;
 }

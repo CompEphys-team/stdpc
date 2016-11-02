@@ -1,6 +1,7 @@
 #include "DigiData.h"
 #include "limits.h"
 #include "AP.h"
+#include "DigiDataDlg.h"
 
 // DigiData 1200 device driver
 
@@ -8,8 +9,9 @@
 static DigiDataProxy prox;
 std::vector<DigiDataData> DigiDataProxy::p;
 DAQProxy *DigiData::proxy() const { return &prox; }
+DAQProxy *DigiDataDlg::proxy() const { return &prox; }
 DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID); }
-/* NYI: DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, parent); } */
+DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, parent); }
 
 DigiDataProxy::DigiDataProxy()
 {

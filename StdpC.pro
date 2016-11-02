@@ -57,6 +57,7 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqWidget.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui
+
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
     $$PWD/src/include/ChemSynDlg.h \
@@ -112,7 +113,7 @@ HEADERS += \
     $$PWD/src/include/Component.h \
     $$PWD/src/include/WideComboBox.h \
     $$PWD/src/include/DaqOpts.h \
-    $$PWD/src/include/DaqOptsPrototype.h \
+    $$PWD/src/include/DaqOptsBase.h \
     $$PWD/src/include/QCustomPlot.h \
     $$PWD/src/include/CircularFifo.h \
     $$PWD/src/include/SpikeGenDlg.h \
@@ -177,7 +178,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/ChannelBufferHelper.cpp \
     $$PWD/src/core/ModelManager.cpp \
     $$PWD/src/models/Model.cpp \
-    $$PWD/src/gui/ModelOpts.cpp
+    $$PWD/src/gui/ModelOpts.cpp \
+    $$PWD/src/gui/DaqOpts.cpp
 
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 

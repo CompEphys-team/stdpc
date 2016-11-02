@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <QScrollBar>
 #include "ModelOpts.h"
+#include "DaqOpts.h"
 
 MyMainWindow::MyMainWindow(QWidget *parent)
      : QMainWindow(parent),
@@ -31,11 +32,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      ui->synapseTable->init(prototypes, inChnModel, outChnModel);
 
      QVector<DaqOptsPrototypeBase*> dprot;
-     dprot.push_back(new DaqOptsPrototype<SimulDAQDlg>("SimulDAQ", &SDAQp));
-     dprot.push_back(new DaqOptsPrototype<DigiDataDlg>("DigiData 1200(A)", &DigiDatap));
-#ifdef NATIONAL_INSTRUMENTS
-     dprot.push_back(new DaqOptsPrototype<NIDAQDlg>("Nat'l Instruments", &NIDAQp));
-#endif
+     for ( DAQProxy *proxy : DeviceManager::Register() )
+         dprot.push_back(new DaqOptsPrototype(proxy));
      for ( ModelProxy *proxy : ModelManager::Register )
          dprot.push_back(new ModelOptsPrototype(proxy));
      ui->DAQTable->init(dprot, this);

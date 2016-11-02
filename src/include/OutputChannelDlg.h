@@ -1,15 +1,12 @@
 #ifndef OUTPUTCHANNELDLG_H
 #define OUTPUTCHANNELDLG_H
 
-
 #include <QAbstractButton>
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QComboBox>
-
 #include "ui_OutputChannelDlg.h"
-#include "ObjectDataTypes.h"
-#include "DigiData.h"
+#include "Daq.h"
 
 class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
 {

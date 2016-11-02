@@ -3,14 +3,16 @@
 #include <QFileInfo>
 #include <QDir>
 #include "AP.h"
+#include "SimulDAQDlg.h"
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 /// Construct a single self-registering proxy
 static SimulDAQProxy prox;
 std::vector<SDAQData> SimulDAQProxy::p;
 DAQProxy *SimulDAQ::proxy() const { return &prox; }
+DAQProxy *SimulDAQDlg::proxy() const { return &prox; }
 DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID); }
-/* NYI: DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, parent); } */
+DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, parent); }
 
 SimulDAQProxy::SimulDAQProxy()
 {

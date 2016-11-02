@@ -2,14 +2,7 @@
 #define DAQTABLE_H
 
 #include <QTableWidget>
-#include "DaqOptsPrototype.h"
-
-#include "SimulDAQDlg.h"
-#include "DigiDataDlg.h"
-#ifdef NATIONAL_INSTRUMENTS
-#include "NIDAQDlg.h"
-#endif
-
+#include "DaqOptsBase.h"
 
 class DaqTable : public QTableWidget
 {
