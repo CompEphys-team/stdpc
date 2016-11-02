@@ -96,7 +96,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
 
      connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
-     connect(ui->DAQReset, SIGNAL(clicked(bool)), ui->DAQTable, SLOT(importData()));
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(DCT, &DCThread::updateRate, [this](int rate){
