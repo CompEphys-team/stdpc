@@ -10,7 +10,7 @@ public:
     DaqOpts(QWidget *parent, DAQProxy *proxy, size_t idx);
     ~DaqOpts();
 
-    void removeDevice(size_t idx);
+    void removeDevice();
     void importData();
     void exportData();
     void setIndex(size_t i);

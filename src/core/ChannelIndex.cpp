@@ -5,56 +5,8 @@
 #include "ModelManager.h"
 #include "DeviceManager.h"
 
-ChannelIndex::ChannelIndex(bool validNone) :
-    isValid(validNone),
-    isNone(validNone),
-    isPrototype(false),
-    isVirtual(false),
-    modelClass(""),
-    modelID(0),
-    instID(0),
-    isAnalog(false),
-    daqClass(""),
-    devID(0),
-    isInChn(false),
-    chanID(0)
-{
-}
-
-ChannelIndex::ChannelIndex(DAQClass dClass, int dID, bool isIn, int cID) :
-    isValid(true),
-    isNone(false),
-    isPrototype(false),
-    isVirtual(false),
-    isAnalog(true),
-    devID(dID),
-    isInChn(isIn),
-    chanID(cID)
-{
-    switch ( dClass ) {
-    case DAQClass::DD1200 : daqClass = "DigiData1200"; break;
-    case DAQClass::NI :     daqClass = "NIDAQ";        break;
-    case DAQClass::Simul :  daqClass = "SimulDAQ";     break;
-    }
-}
-
-ChannelIndex::ChannelIndex(ModelClass mClass, int mID, int iID) :
-    isValid(true),
-    isNone(false),
-    isPrototype(iID == -1),
-    isVirtual(iID >= 0),
-    modelID(mID),
-    instID(iID == -1 ? 0 : iID),
-    isAnalog(false)
-{
-    switch ( mClass ) {
-    case ModelClass::HH : modelClass = "HH"; break;
-    case ModelClass::SG : modelClass = "SG"; break;
-    }
-}
-
 ChannelIndex::ChannelIndex(ChannelIndex::ctorType type, QString typeClass, size_t first, size_t second, bool isInChn) :
-    isValid(true),
+    isValid(type != Invalid),
     isNone(type==None),
     isPrototype(type==Prototype),
     isVirtual(type==Virtual),
@@ -226,7 +178,7 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         if ( parts.size() != 3 )
             return is;
 
-        if ( ModelManager::Register.contains(parts.at(1)) )
+        if ( ModelManager::Register().contains(parts.at(1)) )
             dex.modelClass = parts.at(1);
         else
             return is;
@@ -238,7 +190,7 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         if ( parts.size() != 4 )
             return is;
 
-        if ( ModelManager::Register.contains(parts.at(1)) )
+        if ( ModelManager::Register().contains(parts.at(1)) )
             dex.modelClass = parts.at(1);
         else
             return is;

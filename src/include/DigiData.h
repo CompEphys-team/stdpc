@@ -73,6 +73,18 @@
 #define COUNTS                  2048.0
 
 
+class DigiDataData : public DAQData
+{
+  public:
+    short int baseAddress;
+    short int syncIOMask;
+    DigiDataData() : DAQData(),
+        baseAddress(0x320),
+        syncIOMask(0x0000)
+    {}
+};
+
+
 class DigiDataProxy : public DAQProxy {
 public:
     DigiDataProxy();
@@ -132,7 +144,6 @@ class DigiData: public DAQ
 
     virtual inline DAQData *params() { return &DigiDataProxy::p[devID]; }
     virtual DAQProxy *proxy() const;
-    virtual QString prefix();
     
     // actually activated stuff
 };

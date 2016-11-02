@@ -3,6 +3,7 @@
 
 #include "ui_SimulDAQDlg.h"
 #include "DAQDlg.h"
+#include "SimulDAQ.h"
 
 class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
 {

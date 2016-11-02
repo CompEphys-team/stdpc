@@ -8,9 +8,6 @@ using namespace std;
 #include <QColor>
 #include "ChannelIndex.h"
 
-// Forward
-class DCThread;
-
 struct SynapseAssignment {
     bool active;
     ChannelIndex PreSynChannel;
@@ -260,59 +257,7 @@ public:
     std::vector<inChnData> inChn;
     std::vector<outChnData> outChn;
     DAQData() : active(false) {}
-
-    bool removed; // Dummy (for now)
 };
-
-class SimulDAQ;
-class SimulDAQDlg;
-class SDAQData : public DAQData {
-  public:
-    QString inFileName;
-    QString outFileName;
-    double inTFac;
-    double outDt;
-    SDAQData() : DAQData(),
-        inFileName("StdpcIn1.dat"),
-        outFileName("StdpcOut1.dat"),
-        inTFac(1),
-        outDt(0.001)
-    {}
-
-    typedef SimulDAQ DaqType;
-    typedef SimulDAQDlg DlgType;
-    static QString daqClass() { return "SimulDAQ"; }
-};
-
-class DigiData;
-class DigiDataDlg;
-class DigiDataData : public DAQData {
-  public:
-    short int baseAddress;
-    short int syncIOMask;
-    DigiDataData() : DAQData(),
-        baseAddress(0x320),
-        syncIOMask(0x0000)
-    {}
-
-    typedef DigiData DaqType;
-    typedef DigiDataDlg DlgType;
-    static QString daqClass() { return "DigiData1200"; }
-};
-
-#ifdef NATIONAL_INSTRUMENTS
-class NIDAQ;
-class NIDAQDlg;
-class NIDAQData : public DAQData {
-  public:
-    QString deviceName;
-    NIDAQData() : DAQData(), deviceName("Dev1") {}
-
-    typedef NIDAQ DaqType;
-    typedef NIDAQDlg DlgType;
-    static QString daqClass() { return "NIDAQ"; }
-};
-#endif
 
 struct GraphData {
     bool active;
@@ -340,45 +285,6 @@ struct ModelData {
     virtual vInstData &instance(size_t i) = 0;
     virtual size_t numInst() const = 0;
     ModelData() : active(false) {}
-};
-
-struct HHNeuronData : public ModelData {
-    double C;
-    double gLeak;
-    double ELeak;
-    std::vector<vInstData> inst;
-
-    inline vInstData &instance(size_t i) { return inst[i]; }
-    inline size_t numInst() const { return inst.size(); }
-    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
-};
-
-struct SgInstData : public vInstData {
-    ChannelIndex bdChannel;
-    double bdThresh;
-};
-
-struct SGData : public ModelData {
-  bool LUTables;
-  double VSpike;
-  double spkTimeScaling;
-  double VRest;
-
-  int bdType;
-  double bdtUnder;
-  double bdtOver;
-  bool bdtUnderCont;
-  bool bdtOverCont;
-  bool bdStrictlyCont;
-
-  double period;
-  bool loopBursts;
-  std::vector<std::vector<double>> SpikeT;
-
-  std::vector<SgInstData> inst;
-
-  inline vInstData &instance(size_t i) { return inst[i]; }
-  inline size_t numInst() const { return inst.size(); }
 };
 
 #endif

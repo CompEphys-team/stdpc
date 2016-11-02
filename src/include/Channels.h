@@ -6,6 +6,9 @@
 #include "ChannelBufferHelper.h"
 #include <memory>
 
+// Forward declaration for synapse/current ctors
+class DCThread;
+
 class inChannel {
  public:
     inChnData *p;

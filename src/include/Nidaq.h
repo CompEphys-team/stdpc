@@ -2,11 +2,17 @@
 #define NIDAQ_H
 
 #include "DeviceManager.h"
-
 #include <NIDAQmx.h>
 
 #define MAXRANGES 64
 #define MAXCHANNELS 64
+
+class NIDAQData : public DAQData
+{
+public:
+    QString deviceName;
+    NIDAQData() : DAQData(), deviceName("Dev1") {}
+};
 
 class NIDAQProxy : public DAQProxy {
 public:
@@ -57,7 +63,6 @@ class NIDAQ: public DAQ
 
     virtual inline DAQData *params() { return &NIDAQProxy::p[devID]; }
     virtual DAQProxy *proxy() const;
-    virtual QString prefix();
 };
 
 #endif

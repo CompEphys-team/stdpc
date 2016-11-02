@@ -4,6 +4,34 @@
 #include "Global_func.h"
 #include "ModelManager.h"
 
+struct SgInstData : public vInstData {
+    ChannelIndex bdChannel;
+    double bdThresh;
+};
+
+struct SGData : public ModelData {
+  bool LUTables;
+  double VSpike;
+  double spkTimeScaling;
+  double VRest;
+
+  int bdType;
+  double bdtUnder;
+  double bdtOver;
+  bool bdtUnderCont;
+  bool bdtOverCont;
+  bool bdStrictlyCont;
+
+  double period;
+  bool loopBursts;
+  std::vector<std::vector<double>> SpikeT;
+
+  std::vector<SgInstData> inst;
+
+  inline vInstData &instance(size_t i) { return inst[i]; }
+  inline size_t numInst() const { return inst.size(); }
+};
+
 class SpkGenProxy : public ModelProxy {
 public:
     SpkGenProxy();

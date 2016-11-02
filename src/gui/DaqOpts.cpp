@@ -46,7 +46,7 @@ DaqOpts::~DaqOpts()
     delete dlg;
 }
 
-void DaqOpts::removeDevice(size_t idx)
+void DaqOpts::removeDevice()
 {
     Devices.remove(proxy, idx);
 }

@@ -34,7 +34,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      QVector<DaqOptsPrototypeBase*> dprot;
      for ( DAQProxy *proxy : DeviceManager::Register() )
          dprot.push_back(new DaqOptsPrototype(proxy));
-     for ( ModelProxy *proxy : ModelManager::Register )
+     for ( ModelProxy *proxy : ModelManager::Register() )
          dprot.push_back(new ModelOptsPrototype(proxy));
      ui->DAQTable->init(dprot, this);
      

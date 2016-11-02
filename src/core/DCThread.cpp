@@ -62,7 +62,7 @@ void DCThread::run()
        b->init_chans();
 
    // Populate Models in absence of UI doing it
-   for ( ModelProxy *proxy : ModelManager::Register )
+   for ( ModelProxy *proxy : ModelManager::Register() )
        for ( size_t j = 0; j < proxy->size(); j++ )
            Models.initSingle(proxy, j);
    Models.initActive(this);

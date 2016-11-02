@@ -3,6 +3,7 @@
 
 #include "ui_DigiDataDlg.h"
 #include "DAQDlg.h"
+#include "DigiData.h"
 
 class DigiDataDlg : public DAQDlg, private Ui::DigiDataDlg
 {

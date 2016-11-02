@@ -1,4 +1,5 @@
 #include "Daq.h"
+#include "DeviceManager.h"
 
 DAQ::DAQ(size_t devID) :
     devID(devID),
@@ -83,7 +84,7 @@ QPair<QVector<QString>, QVector<inChannel*>> DAQ::inChans_to_save()
     QVector<inChannel*> chans;
     for ( int i = 0; i < actInChnNo; i++ ) {
         if ( in[inIdx[i]].save ) {
-            labels.push_back(QString("%1_V%2").arg(prefix()).arg(inIdx[i]));
+            labels.push_back(QString("%1_%2_V%3").arg(proxy()->daqClass()).arg(devID).arg(inIdx[i]));
             chans.push_back(&in[inIdx[i]]);
         }
     }
@@ -97,7 +98,7 @@ QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
     QVector<outChannel*> chans;
     for ( int i = 0; i < actOutChnNo; i++ ) {
         if ( out[outIdx[i]].save ) {
-            labels.push_back(QString("%1_I%2").arg(prefix()).arg(outIdx[i]));
+            labels.push_back(QString("%1_%2_I%3").arg(proxy()->daqClass()).arg(devID).arg(outIdx[i]));
             chans.push_back(&out[outIdx[i]]);
         }
     }

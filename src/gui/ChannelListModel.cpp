@@ -9,7 +9,7 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
 {
     for ( DAQProxy *proxy : DeviceManager::Register() )
         daqHelpers.push_back(DAQHelper(proxy, this));
-    for ( ModelProxy *proxy : ModelManager::Register )
+    for ( ModelProxy *proxy : ModelManager::Register() )
         modelHelpers.push_back(ModelHelper(proxy, this));
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
     // Owner connects model removals
@@ -188,7 +188,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
 {
     QVariant ret;
     if ( !index.isValid() && role == Qt::UserRole ) {
-        ret.setValue(ChannelIndex(true));
+        ret.setValue(ChannelIndex(ChannelIndex::None));
         return ret;
     }
     if (!index.isValid() || !(role==Qt::DisplayRole || role>=Qt::UserRole))
@@ -197,7 +197,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     int offset = 0, row = index.row();
     if ( displayFlags & Blank ) {
         if ( row == offset ) {
-            ret.setValue(ChannelIndex(true));
+            ret.setValue(ChannelIndex(ChannelIndex::None));
             switch ( role ) {
             case Qt::DisplayRole:   return QString();
             case Qt::UserRole:      return ret;
@@ -208,7 +208,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
     }
     if ( displayFlags & None ) {
         if ( row == offset ) {
-            ret.setValue(ChannelIndex(true));
+            ret.setValue(ChannelIndex(ChannelIndex::None));
             switch ( role ) {
             case Qt::DisplayRole:   return QString("None");
             case Qt::UserRole:      return ret;
@@ -225,7 +225,7 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
             return ret;
 
     if ( role == Qt::UserRole ) {
-        ret.setValue(ChannelIndex(true));
+        ret.setValue(ChannelIndex(ChannelIndex::None));
         return ret;
     } else {
         return QVariant();

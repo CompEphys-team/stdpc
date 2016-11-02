@@ -1,7 +1,5 @@
 #include "ModelManager.h"
 
-QHash<QString, ModelProxy*> ModelManager::Register;
-
 void ModelManager::initActive(DCThread *DCT)
 {
     for ( std::shared_ptr<ModelPrototype> &m : activeModels )
@@ -12,7 +10,7 @@ void ModelManager::clear()
 {
     activeModels.clear();
     allModels.clear();
-    for ( ModelProxy *proxy : Register )
+    for ( ModelProxy *proxy : Register() )
         while ( proxy->size() )
             proxy->remove(proxy->size());
 }
@@ -46,7 +44,7 @@ void ModelManager::initSingle(ModelProxy *proxy, size_t idx)
 
 bool ModelManager::empty() const
 {
-    for ( ModelProxy *proxy : Register )
+    for ( ModelProxy *proxy : Register() )
         for ( size_t i = 0; i < proxy->size(); i++ )
             if ( proxy->param(i).active )
                 for ( size_t j = 0; j < proxy->param(i).numInst(); j++ )

@@ -11,15 +11,26 @@ class DAQDlg;
 
 class DAQProxy {
 public:
+    /// Parameter access and manipulation functions:
+    /// Return a reference to the indicated parameter set
     virtual DAQData& param(size_t i) = 0;
+    /// Return the number of parameter sets present
     virtual size_t size() = 0;
+    /// Change the number of parameter sets
     virtual void resize(size_t) = 0;
+    /// Remove a parameter set. Subsequent sets are expected to move up into the freed space.
     virtual void remove(size_t) = 0;
 
+    /// Return an identifier for this device class (e.g. "NIDAQ"). Must not contain any whitespace or "/" characters.
     virtual QString daqClass() = 0;
+
+    /// Return a human-readable identifier for this device class (e.g. "National Instruments") for use in the GUI
     virtual inline QString prettyName() { return daqClass(); }
 
+    /// Create a new device object
     virtual DAQ *createDAQ(size_t devID) = 0;
+
+    /// Create a new device dialog
     virtual DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr) = 0;
 };
 

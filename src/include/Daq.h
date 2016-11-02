@@ -47,8 +47,6 @@ class DAQ {
     struct ChannelLimitWarning {QString what; QString chan_label; double hiLim; double loLim; double value;};
     bool check_limits(bool checkV_and_warn, ChannelLimitWarning &w);
 
-    virtual QString prefix() = 0;
-
     size_t devID;
 
     const double &t;

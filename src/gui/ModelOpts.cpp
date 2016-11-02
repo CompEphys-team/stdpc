@@ -26,7 +26,7 @@ ModelOpts::~ModelOpts()
     delete dlg;
 }
 
-void ModelOpts::removeDevice(size_t idx)
+void ModelOpts::removeDevice()
 {
     proxy->remove(idx);
     emit removedModel(ChannelIndex(ChannelIndex::Prototype, proxy->modelClass(), idx));

@@ -11,27 +11,27 @@
 
 class ModelProxy {
 public:
+    /// Parameter access and manipulation functions:
+    /// Return a reference to the indicated parameter set
     virtual ModelData& param(size_t i) = 0;
+    /// Return the number of parameter sets present
     virtual size_t size() = 0;
+    /// Change the number of parameter sets
     virtual void resize(size_t) = 0;
+    /// Remove a parameter set. Subsequent sets are expected to move up into the freed space.
     virtual void remove(size_t) = 0;
 
+    /// Return an identifier for this model class (e.g. "HH"). Must not contain any whitespace or "/" characters.
     virtual QString modelClass() = 0;
+
+    /// Return a human-readable identifier for this model class (e.g. "Hodgkin-Huxley neuron") for use in the GUI
     virtual inline QString prettyName() { return modelClass(); }
 
+    /// Create a new model object
     virtual ModelPrototype *createPrototype(size_t modelID) = 0;
+
+    /// Create a new model dialog
     virtual ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr) = 0;
-};
-
-
-// Helper to allow using an `enum class` as unordered_map key
-struct EnumClassHash
-{
-    template <typename T>
-    size_t operator()(T t) const
-    {
-        return static_cast<size_t>(t);
-    }
 };
 
 
@@ -62,11 +62,8 @@ public:
     inline QVector<std::shared_ptr<ModelPrototype>> const& active() const { return activeModels; }
     inline map_type const& all() const { return allModels; }
 
-    static QHash<QString, ModelProxy*> Register;
-    static inline void RegisterModel(QString modelName, ModelProxy *proxy) { Register[modelName] = proxy; }
-
-signals:
-    void removedModel(ChannelIndex dex);
+    static QHash<QString, ModelProxy*> &Register() { static QHash<QString, ModelProxy*> r; return r; }
+    static inline void RegisterModel(QString modelName, ModelProxy *proxy) { Register()[modelName] = proxy; }
 
 private:
     QVector<std::shared_ptr<ModelPrototype>> activeModels;

@@ -199,7 +199,7 @@ void DigiData::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i, Chan_Gain_Code;
   DAQData *p = params();
-  ChannelIndex dex(DAQClass::DD1200, devID, true);
+  ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, true);
 
   actInChnNo= chnNo;  
   WriteWord(ADCDAC_control, ADCSCANLISTENABLE);
@@ -248,7 +248,7 @@ void DigiData::get_single_scan(inChannel *in)
 void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 {
   DAQData *p = params();
-  ChannelIndex dex(DAQClass::DD1200, devID, false);
+  ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, false);
 
   // collect the active out channels
   actOutChnNo= chnNo;
@@ -281,10 +281,4 @@ void DigiData::reset_board()
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,0);
   } 
-}
-
-//---------------------------------------------------------------------------
-QString DigiData::prefix()
-{
-    return QString("DigiData_%1").arg(devID);
 }

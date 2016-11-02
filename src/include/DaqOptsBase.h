@@ -10,7 +10,7 @@ class DaqOptsBase : public QObject
 public:
     DaqOptsBase(QWidget *parent, size_t idx) : QObject(parent), idx(idx) {}
     virtual ~DaqOptsBase() {}
-    virtual void removeDevice(size_t idx) = 0;
+    virtual void removeDevice() = 0;
 
     virtual void importData() = 0;
     virtual void exportData() = 0;
@@ -56,7 +56,7 @@ public:
                 inst[i]->widget()->active->setChecked(true);
                 inst[i]->setIndex(i);
             } else {
-                inst[i]->removeDevice(i);
+                inst[i]->removeDevice();
                 delete inst[i];
                 inst.remove(i);
                 --i;

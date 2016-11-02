@@ -3,6 +3,7 @@
 
 #include "ui_NIDAQDlg.h"
 #include "DAQDlg.h"
+#include "Nidaq.h"
 
 class NIDAQDlg : public DAQDlg, private Ui::NIDAQDlg
 {

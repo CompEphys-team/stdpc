@@ -1,12 +1,24 @@
 #ifndef SIMULDAQ_H
 #define SIMULDAQ_H
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <QList>
 #include "DeviceManager.h"
+
+class SDAQData : public DAQData {
+  public:
+    QString inFileName;
+    QString outFileName;
+    double inTFac;
+    double outDt;
+    SDAQData() : DAQData(),
+        inFileName("StdpcIn1.dat"),
+        outFileName("StdpcOut1.dat"),
+        inTFac(1),
+        outDt(0.001)
+    {}
+};
 
 class SimulDAQProxy : public DAQProxy {
 public:
@@ -41,7 +53,6 @@ class SimulDAQ: public DAQ
 
     virtual inline DAQData *params() { return &SimulDAQProxy::p[devID]; }
     virtual DAQProxy *proxy() const;
-    virtual QString prefix();
 
     ifstream is;
     ofstream os;  

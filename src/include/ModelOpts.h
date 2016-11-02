@@ -10,7 +10,7 @@ public:
     ModelOpts(QWidget *parent, ModelProxy *proxy, size_t idx);
     ~ModelOpts();
 
-    void removeDevice(size_t idx);
+    void removeDevice();
     void importData();
     void exportData();
     void setIndex(size_t i);

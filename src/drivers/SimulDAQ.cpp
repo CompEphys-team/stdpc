@@ -150,7 +150,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
   short int i;
   actInChnNo= chnNo;
 
-  ChannelIndex dex(DAQClass::Simul, devID, true);
+  ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, true);
 
   for(i= 0; i < actInChnNo; i++)
   {
@@ -225,7 +225,7 @@ void SimulDAQ::get_single_scan(inChannel *in)
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
 {
-  ChannelIndex dex(DAQClass::Simul, devID, false);
+  ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, false);
 
   short int i;
   actOutChnNo= chnNo;
@@ -286,10 +286,4 @@ void SimulDAQ::rewind()
     }
     inT= *intIter;
   }
-}
-
-
-QString SimulDAQ::prefix()
-{
-    return QString("SimulDAQ_%1").arg(devID);
 }
