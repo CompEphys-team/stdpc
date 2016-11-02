@@ -8,8 +8,8 @@
 
 class SDAQData : public DAQData {
   public:
-    QString inFileName;
-    QString outFileName;
+    QuotedString inFileName;
+    QuotedString outFileName;
     double inTFac;
     double outDt;
     SDAQData() : DAQData(),

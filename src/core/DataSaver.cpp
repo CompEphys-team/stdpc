@@ -5,7 +5,7 @@ DataSaver::DataSaver()
 }
 
 // Opens the file
-bool DataSaver::InitDataSaving(QString filename, bool isBnry)
+bool DataSaver::InitDataSaving(const QString &filename, bool isBnry)
 {
     if( !os.good() || os.is_open() ) {
         os.close();

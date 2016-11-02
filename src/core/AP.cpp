@@ -453,35 +453,3 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 
     return true;
 }
-
-std::istream &operator>>(std::istream &is, QString &str)
-{
-    std::string tmp;
-    is >> tmp;
-    str = QString::fromStdString(tmp);
-    return is;
-}
-
-std::ostream &operator<<(std::ostream &os, const QString &str)
-{
-    os << str.toStdString();
-    return os;
-}
-
-std::istream &operator>>(std::istream &is, QColor &col)
-{
-    std::string tmp;
-    is >> tmp;
-    QStringList v = QString::fromStdString(tmp).split(',');
-    if ( v.size() == 3 )
-        col = QColor::fromRgb(v[0].toInt(), v[1].toInt(), v[2].toInt());
-    else if ( v.size() == 4 )
-        col = QColor::fromRgb(v[0].toInt(), v[1].toInt(), v[2].toInt(), v[3].toInt());
-    return is;
-}
-
-std::ostream &operator<<(std::ostream &os, const QColor &col)
-{
-    os << col.red() << ',' << col.green() << ',' << col.blue() << ',' << col.alpha();
-    return os;
-}

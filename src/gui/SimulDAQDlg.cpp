@@ -1,5 +1,5 @@
 #include "SimulDAQDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
 #include "SimulDAQ.h"
 #include <QFileDialog>
 
@@ -33,8 +33,8 @@ void SimulDAQDlg::exportData(bool forceInit)
       for ( outChnData &i : SimulDAQProxy::p[idx].outChn )
           i.active = true;
   }
-  getEntry(SimulDAQProxy::p[idx].inFileName, InputFileE->text(), change);
-  getEntry(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
+  getEntry<QString>(SimulDAQProxy::p[idx].inFileName, InputFileE->text(), change);
+  getEntry<QString>(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
   getEntry(SimulDAQProxy::p[idx].inTFac, inTFacE->text().toDouble(), change);
   getEntry(SimulDAQProxy::p[idx].outDt, outDtE->text().toDouble()*1e-3, change);
 

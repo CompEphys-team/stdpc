@@ -16,7 +16,7 @@ private:
 
 public:
     DataSaver();
-    bool InitDataSaving(QString, bool);
+    bool InitDataSaving(const QString &, bool);
     void SaveLine(QVector<double>);
     void SaveHeader(QVector<QString>);
     void EndDataSaving();

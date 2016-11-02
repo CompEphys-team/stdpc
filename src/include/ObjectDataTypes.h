@@ -7,6 +7,7 @@ using namespace std;
 #include <iostream>
 #include <QColor>
 #include "ChannelIndex.h"
+#include "Util.h"
 
 struct SynapseAssignment {
     bool active;
@@ -222,7 +223,7 @@ struct elecCalibParams {
 
 typedef struct {
   bool enabled;
-  QString fileName;
+  QuotedString fileName;
   double savingFreq;
   bool isBinary;
 

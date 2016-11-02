@@ -1,5 +1,5 @@
 #include "NIDAQDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
 #include "Nidaq.h"
 
 NIDAQDlg::NIDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :

@@ -1,5 +1,5 @@
 #include "DigiDataDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
 #include "DigiData.h"
 
 DigiDataDlg::DigiDataDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
