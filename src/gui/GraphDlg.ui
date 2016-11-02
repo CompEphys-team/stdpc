@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>GraphDlg</class>
- <widget class="QDialog" name="GraphDlg">
+ <widget class="QWidget" name="GraphDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -9,9 +9,6 @@
     <width>852</width>
     <height>587</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>GraphDialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="5">

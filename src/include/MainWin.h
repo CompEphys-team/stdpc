@@ -32,7 +32,6 @@ class MyMainWindow : public QMainWindow
      void importData();
 
      DataSavingDlg *DSDlg;
-     GraphDlg *graphDlg;
      DCThread *DCT;
 
      ChannelListModel *inChnModel, *outChnModel;

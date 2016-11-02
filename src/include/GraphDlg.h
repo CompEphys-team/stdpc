@@ -11,7 +11,7 @@ namespace Ui {
 class GraphDlg;
 }
 
-class GraphDlg : public QDialog
+class GraphDlg : public QWidget
 {
      Q_OBJECT
 private:
@@ -31,16 +31,16 @@ private slots:
 
 public:
      GraphDlg(QWidget *parent = 0);
+     void link(QWidget *mainwin);
      ~GraphDlg();
 
      struct DataPoint { double t; double value; };
      std::vector<std::unique_ptr<CircularFifo<DataPoint>>> q;
 
 public slots:
-     void startPlotting(DCThread *);
+     bool startPlotting(DCThread *);
      void stopPlotting();
      void reloadGraphs();
-     void reject();
 }; 
 
 #endif

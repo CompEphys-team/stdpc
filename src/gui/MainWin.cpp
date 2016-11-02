@@ -17,7 +17,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
 
      DSDlg= new DataSavingDlg(this);
-     graphDlg = new GraphDlg(this);
+
+     ui->graphtab->link(this);
 
      QVector<ComponentPrototypeBase *> prototypes;
      prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
@@ -82,8 +83,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
-     
-     connect(ui->actionData_display, SIGNAL(triggered(bool)), graphDlg, SLOT(show()));
 
      connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
      connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
@@ -203,7 +202,8 @@ void MyMainWindow::StartButClicked()
   while (!DCT->finished) Sleep(100);
   exportData();
 
-  graphDlg->startPlotting(DCT);
+  if ( !ui->graphtab->startPlotting(DCT) )
+      ui->tabWidget->setTabEnabled(1, false);
   rateIndicator->setText("Started");
   DCT->start();
 }
@@ -223,7 +223,8 @@ void MyMainWindow::StopButClicked()
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
-  graphDlg->stopPlotting();
+  ui->graphtab->stopPlotting();
+  ui->tabWidget->setTabEnabled(1, true);
 }
 
 void MyMainWindow::exportData(bool ignoreDAQ)
@@ -240,7 +241,7 @@ void MyMainWindow::importData()
   ui->synapseTable->importData();
   ui->currentTable->importData();
   DSDlg->importData();
-  graphDlg->reloadGraphs();
+  ui->graphtab->reloadGraphs();
   updateStartButton();
 }
 

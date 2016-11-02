@@ -5,7 +5,7 @@
 #include "DCThread.h"
 
 GraphDlg::GraphDlg(QWidget *parent)
-     : QDialog(parent),
+     : QWidget(parent),
        ui(new Ui::GraphDlg),
        clm(ChannelListModel::AnalogIn
          | ChannelListModel::AnalogOut
@@ -15,8 +15,6 @@ GraphDlg::GraphDlg(QWidget *parent)
  {
     ui->setupUi(this);
 
-    connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
-    connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
     ui->channel->setModel(&clm);
 
     connect(ui->colorBtn, &QToolButton::clicked, [=](){
@@ -86,6 +84,12 @@ GraphDlg::GraphDlg(QWidget *parent)
     reloadGraphs();
 }
 
+void GraphDlg::link(QWidget *mainwin)
+{
+    connect(mainwin, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
+    connect(mainwin, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
+}
+
 void GraphDlg::channelIndexChanged()
 {
     ChannelIndex sel = ui->channel->currentData().value<ChannelIndex>();
@@ -106,12 +110,6 @@ GraphDlg::~GraphDlg()
     delete ui;
 }
 
-void GraphDlg::reject()
-{
-    if ( !dataTimer.isActive() )
-        QDialog::reject();
-}
-
 void GraphDlg::reloadGraphs()
 {
     ui->plot->clearGraphs();
@@ -129,13 +127,13 @@ void GraphDlg::reloadGraphs()
     ui->plot->replot();
 }
 
-void GraphDlg::startPlotting(DCThread *DCT)
+bool GraphDlg::startPlotting(DCThread *DCT)
 {
     if ( !isVisible() || Graphp.empty() ) {
         for ( GraphData &p : Graphp )
             p.active = false;
         DCT->setGraph();
-        return;
+        return false;
     }
 
     ui->addBtn->setEnabled(false);
@@ -165,6 +163,8 @@ void GraphDlg::startPlotting(DCThread *DCT)
         dataTimer.start(); // As fast as possible to prevent q overflows
     else
         dataTimer.start(20); // 50 Hz for slower sampling
+
+    return true;
 }
 
 void GraphDlg::stopPlotting()
