@@ -10,7 +10,7 @@ class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
     Q_OBJECT
 
 public:
-     SimulDAQDlg(size_t idx, QWidget *parent= 0);
+     SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
      void exportData(bool forceInit = false);
      void importData();
      void setIndex(size_t);
@@ -22,8 +22,6 @@ private slots:
 protected:
      void backup();
      void restoreBackup();
-
-     DAQProxy *proxy() const;
 
      SDAQData bak;
      QString label;

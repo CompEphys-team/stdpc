@@ -10,9 +10,8 @@ extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 static SimulDAQProxy prox;
 std::vector<SDAQData> SimulDAQProxy::p;
 DAQProxy *SimulDAQ::proxy() const { return &prox; }
-DAQProxy *SimulDAQDlg::proxy() const { return &prox; }
 DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID); }
-DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, parent); }
+DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
 
 SimulDAQProxy::SimulDAQProxy()
 {

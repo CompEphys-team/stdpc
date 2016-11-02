@@ -3,8 +3,8 @@
 #include "SimulDAQ.h"
 #include <QFileDialog>
 
-SimulDAQDlg::SimulDAQDlg(size_t idx, QWidget *parent) :
-    DAQDlg(idx, Devices.getDevice(ChannelIndex(ChannelIndex::Analog, SimulDAQProxy::daqClassStatic(), idx)), parent)
+SimulDAQDlg::SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    DAQDlg(idx, proxy, parent)
 {
   setupUi(this);
   connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));

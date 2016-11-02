@@ -1,8 +1,11 @@
 #include "OutputChannelDlg.h"
 #include <QMessageBox>
+#include "DeviceManager.h"
 
-OutputChannelDlg::OutputChannelDlg(QWidget *parent)
-     : QDialog(parent)
+OutputChannelDlg::OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    QDialog(parent),
+    idx(idx),
+    proxy(proxy)
 {
   setupUi(this);
 }
@@ -43,7 +46,7 @@ void OutputChannelDlg::clearAll()
 }
 
 
-void OutputChannelDlg::init(DAQ *b)
+void OutputChannelDlg::init()
 {
   #define Y0 90
   #define DY 22
@@ -61,7 +64,7 @@ void OutputChannelDlg::init(DAQ *b)
   QLineEdit *letmp; 
   QString nm;
 
-  board = b;
+  DAQ *board = Devices.getDevice(ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), idx));
      
   clearAll();
   ChnNo= board->outChnNo;
@@ -148,7 +151,7 @@ OutputChannelDlg::~OutputChannelDlg()
 
 void OutputChannelDlg::exportData()
 {
-  DAQData *p = board->params();
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
     p->outChn[i].active= (act[i]->checkState() > 0);
     p->outChn[i].gain= rng[i]->currentIndex();
@@ -163,7 +166,7 @@ void OutputChannelDlg::exportData()
 
 void OutputChannelDlg::importData()
 {
-  DAQData *p = board->params();
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
     act[i]->setChecked(p->outChn[i].active);
     rng[i]->setCurrentIndex(p->outChn[i].gain);

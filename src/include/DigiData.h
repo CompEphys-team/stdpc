@@ -93,8 +93,7 @@ public:
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
 
-    inline QString daqClass() { return daqClassStatic(); }
-    inline static QString daqClassStatic() { return "DigiData1200"; }
+    inline QString daqClass() { return "DigiData1200"; }
     inline QString prettyName() { return "DigiData 1200(A)"; }
 
     DAQ *createDAQ(size_t devID);

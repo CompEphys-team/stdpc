@@ -2,8 +2,8 @@
 #include "Tools.cpp"
 #include "DigiData.h"
 
-DigiDataDlg::DigiDataDlg(size_t idx, QWidget *parent) :
-    DAQDlg(idx, Devices.getDevice(ChannelIndex(ChannelIndex::Analog, DigiDataProxy::daqClassStatic(), idx)), parent)
+DigiDataDlg::DigiDataDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    DAQDlg(idx, proxy, parent)
 {
     setupUi(this);
     connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));

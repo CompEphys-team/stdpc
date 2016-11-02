@@ -13,9 +13,8 @@
 static NIDAQProxy prox;
 std::vector<NIDAQData> NIDAQProxy::p;
 DAQProxy *NIDAQ::proxy() const { return &prox; }
-DAQProxy *NIDAQDlg::proxy() const { return &prox; }
 DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID); }
-DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, parent); }
+DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, &prox, parent); }
 
 NIDAQProxy::NIDAQProxy()
 {

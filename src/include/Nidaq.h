@@ -22,8 +22,7 @@ public:
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
 
-    inline QString daqClass() { return daqClassStatic(); }
-    inline static QString daqClassStatic() { return "NIDAQ"; }
+    inline QString daqClass() { return "NIDAQ"; }
     inline QString prettyName() { return "Nat'l Instruments"; }
 
     DAQ *createDAQ(size_t devID);

@@ -8,7 +8,7 @@
 class NIDAQDlg : public DAQDlg, private Ui::NIDAQDlg
 {
 public:
-     NIDAQDlg(size_t idx, QWidget *parent= 0);
+     NIDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
      void exportData(bool forceInit = false);
      void importData();
      void setIndex(size_t);
@@ -16,8 +16,6 @@ public:
 protected:
     void backup();
     void restoreBackup();
-
-    DAQProxy *proxy() const;
 
     NIDAQData bak;
     QString label;

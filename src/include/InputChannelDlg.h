@@ -16,15 +16,15 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      Q_OBJECT
 
   public:
-     InputChannelDlg(QWidget *parent= 0);
-     void init(DAQ *);
+     InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     void init();
      void importData();
      virtual ~InputChannelDlg();
+
+     inline void setIndex(size_t i) { idx = i; }
      
      int ChnNo;
      int lbNum;
-     DAQ *board;
-     ChannelIndex dex;
      
   protected:
      QVector<double> inLow;
@@ -40,6 +40,9 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      QVector<QPushButton *> calib;
 
      QVector<elecCalibParams> calibBackup;
+
+     size_t idx;
+     DAQProxy *proxy;
 
   public slots:
     void accept();

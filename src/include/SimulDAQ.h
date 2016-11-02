@@ -28,8 +28,7 @@ public:
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
 
-    inline QString daqClass() { return daqClassStatic(); }
-    inline static QString daqClassStatic() { return "SimulDAQ"; }
+    inline QString daqClass() { return "SimulDAQ"; }
 
     DAQ *createDAQ(size_t devID);
     DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr);

@@ -9,9 +9,8 @@
 static DigiDataProxy prox;
 std::vector<DigiDataData> DigiDataProxy::p;
 DAQProxy *DigiData::proxy() const { return &prox; }
-DAQProxy *DigiDataDlg::proxy() const { return &prox; }
 DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID); }
-DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, parent); }
+DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
 
 DigiDataProxy::DigiDataProxy()
 {

@@ -11,7 +11,7 @@ class DAQDlg : public QDialog
      Q_OBJECT
 
 public:
-     DAQDlg(size_t idx, DAQ *board, QWidget *parent = nullptr);
+     DAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent = nullptr);
 
      virtual void importData();
      virtual void exportData(bool forceInit = false);
@@ -35,6 +35,7 @@ protected slots:
 
 protected:
     size_t idx;
+    DAQProxy *proxy;
     InputChannelDlg *inDlg;
     OutputChannelDlg *outDlg;
     bool didInit;
@@ -43,8 +44,6 @@ protected:
     virtual void restoreBackup() = 0;
 
     void initDAQ();
-
-    virtual DAQProxy *proxy() const = 0;
 }; 
 
 #endif

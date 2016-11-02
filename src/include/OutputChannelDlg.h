@@ -13,15 +13,16 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      Q_OBJECT
 
   public:
-     OutputChannelDlg(QWidget *parent= 0);
-     void init(DAQ *);
+     OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     void init();
      void exportData();
      void importData();
      virtual ~OutputChannelDlg();
+
+     inline void setIndex(size_t i) { idx = i; }
      
      int ChnNo;
      int lbNum;
-     DAQ *board;
 
   protected:
      QVector<double> outLow;
@@ -32,6 +33,9 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      QVector<QLineEdit *> bias;
      QVector<QLabel *> allLabel;
      QVector<QCheckBox *> saveChnl;
+
+     size_t idx;
+     DAQProxy *proxy;
                
   public slots:
      void accept();
