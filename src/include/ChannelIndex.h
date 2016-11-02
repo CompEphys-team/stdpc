@@ -8,12 +8,17 @@
 // Forward
 struct inChnData;
 struct outChnData;
+class DAQProxy;
+class ModelProxy;
 
 class ChannelIndex
 {
 public:
-    enum ctorType { Prototype, Virtual, Analog, None, Invalid };
-    ChannelIndex(ctorType type = Invalid, QString typeClass = "", size_t modelID_or_deviceID=0, size_t instID_or_chanID=0, bool isInChn=true);
+    ChannelIndex();
+    ChannelIndex(DAQProxy *proxy, size_t devID=0, size_t chanID=0, bool isInChn=true);
+    ChannelIndex(ModelProxy *proxy, size_t modelID=0);
+    ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID);
+    static ChannelIndex None() { ChannelIndex i; i.isValid = true; i.isNone = true; return i; }
 
     ChannelIndex toInstance(size_t instID) const;
 

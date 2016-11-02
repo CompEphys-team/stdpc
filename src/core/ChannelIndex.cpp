@@ -5,19 +5,55 @@
 #include "ModelManager.h"
 #include "DeviceManager.h"
 
-ChannelIndex::ChannelIndex(ChannelIndex::ctorType type, QString typeClass, size_t first, size_t second, bool isInChn) :
-    isValid(type != Invalid),
-    isNone(type==None),
-    isPrototype(type==Prototype),
-    isVirtual(type==Virtual),
-    modelClass(typeClass),
-    modelID(first),
-    instID(second),
-    isAnalog(type==Analog),
-    daqClass(typeClass),
-    devID(first),
+ChannelIndex::ChannelIndex() :
+    isValid(false),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(false),
+    modelClass(""),
+    modelID(0),
+    instID(0),
+    isAnalog(false),
+    daqClass(""),
+    devID(0),
+    isInChn(true),
+    chanID(0)
+{
+
+}
+
+ChannelIndex::ChannelIndex(DAQProxy *proxy, size_t devID, size_t chanID, bool isInChn) :
+    isValid(proxy != nullptr),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(false),
+    isAnalog(proxy != nullptr),
+    daqClass(proxy->daqClass()),
+    devID(devID),
     isInChn(isInChn),
-    chanID(second)
+    chanID(chanID)
+{}
+
+ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
+    isValid(proxy != nullptr),
+    isNone(false),
+    isPrototype(true),
+    isVirtual(false),
+    modelClass(proxy->modelClass()),
+    modelID(modelID),
+    instID(0),
+    isAnalog(false)
+{}
+
+ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
+    isValid(proxy != nullptr),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(true),
+    modelClass(proxy->modelClass()),
+    modelID(modelID),
+    instID(instID),
+    isAnalog(false)
 {}
 
 ChannelIndex ChannelIndex::toInstance(size_t instID) const

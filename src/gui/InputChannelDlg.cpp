@@ -79,7 +79,7 @@ void InputChannelDlg::init()
   QLabel *lb;
   QString nm;
 
-  DAQ *board = Devices.getDevice(ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), idx));
+  DAQ *board = Devices.getDevice(ChannelIndex(proxy, idx));
 
   clearAll();
   ChnNo= board->inChnNo;
@@ -182,7 +182,7 @@ void InputChannelDlg::init()
     btntmp->setGeometry(QRect(X10, Y0+i*DY-1, 70, 20));
     btntmp->setObjectName(QString("Calibrate ")+nm);
     connect(btntmp, &QPushButton::clicked, [=](){
-        ChannelIndex dex(ChannelIndex::Analog, proxy->daqClass(), idx, i, true);
+        ChannelIndex dex(proxy, idx, i, true);
         ElectrodeCompDlg *calibDlg = new ElectrodeCompDlg(proxy->param(idx).inChn[i].calib, dex, this);
         connect(calibDlg, SIGNAL(message(QString)), this->parent(), SIGNAL(message(QString)));
         connect(&calibDlg->calibrator, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
@@ -221,7 +221,7 @@ void InputChannelDlg::exportData()
     p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
     p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
     p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
-    calib[i]->setEnabled(Devices.getDevice(ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), idx))->initialized
+    calib[i]->setEnabled(Devices.getDevice(ChannelIndex(proxy, idx))->initialized
                          && p->inChn[i].active && proxy->daqClass() != "SimulDAQ");
   }
 }

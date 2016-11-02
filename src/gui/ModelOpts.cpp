@@ -29,7 +29,7 @@ ModelOpts::~ModelOpts()
 void ModelOpts::removeDevice()
 {
     proxy->remove(idx);
-    emit removedModel(ChannelIndex(ChannelIndex::Prototype, proxy->modelClass(), idx));
+    emit removedModel(ChannelIndex(proxy, idx));
 }
 
 void ModelOpts::importData()

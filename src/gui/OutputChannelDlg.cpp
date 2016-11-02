@@ -64,7 +64,7 @@ void OutputChannelDlg::init()
   QLineEdit *letmp; 
   QString nm;
 
-  DAQ *board = Devices.getDevice(ChannelIndex(ChannelIndex::Analog, proxy->daqClass(), idx));
+  DAQ *board = Devices.getDevice(ChannelIndex(proxy, idx));
      
   clearAll();
   ChnNo= board->outChnNo;

@@ -227,7 +227,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
     DAQmxCreateTask ("", &inTask);
 
     DAQData *p = params();
-    ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, true);
+    ChannelIndex dex(&prox, devID, 0, true);
   
     for (int i= 0; i < chnNo; i++) {
       inIdx[i]= Chns[i];
@@ -294,7 +294,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     DAQmxCreateTask("", &outTask);
 
     DAQData *p = params();
-    ChannelIndex dex(ChannelIndex::Analog, proxy()->daqClass(), devID, 0, false);
+    ChannelIndex dex(&prox, devID, 0, false);
    
     for (int i= 0; i < chnNo; i++) {
       outIdx[i]= Chns[i];

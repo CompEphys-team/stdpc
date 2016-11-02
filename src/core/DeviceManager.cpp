@@ -56,7 +56,7 @@ void DeviceManager::remove(DAQProxy *proxy, size_t idx)
         proxy->remove(idx);
         for ( int i = idx; i < vec.size(); i++ )
             vec[i]->devID = i;
-        emit removedDevice(ChannelIndex(ChannelIndex::Analog, dc, idx));
+        emit removedDevice(ChannelIndex(proxy, idx));
     }
 }
 
