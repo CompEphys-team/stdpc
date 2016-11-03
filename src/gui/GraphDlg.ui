@@ -11,52 +11,17 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="5">
-    <widget class="WideComboBox" name="channel"/>
+   <item row="1" column="0" colspan="8">
+    <widget class="QCustomPlot" name="plot" native="true"/>
    </item>
-   <item row="0" column="5">
-    <widget class="QRadioButton" name="radioVoltage">
-     <property name="text">
-      <string>Voltage</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="6">
-    <widget class="QRadioButton" name="radioCurrent">
-     <property name="text">
-      <string>Current</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="7">
-    <widget class="QToolButton" name="colorBtn">
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 0, 0);
-color: rgb(170, 0, 0);</string>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="8">
-    <widget class="QPushButton" name="addBtn">
-     <property name="text">
-      <string>Add to graph</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Global sampling interval:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="0" column="1">
     <widget class="QDoubleSpinBox" name="samplingInterval">
      <property name="maximum">
       <double>1000.000000000000000</double>
@@ -66,21 +31,21 @@ color: rgb(170, 0, 0);</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
+   <item row="0" column="2">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>ms</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="3">
+   <item row="0" column="3">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Buffer size:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="4">
+   <item row="0" column="4">
     <widget class="QSpinBox" name="bufferExp">
      <property name="prefix">
       <string>10^</string>
@@ -93,29 +58,19 @@ color: rgb(170, 0, 0);</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
+   <item row="0" column="5">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Mean true sampling frequency (Hz):</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
+   <item row="0" column="6">
     <widget class="QLabel" name="cycleFreq">
      <property name="text">
       <string>0000</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="8">
-    <widget class="QPushButton" name="clearBtn">
-     <property name="text">
-      <string>Clear all</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="9">
-    <widget class="QCustomPlot" name="plot" native="true"/>
    </item>
    <item row="3" column="0" colspan="6">
     <widget class="QLabel" name="label_3">
@@ -130,14 +85,35 @@ color: rgb(170, 0, 0);</string>
      </property>
     </widget>
    </item>
+   <item row="2" column="0" colspan="8">
+    <widget class="QTableWidget" name="table">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="columnCount">
+      <number>4</number>
+     </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>WideComboBox</class>
-   <extends>QComboBox</extends>
-   <header>WideComboBox.h</header>
-  </customwidget>
   <customwidget>
    <class>QCustomPlot</class>
    <extends>QWidget</extends>

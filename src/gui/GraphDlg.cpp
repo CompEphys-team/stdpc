@@ -4,44 +4,25 @@
 #include "Global.h"
 #include "DCThread.h"
 
+
 GraphDlg::GraphDlg(QWidget *parent)
      : QWidget(parent),
        ui(new Ui::GraphDlg),
        clm(ChannelListModel::AnalogIn
          | ChannelListModel::AnalogOut
          | ChannelListModel::Virtual, this),
-       color("black"),
        dataTimer(this)
  {
     ui->setupUi(this);
 
-    ui->channel->setModel(&clm);
-
-    connect(ui->colorBtn, &QToolButton::clicked, [=](){
-        color = QColorDialog::getColor(color, this, "Choose a graph color");
-        ui->colorBtn->setStyleSheet(QString("background-color: rgb(%1,%2,%3);")
-                                    .arg(color.red()).arg(color.green()).arg(color.blue()));
-    });
-    ui->colorBtn->setStyleSheet(QString("background-color: black;"));
-
-    connect(ui->channel, SIGNAL(currentIndexChanged(int)), this, SLOT(channelIndexChanged()));
-    ui->channel->setCurrentIndex(0);
-
-    connect(ui->addBtn, &QPushButton::clicked, [=](){
-        if ( ui->channel->currentIndex() >= 0 ) {
-            GraphData p;
-            p.active = true;
-            p.chan = ui->channel->currentData().value<ChannelIndex>();
-            p.isVoltage = ui->radioVoltage->isChecked();
-            p.color = color;
-            Graphp.push_back(p);
-            reloadGraphs();
-        }
-    });
-    connect(ui->clearBtn, &QPushButton::clicked, [=](){
-        Graphp.clear();
-        reloadGraphs();
-    });
+    ui->table->setHorizontalHeaderLabels({"Active",
+                                          "Colour",
+                                          "Type",
+                                          "Channel"});
+    ui->table->setColumnWidth(0, 50);
+    ui->table->setColumnWidth(1, 60);
+    ui->table->setColumnWidth(2, 80);
+    growTable(false);
 
     ui->plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes);
 
@@ -58,15 +39,6 @@ GraphDlg::GraphDlg(QWidget *parent)
     ui->plot->yAxis2->setRange(-100, 100);
     ui->plot->yAxis2->setTickLabels(true);
 
-    ui->plot->legend->setVisible(true);
-    QCPLayoutGrid *subLayout = new QCPLayoutGrid;
-    ui->plot->plotLayout()->addElement(0, 1, subLayout);
-    subLayout->addElement(0, 0, new QCPLayoutElement);
-    subLayout->addElement(1, 0, ui->plot->legend);
-    subLayout->addElement(2, 0, new QCPLayoutElement);
-    subLayout->addElement(0, 1, new QCPLayoutElement);
-    ui->plot->plotLayout()->setColumnStretchFactor(1, 0.001);
-
     connect(ui->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->plot->xAxis2, SLOT(setRange(QCPRange)));
     connect(ui->plot, &QCustomPlot::selectionChangedByUser, [=](){
         QList<QCPAxis *> axes = ui->plot->selectedAxes();
@@ -80,8 +52,6 @@ GraphDlg::GraphDlg(QWidget *parent)
     ui->plot->axisRect()->setRangeDragAxes(ui->plot->axisRect()->axes());
 
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(replot()));
-
-    reloadGraphs();
 }
 
 void GraphDlg::link(QWidget *mainwin)
@@ -90,76 +60,105 @@ void GraphDlg::link(QWidget *mainwin)
     connect(mainwin, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
 }
 
-void GraphDlg::channelIndexChanged()
-{
-    ChannelIndex sel = ui->channel->currentData().value<ChannelIndex>();
-    ui->radioCurrent->setEnabled(sel.isVirtual && sel.modelClass != "SG");
-    ui->radioVoltage->setEnabled(sel.isVirtual && sel.modelClass != "SG");
-    if ( !sel.isVirtual ) {
-        ui->radioCurrent->setChecked(!sel.isInChn);
-        ui->radioVoltage->setChecked(sel.isInChn);
-    } else if ( sel.modelClass == "SG" ) {
-        ui->radioCurrent->setChecked(false);
-        ui->radioVoltage->setChecked(true);
-    }
-}
-
 GraphDlg::~GraphDlg()
 {
     dataTimer.stop();
     delete ui;
 }
 
+void GraphDlg::importData()
+{
+    ui->bufferExp->setValue(Plotp.bufferExp);
+    ui->samplingInterval->setValue(Plotp.interval * 1e3);
+
+    actives.clear();
+    colors.clear();
+    types.clear();
+    channels.clear();
+    ui->table->setRowCount(0);
+    int row = 0;
+    for ( GraphData const& p : Plotp.graphs ) {
+        QCheckBox *active = new QCheckBox();
+        ColorButton *colBtn = new ColorButton();
+        QComboBox *type = new QComboBox();
+        WideComboBox *channel = new WideComboBox();
+        addRow(row++, active, colBtn, type, channel);
+        active->setChecked(p.active);
+        colBtn->setColor(p.color);
+        type->setCurrentIndex(!p.isVoltage);
+        channel->setCurrentIndex(clm.index(p.chan));
+    }
+    growTable(false);
+}
+
+void GraphDlg::exportData()
+{
+    Plotp.bufferExp = ui->bufferExp->value();
+    Plotp.interval = ui->samplingInterval->value() * 1e-3;
+    Plotp.graphs.clear();
+    Plotp.graphs.reserve(ui->table->rowCount() - 1);
+    GraphData p;
+    for ( int i = 0; i < ui->table->rowCount() - 1; i++ ) {
+        p.active = actives[i]->isChecked();
+        p.color = colors[i]->color;
+        p.isVoltage = !types[i]->currentIndex();
+        p.chan = channels[i]->currentData().value<ChannelIndex>();
+        Plotp.graphs.push_back(p);
+    }
+}
+
 void GraphDlg::reloadGraphs()
 {
+    constexpr size_t bufferSize[] = {1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000};
     ui->plot->clearGraphs();
+    activeGraphs.clear();
+    activeGraphs.reserve(Plotp.graphs.size());
+    q.clear();
+    q.reserve(Plotp.graphs.size());
     QCPGraph *graph;
-    for ( GraphData const& p : Graphp ) {
-        if ( p.isVoltage ) {
-            graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis);
-            graph->setName(QString("%1 (mV)").arg(p.chan.prettyName()));
-        } else {
-            graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
-            graph->setName(QString("%1 (nA)").arg(p.chan.prettyName()));
+    for ( GraphData const& p : Plotp.graphs ) {
+        if ( p.active ) {
+            activeGraphs.push_back(p);
+            q.push_back(std::unique_ptr<CircularFifo<DataPoint>>(new CircularFifo<DataPoint>(bufferSize[Plotp.bufferExp])));
+            if ( p.isVoltage ) {
+                graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis);
+            } else {
+                graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
+            }
+            graph->setPen(QPen(p.color));
         }
-        graph->setPen(QPen(p.color));
     }
     ui->plot->replot();
 }
 
 bool GraphDlg::startPlotting(DCThread *DCT)
 {
-    if ( !isVisible() || Graphp.empty() ) {
-        for ( GraphData &p : Graphp )
-            p.active = false;
+    bool isPlotting = false;
+    if ( isVisible() && Plotp.graphs.size() ) {
+        for ( GraphData &p : Plotp.graphs ) {
+            if ( p.active ) {
+                isPlotting = true;
+                break;
+            }
+        }
+    }
+    if ( !isPlotting ) {
         DCT->setGraph();
         return false;
     }
 
-    ui->addBtn->setEnabled(false);
-    ui->clearBtn->setEnabled(false);
     ui->samplingInterval->setEnabled(false);
     ui->bufferExp->setEnabled(false);
 
     reloadGraphs();
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
-    q.clear();
 
-    constexpr size_t bufferSize[] = {1,10,100,1000,10000,100000,1000000,10000000,100000000,1000000000};
-
-    for ( GraphData &p : Graphp ) {
-        p.active = true;
-        q.push_back(std::unique_ptr<CircularFifo<DataPoint>>(new CircularFifo<DataPoint>(bufferSize[ui->bufferExp->value()])));
-    }
-
-    double samplingInterval = ui->samplingInterval->value();
-
-    DCT->setGraph(this, samplingInterval * 1e-3);
+    DCT->setGraph(this, Plotp.interval);
 
     initial = true;
     nPoints = 0;
 
-    if ( samplingInterval < 0.1 )
+    if ( Plotp.interval < 1e-4 )
         dataTimer.start(); // As fast as possible to prevent q overflows
     else
         dataTimer.start(20); // 50 Hz for slower sampling
@@ -170,8 +169,6 @@ bool GraphDlg::startPlotting(DCThread *DCT)
 void GraphDlg::stopPlotting()
 {
     dataTimer.stop();
-    ui->addBtn->setEnabled(true);
-    ui->clearBtn->setEnabled(true);
     ui->samplingInterval->setEnabled(true);
     ui->bufferExp->setEnabled(true);
 }
@@ -192,7 +189,7 @@ void GraphDlg::replot()
     double fac;
     double tNow = 0.;
     for ( auto &queue : q ) {
-        if ( Graphp[i].isVoltage )
+        if ( activeGraphs[i].isVoltage )
             fac = 1e3;
         else
             fac = 1e9;
@@ -226,4 +223,67 @@ void GraphDlg::replot()
     ui->plot->replot(QCustomPlot::rpQueuedReplot);
 
     ui->cycleFreq->setText(QString::number(nPoints / (tNow - t0)));
+}
+
+
+
+
+void GraphDlg::growTable(bool reactive)
+{
+    disconnect(activec);
+    disconnect(typec);
+    disconnect(channelc);
+
+    if ( reactive && !actives.empty() )
+        actives.last()->setChecked(true);
+
+    QCheckBox *active = new QCheckBox();
+    ColorButton *colBtn = new ColorButton();
+    QComboBox *type = new QComboBox();
+    WideComboBox *channel = new WideComboBox();
+
+    addRow(ui->table->rowCount(), active, colBtn, type, channel);
+
+    activec = connect(active, SIGNAL(stateChanged(int)), this, SLOT(growTable()));
+    typec = connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(growTable()));
+    channelc = connect(channel, SIGNAL(currentIndexChanged(int)), this, SLOT(growTable()));
+}
+
+void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel)
+{
+    ui->table->insertRow(row);
+
+    QWidget *widget = new QWidget();
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->addWidget(active);
+    layout->setAlignment(Qt::AlignCenter);
+    layout->setMargin(0);
+    widget->setLayout(layout);
+    ui->table->setCellWidget(row, 0, widget);
+
+    ui->table->setCellWidget(row, 1, colBtn);
+
+    type->addItem("Voltage");
+    type->addItem("Current");
+    ui->table->setCellWidget(row, 2, type);
+
+    channel->setModel(&clm);
+    connect(channel, static_cast<void (WideComboBox::*)(int)>(&WideComboBox::currentIndexChanged), [=](int){
+        ChannelIndex sel = channel->currentData().value<ChannelIndex>();
+        if ( sel.isVirtual && sel.modelClass != "SG" ) {
+            type->setEnabled(true);
+        } else if ( sel.isAnalog && !sel.isInChn ) {
+            type->setCurrentIndex(1);
+            type->setEnabled(false);
+        } else {
+            type->setCurrentIndex(0);
+            type->setEnabled(false);
+        }
+    });
+    ui->table->setCellWidget(row, 3, channel);
+
+    actives.insert(row, active);
+    colors.insert(row, colBtn);
+    types.insert(row, type);
+    channels.insert(row, channel);
 }

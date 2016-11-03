@@ -278,9 +278,16 @@ void initAP()
 
 
     // Graphs
-    addAP("Graphp[#].chan", &Graphp, &GraphData::chan);
-    addAP("Graphp[#].isVoltage", &Graphp, &GraphData::isVoltage);
-    addAP("Graphp[#].color", &Graphp, &GraphData::color);
+    addAP("Plotp.bufferExp", &Plotp, &PlotData::bufferExp);
+    addAP("Plotp.interval", &Plotp, &PlotData::interval);
+    addAP("Plotp.graphs[#].active", &Plotp, &PlotData::graphs, &GraphData::active);
+    AP *graphCol = addAP("Plotp.graphs[#].color", &Plotp, &PlotData::graphs, &GraphData::color);
+    AP *graphVol = addAP("Plotp.graphs[#].isVoltage", &Plotp, &PlotData::graphs, &GraphData::isVoltage);
+    AP *graphChn = addAP("Plotp.graphs[#].chan", &Plotp, &PlotData::graphs, &GraphData::chan);
+
+    addDeprecatedAP("Graphp[#].chan", graphChn);
+    addDeprecatedAP("Graphp[#].isVoltage", graphVol);
+    addDeprecatedAP("Graphp[#].color", graphCol);
 
 
     // Sample & hold

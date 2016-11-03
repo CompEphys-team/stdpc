@@ -233,6 +233,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->currentTable->exportData();
   ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
+  ui->graphtab->exportData();
 }
  
 void MyMainWindow::importData()
@@ -241,7 +242,7 @@ void MyMainWindow::importData()
   ui->synapseTable->importData();
   ui->currentTable->importData();
   DSDlg->importData();
-  ui->graphtab->reloadGraphs();
+  ui->graphtab->importData();
   updateStartButton();
 }
 
@@ -305,7 +306,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   abHHp.clear();
   Models.clear();
   Devices.clear();
-  Graphp.clear();
+  Plotp.graphs.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));

@@ -75,23 +75,24 @@ void DCThread::run()
    if ( graph ) {
        inChannel *itmp;
        outChannel *otmp;
-       i = 0;
-       graphVar.resize(Graphp.size());
-       for ( GraphData &p : Graphp ) {
-           if ( !p.active || !p.chan.isValid || p.chan.isNone ) {
-               graphVar[i] = &graphDummy;
+       graphVar.clear();
+       graphVar.reserve(Plotp.graphs.size());
+       for ( GraphData &p : Plotp.graphs ) {
+           if ( !p.active ) {
+               continue;
+           } else if ( !p.chan.isValid || p.chan.isNone ) {
+               graphVar.push_back(&graphDummy);
            } else if ( p.chan.isVirtual ) {
-               graphVar[i] = p.isVoltage
+               graphVar.push_back(p.isVoltage
                        ? &((itmp = getInChan(p.chan)) ? itmp->V : graphDummy)
-                       : &((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy);
+                       : &((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
            } else if ( p.chan.isInChn ) {
-               graphVar[i] =& ((itmp = getInChan(p.chan)) ? itmp->V : graphDummy);
+               graphVar.push_back(&((itmp = getInChan(p.chan)) ? itmp->V : graphDummy));
            } else {
-               graphVar[i] =& ((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy);
+               graphVar.push_back(&((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
            }
-           ++i;
        }
-       message(QString("Added %1 channels for display").arg(i));
+       message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
    bufferHelper.reset(new ChannelBufferHelper);

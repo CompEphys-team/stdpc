@@ -266,7 +266,14 @@ struct GraphData {
     bool isVoltage;
     QColor color;
 
-    GraphData() : active(false) {}
+    GraphData() : active(true) {}
+};
+
+struct PlotData {
+    double interval;
+    int bufferExp;
+    std::vector<GraphData> graphs;
+    PlotData() : interval(1e-3), bufferExp(4) {}
 };
 
 typedef struct {

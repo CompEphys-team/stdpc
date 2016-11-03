@@ -11,7 +11,7 @@
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
 #include "DCThread.h"
-#include "GraphDlg.h"
+#include "ChannelListModel.h"
 
 namespace Ui {
 class MainWindow;

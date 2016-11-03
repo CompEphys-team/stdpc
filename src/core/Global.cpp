@@ -13,7 +13,7 @@ std::vector<DestexheSynData> DxheSynp;
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
-std::vector<GraphData> Graphp;
+PlotData Plotp;
 
 dataSavingParams dataSavingPs;
 

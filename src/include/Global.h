@@ -31,7 +31,7 @@ extern std::vector<abHHData> abHHp;
 
 extern dataSavingParams dataSavingPs;
 
-extern std::vector<GraphData> Graphp;
+extern PlotData Plotp;
 
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;
