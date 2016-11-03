@@ -379,5 +379,5 @@ void MyMainWindow::UnLoadScript()
 
 void MyMainWindow::DisplayAbout()
 {
-    QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC 2016 RC2a."));
+    QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC 2016 RC2b."));
 }
