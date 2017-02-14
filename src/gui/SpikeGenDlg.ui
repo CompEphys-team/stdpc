@@ -592,7 +592,7 @@
    <item row="3" column="2" colspan="2">
     <widget class="QDoubleSpinBox" name="Period">
      <property name="maximum">
-      <double>600000.000000000000000</double>
+      <double>6000000.000000000000000</double>
      </property>
      <property name="singleStep">
       <double>100.000000000000000</double>

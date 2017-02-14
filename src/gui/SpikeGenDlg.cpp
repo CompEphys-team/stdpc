@@ -188,7 +188,7 @@ void SpikeGenDlg::growSTTable(int row, int col)
 QDoubleSpinBox *SpikeGenDlg::makeSTCell(int row, int col)
 {
     QDoubleSpinBox *cell = new QDoubleSpinBox();
-    cell->setRange(0., 100000.);
+    cell->setRange(0., 6000000.);
     cell->setSingleStep(10.);
     connect(cell, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double){
         growSTTable(row, col);
