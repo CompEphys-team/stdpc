@@ -65,6 +65,7 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
         }
         std::vector<std::vector<double>> tmp;
         this->exportST(tmp);
+        this->importST(tmp); // Reflect potential changes (sorting, dropped values) in GUI
         for ( int row = 0; row < (int)tmp.size(); row++ ) {
             os << tmp[row].size() << " ";
             for ( int col = 0; col < (int)tmp[row].size(); col++ ) {
