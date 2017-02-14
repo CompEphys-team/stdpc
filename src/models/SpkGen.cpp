@@ -109,35 +109,13 @@ void SpkGen::update(double t, double dt)
         if (burstDetected) { // burst (first crossing) was detected, waiting for opposite crossing
             if (((p->bdType == 1) && (bdChn->V > instp->bdThresh)) ||
                 ((p->bdType == 2) && (bdChn->V < instp->bdThresh))) {
-                tUnderThresh += dt;     // "under" and "over" only phrases for first and second cond.
-                if (tUnderThresh > p->bdtUnder) {
+                tOverThresh += dt;     // "under" and "over" only phrases for first and second cond. -- Note, this was reversed before v2017!
+                if (tOverThresh > p->bdtOver) {
                     SGactive = true;
-                    tOverThresh = 0.;
+                    tUnderThresh = 0.;
                     burstDetected = false;
                     ISI_time = 0.0;
                     period = p->SpikeT[burstNo].back() + (20.0/p->spkTimeScaling);
-                }
-            } else if ( p->bdtUnderCont ) {
-                if ( !onThreshold &&
-                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
-                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
-                    onThreshold = true;
-                } else {
-                    onThreshold = false;
-                    tUnderThresh = 0.;
-                    if ( p->bdStrictlyCont ) {
-                        tOverThresh = 0.;
-                        burstDetected = false;
-                    }
-                }
-            }
-        } else {  // burst (first crossing) not yet detected ...
-            if (((p->bdType == 1) && (bdChn->V < instp->bdThresh)) ||
-                ((p->bdType == 2) && (bdChn->V > instp->bdThresh))) {
-                tOverThresh += dt;
-                if (tOverThresh > p->bdtOver) {
-                    tUnderThresh = 0.;
-                    burstDetected = true;
                 }
             } else if ( p->bdtOverCont ) {
                 if ( !onThreshold &&
@@ -147,6 +125,28 @@ void SpkGen::update(double t, double dt)
                 } else {
                     onThreshold = false;
                     tOverThresh = 0.;
+                    if ( p->bdStrictlyCont ) {
+                        tUnderThresh = 0.;
+                        burstDetected = false;
+                    }
+                }
+            }
+        } else {  // burst (first crossing) not yet detected ...
+            if (((p->bdType == 1) && (bdChn->V < instp->bdThresh)) ||
+                ((p->bdType == 2) && (bdChn->V > instp->bdThresh))) {
+                tUnderThresh += dt;
+                if (tUnderThresh > p->bdtUnder) {
+                    tOverThresh = 0.;
+                    burstDetected = true;
+                }
+            } else if ( p->bdtUnderCont ) {
+                if ( !onThreshold &&
+                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
+                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
+                    onThreshold = true;
+                } else {
+                    onThreshold = false;
+                    tUnderThresh = 0.;
                 }
             }
         }
