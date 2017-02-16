@@ -12,7 +12,7 @@ class abHH
     abHHData *p;
     inChannel *pre;
     outChannel *out;
-    CurrentAssignment a;
+    CurrentAssignment *a;
     stdpc::function *theExp;
     stdpc::function *theExpSigmoid;
     stdpc::function *theTanh;
@@ -24,7 +24,7 @@ class abHH
     double km[4], kh[4], mi, hi;
     
   public:
-    abHH(abHHData *p, DCThread *t, CurrentAssignment a);
+    abHH(abHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out);
     void currentUpdate(double, double);
     double mhFunc(double, int);
     void RK4(double t, double dt, size_t n);

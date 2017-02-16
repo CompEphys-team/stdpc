@@ -1,7 +1,7 @@
 #include "HH.h"
 #include "DCThread.h"
 
-HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment a) :
+HH::HH(mhHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out) :
     p(inp),
     m(0.0),
     h(0.9),
@@ -9,8 +9,8 @@ HH::HH(mhHHData *inp, DCThread *t, CurrentAssignment a) :
     taum(p->taum),
     hinf(0.9),
     tauh(p->tauh),
-    pre(t->getInChan(a.VChannel)),
-    out(t->getOutChan(a.IChannel)),
+    pre(pre),
+    out(out),
     a(a)
 {
     if (p->LUTables) {
@@ -37,7 +37,7 @@ void HH::currentUpdate(double, double dt)
   static double V, tmp;
   static int i;
     
-  if (p->active && *a.actP && pre->active && out->active) {
+  if (p->active && a->active && pre->active && out->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // linear Euler:
@@ -95,7 +95,7 @@ void HH::RK4(double, double dt, size_t n)
     static double V, tmp;
     static int i;
 
-    if (p->active && *a.actP && pre->active && out->active) {
+    if (p->active && a->active && pre->active && out->active) {
       V= pre->V;
       if (p->mExpo > 0) {
           minf = (1.0-p->Cm)*(*theExpSigmoid)((V-p->Vm)/p->sm)+p->Cm;

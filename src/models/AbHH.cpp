@@ -1,10 +1,10 @@
 #include "AbHH.h"
 #include "DCThread.h"
 
-abHH::abHH(abHHData *inp, DCThread *t, CurrentAssignment a) :
+abHH::abHH(abHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out) :
     p(inp),
-    pre(t->getInChan(a.VChannel)),
-    out(t->getOutChan(a.IChannel)),
+    pre(pre),
+    out(out),
     a(a),
     m(0.0),
     h(1.0),
@@ -54,7 +54,7 @@ void abHH::currentUpdate(double t, double dt)
   static double V;
   static int i;
   
-  if (p->active && *a.actP && pre->active && out->active) {
+  if (p->active && a->active && pre->active && out->active) {
     V= pre->V;
     if (p->mExpo > 0) {
       // Linear Euler:
@@ -86,7 +86,7 @@ void abHH::RK4(double, double dt, size_t n)
     static double V;
     static int i;
 
-    if (p->active && *a.actP && pre->active && out->active) {
+    if (p->active && a->active && pre->active && out->active) {
       V = pre->V;
       if (p->mExpo > 0) {
           /// Calculate km[n]=dm/dt based on the previous intermediates (Vi, mi)

@@ -535,21 +535,23 @@ template <class T>
 void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &inModel,
                            typename T::param_type &p, CurrentAssignment &a)
 {
-    CurrentAssignment tmp;
-    tmp.actP = &a.active;
     if ( a.VChannel == a.IChannel ) {
         // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
         for ( ChannelIndex VIChan : getChanIndices(a.VChannel) ) {
-            tmp.VChannel = VIChan;
-            tmp.IChannel = VIChan;
-            inModel.push_back(T(&p, this, tmp));
+            inChannel *inC = getInChan(VIChan);
+            outChannel *outC = getOutChan(VIChan);
+            if ( inC && outC ) {
+                inModel.push_back(T(&p, &a, inC, outC));
+            }
         }
     } else { // NOTE: These channels are assumed to be analog only, although technically, a/d combos are permitted
         for ( ChannelIndex VChan : getChanIndices(a.VChannel) ) {
-            tmp.VChannel = VChan;
             for ( ChannelIndex IChan : getChanIndices(a.IChannel) ) {
-                tmp.IChannel = IChan;
-                preModel.push_back(T(&p, this, tmp));
+                inChannel *inC = getInChan(VChan);
+                outChannel *outC = getOutChan(IChan);
+                if ( inC && outC ) {
+                    preModel.push_back(T(&p, &a, inC, outC));
+                }
             }
         }
     }

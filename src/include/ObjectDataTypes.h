@@ -28,7 +28,6 @@ struct GapJunctionAssignment {
 
 struct CurrentAssignment {
     bool active;
-    bool *actP;
     ChannelIndex VChannel;
     ChannelIndex IChannel;
 };

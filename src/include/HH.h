@@ -22,10 +22,10 @@ class HH
     double I;
     inChannel *pre;
     outChannel *out;
-    CurrentAssignment a;
+    CurrentAssignment *a;
     
   public:
-    HH(mhHHData *p, DCThread *t, CurrentAssignment a);
+    HH(mhHHData *p, CurrentAssignment *a, inChannel *pre, outChannel *out);
     void currentUpdate(double, double);
     void RK4(double, double, size_t);
 
