@@ -599,40 +599,51 @@ void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
 template <typename T>
 void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJunctionAssignment &a)
 {
-    std::vector<GapJunctionAssignment> vec;
-    GapJunctionAssignment tmp;
-    tmp.actP = &a.active;
+    struct postChanPointers {
+        inChannel *inC;
+        outChannel *outC;
+    };
+    std::vector<postChanPointers> postChans;
+
     if ( a.postInChannel == a.postOutChannel ) {
         for ( ChannelIndex post : getChanIndices(a.postInChannel) ) {
-            tmp.postInChannel = post;
-            tmp.postOutChannel = post;
-            vec.push_back(tmp);
+            inChannel *inC = getInChan(post);
+            outChannel *outC = getOutChan(post);
+            if ( inC && outC ) {
+                postChans.push_back({inC, outC});
+            }
         }
     } else {
         for ( ChannelIndex in : getChanIndices(a.postInChannel) ) {
-            tmp.postInChannel = in;
             for ( ChannelIndex out : getChanIndices(a.postOutChannel) ) {
-                tmp.postOutChannel = out;
-                vec.push_back(tmp);
+                inChannel *inC = getInChan(in);
+                outChannel *outC = getOutChan(out);
+                if ( inC && outC ) {
+                    postChans.push_back({inC, outC});
+                }
             }
         }
     }
 
     if ( a.preInChannel == a.preOutChannel ) {
         for ( ChannelIndex pre : getChanIndices(a.preInChannel) ) {
-            for ( GapJunctionAssignment &tmp : vec ) {
-                tmp.preInChannel = pre;
-                tmp.preOutChannel = pre;
-                inst.push_back(T(&p, this, tmp));
+            inChannel *inC = getInChan(pre);
+            outChannel *outC = getOutChan(pre);
+            if ( inC && outC ) {
+                for ( postChanPointers &post : postChans ) {
+                    inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
+                }
             }
         }
     } else {
         for ( ChannelIndex in : getChanIndices(a.preInChannel) ) {
             for ( ChannelIndex out : getChanIndices(a.preOutChannel) ) {
-                for ( GapJunctionAssignment &tmp : vec ) {
-                    tmp.preInChannel = in;
-                    tmp.preOutChannel = out;
-                    inst.push_back(T(&p, this, tmp));
+                inChannel *inC = getInChan(in);
+                outChannel *outC = getOutChan(out);
+                if ( inC && outC ) {
+                    for ( postChanPointers &post : postChans ) {
+                        inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
+                    }
                 }
             }
         }

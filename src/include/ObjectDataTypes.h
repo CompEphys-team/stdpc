@@ -19,7 +19,6 @@ struct SynapseAssignment {
 
 struct GapJunctionAssignment {
     bool active;
-    bool *actP;
     ChannelIndex preInChannel;
     ChannelIndex postInChannel;
     ChannelIndex preOutChannel;

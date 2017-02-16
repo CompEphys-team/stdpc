@@ -14,10 +14,10 @@ class GapJunction {
     inChannel *post;
     outChannel *outpre;
     outChannel *outpost;
-    GapJunctionAssignment a;
+    GapJunctionAssignment *a;
         
   public:
-    GapJunction(GJunctData *, DCThread *, GapJunctionAssignment);
+    GapJunction(GJunctData *, GapJunctionAssignment *, inChannel *pre, outChannel *outpre, inChannel *post, outChannel *outpost);
     void currentUpdate(double, double);
 
     typedef GJunctData param_type;
