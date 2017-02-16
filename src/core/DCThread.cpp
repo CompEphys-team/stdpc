@@ -571,7 +571,7 @@ void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
         for ( ChannelIndex post : postSynInst ) {
             for ( ChannelIndex pre : preSynInst ) {
                 if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) ) {
-                    T tmp(&p, this, a, preC, postC, outC);
+                    T tmp(&p, this, &a, preC, postC, outC);
                     if ( pre.isVirtual && post.isAnalog )
                         postModel.push_back(tmp);
                     else
@@ -584,7 +584,7 @@ void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
             for ( ChannelIndex out : outSynInst ) {
                 for ( ChannelIndex pre : preSynInst ) {
                     if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) ) {
-                        T tmp(&p, this, a, preC, postC, outC);
+                        T tmp(&p, this, &a, preC, postC, outC);
                         if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
                             postModel.push_back(tmp);
                         else

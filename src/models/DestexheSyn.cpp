@@ -3,7 +3,7 @@
 #include <cmath>
 #include "DCThread.h"
     
-DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment &a, inChannel *pre, inChannel *post, outChannel *out) :
+DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
     p(inp),
     pre(pre),
     post(post),
@@ -36,8 +36,8 @@ DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment &a
         Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
     }
 
-    if ( a.delay > 0. ) {
-        bufferHandle = pre->getBufferHandle(a.delay, t->bufferHelper);
+    if ( a->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
         buffered = true;
     }
 }
@@ -76,7 +76,7 @@ void DestexheSyn::currentUpdate(double t, double dt)
 {
   static double rt, dS;
 
-  if ( !p->active || !a.active || !pre->active || !post->active || !out->active || t < a.delay )
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
       return;
   
   // calculate synaptic current
