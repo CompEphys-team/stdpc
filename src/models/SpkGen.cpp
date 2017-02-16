@@ -158,7 +158,8 @@ void SpkGen::update(double t, double dt)
         // in account all the spikes (superimposing) the voltage due to each spike
         V = 0.0;
         for ( double const& tSpike : p->SpikeT[burstNo] )
-            V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
+            if ( tSpike > 0 )
+                V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
         V *= p->VSpike;
         V += p->VRest;
 
