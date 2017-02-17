@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Global sampling interval:</string>
+      <string>Sampling interval:</string>
      </property>
     </widget>
    </item>
@@ -61,7 +61,7 @@
    <item row="0" column="5">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>Mean true sampling frequency (Hz):</string>
+      <string>Mean sampling frequency (Hz):</string>
      </property>
     </widget>
    </item>
