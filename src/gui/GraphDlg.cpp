@@ -86,10 +86,10 @@ void GraphDlg::importData()
         QComboBox *type = new QComboBox();
         WideComboBox *channel = new WideComboBox();
         addRow(row++, active, colBtn, type, channel);
-        active->setChecked(p.active);
         colBtn->setColor(p.color);
         type->setCurrentIndex(!p.isVoltage);
         channel->setCurrentIndex(clm.index(p.chan));
+        active->setChecked(p.active);
     }
     growTable(false);
 }
@@ -178,6 +178,8 @@ void GraphDlg::setInteractive(bool maybe)
 {
     ui->samplingInterval->setEnabled(maybe);
     ui->bufferExp->setEnabled(maybe);
+    ui->TraceClear->setEnabled(maybe);
+    ui->TraceReset->setEnabled(maybe);
     for ( int i = 0; i < actives.size(); i++ ) {
         if ( maybe || !actives[i]->isChecked() )
             actives[i]->setEnabled(maybe);
@@ -311,4 +313,28 @@ void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox
     colors.insert(row, colBtn);
     types.insert(row, type);
     channels.insert(row, channel);
+}
+
+void GraphDlg::on_TraceActivate_clicked()
+{
+    for ( int i = 0; i < actives.size() - 1; i++ )
+        actives[i]->setChecked(true);
+}
+
+void GraphDlg::on_TraceDeactivate_clicked()
+{
+    for ( int i = 0; i < actives.size() - 1; i++ )
+        actives[i]->setChecked(false);
+}
+
+void GraphDlg::on_TraceClear_clicked()
+{
+    for ( int i = ui->table->rowCount() - 2; i >= 0; i-- )
+        if ( !actives[i]->isChecked() )
+            ui->table->removeRow(i);
+}
+
+void GraphDlg::on_TraceReset_clicked()
+{
+    importData();
 }

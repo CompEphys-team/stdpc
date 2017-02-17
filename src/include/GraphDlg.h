@@ -69,6 +69,11 @@ private slots:
     void replot();
     void growTable(bool reactive = true);
 
+    void on_TraceActivate_clicked();
+    void on_TraceDeactivate_clicked();
+    void on_TraceClear_clicked();
+    void on_TraceReset_clicked();
+
 public:
      GraphDlg(QWidget *parent = 0);
      void link(QWidget *mainwin);

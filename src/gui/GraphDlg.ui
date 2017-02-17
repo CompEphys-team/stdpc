@@ -11,9 +11,6 @@
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0" colspan="8">
-    <widget class="QCustomPlot" name="plot" native="true"/>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
@@ -75,20 +72,10 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="6">
-    <widget class="QLabel" name="label_3">
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>20</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Plotting with QCustomPlot, licensed under GPLv3. More info: http://www.qcustomplot.com/</string>
-     </property>
-    </widget>
+   <item row="1" column="0" colspan="8">
+    <widget class="QCustomPlot" name="plot" native="true"/>
    </item>
-   <item row="2" column="0" colspan="8">
+   <item row="2" column="0" rowspan="4" colspan="7">
     <widget class="QTableWidget" name="table">
      <property name="maximumSize">
       <size>
@@ -112,6 +99,47 @@
      <column/>
      <column/>
      <column/>
+    </widget>
+   </item>
+   <item row="2" column="7">
+    <widget class="QPushButton" name="TraceActivate">
+     <property name="text">
+      <string>Activate all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="7">
+    <widget class="QPushButton" name="TraceDeactivate">
+     <property name="text">
+      <string>Deactivate all</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="7">
+    <widget class="QPushButton" name="TraceClear">
+     <property name="text">
+      <string>Clear inactive</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="7">
+    <widget class="QPushButton" name="TraceReset">
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="5">
+    <widget class="QLabel" name="label_3">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Plotting with QCustomPlot, licensed under GPLv3. More info: http://www.qcustomplot.com/</string>
+     </property>
     </widget>
    </item>
   </layout>
