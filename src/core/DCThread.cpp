@@ -398,6 +398,12 @@ void DCThread::run()
          for ( DestexheSyn &obj : dsynPost )
              obj.currentUpdate(t, dt);
 
+         // copy AEC compensated input values to output channels if desired
+         for ( int k=0; k<aecChannels.size(); k++ ){
+             if ( aecCopy[k])
+                 aecCopy[k]->I= aecIn[k]->V;
+         }
+
          //--------------- Data saving ------------------------//
          if ( saving && dataSavingPs.enabled ) {
            if ( t >= lastSave + savingPeriod )
@@ -455,12 +461,6 @@ void DCThread::run()
          }
 
      // --- Calculate end --- //
-
-     // copy AEC compensated input values to output channels if desired
-     for ( int k=0; k<aecChannels.size(); k++ ){
-         if ( aecCopy[k])
-             aecCopy[k]->I= aecIn[k]->V;
-     }
 
      // --- Write --- //
      for ( auto &b : Devices.active() )
