@@ -28,7 +28,10 @@ ElectrodeCompDlg::ElectrodeCompDlg(elecCalibParams &p, ChannelIndex dex, QWidget
     ui->leGenOutChannelNum_1->setModel(&outChnModel);
     ui->leGenCopyChannelNum_1->setModel(&outChnModel);
 
-    importData();
+    if ( p.samplingRate == 0 ) // Use unset samplingRate as proxy for uninitialised p => export defaults
+        exportData();
+    else
+        importData();
     ui->label_inChn->setText(dex.prettyName());
 
     connect(ui->elecMeasButton_1, SIGNAL(released()), this, SLOT(MeasureElectrode()));
