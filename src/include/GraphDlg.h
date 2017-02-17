@@ -63,6 +63,8 @@ private:
 
     void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel);
 
+    void setInteractive(bool maybe);
+
 private slots:
     void replot();
     void growTable(bool reactive = true);

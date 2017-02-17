@@ -150,8 +150,7 @@ bool GraphDlg::startPlotting(DCThread *DCT)
         return false;
     }
 
-    ui->samplingInterval->setEnabled(false);
-    ui->bufferExp->setEnabled(false);
+    setInteractive(false);
 
     reloadGraphs();
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
@@ -172,8 +171,20 @@ bool GraphDlg::startPlotting(DCThread *DCT)
 void GraphDlg::stopPlotting()
 {
     dataTimer.stop();
-    ui->samplingInterval->setEnabled(true);
-    ui->bufferExp->setEnabled(true);
+    setInteractive(true);
+}
+
+void GraphDlg::setInteractive(bool maybe)
+{
+    ui->samplingInterval->setEnabled(maybe);
+    ui->bufferExp->setEnabled(maybe);
+    for ( int i = 0; i < actives.size(); i++ ) {
+        if ( maybe || !actives[i]->isChecked() )
+            actives[i]->setEnabled(maybe);
+        colors[i]->setEnabled(maybe);
+        types[i]->setEnabled(maybe);
+        channels[i]->setEnabled(maybe);
+    }
 }
 
 void GraphDlg::replot()
