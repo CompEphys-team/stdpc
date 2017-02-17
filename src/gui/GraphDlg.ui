@@ -50,6 +50,9 @@
      <property name="prefix">
       <string>10^</string>
      </property>
+     <property name="minimum">
+      <number>2</number>
+     </property>
      <property name="maximum">
       <number>9</number>
      </property>
