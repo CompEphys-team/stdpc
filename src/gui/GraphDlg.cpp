@@ -134,7 +134,7 @@ void GraphDlg::reloadGraphs()
 bool GraphDlg::startPlotting(DCThread *DCT)
 {
     bool isPlotting = false;
-    if ( isVisible() && Plotp.graphs.size() ) {
+    if ( Plotp.graphs.size() ) {
         for ( GraphData &p : Plotp.graphs ) {
             if ( p.active ) {
                 isPlotting = true;
