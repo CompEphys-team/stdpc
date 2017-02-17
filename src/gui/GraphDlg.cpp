@@ -40,6 +40,9 @@ GraphDlg::GraphDlg(QWidget *parent)
     ui->plot->yAxis2->setTickLabels(true);
 
     connect(ui->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->plot->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->plot->xAxis2, SIGNAL(rangeChanged(QCPRange)), ui->plot->xAxis, SLOT(setRange(QCPRange)));
+    ui->plot->xAxis2->setTicker(timeTicker);
+
     connect(ui->plot, &QCustomPlot::selectionChangedByUser, [=](){
         QList<QCPAxis *> axes = ui->plot->selectedAxes();
         if ( axes.isEmpty() )
