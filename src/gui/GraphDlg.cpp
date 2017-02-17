@@ -256,6 +256,17 @@ void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox
 {
     ui->table->insertRow(row);
 
+    connect(active, QCheckBox::stateChanged, [=](int state){
+        ChannelIndex chan = channel->currentData().value<ChannelIndex>();
+        bool isVoltage = !type->currentIndex();
+        for ( size_t i = 0; i < activeGraphs.size(); i++ ) {
+            if ( activeGraphs[i].chan == chan && activeGraphs[i].isVoltage == isVoltage ) {
+                ui->plot->graph(i)->setVisible(state);
+                ui->plot->replot(QCustomPlot::rpQueuedReplot);
+                break;
+            }
+        }
+    });
     QWidget *widget = new QWidget();
     QHBoxLayout *layout = new QHBoxLayout(widget);
     layout->addWidget(active);
