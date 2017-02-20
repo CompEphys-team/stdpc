@@ -205,7 +205,7 @@ void MyMainWindow::StartButClicked()
   if ( !ui->graphtab->startPlotting(DCT) )
       ui->tabWidget->setTabEnabled(1, false);
   rateIndicator->setText("Started");
-  DCT->start();
+  DCT->setup_and_go();
 }
 
 void MyMainWindow::StopButClicked()

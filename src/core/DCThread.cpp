@@ -37,27 +37,9 @@ void DCThread::setGraph(GraphDlg *g, double dt)
     }
 }
 
-void DCThread::run()
+void DCThread::setup_and_go()
 {
-   double savingPeriod= 1.0;
-   int rateCounter = 0;
-   double lastRateReport = 0.;
-   static int i;
-   static double evt;
-   bool SampleHoldOn= false;
-   inChannel *SampleHoldChan;
-   DAQ *SampleHoldBoard;
-
-   // RK4 step size adaptation variables:
-   constexpr int tDepth = 100;
-   int tDepthUsed = -1;
-   double tFull[tDepth] = {}, tComp[tDepth] = {};
-   double sumTFull = 0., sumTComp = 0.;
-   int tFullOff = 0, tCompOff = 0;
-   double meanTComp, meanDT;
-   double subDT, subT, tLoop;
-   int nSubsteps;
-
+   // Initialise devices
    for ( auto &b : Devices.active() )
        b->init_chans();
 
@@ -67,11 +49,8 @@ void DCThread::run()
            Models.initSingle(proxy, j);
    Models.initActive(this);
 
-   SampleHoldChan = getInChan(SampleHoldp.trigChn);
-   SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
-
    // set up the graphic display channels
-   double graphDummy = 0.0;
+   graphDummy = 0.0;
    if ( graph ) {
        inChannel *itmp;
        outChannel *otmp;
@@ -95,8 +74,10 @@ void DCThread::run()
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
+   // Prepare the buffer helper for delayed synapses
    bufferHelper.reset(new ChannelBufferHelper);
 
+   // Populate synapses and currents
    csynPre.clear();
    csynPost.clear();
    for ( CSynData &p : CSynp ) {
@@ -166,6 +147,7 @@ void DCThread::run()
    for ( auto const& m : Models.active() )
        message(m->getStatus());
 
+   // Generate lookup tables
    int sz;
    sz= tanhLU.generate();
    if (sz > 0) message(QString("Tanh lookup table (re)generated"));
@@ -174,8 +156,11 @@ void DCThread::run()
    sz= expSigmoidLU.generate();
    if (sz > 0) message(QString("Exponential sigmoid lookup table (re)generated"));
 
-   // Checking validity of AEC channels
-   QVector<AECChannel*> aecChannels;
+   // Set up AEC channels
+   aecChannels.clear();
+   aecIn.clear();
+   aecOut.clear();
+   aecCopy.clear();
    for ( auto &b : Devices.active() ) {
        for ( AECChannel *aec : b->aecChans() ) {
            DAQ *outB = Devices.getDevice(aec->outChnNum);
@@ -187,21 +172,18 @@ void DCThread::run()
                message(QString("AEC channel is active on input channel %1 and output channel %2")
                        .arg(aec->inChnNum.prettyName(), aec->outChnNum.prettyName()));
                aecChannels.push_back(aec);
+               aecIn.push_back(getInChan(aec->inChnNum));
+               aecOut.push_back(getOutChan(aec->outChnNum));
+               if ( aecIn.back()->p->calib.copyChnOn )
+                   aecCopy.push_back(getOutChan(aecIn.back()->p->calib.copyChn));
+               else
+                   aecCopy.push_back(nullptr);
            }
        }
    }
-   QVector<inChannel*> aecIn(aecChannels.size(), nullptr);
-   QVector<outChannel*> aecOut(aecChannels.size(), nullptr);
-   QVector<outChannel*> aecCopy(aecChannels.size(), nullptr);
-   for ( AECChannel *aec : aecChannels ) {
-       aecIn[i] = getInChan(aec->inChnNum);
-       aecOut[i] = getOutChan(aec->outChnNum);
-       if ( aecIn[i]->p->calib.copyChnOn )
-          aecCopy[i] = getOutChan(aecIn[i]->p->calib.copyChn);
-   }
 
    // Init data saving
-   bool saving = false;
+   saving = false;
    if ( dataSavingPs.enabled ) {
        saving = dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
        if ( !saving )
@@ -244,6 +226,33 @@ void DCThread::run()
        data.clear();
        data.resize(header.size());
    }
+
+   start();
+}
+
+void DCThread::run()
+{
+   double savingPeriod= 1.0;
+   int rateCounter = 0;
+   double lastRateReport = 0.;
+   static int i;
+   static double evt;
+   bool SampleHoldOn= false;
+   inChannel *SampleHoldChan;
+   DAQ *SampleHoldBoard;
+
+   // RK4 step size adaptation variables:
+   constexpr int tDepth = 100;
+   int tDepthUsed = -1;
+   double tFull[tDepth] = {}, tComp[tDepth] = {};
+   double sumTFull = 0., sumTComp = 0.;
+   int tFullOff = 0, tCompOff = 0;
+   double meanTComp, meanDT;
+   double subDT, subT, tLoop;
+   int nSubsteps;
+
+   SampleHoldChan = getInChan(SampleHoldp.trigChn);
+   SampleHoldBoard = Devices.getDevice(SampleHoldp.trigChn);
 
    bool limitWarningEmitted = false;
    bool processAnalogs = false;

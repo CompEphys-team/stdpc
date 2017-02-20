@@ -36,6 +36,8 @@ private:
 
      void setGraph(GraphDlg * = nullptr, double dt = 0.0);
 
+     void setup_and_go();
+
      inChannel *getInChan(ChannelIndex const& dex);
      outChannel *getOutChan(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
@@ -73,16 +75,24 @@ private:
      outChannel outChnNone;
 
      std::shared_ptr<ChannelBufferHelper> bufferHelper;
-     
- private:
+
+private:
      bool initial;   
      double t;
      double dt;
+
+     bool saving;
+     double savingPeriod;
      double lastWrite;
+
+     QVector<AECChannel*> aecChannels;
+     QVector<inChannel*> aecIn;
+     QVector<outChannel*> aecOut, aecCopy;
 
      GraphDlg *graph;
      QVector<double *> graphVar;
      double graphDt;
+     double graphDummy;
 
      QList<QPair<double, std::function<void()>>> scriptq;
      QList<QPair<double, std::function<void()>>>::iterator scrIter;
