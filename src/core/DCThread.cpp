@@ -17,6 +17,8 @@ DCThread::DCThread() :
   scripting= false;
 
   dataSaver = new DataSaver();
+  connect(this, SIGNAL(saveData()), dataSaver, SLOT(SaveLine()), Qt::QueuedConnection);
+  connect(this, SIGNAL(done()), dataSaver, SLOT(EndDataSaving()), Qt::QueuedConnection);
 
   outNoneData.active = true;
   outNoneData.gain = 0;
@@ -222,10 +224,7 @@ void DCThread::setup_and_go()
            header.append(QString("VAEC_%1").arg(aec->inChnNum.toString('_')));
        }
 #endif
-       dataSaver->SaveHeader(header);
-
-       data.clear();
-       data.resize(header.size());
+       dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
    }
 
    start();
@@ -418,17 +417,17 @@ void DCThread::run()
            if ( t >= lastSave + savingPeriod )
            {
               i = 0;
-              data[i++] = t;
+              dataSaver->q[i++]->push(t);
               for ( inChannel *in : inChnsToSave )
-                  data[i++] = in->V;
+                  dataSaver->q[i++]->push(in->V);
               for ( outChannel *out : outChnsToSave )
-                  data[i++] = out->I;
+                  dataSaver->q[i++]->push(out->I);
             #ifdef TEST_VERSION
               for ( AECChannel *aec : aecChannels )
-                  data[i++] = aec->v_e;
+                  dataSaver->q[i++]->push(aec->v_e);
             #endif
 
-              dataSaver->SaveLine(data);
+              emit saveData();
               lastSave = t;
            }
          }

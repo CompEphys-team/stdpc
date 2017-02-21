@@ -1,24 +1,31 @@
 #ifndef DATASAVER_H
 #define DATASAVER_H
 
+#include <QObject>
 #include <QString>
 #include <QVector>
 #include <fstream>
+#include <memory>
+#include "CircularFifo.h"
 
-using namespace std;
-
-class DataSaver
+class DataSaver : public QObject
 {
+    Q_OBJECT
+
 private:
     QString filename;
     bool isBinary;
-    ofstream os;
+    std::ofstream os;
 
 public:
     DataSaver();
     bool InitDataSaving(const QString &, bool);
-    void SaveLine(QVector<double>);
-    void SaveHeader(QVector<QString>);
+    void SaveHeader(QVector<QString>, double savingFreq);
+
+    std::vector<std::unique_ptr<CircularFifo<float>>> q;
+
+public slots:
+    void SaveLine();
     void EndDataSaving();
 };
 

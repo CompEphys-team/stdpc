@@ -51,8 +51,6 @@ private:
      template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
 
-     // Temporary data storing object
-     QVector<double> data;
      QVector<inChannel *> inChnsToSave;
      QVector<outChannel *> outChnsToSave;
      
@@ -106,6 +104,7 @@ private:
      void CloseToLimit(QString, QString, double, double, double);
      void updateRate(int Hz);
      void done();
+     void saveData();
 };
 
 
