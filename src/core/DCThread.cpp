@@ -232,7 +232,6 @@ void DCThread::setup_and_go()
 
 void DCThread::run()
 {
-   double savingPeriod= 1.0;
    int rateCounter = 0;
    double lastRateReport = 0.;
    static int i;
