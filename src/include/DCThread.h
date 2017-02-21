@@ -105,6 +105,7 @@ private:
      void updateRate(int Hz);
      void done();
      void saveData();
+     void forceSaveData();
 };
 
 

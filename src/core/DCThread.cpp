@@ -19,6 +19,7 @@ DCThread::DCThread() :
   dataSaver = new DataSaver();
   connect(this, SIGNAL(saveData()), dataSaver, SLOT(SaveLine()), Qt::QueuedConnection);
   connect(this, SIGNAL(done()), dataSaver, SLOT(EndDataSaving()), Qt::QueuedConnection);
+  connect(this, SIGNAL(forceSaveData()), dataSaver, SLOT(SaveLine()), Qt::BlockingQueuedConnection);
 
   outNoneData.active = true;
   outNoneData.gain = 0;
@@ -417,7 +418,12 @@ void DCThread::run()
            if ( t >= lastSave + savingPeriod )
            {
               i = 0;
-              dataSaver->q[i++]->push(t);
+              bool space = dataSaver->q[i++]->push(t);
+              if ( !space ) { // Queues full
+                  forceSaveData(); // BlockingQueuedConnection ensures completion of
+                                   // DataSaver::SaveLine before this call returns
+                  dataSaver->q[i-1]->push(t);
+              }
               for ( inChannel *in : inChnsToSave )
                   dataSaver->q[i++]->push(in->V);
               for ( outChannel *out : outChnsToSave )
@@ -427,7 +433,8 @@ void DCThread::run()
                   dataSaver->q[i++]->push(aec->v_e);
             #endif
 
-              emit saveData();
+              if ( space )
+                  emit saveData();
               lastSave = t;
            }
          }
