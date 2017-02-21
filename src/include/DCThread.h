@@ -74,6 +74,7 @@ private:
      std::vector<abHH> abhhPre;
      std::vector<abHH> abhhIn;
 
+     outChnData outNoneData;
      outChannel outChnNone;
 
      std::shared_ptr<ChannelBufferHelper> bufferHelper;

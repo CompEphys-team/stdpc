@@ -18,10 +18,11 @@ DCThread::DCThread() :
 
   dataSaver = new DataSaver();
 
-  outChnData outNoneData;
   outNoneData.active = true;
   outNoneData.gain = 0;
   outNoneData.gainFac = 1.0;
+  outNoneData.bias = 0;
+  outNoneData.chnlSaving = false;
   outChnNone.init(&outNoneData);
 }
 
