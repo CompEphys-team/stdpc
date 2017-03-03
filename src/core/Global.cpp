@@ -1,32 +1,21 @@
-#include "Main.h"
 #include "Global.h"
+#include "DeviceManager.h"
+#include "ModelManager.h"
 
-int synType[MAX_SYN_NO];
-CSynData CSynp[MAX_SYN_NO];
-abSynData abSynp[MAX_SYN_NO];
-GJunctData ESynp[MAX_SYN_NO];
-DestexheSynData DxheSynp[MAX_SYN_NO];
+int LOADED_PROTOCOL_VERSION;
+QString LEGACY_DAQ_CLASS;
 
-int HHType[MAX_HH_NO];
-mhHHData mhHHp[MAX_HH_NO];
-abHHData abHHp[MAX_HH_NO];
+std::vector<CSynData> CSynp;
+std::vector<abSynData> abSynp;
+std::vector<GJunctData> ESynp;
+std::vector<DestexheSynData> DxheSynp;
 
-inChnData *inChnp;
-outChnData *outChnp;
-inChnData inSpkGenChnp;
-outChnData outSpkGenChnp;
+std::vector<mhHHData> mhHHp;
+std::vector<abHHData> abHHp;
 
-DigiDataData DigiDatap;
-SDAQData SDAQp;
-#ifdef NATIONAL_INSTRUMENTS
-NIDAQData NIDAQp;
-#endif
-SGData SGp;
-
-graphData Graphp[2];
+PlotData Plotp;
 
 dataSavingParams dataSavingPs;
-elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
 
 // Attilas Sample-and-Hold
 SampleHoldData SampleHoldp;
@@ -36,15 +25,6 @@ tanhLUtable tanhLU;
 expLUtable expLU;
 expSigmoidLUtable expSigmoidLU;
 
-// adjustable parameters
-
-QVector<double *> dAP;
-QVector<int *> iAP;
-QVector<bool *> bAP;
-QVector<QString *> sAP;
-QVector<short int *> siAP;
-QVector<QString> APname;
-QVector<int> APindex;
-QVector<APTYPE> APtype;
-
-
+Clock DAQClock;
+DeviceManager Devices;
+ModelManager Models;

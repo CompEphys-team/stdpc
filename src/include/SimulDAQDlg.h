@@ -1,26 +1,30 @@
 #ifndef SIMULDAQDLG_H
 #define SIMULDAQDLG_H
 
-
 #include "ui_SimulDAQDlg.h"
-#include "ObjectDataTypes.h"
 #include "DAQDlg.h"
-#include "Global.h"
+#include "SimulDAQ.h"
 
 class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
 {
-     Q_OBJECT
+    Q_OBJECT
 
-  public:
-     SimulDAQDlg(QWidget *parent= 0);
-     bool exportData(SDAQData &);
-     void importData(SDAQData);
-     
-  public slots:
-     void accept();
-     void reject();
-     void appear();
+public:
+     SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     void exportData(bool forceInit = false);
+     void importData();
+     void setIndex(size_t);
 
-}; 
+private slots:
+     void on_InputFileB_clicked();
+     void on_OutputFileB_clicked();
+
+protected:
+     void backup();
+     void restoreBackup();
+
+     SDAQData bak;
+     QString label;
+};
 
 #endif

@@ -1,9 +1,45 @@
 
 #include "DestexheSyn.h"
 #include <cmath>
+#include "DCThread.h"
     
-DestexheSyn::DestexheSyn()
+DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
+    p(inp),
+    pre(pre),
+    post(post),
+    out(out),
+    a(a),
+    buffered(false),
+    S(0.0),
+    tlast(-1.0e10),
+    g(p->gSyn)
 {
+    if (p->LUTables) {
+        theExp= &expLU;
+        expLU.require(-50.0, 50.0, 0.02);
+        theExpSigmoid= &expSigmoidLU;
+        expSigmoidLU.require(-50.0, 50.0, 0.02);
+        theTanh= &tanhLU;
+        tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+        theExp= &expFunc;
+        theExpSigmoid= &expSigmoidFunc;
+        theTanh= &tanhFunc;
+    }
+
+    graw= invGFilter(g);
+    if (p->Plasticity == 2) {
+        P= p->ODE.InitialP;
+        D= p->ODE.InitialD;
+        Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
+        Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( a->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
+        buffered = true;
+    }
 }
 
 double DestexheSyn::invGFilter(double ing)
@@ -36,41 +72,12 @@ double DestexheSyn::gFilter(double ingr)
   return ng;
 }
 
-void DestexheSyn::init(DestexheSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->PreSynChannel]];
-  post= &inChn[inIdx[p->PostSynChannel]];
-  out= &outChn[outIdx[p->OutSynChannel]];
-
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  S= 0.0;
-  tlast= -1.0e10;
-  g= p->gSyn;
-  graw= invGFilter(g);
-  if (p->Plasticity == 2) {
-    P= p->ODE.InitialP;
-    D= p->ODE.InitialD;
-    Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
-    Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
-  }
-}
-
 void DestexheSyn::currentUpdate(double t, double dt)
 {
   static double rt, dS;
+
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+      return;
   
   // calculate synaptic current
   rt= t - tlast;
@@ -78,7 +85,7 @@ void DestexheSyn::currentUpdate(double t, double dt)
     // continue release from an old spike
     dS= p->alpha*(1.0-S) - p->beta*S;
   } else {
-    if (pre->V > p->Vpre) {
+    if ((buffered ? pre->getBufferedV(bufferHandle) : pre->V) > p->Vpre) {
       // new spike ... start releasing
       tlast= t;
       dS= p->alpha*(1.0-S) - p->beta*S;
@@ -194,6 +201,6 @@ void DestexheSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

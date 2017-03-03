@@ -1,46 +1,37 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#include "Main.h"
 #include <QVector>
+#include <vector>
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
+#include "Clock.h"
 
 #define MAX_ST_HISTORY 20
-#define MAX_SYN_NO 6
-#define MAX_HH_NO 6
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
-#define MAX_ELECTRODE_NO 4
+
+#define STDPC_PROTOCOL_VERSION 3
+#define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
+extern int LOADED_PROTOCOL_VERSION;
+extern QString LEGACY_DAQ_CLASS;
+
+// Forward
+class DeviceManager;
+class ModelManager;
 
 
-extern int synType[MAX_SYN_NO];
-extern CSynData CSynp[MAX_SYN_NO];
-extern abSynData abSynp[MAX_SYN_NO];
-extern GJunctData ESynp[MAX_SYN_NO];
-extern DestexheSynData DxheSynp[MAX_SYN_NO];
+extern std::vector<CSynData> CSynp;
+extern std::vector<abSynData> abSynp;
+extern std::vector<GJunctData> ESynp;
+extern std::vector<DestexheSynData> DxheSynp;
 
-extern int HHType[MAX_HH_NO];
-extern mhHHData mhHHp[MAX_HH_NO];
-extern abHHData abHHp[MAX_HH_NO];
-
-extern inChnData *inChnp;
-extern outChnData *outChnp;
-extern inChnData inSpkGenChnp;
-extern outChnData outSpkGenChnp;
-
-extern DigiDataData DigiDatap;
-extern SDAQData SDAQp;
-#ifdef NATIONAL_INSTRUMENTS
-extern NIDAQData NIDAQp;
-#endif
-extern SGData SGp;
+extern std::vector<mhHHData> mhHHp;
+extern std::vector<abHHData> abHHp;
 
 extern dataSavingParams dataSavingPs;
-extern elecCalibParams  elecCalibPs[MAX_ELECTRODE_NO];
 
-
-extern graphData Graphp[2];
+extern PlotData Plotp;
 
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;
@@ -50,18 +41,8 @@ extern tanhLUtable tanhLU;
 extern expLUtable expLU;
 extern expSigmoidLUtable expSigmoidLU;
 
-// adjustable parameters
-
-enum APTYPE {DBLTYPE,INTTYPE,BOOLTYPE,STRTYPE,SHORTINTTYPE};
-
-extern QVector<double *> dAP;
-extern QVector<int *> iAP;
-extern QVector<bool *> bAP;
-extern QVector<QString *> sAP;
-extern QVector<short int *> siAP;
-extern QVector<QString> APname;
-extern QVector<int> APindex;
-extern QVector<APTYPE> APtype;
-
+extern Clock DAQClock;
+extern DeviceManager Devices;
+extern ModelManager Models;
 
 #endif

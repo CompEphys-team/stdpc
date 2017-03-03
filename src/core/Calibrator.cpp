@@ -8,10 +8,7 @@
 #include <time.h>
 #include <cmath>
 
-#include "SimulDAQ.h"
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
+#include "DeviceManager.h"
 
 
 Calibrator::Calibrator() :
@@ -30,70 +27,26 @@ Calibrator::Calibrator() :
 }
 
 
-void Calibrator::GeneralInit(DAQ *brd, DCThread *DCThrd)
-{
-    board = brd;
-    DCT = DCThrd;
-}
-
-
-int Calibrator::ChannelInit(int inChNum, int outChNum)
+int Calibrator::ChannelInit(ChannelIndex inChNum, ChannelIndex outChNum)
 {
     inputChannelNumber = inChNum;
     outputChannelNumber = outChNum;
 
-    int i;
+    inBoard = Devices.getDevice(inputChannelNumber);
+    if ( !inBoard || !inBoard->initialized )
+        return 3; // Return code for inactive input device
+    inBoard->init_chans();
+    inChn = Devices.getInChan(inputChannelNumber);
+    if ( !inChn || !inChn->active )
+        return 1; // Return code for inactive input channel
 
-    short int *inIdx;
-    short int *outIdx;
-    short int inNo;
-    short int outNo;
-
-    inChn  = new inChannel[board->inChnNo];
-    outChn = new outChannel[board->outChnNo];
-
-    inIdx  = new short int[board->inChnNo];
-    outIdx = new short int[board->outChnNo];
-
-    inNo= 0;
-    for (i= 0; i < board->inChnNo; i++) {
-       if (inChnp[i].active) {
-          inIdx[inNo++]= i;
-          inChn[i].init(&inChnp[i]);
-       }
-    }
-
-    outNo= 0;
-    for (i=0; i < board->outChnNo; i++) {
-        if (outChnp[i].active) {
-           outIdx[outNo++]= i;
-           outChn[i].init(&outChnp[i]);
-        }
-    }
-
-    // Check validity of selected channels
-    bool valid= false;
-
-    for (i= 0; i < inNo; i++) {
-        if(inIdx[i] == inputChannelNumber){
-             valid= true;
-        }
-    }
-
-    if (valid == false) return 1;  // Return code for inactive input channel
-
-    valid= false;
-
-    for (i= 0; i < outNo; i++) {
-        if(outIdx[i] == outputChannelNumber){
-             valid= true;
-        }
-    }
-
-    if (valid == false) return 2;  // Return code for inactive output channel
-
-    board->generate_scan_list(1,&(inputChannelNumber));
-    board->generate_analog_out_list(1,&(outputChannelNumber));
+    outBoard = Devices.getDevice(outputChannelNumber);
+    if ( !outBoard || !outBoard->initialized )
+        return 4; // Return code for inactive output device
+    outBoard->init_chans();
+    outChn = Devices.getOutChan(outputChannelNumber);
+    if ( !outChn || !outChn->active )
+        return 2; // Return code for inactive output channel
 
     return 0;   // Return code for successfull channel initialization
 }
@@ -226,13 +179,14 @@ void Calibrator::ElectrodeMeasurement(double injLenPerLevel, double sampRate, in
 
     //-----------------Only for testing---------------//
   #ifdef TEST_VERSION
-    fname = QString("iLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("iLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, iLevels);
-    fname = QString("vLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("vLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, vLevels);
-    fname = QString("rLevelsElec_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("rLevelsElec_")+inChnName+QString(".dat");
     saveData(fname, rLevels);
-    fname = QString("tauE_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("tauE_")+inChnName+QString(".dat");
     saveData(fname, tauE);
  #endif
     //-----------------Only for testing---------------//
@@ -362,20 +316,21 @@ void Calibrator::MembraneMeasurement(double injLenPerRep, double sampRate, int r
 
   #ifdef TEST_VERSION
     //-----------------Only for testing---------------//
-    fname = QString("iLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("iLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, iLevels);
-    fname = QString("vLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("vLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, vLevels);
-    fname = QString("rLevelsMemb_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("rLevelsMemb_")+inChnName+QString(".dat");
     saveData(fname, rLevels);
-    fname = QString("tauM_")+QString::number(inputChannelNumber)+QString(".dat");
+    fname = QString("tauM_")+inChnName+QString(".dat");
     saveData(fname, tauM);  
     //-----------------Only for testing---------------//
   #endif
 }
 
 
-void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
+void Calibrator::Calibration(double injCalLen, double sampRate, int fullKLen, int elecKLen, double injAmp, double hyperpolCurr)
 {
     fullKerLen = fullKLen;
     elecKerLen = elecKLen;   
@@ -444,39 +399,61 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int elecNum, int
 
     //-----------------Only for testing---------------//
   #ifdef TEST_VERSION
-    fname = QString("full_kernel_")+QString::number(elecNum)+QString(".dat");
+    QString inChnName = inputChannelNumber.toString('-');
+    fname = QString("full_kernel_")+inChnName+QString(".dat");
     saveData(fname, kerCalc->fullKernel);
-    fname = QString("currents_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("currents_")+inChnName+QString(".dat");
     saveData(fname, currents);
-    fname = QString("voltages_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("voltages_")+inChnName+QString(".dat");
     saveData(fname, voltages);
-    fname = QString("times_")+QString::number(elecNum)+QString(".dat");
+    fname = QString("times_")+inChnName+QString(".dat");
     saveData(fname, times);
   #endif
     //-----------------Only for testing---------------//
 
     // Init AECChannel with the kernel
-    DCT->aecChannels[elecNum]->Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());
+    inChn->aec.Initialize(inputChannelNumber, outputChannelNumber, 1.0/actSampRate, kerCalc->GetElecKernel());
 
     // Save the kernel for testing
-    QString fname = QString("kernel_")+QString::number(elecNum)+QString(".dat");
+    QString fname = QString("kernel_%1.dat").arg(inputChannelNumber.toString('-'));
     saveData(fname, kerCalc->GetElecKernel());
 
 }
 
 
+/*
 // Completes the sampling cycle by waiting till the end of the sampling period
 double Calibrator::WaitTillNextSampling(double time)
 {
     double t = 0.0;
-
+    // it appears that in (at least) the release version, this function is
+    // churning so fast that it gets confused about the actual time that
+    // has elapsed. In debug mode it seems slow enough not to encounter this.
+    // (alternatively it could also be a question of unknown optimisations in
+    // ther release version causing this).
+    // As a fix, we slow down the churning by doing some (useless) math.
+    // 20 iterations appeared to be the sweet spot where the repeats were slow enough
+    // to get maeningful readings from the windows high precision counter and yet not be too coarse
+    // with the precision of achieved update time steps.
+    // (TN 2015-08-06)
+#ifdef QT_NO_DEBUG
+    double y= 2.0;
+    double z= 0.0;
+#endif
     do
     {
         t += board->get_RTC();
+#ifdef QT_NO_DEBUG
+        for (int i= 0; i < 20; i++) {
+            z= sqrt(y);
+            y= z*z;
+        }
+#endif
     } while (t < time);
 
     return t;
 }
+*/
 
 
 // Injects the current and records the voltage
@@ -494,37 +471,40 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     t = 0.0; // init time
 
     // Create tolerance limits
-    double higherLimit = inChnp[inputChannelNumber].minVoltage + 0.9*(inChnp[inputChannelNumber].maxVoltage-inChnp[inputChannelNumber].minVoltage);
-    double lowerLimit =  inChnp[inputChannelNumber].minVoltage + 0.1*(inChnp[inputChannelNumber].maxVoltage-inChnp[inputChannelNumber].minVoltage);
+    double higherLimit = inChn->p->minVoltage + 0.9*(inChn->p->maxVoltage-inChn->p->minVoltage);
+    double lowerLimit =  inChn->p->minVoltage + 0.1*(inChn->p->maxVoltage-inChn->p->minVoltage);
     bool limitWarningEmitted = false;
 
     // board->reset_board();
-    board->reset_RTC();
+    DAQClock.reset_RTC();
+    inBoard->start();
+    if ( inBoard != outBoard )
+        outBoard->start();
 
     if( isCalibration == true ) // read -- wait -- write order in case of calibration
         for ( sample=1; sample<numOfSamples; sample++ )
         {
 
             // --- Read --- //
-            board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            inBoard->get_scan();
+            voltages[sample]= inChn->V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChn->p->minVoltage, inChn->p->maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
 
 
             // --- Wait --- //
-            t += WaitTillNextSampling(samplingPeriod);
+            t += DAQClock.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
 
             // --- Write --- //
-            outChn[outputChannelNumber].I= currents[sample];
-            board->write_analog_out(outChn);
+            outChn->I= currents[sample];
+            outBoard->write_analog_out();
             // --- Write end --- //
 
         }
@@ -534,23 +514,23 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
         {
 
             // --- Write --- //
-            outChn[outputChannelNumber].I= currents[sample];
-            board->write_analog_out(outChn);
+            outChn->I= currents[sample];
+            outBoard->write_analog_out();
             // --- Write end --- //
 
 
             // --- Wait --- //
-            t += WaitTillNextSampling(samplingPeriod);
+            t += DAQClock.wait_till_elapsed(samplingPeriod);
             times[sample] = t; // save the time stamp
             // --- Wait end --- //
 
 
             // --- Read --- //
-            board->get_scan(inChn);
-            voltages[sample]= inChn[inputChannelNumber].V; // save voltage
+            inBoard->get_scan();
+            voltages[sample]= inChn->V; // save voltage
             if ( voltages[sample] > higherLimit || voltages[sample] < lowerLimit ) // check channel limits
                 if ( limitWarningEmitted == false){
-                      emit CloseToLimit(QString("Voltage"), inputChannelNumber, inChnp[inputChannelNumber].minVoltage, inChnp[inputChannelNumber].maxVoltage, voltages[sample]);
+                      emit CloseToLimit(QString("Voltage"), inputChannelNumber.prettyName(), inChn->p->minVoltage, inChn->p->maxVoltage, voltages[sample]);
                       limitWarningEmitted = true;
                 }
             // --- Read end --- //
@@ -566,7 +546,9 @@ void Calibrator::InjectAndRecord(int numOfSamples, bool isCalibration)
     }
 
     // Reset board
-    board->reset_board();
+    inBoard->reset_board();
+    if ( inBoard != outBoard )
+        outBoard->reset_board();
 }
 
 
@@ -578,20 +560,23 @@ double Calibrator::VoltageOffsetMeasurement()
     double offsetMeasLen = 5.0; // in msec
     int offsetSamplingNum = (int) (offsetMeasLen*1e-3/samplingPeriod);  // how many sampling steps
 
-    board->reset_RTC();
+    DAQClock.reset_RTC();
+    inBoard->start();
 
     // Measure the voltage offset
     for (sample=0; sample<offsetSamplingNum; sample++)
     {
         // Channel read
-        board->get_scan(inChn);
+        inBoard->get_scan();
 
         // Save voltage
-        vOffset += inChn[inputChannelNumber].V;
+        vOffset += inChn->V;
 
-        WaitTillNextSampling(samplingPeriod);
+        DAQClock.wait_till_elapsed(samplingPeriod);
     }
     vOffset /= offsetSamplingNum;
+
+    inBoard->reset_board();
 
     return vOffset;
 }
@@ -641,10 +626,10 @@ void Calibrator::CalcSamplingStats()
 
 
 // Turns on/off the compensation on the corresponding electrode
-void Calibrator::SetChannelActivation(int elecNum, bool state)
+void Calibrator::SetChannelActivation(bool state)
 {
-    if ( state == true ) DCT->aecChannels[elecNum]->Activate();
-    else                 DCT->aecChannels[elecNum]->Inactivate();
+    if ( state == true ) inChn->aec.Activate();
+    else                 inChn->aec.Inactivate();
 }
 
 

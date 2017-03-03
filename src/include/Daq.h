@@ -1,22 +1,56 @@
 #ifndef DAQ_H
 #define DAQ_H
 
+#include "Clock.h"
 #include "Channels.h"
+#include <QPair>
+
+class DAQProxy;
 
 class DAQ {
+  private:
+    LARGE_INTEGER intClock_frequency;
+    double sysT;
+
+  protected:
+    static constexpr double upTolFac = 0.99;
+    static constexpr double loTolFac = 0.01;
+    QVector<double> iHiLim;
+    QVector<double> iLoLim;
+    QVector<double> vHiLim;
+    QVector<double> vLoLim;
+    QVector<QString> inChnLabels;
+    QVector<QString> outChnLabels;
+
   public:
-    DAQ();
+    DAQ(size_t devID, DAQProxy *proxy);
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
-    virtual void reset_RTC()= 0;
-    virtual double get_RTC()= 0;
+    virtual void start() = 0;
     virtual void generate_scan_list(short int, short int *)= 0;
     virtual void generate_analog_out_list(short int, short int *)= 0;
-    virtual void get_scan(inChannel *)= 0;
-    virtual void get_single_scan(inChannel *, int)= 0;
-    virtual void write_analog_out(outChannel *)= 0;
+    virtual void get_scan()= 0;
+    virtual void get_single_scan(inChannel *)= 0;
+    virtual void write_analog_out()= 0;
     virtual void reset_board()= 0;
-    
+
+    DAQData *params();
+
+    void init_chans(); // Sets up scan list, analog out list
+    void reset_chans();
+    void process_scan(double t); // detects spikes, updates channel buffer
+    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save();
+    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save();
+    QVector<AECChannel*> aecChans();
+
+    struct ChannelLimitWarning {QString what; QString chan_label; double hiLim; double loLim; double value;};
+    bool check_limits(bool checkV_and_warn, ChannelLimitWarning &w);
+
+    size_t devID;
+    DAQProxy *proxy;
+
+    const double &t;
+
     int inChnNo;
     int outChnNo;
 
@@ -37,8 +71,9 @@ class DAQ {
     short int actOutChnNo;
     short int *outIdx;
     double *outGainFac;
-    double clock_frequency;
-    double clock_cycle;
+
+    QVector<inChannel> in;
+    QVector<outChannel> out;
 
     bool initialized;
 };

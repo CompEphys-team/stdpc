@@ -1,11 +1,59 @@
 #include "DigiData.h"
 #include "limits.h"
+#include "AP.h"
+#include "DigiDataDlg.h"
 
 // DigiData 1200 device driver
 
+/// Construct a single self-registering proxy
+static DigiDataProxy prox;
+std::vector<DigiDataData> DigiDataProxy::p;
+DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, &prox); }
+DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
+
+DigiDataProxy::DigiDataProxy() :
+    regAP {
+        addAP("DigiDatap[#].active", &p, &DigiDataData::active),
+        addAP("DigiDatap[#].baseAddress", &p, &DigiDataData::baseAddress),
+        addAP("DigiDatap[#].syncIOMask", &p, &DigiDataData::syncIOMask),
+        addAP("DigiDatap[#].inChn[#].active", &p, &DigiDataData::inChn, &inChnData::active),
+        addAP("DigiDatap[#].inChn[#].gain", &p, &DigiDataData::inChn, &inChnData::gain),
+        addAP("DigiDatap[#].inChn[#].gainFac", &p, &DigiDataData::inChn, &inChnData::gainFac),
+        addAP("DigiDatap[#].inChn[#].spkDetect", &p, &DigiDataData::inChn, &inChnData::spkDetect),
+        addAP("DigiDatap[#].inChn[#].spkDetectThresh", &p, &DigiDataData::inChn, &inChnData::spkDetectThresh),
+        addAP("DigiDatap[#].inChn[#].bias", &p, &DigiDataData::inChn, &inChnData::bias),
+        addAP("DigiDatap[#].inChn[#].chnlSaving", &p, &DigiDataData::inChn, &inChnData::chnlSaving),
+        addAP("DigiDatap[#].outChn[#].active", &p, &DigiDataData::outChn, &outChnData::active),
+        addAP("DigiDatap[#].outChn[#].gain", &p, &DigiDataData::outChn, &outChnData::gain),
+        addAP("DigiDatap[#].outChn[#].gainFac", &p, &DigiDataData::outChn, &outChnData::gainFac),
+        addAP("DigiDatap[#].outChn[#].bias", &p, &DigiDataData::outChn, &outChnData::bias),
+        addAP("DigiDatap[#].outChn[#].chnlSaving", &p, &DigiDataData::outChn, &outChnData::chnlSaving),
+
+        addAP("DigiDatap[#].inChn[#].calib.copyChnOn", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn),
+        addAP("DigiDatap[#].inChn[#].calib.copyChn", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::copyChn),
+        addAP("DigiDatap[#].inChn[#].calib.samplingRate", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::samplingRate),
+        addAP("DigiDatap[#].inChn[#].calib.outputChannelNumber", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber),
+        addAP("DigiDatap[#].inChn[#].calib.iMaxElec", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec),
+        addAP("DigiDatap[#].inChn[#].calib.iMinElec", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMinElec),
+        addAP("DigiDatap[#].inChn[#].calib.numberOfLevels", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels),
+        addAP("DigiDatap[#].inChn[#].calib.injLenPerLevel", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel),
+        addAP("DigiDatap[#].inChn[#].calib.iMembStep", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::iMembStep),
+        addAP("DigiDatap[#].inChn[#].calib.numberOfRepeats", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats),
+        addAP("DigiDatap[#].inChn[#].calib.injLenPerRepeat", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat),
+        addAP("DigiDatap[#].inChn[#].calib.hyperpolCurr", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr),
+        addAP("DigiDatap[#].inChn[#].calib.injCalAmp", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp),
+        addAP("DigiDatap[#].inChn[#].calib.injCalLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::injCalLen),
+        addAP("DigiDatap[#].inChn[#].calib.fullKernelLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen),
+        addAP("DigiDatap[#].inChn[#].calib.electrodeKernelLen", &p, &DigiDataData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen),
+    }
+{
+    DeviceManager::RegisterDAQ(daqClass(), this);
+}
+
 //---------------------------------------------------------------------------
 
-DigiData::DigiData()
+DigiData::DigiData(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy)
 {
   inChnNo= 16;
   inIdx= new short int[inChnNo];
@@ -53,13 +101,9 @@ DigiData::DigiData()
   DACEnable= new short int[outChnNo];  
   DACEnable[0]= DACCHANNEL0ENABLE;
   DACEnable[1]= DACCHANNEL1ENABLE;
-  
-  clock_frequency= 4000000.0; // 4MHz clock
-  clock_cycle= ((double) USHRT_MAX + 1.0)/clock_frequency;
-  
   portsOpen= false;
   init();
-};
+}
 
 DigiData::~DigiData()
 {
@@ -84,7 +128,7 @@ DigiData::~DigiData()
 
 void DigiData::init()
 {
-   short int base= DigiDatap.baseAddress;
+   short int base= DigiDataProxy::p[devID].baseAddress;
    base_address=       base;
    DAC_data=           base | DACDATA;
    ADC_data=           base | ADCDATA;
@@ -141,55 +185,6 @@ bool DigiData::initialize_board(QString &name)
    return success;
 }
 
-//---------------------------------------------------------------------------
-void DigiData::reset_RTC()
-{
-   WriteByte(real_time_control,C0MODE2);
-   WriteByte(real_time_data_0,ZEROBYTE);
-   WriteByte(real_time_data_0,ZEROBYTE);
-
-   WriteByte(real_time_control,C1MODE2);
-   WriteByte(real_time_data_1,FASTBYTE);  // very fast to generate clock to
-   WriteByte(real_time_data_1,ZEROBYTE); // counter 2 soon --> reset C2
-
-   WriteByte(real_time_control,C2MODE2);
-   WriteByte(real_time_data_2,ZEROBYTE);
-   WriteByte(real_time_data_2,ZEROBYTE);
-
-   do{                                       // wait for counter 2 reset
-      WriteByte(real_time_control,READCOUNT2);
-   }while((ReadByte(real_time_data_2) & ReadByte(real_time_data_2)) != 0xff);
-
-   WriteByte(real_time_control,C1MODE2);
-   WriteByte(real_time_data_1,ZEROBYTE);
-   WriteByte(real_time_data_1,ZEROBYTE);
-}
-
-//---------------------------------------------------------------------------
-double DigiData::get_RTC(void)
-{
-//     short unsigned int hi, med;
-   static short unsigned int lo;
-   static double dt, lastT;
-   /* I'm returning only the 16 bit low order register which makes the program
-run more fast but put some limitation in the time required to make a cycle R-W
-of ADC/DAC operations. The maximum time of the cycle should not be larger than
-16 ms. One should use the program runing in realtime.
-*/
-
-   WriteByte(real_time_control,READALLCOUNTERS);
-
-//   hi= ~(ReadByte(real_time_data_2)+(256*ReadByte(real_time_data_2)));
-//   med= ~(ReadByte(real_time_data_1)+(256*ReadByte(real_time_data_1))-2);
-   lo= ~(ReadByte(real_time_data_0)+(256*ReadByte(real_time_data_0))-2);
-//   t= (double)lo + 65536.0*(double)med + 4294967296.0*(double)hi;
-   lastT= t;
-   t= ((double)lo)/clock_frequency;
-   dt= t-lastT;
-   if (dt < 0.0) dt+= clock_cycle;
-   
-   return dt;
-}
 
 //---------------------------------------------------------------------------
 void DigiData::digital_out(unsigned char outbyte)
@@ -202,22 +197,26 @@ void DigiData::digital_out(unsigned char outbyte)
 void DigiData::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i, Chan_Gain_Code;
+  DAQData *p = params();
+  ChannelIndex dex(&prox, devID, 0, true);
 
   actInChnNo= chnNo;  
   WriteWord(ADCDAC_control, ADCSCANLISTENABLE);
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac*inHigh[inChnp[inIdx[i]].gain]/16.0/COUNTS; // divide by 16.0 b/c of 12 bit in chns
-    Chan_Gain_Code= i + inChnGain[inChnp[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
+    inGainFac[i]= p->inChn[inIdx[i]].gainFac*inHigh[p->inChn[inIdx[i]].gain]/16.0/COUNTS; // divide by 16.0 b/c of 12 bit in chns
+    Chan_Gain_Code= i + inChnGain[p->inChn[inIdx[i]].gain] + (inIdx[i] * CHANNELSHIFT);
     if(i == (actInChnNo -1)) Chan_Gain_Code+= LASTCHANNELFLAG;
     WriteWord(channel_scan_list, Chan_Gain_Code);
+    dex.chanID = inIdx[i];
+    inChnLabels[inIdx[i]] = dex.toString();
   }
   WriteWord(ADCDAC_control, ADCSCANLISTDISABLE);
 }
 
 //---------------------------------------------------------------------------
-void DigiData::get_scan(inChannel *in)
+void DigiData::get_scan()
 {
    short int i, scan;
 
@@ -229,7 +228,7 @@ void DigiData::get_scan(inChannel *in)
    }
 }
 
-void DigiData::get_single_scan(inChannel *in, int which)
+void DigiData::get_single_scan(inChannel *in)
 {
    short int i, scan;
 
@@ -237,8 +236,8 @@ void DigiData::get_single_scan(inChannel *in, int which)
 
    for(i= 0; i < actInChnNo; i++){
       scan= ReadWord(ADC_data);
-      if (inIdx[i] == which) {
-          in[inIdx[i]].V= inGainFac[i] * (double) scan;
+      if (&(this->in[inIdx[i]]) == in) {
+          in->V= inGainFac[i] * (double) scan;
       }
    }
 }
@@ -247,28 +246,34 @@ void DigiData::get_single_scan(inChannel *in, int which)
 //---------------------------------------------------------------------------
 void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 {
+  DAQData *p = params();
+  ChannelIndex dex(&prox, devID, 0, false);
+
   // collect the active out channels
   actOutChnNo= chnNo;
   for (int i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac/outHigh[outChnp[outIdx[i]].gain]*1e9*COUNTS;
+    outGainFac[i]= p->outChn[outIdx[i]].gainFac/outHigh[p->outChn[outIdx[i]].gain]*1e9*COUNTS;
+    dex.chanID = outIdx[i];
+    outChnLabels[outIdx[i]] = dex.toString();
   }
 }
 
 
 //---------------------------------------------------------------------------
-void DigiData::write_analog_out(outChannel *out)
+void DigiData::write_analog_out()
 {
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
     int_I= ((short int) (out[outIdx[i]].I*outGainFac[i]))*16;
-    int_I|= DigiDatap.syncIOMask; // write synchronous digital IO
+    int_I|= DigiDataProxy::p[devID].syncIOMask; // write synchronous digital IO
     WriteWord(ADCDAC_control,DACEnable[outIdx[i]]);
     WriteWord(DAC_data,int_I);
   } 
 }
 
 
+//---------------------------------------------------------------------------
 void DigiData::reset_board() 
 {
   for (int i= 0; i < outChnNo; i++) {

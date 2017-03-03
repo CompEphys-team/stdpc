@@ -1,23 +1,42 @@
 #ifndef NIDAQ_H
 #define NIDAQ_H
 
-using namespace std;
-
-#include "Channels.h"
-#include "DAQ.h"
-
+#include "DeviceManager.h"
 #include <NIDAQmx.h>
-#include <windows.h>
 
 #define MAXRANGES 64
 #define MAXCHANNELS 64
 
+class NIDAQData : public DAQData
+{
+public:
+    QString deviceName;
+    NIDAQData() : DAQData(), deviceName("Dev1") {}
+};
+
+class NIDAQProxy : public DAQProxy {
+public:
+    NIDAQProxy();
+    inline DAQData &param(size_t i) { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString daqClass() { return "NIDAQ"; }
+    inline QString prettyName() { return "Nat'l Instruments"; }
+
+    DAQ *createDAQ(size_t devID);
+    DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr);
+
+    std::vector<AP*> regAP;
+    inline const std::vector<AP*> &coreAPs() const { return regAP; }
+
+    static std::vector<NIDAQData> p;
+};
+
 class NIDAQ: public DAQ
 {
   private:
-   LARGE_INTEGER intClock_frequency;
-   double sysT;
-   double t;
    char *devName;
    char *iChnNm[MAXCHANNELS];
    char *oChnNm[MAXCHANNELS];
@@ -31,23 +50,18 @@ class NIDAQ: public DAQ
    int DevicePresent;
              
   public:
-    NIDAQ();
+    NIDAQ(size_t devID, DAQProxy *proxy);
     virtual ~NIDAQ();
     void init();
     virtual bool initialize_board(QString &);
-    virtual void reset_RTC();
-    virtual double get_RTC();
+    virtual void start();
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan(inChannel *);
-    virtual void get_single_scan(inChannel *, int);
-    virtual void write_analog_out(outChannel *);
+    virtual void get_scan();
+    virtual void get_single_scan(inChannel *);
+    virtual void write_analog_out();
     virtual void reset_board();
-    //short int* inChnGain;
-    //short int* DACEnable;
-    
-    // actually activated stuff
 };
 
 #endif

@@ -1,270 +1,191 @@
-#include <cassert>
 #include "SpkGen.h"
-#include <cmath>
- 
-#define SGOFF 0
-#define EXPLICITSG 1
-#define FILESG 2
-#define VSG 3
-// time after spike expired to read a new one from file (file SpkGen w/o burst detect)
-#define ISI_TIME_MAX 0.005
+#include "DCThread.h"
+#include "ModelManager.h"
+#include "AP.h"
+#include "SpikeGenDlg.h"
 
-SpkGen::SpkGen()
+/// Construct a single self-registering proxy
+static SpkGenProxy prox;
+std::vector<SGData> SpkGenProxy::p;
+ModelProxy *SpkGenPrototype::proxy() const { return &prox; }
+ModelPrototype *SpkGenProxy::createPrototype(size_t modelID) { return new SpkGenPrototype(modelID); }
+ModelDlg *SpkGenProxy::createDialog(size_t modelID, QWidget *parent) { return new SpikeGenDlg(modelID, parent); }
+
+SpkGenProxy::SpkGenProxy()
 {
-  lastRead= QString("");
-  inSpkGenChnp.active= true;
-  inSpkGenChnp.gain= 0;
-  inSpkGenChnp.gainFac= 1.0;
-  inSpkGenChnp.spkDetect= true;
-  inSpkGenChnp.spkDetectThresh= 0.0;
-  outSpkGenChnp.active= true;
-  outSpkGenChnp.gain= 0;
-  outSpkGenChnp.gainFac= 1.0;
+    ModelManager::RegisterModel(modelClass(), this);
+    AP *sgAc = addAP("SGp[#].active", &SpkGenProxy::p, &SGData::active);
+    AP *sgLU = addAP("SGp[#].LUTables", &SpkGenProxy::p, &SGData::LUTables);
+    AP *sgVS = addAP("SGp[#].VSpike", &SpkGenProxy::p, &SGData::VSpike);
+    AP *sgTS = addAP("SGp[#].spkTimeScaling", &SpkGenProxy::p, &SGData::spkTimeScaling);
+    AP *sgVR = addAP("SGp[#].VRest", &SpkGenProxy::p, &SGData::VRest);
+    AP *sgBT = addAP("SGp[#].bdType", &SpkGenProxy::p, &SGData::bdType);
+               addAP("SGp[#].bdtUnder", &SpkGenProxy::p, &SGData::bdtUnder);
+               addAP("SGp[#].bdtOver", &SpkGenProxy::p, &SGData::bdtOver);
+               addAP("SGp[#].bdtUnderCont", &SpkGenProxy::p, &SGData::bdtUnderCont);
+               addAP("SGp[#].bdtOverCont", &SpkGenProxy::p, &SGData::bdtOverCont);
+               addAP("SGp[#].bdStrictlyCont", &SpkGenProxy::p, &SGData::bdStrictlyCont);
+    AP *sgPd = addAP("SGp[#].period", &SpkGenProxy::p, &SGData::period);
+               addAP("SGp[#].loopBursts", &SpkGenProxy::p, &SGData::loopBursts);
+    AP *sgST = addAP("SGp[#].SpikeT[#][#]", &SpkGenProxy::p, &SGData::SpikeT);
+
+               addAP("SGp[#].inst[#].active", &SpkGenProxy::p, &SGData::inst, &vInstData::active);
+               addAP("SGp[#].inst[#].inChn.bias", &SpkGenProxy::p, &SGData::inst, &vInstData::inChn, &inChnData::bias);
+    AP *sgSv = addAP("SGp[#].inst[#].inChn.chnlSaving", &SpkGenProxy::p, &SGData::inst, &vInstData::inChn, &inChnData::chnlSaving);
+    AP *sgBC = addAP("SGp[#].inst[#].bdChannel", &SpkGenProxy::p, &SGData::inst, &SgInstData::bdChannel);
+    AP *sgBH = addAP("SGp[#].inst[#].bdThresh", &SpkGenProxy::p, &SGData::inst, &SgInstData::bdThresh);
+
+    addDeprecatedAP("SGp.active", sgAc);
+    addDeprecatedAP("SGp.saving", sgSv);
+    addDeprecatedAP("SGp.LUTables", sgLU);
+    addDeprecatedAP("SGp.VSpike", sgVS);
+    addDeprecatedAP("SGp.spkTimeScaling", sgTS);
+    addDeprecatedAP("SGp.VRest", sgVR);
+    addDeprecatedAP("SGp.bdType", sgBT);
+    addDeprecatedAP("SGp.bdChannel", sgBC);
+    addDeprecatedAP("SGp[#].bdChannel", sgBC);
+    addDeprecatedAP("SGp.bdThresh", sgBH);
+    addDeprecatedAP("SGp[#].bdThresh", sgBH);
+    addDeprecatedAP("SGp.period", sgPd);
+    addDeprecatedAP("SGp.SpikeT[#]", sgST, 2);
 }
 
 
-SpkGen::~SpkGen() 
+SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
+    Model(parent, instID, DCT),
+    p(static_cast<const SGData *>(&(parent->params()))),
+    instp(static_cast<const SgInstData *>(&params())),
+    V(p->VRest),
+    bdChn(DCT->getInChan(instp->bdChannel)),
+    SGactive(p->bdType == 0),
+    burstDetected(false),
+    tOverThresh(0.),
+    tUnderThresh(0.),
+    onThreshold(false),
+    burstNo(0),
+    ISI_time(0.),
+    period(p->period),
+    initial(true),
+    active(true)
 {
+    in.V = V + instp->inChn.bias;
+    out.save = out.active = false;
+    if (p->LUTables) {
+        theExp= &expLU;
+        expLU.require(-50.0, 50.0, 0.02);
+        theTanh= &tanhLU;
+        tanhLU.require(-50.0, 50.0, 0.02);
+    } else {
+        theExp= &expFunc;
+        theTanh= &tanhFunc;
+    }
 }
 
-void SpkGen::init(SGData *inp, short int inNo, short int *inIdx, inChannel *inChn)
+void SpkGen::RK4(double t, double dt, size_t n)
 {
-  QString buf;
-  double st, t, V;
-  int sn;
-     
-  p= inp;
-  VChn= &inChn[inIdx[inNo]];
-  bdChn= &inChn[inIdx[p->bdChannel]];
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-50.0, 50.0, 0.02);
-  }
-  else {
-    theExp= &expFunc;
-    theTanh= &tanhFunc;
-  }
-
-  if (p->method == VSG) {
-    if (lastRead != p->STInFName) {
-      if (is.is_open()) is.close();
-      is.clear();
-      is.open(p->STInFName.toLatin1());
-      if (!is.good()) {
-        p->active= false;    
-        lastRead= QString("");
-        message(QString("Voltage data for spike generator not found"));
-      }
-      else {  
-        snq.clear();
-        stq.clear();
-        tq.clear();         
-        Vq.clear();
-        is >> t;
-        while (is.good()) {
-          is >> V;
-          tq.append(t);
-          Vq.append(V);
-          is >> t;
-        }
-        lastRead= p->STInFName;
-      }
-    }
-  }
-  if (p->method == FILESG) {
-    if (is.is_open()) is.close();
-    is.clear();
-    is.open(p->STInFName.toLatin1());
-    if (!is.good()) {
-      p->active= false;    
-    }
-    else {
-      if (p->bdType == 0) { //no burst detection
-        stq.clear(); 
-        is >> st;
-        while (is.good()) {
-          stq.append(st);
-          is >> st;
-        }
-        burstSpikeNo= 10;
-        stIter= stq.begin();
-        for (int i= 0; i < burstSpikeNo; i++) {
-          p->SpikeT[i]= *stIter;
-          stIter++;
-        }
-        buf.setNum(stq.size());
-        message(QString("SpikeGen: Loaded ") + buf + QString(" spike times "));
-      }
-      else {
-        stq.clear();
-        snq.clear();
-        is >> sn;
-        while (is.good()) {
-          snq.append(sn);
-          for (int i= 0; i < sn; i++) {
-            is >> st;
-            stq.append(st);
-          }
-          is >> sn;
-        }
-        snIter= snq.begin();
-        stIter= stq.begin();
-        buf.setNum(snq.size());
-        message(QString("SpikeGen: Loaded ") + buf + QString(" bursts "));
-        burstSpikeNo= 0;
-        readSpikeNo= 0;
-      }
-    }
-  }
-  else {
-    burstSpikeNo= p->SpikeNo;
-    readSpikeNo= burstSpikeNo;
-  }
-  ISI_time= 0.0;
-  nOverThresh= 0;
-  nUnderThresh= 0;
-  burstDetected= false;
-  if (p->bdType == 0) SGactive= true;
-  else SGactive= false;
-  initial= true;
-  is.close();
+    /// Cheapskate RK, because SG isn't really a candidate for it
+    /// Note the 2*dt, which is the actual full step length for this RK cycle
+    /// Note also that burst detection may be slightly inaccurate if the bd channel is another model
+    if ( n == 0 )
+        update(t, 2*dt);
+    // Need neither further changes on `in` (nobody touches its voltage),
+    // nor on `out` (it's inactive anyway)
 }
 
-void SpkGen::VUpdate(double t, double dt)
+void SpkGen::update(double t, double dt)
 {
-  static int i;
-  
-  if (initial) {
-    if (p->method == VSG) {
-      titer= tq.begin();
-      Viter= Vq.begin();
+    if ( !active )
+        return;
+
+    if (initial) {
+        ISI_time = t;
+        initial = false;
+    } else {
+        ISI_time += dt;
     }
-    ISI_time= t;
-    initial= false;
-  }
-  else {
-    if (p->method != VSG) ISI_time+= dt;
-  }
-  
-  if (p->method == VSG) { // voltage from file
-    while ((titer != tq.end()) && (*titer < t-ISI_time)) {
-      titer++;
-      Viter++;
-    }
-    if (titer == tq.end()) {
-      p->active= false;
-      message(QString("Voltage data exhausted ... stopping Generator"));
-      return;
-    }         
-  }
-  else {
-    if (p->bdType > 0) { // taking care of the burst detection options
-      if(!SGactive) { // burst detection hasn't been completed yet ... spike generation inactive
+
+    if (p->bdType > 0 && !SGactive && bdChn ) { // taking care of the burst detection options
+                                      // burst detection hasn't been completed yet ... spike generation inactive
         if (burstDetected) { // burst (first crossing) was detected, waiting for opposite crossing
-          if (readSpikeNo < burstSpikeNo) {
-            if (stIter == stq.end()) {
-              p->active= false;
-              message(QString("Spike time data exhausted ... stopping spike Generator"));
-              return;
-            }
-            p->SpikeT[readSpikeNo++]= *stIter;
-            stIter++;
-            if (readSpikeNo == burstSpikeNo) {
-              p->period= p->SpikeT[burstSpikeNo-1]+(20.0/p->spkTimeScaling);
-            }
-          }
-          if (((p->bdType == 1) && (bdChn->V > p->bdThresh)) || 
-              ((p->bdType == 2) && (bdChn->V < p->bdThresh))) {
-            nUnderThresh++;     // "under" and "over" only phrases for first and second cond.
-            if (nUnderThresh > p->bdNUnder) {
-              SGactive= true;
-              nOverThresh= 0;
-              burstDetected= false;
-             ISI_time= 0.0;
-            }
-          }
-        }
-        else {  // burst (first crossing) not yet detected ...
-          if (((p->bdType == 1) && (bdChn->V < p->bdThresh)) || 
-              ((p->bdType == 2) && (bdChn->V > p->bdThresh))) {
-            nOverThresh++;
-            if (nOverThresh > p->bdNOver) {
-              nUnderThresh= 0;
-              burstDetected= true;
-              if (p->method == FILESG) {
-                if (snIter == snq.end()) {
-                  p->active= false;
-                  message(QString("Spike time data exhausted ... stopping spike Generator"));
-                  return;
+            if (((p->bdType == 1) && (bdChn->V > instp->bdThresh)) ||
+                ((p->bdType == 2) && (bdChn->V < instp->bdThresh))) {
+                tOverThresh += dt;     // "under" and "over" only phrases for first and second cond. -- Note, this was reversed before v2017!
+                if (tOverThresh > p->bdtOver) {
+                    SGactive = true;
+                    tUnderThresh = 0.;
+                    burstDetected = false;
+                    ISI_time = 0.0;
+                    period = p->SpikeT[burstNo].back() + (20.0/p->spkTimeScaling);
                 }
-                else {
-                  burstSpikeNo= *snIter;
-                  snIter++;
-                  readSpikeNo= 0;
+            } else if ( p->bdtOverCont ) {
+                if ( !onThreshold &&
+                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
+                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
+                    onThreshold = true;
+                } else {
+                    onThreshold = false;
+                    tOverThresh = 0.;
+                    if ( p->bdStrictlyCont ) {
+                        tUnderThresh = 0.;
+                        burstDetected = false;
+                    }
                 }
-              }
             }
-          }
+        } else {  // burst (first crossing) not yet detected ...
+            if (((p->bdType == 1) && (bdChn->V < instp->bdThresh)) ||
+                ((p->bdType == 2) && (bdChn->V > instp->bdThresh))) {
+                tUnderThresh += dt;
+                if (tUnderThresh > p->bdtUnder) {
+                    tOverThresh = 0.;
+                    burstDetected = true;
+                }
+            } else if ( p->bdtUnderCont ) {
+                if ( !onThreshold &&
+                    (((p->bdType == 1) && (bdChn->V == instp->bdThresh)) ||
+                     ((p->bdType == 2) && (bdChn->V == instp->bdThresh)))) {
+                    onThreshold = true;
+                } else {
+                    onThreshold = false;
+                    tUnderThresh = 0.;
+                }
+            }
         }
-      }
     }
-  }
-  // calculating SpkGen voltage for all cases:
-                 
-  if (SGactive) {// the spike generation is active
-// routine that calculates the membrane potential of the CN taking
-// in account all the spikes (superimposing) the voltage due to each spike
-    if (p->method == VSG) {
-      V= *Viter;
-      assert(Viter != Vq.end());
-    }
-    else {
-      V= 0.0;
-      for (i= 0; i < burstSpikeNo; i++) {
-        V+= VSpike((ISI_time - p->SpikeT[i])*p->spkTimeScaling);
-      }
-      V*= p->VSpike;
-      V+= p->VRest;
 
-      if (ISI_time > p->period) {
-        if (p->bdType > 0) {
-          SGactive= false;
+    // calculating SpkGen voltage for all cases:
+    if (SGactive) {// the spike generation is active
+        // routine that calculates the membrane potential of the CN taking
+        // in account all the spikes (superimposing) the voltage due to each spike
+        V = 0.0;
+        for ( double const& tSpike : p->SpikeT[burstNo] )
+            if ( tSpike > 0 )
+                V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
+        V *= p->VSpike;
+        V += p->VRest;
+
+        if (ISI_time > period) {
+            if (p->bdType > 0) {
+                SGactive = false;
+            } else {
+                ISI_time -= (period = p->period);
+            }
+            if ( ++burstNo == (int)p->SpikeT.size() ) {
+                if ( p->loopBursts ) {
+                    burstNo = 0;
+                } else {
+                    message(QString("Spike time data exhausted ... stopping spike Generator"));
+                    V = p->VRest;
+                    active = false;
+                }
+            }
         }
-        else {
-          if (p->method == EXPLICITSG) ISI_time-= p->period;
-        }
-      }                             
+    } else {
+        V = p->VRest;
     }
-  }
-  else {
-    V= p->VRest;
-  }
-  VChn->V= V;
-  
-  if ((p->method == FILESG) && (p->bdType == 0)) {
-    if ((ISI_time - p->SpikeT[0]) > ISI_TIME_MAX) {
-      for (i= 0; i < burstSpikeNo-1; i++) {
-        p->SpikeT[i]=p->SpikeT[i+1];
-      }
-      if (stIter == stq.end()) {
-        burstSpikeNo--;
-        if (burstSpikeNo == 0) {
-          p->active= false;
-          message(QString("Spike time data exhausted ... stopping spike Generator"));
-        }
-      }
-      else {
-        p->SpikeT[burstSpikeNo-1]= *stIter;
-        stIter++;
-      }
-    }
-  }
+    in.V = V + instp->inChn.bias;
 }
 
 // how to generate a spike
-
 double SpkGen::VSpike(double t){
   #define A 1.0
   #define B 4.0
@@ -276,7 +197,7 @@ double SpkGen::VSpike(double t){
   #define NORMALIZE 3.25394
 
   double f1, f2, f_spike;
-  
+
   if ((t-T0)/TAU1 < 100.0)
     f1= (((*theTanh)(A1*(T0-t))+1.0)/2.0)*(*theExp)((t-T0)/TAU1);
   else f1= 0.0;
@@ -299,6 +220,10 @@ double SpkGen::VSpike(double t){
 }
 
 
-#undef SGOFF
-#undef EXPLICITSG
-#undef FILESG
+void SpkGenPrototype::init(DCThread *DCT)
+{
+    inst.reserve(params().numInst());
+    for ( size_t i = 0; i < params().numInst(); i++ )
+        if ( params().instance(i).active )
+            inst.emplace_back(new SpkGen(this, i, DCT));
+}

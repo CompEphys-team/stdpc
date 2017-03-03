@@ -3,9 +3,33 @@
 
 using namespace std;
 
-#include "Main.h"
 #include <QString>
 #include <iostream>
+#include <QColor>
+#include "ChannelIndex.h"
+#include "Util.h"
+
+struct SynapseAssignment {
+    bool active;
+    ChannelIndex PreSynChannel;
+    ChannelIndex PostSynChannel;
+    ChannelIndex OutSynChannel;
+    double delay;
+};
+
+struct GapJunctionAssignment {
+    bool active;
+    ChannelIndex preInChannel;
+    ChannelIndex postInChannel;
+    ChannelIndex preOutChannel;
+    ChannelIndex postOutChannel;
+};
+
+struct CurrentAssignment {
+    bool active;
+    ChannelIndex VChannel;
+    ChannelIndex IChannel;
+};
 
 typedef struct {
   double AMinus;
@@ -49,9 +73,6 @@ typedef struct {
   bool active;
   bool LUTables;
   bool MgBlock;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double VSyn;
   double tauSyn;
@@ -72,14 +93,12 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
 } CSynData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double Vrev;
   double aS;
@@ -93,14 +112,12 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
 } abSynData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int PreSynChannel;
-  int PostSynChannel;
-  int OutSynChannel;
   double gSyn;
   double Vpre;
   double Vrev;
@@ -112,23 +129,19 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+  std::vector<SynapseAssignment> assign;
 } DestexheSynData;
 
 typedef struct {
   bool active;
-  int preInChannel;
-  int postInChannel;
-  int preOutChannel;
-  int postOutChannel;
   int type;
   double gSyn;
+  std::vector<GapJunctionAssignment> assign;
 } GJunctData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int VChannel;
-  int IChannel;
   double gMax;
   double Vrev;
   int mExpo;
@@ -149,13 +162,12 @@ typedef struct {
   double tauhAmpl;
   double Vtauh;
   double stauh;
-} mhHHData;        
+  std::vector<CurrentAssignment> assign;
+} mhHHData;
 
 typedef struct {
   bool active;
   bool LUTables;
-  int VChannel;
-  int IChannel;
   double gMax;
   double Vrev;
   int mExpo;
@@ -176,14 +188,17 @@ typedef struct {
   double hkb;
   double hVb;
   double hsb;
+  std::vector<CurrentAssignment> assign;
 } abHHData;
 
-typedef struct {
+struct elecCalibParams {
+  // channel copy parameters
+  bool copyChnOn;
+  ChannelIndex copyChn;
 
   // General params
   double samplingRate;
-  int inputChannelNumber;
-  int outputChannelNumber;
+  ChannelIndex outputChannelNumber;
 
   // Electrode measurement params
   double iMaxElec;
@@ -202,37 +217,17 @@ typedef struct {
   double injCalLen;
   double fullKernelLen;
   double electrodeKernelLen;
-
-} elecCalibParams;
+};
 
 typedef struct {
   bool enabled;
-  QString fileName;
+  QuotedString fileName;
   double savingFreq;
   bool isBinary;
 
 } dataSavingParams;
-
-typedef struct {
-  bool active;
-  int method;
-  bool saving;
-  int LUTables;
-  double VSpike;
-  double spkTimeScaling;
-  double VRest;
-  int bdType;
-  int bdChannel;
-  double bdThresh;
-  int bdNUnder;
-  int bdNOver;
-  double period;
-  int SpikeNo;
-  QString STInFName;
-  double SpikeT[10];
-} SGData;
  
-typedef struct {
+struct inChnData {
   bool active;
   int gain;
   double gainFac;
@@ -242,9 +237,10 @@ typedef struct {
   double minVoltage;
   double maxVoltage;
   bool chnlSaving;
-} inChnData;
+  elecCalibParams calib;
+};
 
-typedef struct {
+struct outChnData {
   bool active;
   int gain;
   double gainFac;
@@ -252,60 +248,49 @@ typedef struct {
   double minCurrent;
   double maxCurrent;
   bool chnlSaving;
-} outChnData;
-
-class SDAQData {
-  public: 
-    QString inFileName;
-    QString outFileName;
-    short int inChnNo;
-    short int outChnNo;
-    double inTFac;
-    double outDt;
-    SDAQData &operator=(SDAQData);
 };
 
-class DigiDataData {
-  public: 
-    short int baseAddress;
-    short int syncIOMask;
-    DigiDataData &operator=(DigiDataData);
+class DAQData {
+public:
+    bool active;
+    std::vector<inChnData> inChn;
+    std::vector<outChnData> outChn;
+    DAQData() : active(false) {}
 };
 
-#ifdef NATIONAL_INSTRUMENTS
-class NIDAQData {
-  public: 
-    QString deviceName;
-    NIDAQData &operator=(NIDAQData);
-};
-#endif
+struct GraphData {
+    bool active;
+    ChannelIndex chan;
+    bool isVoltage;
+    QColor color;
 
-typedef struct {
-  bool active[4];
-  QString color[4];
-  int chn[4];
-  double miny[4];
-  double maxy[4];
-  double xrange;
-  double dt;
-  int xtNo;
-  int ytNo;
-  double yfac[4];
-} graphData;
+    GraphData() : active(true) {}
+};
+
+struct PlotData {
+    double interval;
+    int bufferExp;
+    std::vector<GraphData> graphs;
+    PlotData() : interval(1e-3), bufferExp(4) {}
+};
 
 typedef struct {
   bool active;
   double threshV;
-  int trigChn;
+  ChannelIndex trigChn;
 } SampleHoldData;
 
-ostream &operator<<(ostream &os, SDAQData &p);
-istream &operator>>(istream &is, SDAQData &p); 
-ostream &operator<<(ostream &os, DigiDataData &p);
-istream &operator>>(istream &is, DigiDataData &p);
-#ifdef NATIONAL_INSTRUMENTS
-ostream &operator<<(ostream &os, NIDAQData &p); 
-istream &operator>>(istream &is, NIDAQData &p); 
-#endif
+struct vInstData {
+    bool active;
+    inChnData inChn;
+    outChnData outChn;
+};
+
+struct ModelData {
+    bool active;
+    virtual vInstData &instance(size_t i) = 0;
+    virtual size_t numInst() const = 0;
+    ModelData() : active(false) {}
+};
 
 #endif

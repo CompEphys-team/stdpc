@@ -2,12 +2,13 @@
 #define AECCHANNEL_H
 
 #include <QVector>
+#include "ChannelIndex.h"
 
 class AECChannel
 {
 public:
-    short int inChnNum;
-    short int outChnNum;
+    ChannelIndex inChnNum;
+    ChannelIndex outChnNum;
 
     bool active;
 
@@ -26,7 +27,7 @@ public:
     void Inactivate();
     bool IsActive();
 
-    void Initialize(short int inChnNum, short int outChnNum, double kerSampPer, QVector<double> kernel);
+    void Initialize(ChannelIndex inChnNum, ChannelIndex outChnNum, double kerSampPer, QVector<double> kernel);
     void ResetChannel();
     double CalculateVe(double current, double dt);
 

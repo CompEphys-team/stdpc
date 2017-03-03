@@ -11,6 +11,9 @@ LUtable::LUtable()
 {
   generated= false;
   requested= false;
+  Rdx = 0.0;
+  Rxmin = 0.0;
+  Rxmax = 0.0;
 }
 
 void LUtable::reset()
@@ -22,7 +25,7 @@ void LUtable::require(double inxmin, double inxmax, double indx)
 {
   if (inxmin < Rxmin) Rxmin= inxmin;
   if (inxmax > Rxmax) Rxmax= inxmax;
-  if (indx < dx) Rdx= indx;
+  if (indx < Rdx || Rdx == 0.0) Rdx= indx;
   requested= true;
 }
 
@@ -43,7 +46,7 @@ int LUtable::allocate()
       }
       xmax= Rxmax;
       xmin= Rxmin;
-      bins= (int) ((xmax+xmin)/dx) +1;
+      bins= (int) ((xmax-xmin)/dx) +1;
       data= new double[bins];
     }
   }

@@ -1,49 +1,48 @@
 #include "DigiDataDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
+#include "DigiData.h"
 
-DigiDataDlg::DigiDataDlg(QWidget *parent) : DAQDlg(parent)
+DigiDataDlg::DigiDataDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    DAQDlg(idx, proxy, parent)
 {
-  setupUi(this);
+    setupUi(this);
+    connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+    connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
+    label = DAQLabel->text();
+    setIndex(idx);
 }
 
-bool DigiDataDlg::exportData(DigiDataData &DDAQp)
+void DigiDataDlg::setIndex(size_t no)
 {
-  bool change= false;
-  bool success;
-  
-  short int tmp= (short int) BaseAddressE->text().toInt(&success,16);
-  if (success) {
-     getEntry(DDAQp.baseAddress, tmp, change);
-  }
-  return change;
+    DAQLabel->setText(label.arg(no));
+    DAQDlg::setIndex(no);
 }
 
-void DigiDataDlg::importData(DigiDataData DDAQp)
+void DigiDataDlg::exportData(bool forceInit)
 {
-  QString num;
-  num.setNum(DDAQp.baseAddress,16);
-  BaseAddressE->setText(num);
+    bool change= false;
+    bool success;
+    short int tmp= (short int) BaseAddressE->text().toInt(&success,16);
+    if (success) {
+        getEntry(DigiDataProxy::p[idx].baseAddress, tmp, change);
+    }
+    DAQDlg::exportData(forceInit || change);
 }
 
-void DigiDataDlg::accept()
+void DigiDataDlg::importData()
 {
-  bool change= exportData(DigiDatap);
-  if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+    QString num;
+    num.setNum(DigiDataProxy::p[idx].baseAddress,16);
+    BaseAddressE->setText(num);
+    DAQDlg::importData();
 }
 
-void DigiDataDlg::reject()
+void DigiDataDlg::backup()
 {
-//  importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+    bak = DigiDataProxy::p[idx];
 }
 
-void DigiDataDlg::appear()
+void DigiDataDlg::restoreBackup()
 {
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+    DigiDataProxy::p[idx] = bak;
 }
-

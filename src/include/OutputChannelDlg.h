@@ -1,26 +1,25 @@
 #ifndef OUTPUTCHANNELDLG_H
 #define OUTPUTCHANNELDLG_H
 
-
 #include <QAbstractButton>
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QComboBox>
-
-#include "ui_outputChannelDlg.h"
-#include "ObjectDataTypes.h"
-#include "DigiData.h"
+#include "ui_OutputChannelDlg.h"
+#include "Daq.h"
 
 class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
 {
      Q_OBJECT
 
   public:
-     OutputChannelDlg(QWidget *parent= 0);
-     void init(DAQ *);
+     OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     void init();
      void exportData();
      void importData();
      virtual ~OutputChannelDlg();
+
+     inline void setIndex(size_t i) { idx = i; }
      
      int ChnNo;
      int lbNum;
@@ -34,18 +33,16 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      QVector<QLineEdit *> bias;
      QVector<QLabel *> allLabel;
      QVector<QCheckBox *> saveChnl;
+
+     size_t idx;
+     DAQProxy *proxy;
                
   public slots:
      void accept();
      void reject();
-     void appear();
      
   private:
-     bool initial;
      void clearAll();
-
-  signals:       
-     void updateOutChn(int, int *);
 }; 
 
 #endif

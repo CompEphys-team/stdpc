@@ -2,21 +2,29 @@
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
-AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
+AlphaBetaHHDlg::AlphaBetaHHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
   setupUi(this);
-  QString lb;
-  lb.setNum(no);
-  lb= "HH "+lb;
-  HHDlgLabel->setText(lb);
+
+  label = HHDlgLabel->text();
+  setIndex(no);
+
+  QVector<AssignmentCellBase<CurrentAssignment>*> vec;
+  vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
+  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 180, in));
+  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 180, out));
+  assignments->init(vec);
+}
+
+void AlphaBetaHHDlg::setIndex(int no)
+{
+    HHDlgLabel->setText(label.arg(no));
 }
 
 void AlphaBetaHHDlg::exportData(abHHData &p)
 {
   p.LUTables= (LUCombo->currentIndex() == 1);
-  p.VChannel= VChannelCombo->currentIndex();
-  p.IChannel= IChannelCombo->currentIndex();
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
   p.mExpo= mExpoE->text().toInt();
@@ -38,6 +46,8 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   p.hkb= hkbE->text().toDouble()*1e3;
   p.hVb= hVbE->text().toDouble()*1e-3;
   p.hsb= hsbE->text().toDouble()*1e-3;
+
+  assignments->exportData(p.assign);
 }
 
 void AlphaBetaHHDlg::importData(abHHData p)
@@ -46,8 +56,6 @@ void AlphaBetaHHDlg::importData(abHHData p)
      
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
-  VChannelCombo->setCurrentIndex(p.VChannel);
-  IChannelCombo->setCurrentIndex(p.IChannel);
   num.setNum(p.gMax*1e9);
   gMaxE->setText(num);
   num.setNum(p.Vrev*1e3);
@@ -85,44 +93,6 @@ void AlphaBetaHHDlg::importData(abHHData p)
   hVbE->setText(num);
   num.setNum(p.hsb*1e3);
   hsbE->setText(num);
-}
-  
-void AlphaBetaHHDlg::updateOutChn(int chN, int *chns) 
-{
-  QString current;
-  QString lb;
-  int newInd;
 
-  current= IChannelCombo->currentText();
-  while (IChannelCombo->count() > 0) {
-    IChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    IChannelCombo->addItem(lb);
-  }
-  newInd= IChannelCombo->findText(current);
-  if (newInd >= 0) IChannelCombo->setCurrentIndex(newInd);
-  else IChannelCombo->setCurrentIndex(0);
-}
-
-void AlphaBetaHHDlg::updateInChn(int chN, int *chns) 
-{
-  QString current;
-  QString lb;
-  int newInd;
-
-  current= VChannelCombo->currentText();
-  while (VChannelCombo->count() > 0) {
-    VChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    VChannelCombo->addItem(lb);
-  }
-  lb= QString("SG");
-  VChannelCombo->addItem(lb);
-  newInd= VChannelCombo->findText(current);
-  if (newInd >= 0) VChannelCombo->setCurrentIndex(newInd);
-  else VChannelCombo->setCurrentIndex(0);
+  assignments->importData(p.assign);
 }

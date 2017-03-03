@@ -6,43 +6,18 @@
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QFileDialog>
-#include "Main.h"
 #include "Global.h"
-#include "ui_mainwin.h"
-#include "InputChannelDlg.h"
-#include "OutputChannelDlg.h"
-#include "ChemSynDlg.h"
-#include "AbSynDlg.h"
-#include "GapJunctionDlg.h"
-#include "DestexheSynDlg.h"
-#include "HHDlg.h"
-#include "AlphaBetaHHDlg.h"
-#include "SpikeTimeDlg.h"
-#include "DigiDataDlg.h"
-#include "SimulDAQDlg.h"
-#include "ElectrodeCompDlg.h"
 #include "DataSavingDlg.h"
-#include "AECChannel.h"
-
-
-#ifdef NATIONAL_INSTRUMENTS
-#include "NIDAQDlg.h" 
-#endif
-
 #include "ObjectDataTypes.h"
-#include "SimulDAQ.h"
-
-#ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
-#endif
-
+#include "DeviceManager.h"
 #include "DCThread.h"
-#include "Graph.h"
-#include "GraphDlg.h"
+#include "ChannelListModel.h"
 
+namespace Ui {
+class MainWindow;
+}
 
-
-class MyMainWindow : public QMainWindow, private Ui::MainWindow
+class MyMainWindow : public QMainWindow
 {
      Q_OBJECT
 
@@ -53,65 +28,28 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
   public:
      MyMainWindow(QWidget *parent= 0);
      virtual ~MyMainWindow();
-     void exportData();
+     void exportData(bool ignoreDAQ = false);
      void importData();
-     void exportSGData();
-     void importSGData();
- 
-     InputChannelDlg *inChnDlg;
-     OutputChannelDlg *outChnDlg;
 
-     ElectrodeCompDlg *ECDlg;
      DataSavingDlg *DSDlg;
-     ChemSynDlg *CSynDlg[MAX_SYN_NO];
-     abSynDlg *abSDlg[MAX_SYN_NO];
-     GapJunctionDlg *GJunctDlg[MAX_SYN_NO];
-     DestexheSynDlg *DxheSynDlg[MAX_SYN_NO];
-     HHDlg *nHHDlg[MAX_HH_NO];
-     AlphaBetaHHDlg *abHHDlg[MAX_HH_NO];
-     SpikeTimeDlg *SpkTDlg;
-     GraphDlg *graphDlg[2];
      DCThread *DCT;
-     int DAQtype;
-     QString DAQName;
-     DAQ *board;
-     DigiDataDlg *DDataDlg;
-     SimulDAQDlg *SDAQDlg;
 
-#ifdef NATIONAL_INSTRUMENTS     
-     NIDAQDlg *NDQDlg;
-#endif
-     
-     DAQDlg *theDAQDlg;
-     Graph Graphs[2];
+     ChannelListModel *inChnModel, *outChnModel;
      
   public slots:
-     void DAQSetup();
-     void updateSGInChn(int, int*);
-     void CloseToLimitWarning(QString, int, double, double, double);
+     void CloseToLimitWarning(QString, QString, double, double, double);
      void DisplayAbout();
+     void DisplayMessage(QString);
+     void updateDeviceStatus(DeviceStatus = DeviceStatus::Inactive, const QString & = QString());
+     void updateStartButton();
+
+  signals:
+     void channelsChanged();
+     void modelRemoved(ChannelIndex);
                  
   private slots:
-     void SGMethodChanged();
-     void Syn0ComboChanged();
-     void Syn1ComboChanged();
-     void Syn2ComboChanged();
-     void Syn3ComboChanged();
-     void Syn4ComboChanged();
-     void Syn5ComboChanged();
-
-     void HH0ComboChanged();
-     void HH1ComboChanged();
-     void HH2ComboChanged();
-     void HH3ComboChanged();
-     void HH4ComboChanged();
-     void HH5ComboChanged();
-
      void StartButClicked();
      void StopButClicked();
-     
-     void DisplayMessage(QString);
-     void showDAQDlg();
      
      void SaveConfig();
      void LoadConfig();
@@ -128,11 +66,15 @@ class MyMainWindow : public QMainWindow, private Ui::MainWindow
     QFileDialog *SaveProtocolFileDlg;
     QFileDialog *LoadScriptFileDlg;    
     
+    QLabel *loadedProtocolStatus;
+    QLabel *rateIndicator;
+
     // adjustable parameter stuff
 
-    void setupAP();
     void doLoadProtocol(QString &);
     void doSaveProtocol(QString &);
+
+    Ui::MainWindow *ui;
 
 }; 
 

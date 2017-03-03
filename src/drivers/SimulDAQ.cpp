@@ -1,34 +1,69 @@
-#include "SimulDaq.h"
+#include "SimulDAQ.h"
 #include "limits.h"
+#include <QFileInfo>
+#include <QDir>
+#include "AP.h"
+#include "SimulDAQDlg.h"
+extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
+/// Construct a single self-registering proxy
+static SimulDAQProxy prox;
+std::vector<SDAQData> SimulDAQProxy::p;
+DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, &prox); }
+DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
 
-SimulDAQ::SimulDAQ()
+SimulDAQProxy::SimulDAQProxy() :
+    regAP {
+        addAP("SDAQp[#].active", &p, &SDAQData::active),
+        addAP("SDAQp[#].inFileName", &p, &SDAQData::inFileName),
+        addAP("SDAQp[#].outFileName", &p, &SDAQData::outFileName),
+        addAP("SDAQp[#].inTFac", &p, &SDAQData::inTFac),
+        addAP("SDAQp[#].outDt", &p, &SDAQData::outDt),
+        addAP("SDAQp[#].inChn[#].active", &p, &SDAQData::inChn, &inChnData::active),
+        addAP("SDAQp[#].inChn[#].gain", &p, &SDAQData::inChn, &inChnData::gain),
+        addAP("SDAQp[#].inChn[#].gainFac", &p, &SDAQData::inChn, &inChnData::gainFac),
+        addAP("SDAQp[#].inChn[#].spkDetect", &p, &SDAQData::inChn, &inChnData::spkDetect),
+        addAP("SDAQp[#].inChn[#].spkDetectThresh", &p, &SDAQData::inChn, &inChnData::spkDetectThresh),
+        addAP("SDAQp[#].inChn[#].bias", &p, &SDAQData::inChn, &inChnData::bias),
+        addAP("SDAQp[#].inChn[#].chnlSaving", &p, &SDAQData::inChn, &inChnData::chnlSaving),
+        addAP("SDAQp[#].outChn[#].active", &p, &SDAQData::outChn, &outChnData::active),
+        addAP("SDAQp[#].outChn[#].gain", &p, &SDAQData::outChn, &outChnData::gain),
+        addAP("SDAQp[#].outChn[#].gainFac", &p, &SDAQData::outChn, &outChnData::gainFac),
+        addAP("SDAQp[#].outChn[#].bias", &p, &SDAQData::outChn, &outChnData::bias),
+        addAP("SDAQp[#].outChn[#].chnlSaving", &p, &SDAQData::outChn, &outChnData::chnlSaving)
+    }
 {
-  inChnNo= SDAQp.inChnNo;
+    DeviceManager::RegisterDAQ(daqClass(), this);
+}
+
+//---------------------------------------------------------------------------
+
+SimulDAQ::SimulDAQ(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy),
+    tOff(0.0)
+{
+  inChnNo= params()->inChn.size();
   inIdx= new short int[inChnNo];
   inGainFac= new double[inChnNo];
-  outChnNo= SDAQp.outChnNo;
+  outChnNo= params()->outChn.size();
   outIdx= new short int[outChnNo];
   outGainFac= new double[outChnNo];
   inGainNo= 1;
   inGainText= new char*[inGainNo];
   inGainText[0]= new char[80];
   strcpy(inGainText[0], "n/a");
-  inLow = QVector<double>(inChnNo);
+  inLow = QVector<double>(inGainNo);
   inLow[0] = -1e10;
-  inHigh = QVector<double>(inChnNo);
+  inHigh = QVector<double>(inGainNo);
   inHigh[0] = 1e10;
   outGainNo= 1;
   outGainText= new char*[outGainNo];
   outGainText[0]= new char[80];
   strcpy(outGainText[0], "n/a");
-  outLow = QVector<double>(outChnNo);
+  outLow = QVector<double>(outGainNo);
   outLow[0] = -1e10;
-  outHigh = QVector<double>(outChnNo);
+  outHigh = QVector<double>(outGainNo);
   outHigh[0] = +1e10;
-  QueryPerformanceFrequency(&intClock_frequency);
-  clock_frequency= (double) intClock_frequency.LowPart;
-  clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
   inq= new QList<double>[inChnNo];
   outq= new QList<double>[outChnNo];
   inIter= new QList<double>::const_iterator[inChnNo];
@@ -49,27 +84,8 @@ SimulDAQ::~SimulDAQ()
   delete[] inIter;
 }
 
-double SimulDAQ::get_RTC()
-{
-  static LARGE_INTEGER inT;
-  static double dt, lastT;
-  
-  QueryPerformanceCounter(&inT);
-  lastT= sysT;
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  dt= sysT-lastT;
-  if (dt < 0.0) dt+= clock_cycle;
-  t+= dt;
- os << t << endl;
-  return dt;
-}
-
-void SimulDAQ::reset_RTC() {
-  static LARGE_INTEGER inT;
-   
-  QueryPerformanceCounter(&inT);
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  t= 0.0;
+void SimulDAQ::start() {
+  tOff = 0.0;
   lastWrite= 0.0;
   rewind();
 }
@@ -83,17 +99,11 @@ bool SimulDAQ::initialize_board(QString &name)
   name= QString("SimulDAQ files ");
 
   intq.clear();
-//  for (int i= 0; i < inChnNo; i++) inq[i].clear();
-//  delete[] inq;
-//  delete[] inIter;
-  is.open(SDAQp.inFileName.toLatin1());
+  is.open(SimulDAQProxy::p[devID].inFileName.toLatin1());
   is >> t;
   t0= t;
-//  inChnNo= SDAQp.inChnNo;
-//  inq= new QList<double>[inChnNo];
-//  inIter= new QList<double>::const_iterator[inChnNo];
   while (is.good()) {
-    intq.append((t-t0)*SDAQp.inTFac);
+    intq.append((t-t0) * SimulDAQProxy::p[devID].inTFac);
     for (int i= 0; i < inChnNo; i++) {
       is >> data;
       inq[i].append(data);
@@ -114,28 +124,20 @@ bool SimulDAQ::initialize_board(QString &name)
   }       
   is.close();
   is.clear();
-//  inChnNo= SDAQp.inChnNo;
-//  delete[] inIdx;
-//  inIdx= new short int[inChnNo];
-//  delete[] inGainFac;
-//  inGainFac= new double[inChnNo];
+
   outtq.clear();
   for (int i= 0; i < outChnNo; i++) outq[i].clear();
-//  delete[] outq;
-
-//  outChnNo= SDAQp.outChnNo;
-//  outq= new QList<double>[outChnNo];
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toLatin1());
-  if (!os.good()) {
+
+  qt_ntfs_permission_lookup++;
+  QFileInfo fInfo(SimulDAQProxy::p[devID].outFileName.toLatin1());
+  if ( !fInfo.dir().isReadable() || (fInfo.exists() && !fInfo.isWritable()) ) {
     name=QString("SimulDAQ output files ");
     success= false;
   }
-//  delete[] outIdx;
-//  outIdx= new short int[outChnNo];
-//  delete[] outGainFac;
-//  outGainFac= new double[outChnNo];
-  reset_RTC();
+  qt_ntfs_permission_lookup--;
+
+  start();
   
   initialized= success;
   
@@ -145,29 +147,33 @@ bool SimulDAQ::initialize_board(QString &name)
 void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
 {
   short int i;
-  actInChnNo= chnNo;  
+  actInChnNo= chnNo;
+
+  ChannelIndex dex(&prox, devID, 0, true);
+
   for(i= 0; i < actInChnNo; i++)
   {
     inIdx[i]= Chns[i];
-    inGainFac[i]= inChnp[inIdx[i]].gainFac;  // read V ... users take care of other units
+    inGainFac[i]= params()->inChn[inIdx[i]].gainFac;  // read V ... users take care of other units
+    dex.chanID = inIdx[i];
+    inChnLabels[inIdx[i]] = dex.toString();
   }
 }
 
-void SimulDAQ::get_scan(inChannel *in)
+void SimulDAQ::get_scan()
 {
   short int i;
   short int idx;
   static double V;
 
   //os << t << endl;
-  if (t >= inT) {
+  if (t >= inT + tOff) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {
       inIter[i]++;
     }
     if (intIter == intq.end()) {
-      t-= dataT;
-      lastWrite-= dataT;
+      tOff+= dataT;
       rewind();
     }
     inT= *intIter;
@@ -184,21 +190,20 @@ void SimulDAQ::get_scan(inChannel *in)
   }
 }
 
-void SimulDAQ::get_single_scan(inChannel *in, int which)
+void SimulDAQ::get_single_scan(inChannel *in)
 {
    short int i;
    short int idx;
    static double V;
 
    //os << t << endl;
-   if (t >= inT) {
+   if (t >= inT + tOff) {
       intIter++;
       for (i= 0; i < inChnNo; i++) {
         inIter[i]++;
       }
       if (intIter == intq.end()) {
-        t-= dataT;
-        lastWrite-= dataT;
+        tOff+= dataT;
         rewind();
       }
       inT= *intIter;
@@ -207,8 +212,8 @@ void SimulDAQ::get_single_scan(inChannel *in, int which)
       for (i= 0; i < inChnNo; i++) {
         V= *inIter[i];
         if ((idx < actInChnNo) && (i == inIdx[idx])) {
-          if (i == which) {
-            in[i].V= V*inGainFac[idx];
+          if (&(this->in[i]) == in) {
+            in->V= V*inGainFac[idx];
           }
           idx++;
         }
@@ -219,24 +224,28 @@ void SimulDAQ::get_single_scan(inChannel *in, int which)
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
 {
+  ChannelIndex dex(&prox, devID, 0, false);
+
   short int i;
   actOutChnNo= chnNo;
   for (i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= outChnp[outIdx[i]].gainFac*1.0e9;  // write nA
+    outGainFac[i]= params()->outChn[outIdx[i]].gainFac*1.0e9;  // write nA
+    dex.chanID = outIdx[i];
+    outChnLabels[outIdx[i]] = dex.toString();
   }
   if (os.is_open()) os.close();
-  os.open(SDAQp.outFileName.toLatin1());
+  os.open(SimulDAQProxy::p[devID].outFileName.toLatin1());
   lastWrite= 0.0;
 }
 
-void SimulDAQ::write_analog_out(outChannel *out)
+void SimulDAQ::write_analog_out()
 {
 //  short int idx;
-  double dt;
+//  double dt;
   
-  dt= get_RTC();
-  if (t > lastWrite+SDAQp.outDt) {
+//  dt= get_RTC();
+  if (t > lastWrite + SimulDAQProxy::p[devID].outDt) {
     lastWrite= t;
     outtq.append(t);
     for (int i= 0; i < outChnNo; i++) {

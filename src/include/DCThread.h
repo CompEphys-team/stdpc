@@ -2,6 +2,7 @@
 #define DCTHREAD_H
 
 #include <QThread>
+#include <functional>
 #include "Global.h"
 #include "ChemSyn.h"
 #include "AbSyn.h"
@@ -9,12 +10,11 @@
 #include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
-#include "SpkGen.h"
-#include "DigiData.h"
-#include "Scripting.h"
-#include "AECChannel.h"
 #include "DataSaver.h"
 
+#include "ChannelBufferHelper.h"
+
+class GraphDlg;
 
 class DCThread : public QThread 
 {
@@ -28,77 +28,84 @@ class DCThread : public QThread
 private:
      DataSaver *dataSaver;
 
+     inline void start(Priority pr = TimeCriticalPriority) { QThread::start(pr); }
+
  public:
      DCThread();
      virtual ~DCThread();
-     void init(DAQ *);
      bool LoadScript(QString &);
      void UnloadScript();
-     double WaitTillNextSampling(double);
 
-     // List of AEC channels (io-channels pairs, kernels and current buffers)
-     QVector<AECChannel*> aecChannels;
+     void setGraph(GraphDlg * = nullptr, double dt = 0.0);
 
-     // Temporary data storing object
-     QVector<double> data;
-     QVector<int> inChnsToSave;
-     QVector<int> outChnsToSave;
+     void setup_and_go();
+
+     inChannel *getInChan(ChannelIndex const& dex);
+     outChannel *getOutChan(ChannelIndex const& dex);
+     std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
+
+     template <typename T>
+     void instantiate(std::vector<T> &pre, std::vector<T> &in, typename T::param_type &, CurrentAssignment &);
+     template <typename T>
+     void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, SynapseAssignment &);
+     template <typename T>
+     void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
+
+     QVector<inChannel *> inChnsToSave;
+     QVector<outChannel *> outChnsToSave;
      
      bool stopped;
      bool finished;
      bool scripting;
-     SpkGen SG;
-     ChemSyn *csyn;
-     abSyn *absyn;
-     GapJunction *esyn;
-     DestexheSyn *dsyn;
-     HH *hh;
-     abHH *abhh;
-     DAQ *board;
-     inChannel *inChn;
-     outChannel *outChn;
-     short int *inIdx;
-     short int *outIdx;
-     short int inNo;
-     short int outNo;
-     
-     short int csNo;
-     short int absNo;
-     short int esNo;
-     short int dsNo;
-     short int hhNo;
-     short int abhhNo;
-     
-     short int *csIdx;
-     short int *absIdx;
-     short int *esIdx;
-     short int *dsIdx;
-     short int *hhIdx;
-     short int *abhhIdx;
-     
- private:
+     std::vector<ChemSyn> csynPre;
+     std::vector<ChemSyn> csynPost;
+     std::vector<abSyn> absynPre;
+     std::vector<abSyn> absynPost;
+
+     std::vector<GapJunction> esyn;
+
+     std::vector<DestexheSyn> dsynPre;
+     std::vector<DestexheSyn> dsynPost;
+
+     std::vector<HH> hhPre;
+     std::vector<HH> hhIn;
+     std::vector<abHH> abhhPre;
+     std::vector<abHH> abhhIn;
+
+     outChnData outNoneData;
+     outChannel outChnNone;
+
+     std::shared_ptr<ChannelBufferHelper> bufferHelper;
+
+private:
      bool initial;   
      double t;
-     double lastT;
      double dt;
-     double lastWrite[2];
-    
-     int grpNo[2];
-     int pen[2][4];
-     double *grp[2][4];
 
+     bool saving;
+     double savingPeriod;
+     double lastWrite;
 
-     QList<scriptInstruction> scriptq;
-     QList<scriptInstruction>::iterator scrIter;
+     QVector<AECChannel*> aecChannels;
+     QVector<inChannel*> aecIn;
+     QVector<outChannel*> aecOut, aecCopy;
+
+     GraphDlg *graph;
+     QVector<double *> graphVar;
+     double graphDt;
+     double graphDummy;
+
+     QList<QPair<double, std::function<void()>>> scriptq;
+     QList<QPair<double, std::function<void()>>>::iterator scrIter;
     
  signals:
      void error(QString message);
      void message(QString message);
-     void addPoint1(double, double, int);
-     void addPoint2(double, double, int);
-     void CloseToLimit(QString, int, double, double, double);
-
-
+     void CloseToLimit(QString, QString, double, double, double);
+     void updateRate(int Hz);
+     void done();
+     void saveData();
+     void forceSaveData();
 };
 
 

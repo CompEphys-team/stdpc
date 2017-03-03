@@ -13,22 +13,21 @@ class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
      Q_OBJECT
 
   public:
-     ChemSynDlg(int, QWidget *parent= 0);
+     ChemSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(CSynData &);
      void importData(CSynData);
+     void setIndex(int);
 
-     int No;   
+     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+
+     typedef CSynData param_type;
      
   public slots:
      void PlastMethodChange();
      void STDComboChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
-     
-  private:
 }; 
 
 #endif

@@ -1,99 +1,43 @@
-#include "Main.h"
 #include "MainWin.h"
+#include "ui_MainWin.h"
 #include "LUtables.h"
+#include "AP.h"
 #include <windows.h>
-
-void MyMainWindow::DAQSetup()
-{
-  QString name;
-  bool success;
-  QMessageBox LoadMsg;
-     
-  DAQtype= DAQComboBox->currentIndex();
-  DAQName= DAQComboBox->currentText();
-  DDataDlg->exportData(DigiDatap);
-  SDAQDlg->exportData(SDAQp);
-#ifdef NATIONAL_INSTRUMENTS 
-  NDQDlg->exportData(NIDAQp);
-#endif
-
-  if (!DCT->finished) {  
-    DisplayMessage("Waiting for running Dynamic Clamp Thread to finish");
-    while (!DCT->finished) { Sleep(1000);}
-  }
-  if (board != NULL) delete board;
-  switch (DAQtype) {
-  case 0: 
-    board= new SimulDAQ;
-    theDAQDlg= SDAQDlg;;
-    break;
-  case 1:
-    board= new DigiData;
-    theDAQDlg= DDataDlg;
-    break;
-#ifdef NATIONAL_INSTRUMENTS
-  case 2:
-    board= new NIDAQ;
-    theDAQDlg= NDQDlg;       
-#endif
-  }
-  LoadMsg.setIcon(QMessageBox::Information);
-  LoadMsg.setWindowTitle(tr("StdpC 2012"));
-  LoadMsg.setText(tr("Initializing hardware ... this may take a while ..."));
-  //LoadMsg.removeButton(LoadMsg.button(QMessageBox::Ok));
-  LoadMsg.show();
-
-  success= board->initialize_board(name);
-  if (success) {
-    DisplayMessage(QString("Good news: ")+name+QString(" found and opened successfully!"));
-    StartBut->setEnabled(true);
-  }
-  else {
-    DisplayMessage(QString("Bad news: ")+name+QString(" not found or not opened successfully!"));
-    StartBut->setEnabled(false);
-  }
-
-  if (inChnp != NULL) delete[] inChnp;
-  inChnp= new inChnData[board->inChnNo];
-  inChnDlg->init(board); // already exports to inChnp ...
-
-  if (outChnp != NULL) delete[] outChnp;
-  outChnp= new outChnData[board->outChnNo];
-  outChnDlg->init(board); // already exports to outChnp ...
-
-  DCT->init(board);
-
-  // set up the adjustable parameters that they reflect the right channel numbers ...
-  setupAP();
-
-  LoadMsg.hide();
-}
+#include <QScrollBar>
+#include "ModelOpts.h"
+#include "DaqOpts.h"
 
 MyMainWindow::MyMainWindow(QWidget *parent)
-     : QMainWindow(parent)
+     : QMainWindow(parent),
+       ui(new Ui::MainWindow)
  {
-     setupUi(this);
-     DDataDlg= new DigiDataDlg(this);
-     SDAQDlg= new SimulDAQDlg(this);
-#ifdef NATIONAL_INSTRUMENTS
-     NDQDlg= new NIDAQDlg(this);
-     DAQComboBox->addItem(QString("National Instruments"));
-#endif
-     ECDlg= new ElectrodeCompDlg(this);
+     ui->setupUi(this);
+
+     inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
+     outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
+
      DSDlg= new DataSavingDlg(this);
-     inChnDlg= new InputChannelDlg(this);
-     outChnDlg= new OutputChannelDlg(this);
-     for (int i= 0; i < 6; i++) {
-       CSynDlg[i]= new ChemSynDlg(i, this);
-       abSDlg[i]= new abSynDlg(i, this);
-       GJunctDlg[i]= new GapJunctionDlg(i, this);
-       DxheSynDlg[i]= new DestexheSynDlg(i, this);
-       nHHDlg[i]= new HHDlg(i, this);
-       abHHDlg[i]= new AlphaBetaHHDlg(i, this);
-     }
-     SpkTDlg= new SpikeTimeDlg;
-     graphDlg[0]= new GraphDlg(0, this);
-     graphDlg[1]= new GraphDlg(1, this);
+
+     ui->graphtab->link(this);
+
+     QVector<ComponentPrototypeBase *> prototypes;
+     prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
+     prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
+     ui->currentTable->init(prototypes, inChnModel, outChnModel);
+
+     prototypes.clear();
+     prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));
+     prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
+     prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
+     prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
+     ui->synapseTable->init(prototypes, inChnModel, outChnModel);
+
+     QVector<DaqOptsPrototypeBase*> dprot;
+     for ( DAQProxy *proxy : DeviceManager::Register() )
+         dprot.push_back(new DaqOptsPrototype(proxy));
+     for ( ModelProxy *proxy : ModelManager::Register() )
+         dprot.push_back(new ModelOptsPrototype(proxy));
+     ui->DAQTable->init(dprot, this);
      
      ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
                QString("*.log"));
@@ -109,136 +53,81 @@ MyMainWindow::MyMainWindow(QWidget *parent)
                QString("*.scr"));
      LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
 
-      // somewhat of a hack: Synchronous digital IO for DigiData boards
-     DigiDatap.syncIOMask= 0x0000;  
+     rateIndicator = new QLabel("Ready");
+     ui->statusbar->addPermanentWidget(rateIndicator);
+     loadedProtocolStatus = new QLabel("");
+     ui->statusbar->addPermanentWidget(loadedProtocolStatus);
          
      DCT= new DCThread();
-   
-     inChnp= NULL;
-     outChnp= NULL;
-
-     LoadConfig();
-
-     connect(SGMethodCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
-     connect(BurstDetectionCombo, SIGNAL(currentIndexChanged(QString)), SLOT(SGMethodChanged()));
-     connect(Syn0Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn0ComboChanged()));
-     connect(Syn1Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn1ComboChanged()));
-     connect(Syn2Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn2ComboChanged()));
-     connect(Syn3Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn3ComboChanged()));
-     connect(Syn4Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn4ComboChanged()));
-     connect(Syn5Combo, SIGNAL(currentIndexChanged(QString)), SLOT(Syn5ComboChanged()));
-     connect(HH0Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH0ComboChanged()));
-     connect(HH1Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH1ComboChanged()));
-     connect(HH2Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH2ComboChanged()));
-     connect(HH3Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH3ComboChanged()));
-     connect(HH4Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH4ComboChanged()));
-     connect(HH5Combo, SIGNAL(currentIndexChanged(QString)), SLOT(HH5ComboChanged()));
      
-     connect(SpikeTimesBut, SIGNAL(clicked()), SpkTDlg, SLOT(show()));
-     connect(StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
-     connect(StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
+     connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
+     connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
      
-     connect(actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(actionDAQ, SIGNAL(triggered()), SLOT(showDAQDlg()));
-     connect(actionInput_channels, SIGNAL(triggered()), inChnDlg, SLOT(appear()));
-     connect(actionOutput_channels, SIGNAL(triggered()), outChnDlg, SLOT(appear()));
-     connect(actionElectrode_setup, SIGNAL(triggered()), ECDlg, SLOT(show()));
-     connect(actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(show()));
-     connect(actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
-     connect(actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
+     connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
+     connect(ui->actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
+     connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
+     connect(ui->actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
-     connect(actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
-     connect(actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
+     connect(ui->actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
+     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
      connect(LoadProtocolFileDlg, SIGNAL(accepted()), SLOT(LoadProtocol()));
-     connect(actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
+     connect(ui->actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
      connect(SaveProtocolFileDlg, SIGNAL(accepted()), SLOT(SaveProtocol()));
-     connect(actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
+     connect(ui->actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
-     connect(actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));    
-     connect(actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
+     connect(ui->actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));
+     connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
-     
-     for (int i= 0; i < 6; i++) {
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), CSynDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), abSDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), DxheSynDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), GJunctDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), nHHDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), abHHDlg[i], SLOT(updateOutChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), CSynDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), GJunctDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), abSDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), DxheSynDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), nHHDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), abHHDlg[i], SLOT(updateInChn(int, int*)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), SLOT(updateSGInChn(int, int*)));
-     }
-     
-     for (int i= 0; i < 2; i++) {
-       connect(outChnDlg, SIGNAL(updateOutChn(int, int*)), graphDlg[i], SLOT(updateOutChn(int, int *)));
-       connect(inChnDlg, SIGNAL(updateInChn(int, int*)), graphDlg[i], SLOT(updateInChn(int, int *)));
-     }
-     connect(DAQComboBox, SIGNAL(currentIndexChanged(QString)), SLOT(DAQSetup()));
-     connect(DDataDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
-     connect(SDAQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
-#ifdef NATIONAL_INSTRUMENTS
-     connect(NDQDlg, SIGNAL(reinitDAQ()), SLOT(DAQSetup()));
-#endif
-     
-     connect(Graph1SetBut, SIGNAL(clicked()),graphDlg[0], SLOT(show()));
-     connect(Graph2SetBut, SIGNAL(clicked()),graphDlg[1], SLOT(show()));
 
+     connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
+     connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
+     connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
+     connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
+
+     connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
+     connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
+     connect(ui->HHClear, &QPushButton::clicked, [=](){ui->currentTable->importData(true);});
+     connect(ui->HHReset, SIGNAL(clicked(bool)), ui->currentTable, SLOT(importData()));
+
+     connect(ui->SynActivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(activateAll()));
+     connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
+     connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
+     connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
+
+     connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-     connect(&DCT->SG,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
-     connect(DCT,SIGNAL(addPoint1(double, double, int)), &Graphs[0], SLOT(addPoint(double, double, int)));
-     connect(DCT,SIGNAL(addPoint2(double, double, int)), &Graphs[1], SLOT(addPoint(double, double, int)));
+     connect(DCT, &DCThread::updateRate, [this](int rate){
+         rateIndicator->setText(QString("Update rate: %1 Hz").arg(rate));
+     });
+     connect(DCT, &DCThread::done, [this](){
+         rateIndicator->setText("Ready");
+     });
+     connect(DCT,SIGNAL(CloseToLimit(QString, QString, double, double, double)),SLOT(CloseToLimitWarning(QString, QString, double, double, double)));
      
-     connect(ECDlg,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
+     initAP();
+     LoadConfig();
 
-     connect(ECDlg->calibrator,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
-     connect(DCT,SIGNAL(CloseToLimit(QString, int, double, double, double)),SLOT(CloseToLimitWarning(QString, int, double, double, double)));
-     
-     // graphical stuff
-     DataD1->setScene(&Graphs[0].Scene);
-     DataD2->setScene(&Graphs[1].Scene);   
-
-     board= NULL;
-     DAQSetup();
-     
      DisplayMessage(QString("Main: Dynamic Clamp starting ..."));
-     exportData();
-     for (int i= 0; i < 2; i++) Graphs[i].init(&Graphp[i]);
+     exportData(true);
+     updateDeviceStatus();
  } 
 
 MyMainWindow::~MyMainWindow()
 {
-  for (int i= 0; i < 6; i++) {
-    delete CSynDlg[i];
-    delete abSDlg[i]; 
-    delete GJunctDlg[i];
-    delete nHHDlg[i];
-    delete abHHDlg[i];
-  }
-  delete inChnDlg;
-  delete outChnDlg;
-  delete DDataDlg;
-  delete SDAQDlg;
-
-#ifdef NATIONAL_INSTRUMENTS
-  delete NDQDlg;
-#endif
+  delete inChnModel;
+  delete outChnModel;
   
   delete ExportLogFileDlg;
   delete LoadProtocolFileDlg;
   delete SaveProtocolFileDlg;
-//  delete[] inChnp;
-//  delete[] outChnp;
+
+  delete ui;
 }
 
-void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowLimit, double highLimit, double value)
+void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double lowLimit, double highLimit, double value)
 {
-   QString msg = what+QString(" is close to channel limit!\nChannel number: ")+QString::number(channelNum)+QString("\nHigh limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value)+QString("\nLow limit: ")+QString::number(lowLimit);
+   QString msg = what+QString(" is close to channel limit!\nChannel: ")+channelName+QString("\nHigh limit: ")+QString::number(highLimit)+QString("\nValue: ")+QString::number(value)+QString("\nLow limit: ")+QString::number(lowLimit);
    //QMessageBox::warning(this, tr("Warning"), msg);
    DisplayMessage(msg);
    return;
@@ -248,7 +137,34 @@ void MyMainWindow::CloseToLimitWarning(QString what, int channelNum, double lowL
 void MyMainWindow::DisplayMessage(QString message)
 {
   QTime tstamp= QTime::currentTime();
-  MessageWindow->addItem(tstamp.toString()+QString(": ")+message);
+  QScrollBar *sb = ui->MessageWindow->verticalScrollBar();
+  bool down = sb->value() == sb->maximum();
+  ui->MessageWindow->addItem(tstamp.toString()+QString(": ")+message);
+  if ( down )
+    ui->MessageWindow->scrollToBottom();
+}
+
+void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
+{
+    switch ( status ) {
+    case DeviceStatus::Active :
+        DisplayMessage(QString("Good news: %1 found and opened successfully!").arg(name));
+        break;
+    case DeviceStatus::Failed :
+        DisplayMessage(QString("Bad news: %1 not found or not opened successfully!").arg(name));
+        break;
+    case DeviceStatus::Inactive :
+    default:
+        break;
+    }
+
+    emit channelsChanged();
+    updateStartButton();
+}
+
+void MyMainWindow::updateStartButton()
+{
+    ui->StartBut->setEnabled(!Devices.active().empty() || Models.empty());
 }
 
 
@@ -268,343 +184,140 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
   event->accept();
 }
 
-void MyMainWindow::SGMethodChanged() 
-{
-//  QMessageBox::warning(this, tr("My Application"),
-//                tr("The signal for index change has been received"),
-//               QMessageBox::Close); 
-
-  int index= SGMethodCombo->currentIndex();
-  int index2= BurstDetectionCombo->currentIndex();
-
-  SGSave->setEnabled(false);
-  SGLUTableCombo->setEditable(false);
-  SpikesL->setEnabled(false);              
-  VSpikeE->setEnabled(false); VSpikeL->setEnabled(false); VSpikeU->setEnabled(false);
-  WidthE->setEnabled(false); WidthL->setEnabled(false); WidthU->setEnabled(false);
-  VRestE->setEnabled(false); VRestL->setEnabled(false); VRestU->setEnabled(false);
-  VRestE->setEnabled(false); VRestL->setEnabled(false); VRestU->setEnabled(false);
-  ExplicitSpikeTimesL->setEnabled(false);
-  NumberE->setEnabled(false); NumberL->setEnabled(false); NumberU->setEnabled(false);
-  PeriodE->setEnabled(false); PeriodL->setEnabled(false); PeriodU->setEnabled(false);
-  SpikeTimesBut->setEnabled(false); 
-  BurstDetectionL->setEnabled(false);
-  BurstDetectionCombo->setEnabled(false);
-  SGbdChannelCombo->setEnabled(false); ChannelL->setEnabled(false);
-  ThresholdE->setEnabled(false); ThresholdL->setEnabled(false); ThresholdU->setEnabled(false);
-  NUnderE->setEnabled(false); NUnderL->setEnabled(false); 
-  NOverE->setEnabled(false); NOverL->setEnabled(false);
-  STInputFileL->setEnabled(false); STInputFileE->setEnabled(false); 
-  if (index == 0) SGSave->setChecked(false);
-  if (index == 3) {
-    SGSave->setEnabled(true); STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
-  }
-  else {
-    if (index > 0) {
-      SGSave->setEnabled(true);
-      SGLUTableCombo->setEditable(true);
-      SpikesL->setEnabled(true);              
-      VSpikeE->setEnabled(true); VSpikeL->setEnabled(true); VSpikeU->setEnabled(true);
-      WidthE->setEnabled(true); WidthL->setEnabled(true); WidthU->setEnabled(true);
-      VRestE->setEnabled(true); VRestL->setEnabled(true); VRestU->setEnabled(true);
-      BurstDetectionL->setEnabled(true);
-      BurstDetectionCombo->setEnabled(true);
-      if (index2 > 0) {
-        SGbdChannelCombo->setEnabled(true); ChannelL->setEnabled(true); 
-        ThresholdE->setEnabled(true); ThresholdL->setEnabled(true); ThresholdU->setEnabled(true);
-        NUnderE->setEnabled(true); NUnderL->setEnabled(true);
-        NOverE->setEnabled(true); NOverL->setEnabled(true);
-      }
-    }
-    if (index == 1) {
-      ExplicitSpikeTimesL->setEnabled(true);
-      NumberE->setEnabled(true); NumberL->setEnabled(true); NumberU->setEnabled(true);
-      PeriodE->setEnabled(true); PeriodL->setEnabled(true); PeriodU->setEnabled(true);
-      SpikeTimesBut->setEnabled(true);
-    }
-    if (index == 2) {
-      STInputFileL->setEnabled(true); STInputFileE->setEnabled(true);
-    }
-  }
-}       
-
-
-#include "SynXComboChanged.cc"
-#include "HHXComboChanged.cc"
-
 void MyMainWindow::StartButClicked() 
-{ 
-  actionLoad_Protocol->setEnabled(false);
-  actionSave_Protocol->setEnabled(false);
-  actionLoad_Script->setEnabled(false);
-  actionUnload_Script->setEnabled(false);
-  actionExport_Log->setEnabled(false);
-  actionExit->setEnabled(false);
-  actionInput_channels->setEnabled(false);
-  actionOutput_channels->setEnabled(false);
-  actionDAQ->setEnabled(false);
-  actionSave_config->setEnabled(false);
-  actionElectrode_setup->setEnabled(false);
-  actionData_saving->setEnabled(false);
-  DAQComboBox->setEnabled(false);
+{
+  ui->actionLoad_Protocol->setEnabled(false);
+  ui->actionSave_Protocol->setEnabled(false);
+  ui->actionLoad_Script->setEnabled(false);
+  ui->actionUnload_Script->setEnabled(false);
+  ui->actionExport_Log->setEnabled(false);
+  ui->actionExit->setEnabled(false);
+  ui->actionSave_config->setEnabled(false);
+  ui->menuConfig->setEnabled(false);
+  ui->DAQTable->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
   while (!DCT->finished) Sleep(100);
   exportData();
-  for (int i= 0; i < 2; i++) Graphs[i].init(&Graphp[i]);
-//      QMessageBox::warning(this, tr("My Application"),
-//                tr("init'ing outChnDlg!"),
-//                QMessageBox::Ok); 
 
-  DCT->start();
+  if ( !ui->graphtab->startPlotting(DCT) )
+      ui->tabWidget->setTabEnabled(1, false);
+  rateIndicator->setText("Started");
+  DCT->setup_and_go();
 }
 
 void MyMainWindow::StopButClicked()
 {
-  actionLoad_Protocol->setEnabled(true);
-  actionSave_Protocol->setEnabled(true);
-  actionLoad_Script->setEnabled(!DCT->scripting);
-  actionUnload_Script->setEnabled(DCT->scripting);
-  actionExport_Log->setEnabled(true);
-  actionExit->setEnabled(true);
-  actionInput_channels->setEnabled(true);
-  actionOutput_channels->setEnabled(true);
-  actionDAQ->setEnabled(true);
-  actionSave_config->setEnabled(true);
-  actionElectrode_setup->setEnabled(true);
-  actionData_saving->setEnabled(true);
-  DAQComboBox->setEnabled(true);
+  ui->actionLoad_Protocol->setEnabled(true);
+  ui->actionSave_Protocol->setEnabled(true);
+  ui->actionLoad_Script->setEnabled(!DCT->scripting);
+  ui->actionUnload_Script->setEnabled(DCT->scripting);
+  ui->actionExport_Log->setEnabled(true);
+  ui->actionExit->setEnabled(true);
+  ui->actionSave_config->setEnabled(true);
+  ui->menuConfig->setEnabled(true);
+  ui->DAQTable->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
+  ui->graphtab->stopPlotting();
+  ui->tabWidget->setTabEnabled(1, true);
 }
 
-void MyMainWindow::exportData()
+void MyMainWindow::exportData(bool ignoreDAQ)
 {
-  // collect data from the synapses
-  synType[0]= Syn0Combo->currentIndex();
-  synType[1]= Syn1Combo->currentIndex();
-  synType[2]= Syn2Combo->currentIndex();
-  synType[3]= Syn3Combo->currentIndex();
-  synType[4]= Syn4Combo->currentIndex();
-  synType[5]= Syn5Combo->currentIndex();
-
-  for (int i= 0; i < 6; i++) {
-    CSynp[i].active= (synType[i] == 1);
-    abSynp[i].active= (synType[i] == 3);
-    ESynp[i].active= (synType[i] == 2);
-    DxheSynp[i].active= (synType[i] == 4);
-    CSynDlg[i]->exportData(CSynp[i]);
-    abSDlg[i]->exportData(abSynp[i]);
-    GJunctDlg[i]->exportData(ESynp[i]);
-    DxheSynDlg[i]->exportData(DxheSynp[i]);
-  }
-  // collect data from the HH conductances
-  HHType[0]= HH0Combo->currentIndex();
-  HHType[1]= HH1Combo->currentIndex();
-  HHType[2]= HH2Combo->currentIndex();
-  HHType[3]= HH3Combo->currentIndex();
-  HHType[4]= HH4Combo->currentIndex();
-  HHType[5]= HH5Combo->currentIndex();
-  
-  for (int i= 0; i < 6; i++) {
-    mhHHp[i].active= (HHType[i] == 1);
-    abHHp[i].active= (HHType[i] == 2);
-    nHHDlg[i]->exportData(mhHHp[i]);
-    abHHDlg[i]->exportData(abHHp[i]);
-  }
-  
-  inChnDlg->exportData();
-  outChnDlg->exportData();
-  DDataDlg->exportData(DigiDatap);
-  SDAQDlg->exportData(SDAQp);
-#ifdef NATIONAL_INSTRUMENTS
-  NDQDlg->exportData(NIDAQp);
-#endif
-  exportSGData();
-  SpkTDlg->exportData();
-  for (int i= 0; i < 2; i++) graphDlg[i]->exportData(Graphp[i]);
-
+  ui->synapseTable->exportData();
+  ui->currentTable->exportData();
+  ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
-  ECDlg->exportData();
-      
+  ui->graphtab->exportData();
 }
  
 void MyMainWindow::importData()
 {
-  // do DAQs and channels first
-  DDataDlg->importData(DigiDatap);
-  SDAQDlg->importData(SDAQp);
-#ifdef NATIONAL_INSTRUMENTS
-  NDQDlg->importData(NIDAQp);
-#endif
-
-  inChnDlg->importData();
-  inChnDlg->accept();
-  outChnDlg->importData();
-  outChnDlg->accept();
-
-  // collect data from the synapses
-  for (int i= 0; i < MAX_SYN_NO; i++) {
-    synType[i]= 0;
-    if (CSynp[i].active) synType[i]= 1;
-    if (abSynp[i].active) synType[i]= 3;
-    if (ESynp[i].active) synType[i]= 2;
-    if (DxheSynp[i].active) synType[i]= 4;
-  }
-  Syn0Combo->setCurrentIndex(synType[0]);
-  Syn1Combo->setCurrentIndex(synType[1]);
-  Syn2Combo->setCurrentIndex(synType[2]);
-  Syn3Combo->setCurrentIndex(synType[3]);
-  Syn4Combo->setCurrentIndex(synType[4]);
-  Syn5Combo->setCurrentIndex(synType[5]);
-
-  for (int i= 0; i < 6; i++) {
-    CSynDlg[i]->importData(CSynp[i]);
-    abSDlg[i]->importData(abSynp[i]);
-    GJunctDlg[i]->importData(ESynp[i]);
-    DxheSynDlg[i]->importData(DxheSynp[i]);
-  }
-  
-  // collect data from the HH conductances
-  for (int i= 0; i < MAX_HH_NO; i++) {
-    HHType[i]= 0;
-    if (mhHHp[i].active) HHType[i]= 1;
-    if (abHHp[i].active) HHType[i]= 2;
-  }
-  HH0Combo->setCurrentIndex(HHType[0]);
-  HH1Combo->setCurrentIndex(HHType[1]);
-  HH2Combo->setCurrentIndex(HHType[2]);
-  HH3Combo->setCurrentIndex(HHType[3]);
-  HH4Combo->setCurrentIndex(HHType[4]);
-  HH5Combo->setCurrentIndex(HHType[5]);
-  
-  for (int i= 0; i < 6; i++) {
-    nHHDlg[i]->importData(mhHHp[i]);
-    abHHDlg[i]->importData(abHHp[i]);
-  }
-  importSGData();
-  SpkTDlg->importData();
-  for (int i= 0; i < 2; i++) graphDlg[i]->importData(Graphp[i]);
-
+  ui->DAQTable->importData();
+  ui->synapseTable->importData();
+  ui->currentTable->importData();
   DSDlg->importData();
-  ECDlg->importData();
-}
-
-void MyMainWindow::exportSGData() 
-{
-  SGp.method= SGMethodCombo->currentIndex();
-  SGp.active= (SGp.method > 0);
-  SGp.LUTables= SGLUTableCombo->currentIndex();
-  if (SGp.active) SGp.saving= (SGSave->checkState() > 0);
-  else SGp.saving= false;
-  SGp.VSpike= VSpikeE->text().toDouble()/1e3;
-  SGp.spkTimeScaling= 5e3/WidthE->text().toDouble();
-  SGp.VRest= VRestE->text().toDouble()/1e3;
-  
-  SGp.bdType= BurstDetectionCombo->currentIndex();
-  SGp.bdChannel= SGbdChannelCombo->currentIndex();
-  SGp.bdThresh= ThresholdE->text().toDouble()/1e3;
-  SGp.bdNUnder= NUnderE->text().toInt();
-  SGp.bdNOver= NOverE->text().toInt();
-  
-  SGp.period= PeriodE->text().toDouble()/1e3;
-  SGp.SpikeNo= NumberE->text().toInt();
-  
-  SGp.STInFName= STInputFileE->text();
-}
-
-void MyMainWindow::importSGData() 
-{
-  QString num;
-  SGMethodCombo->setCurrentIndex(SGp.method);
-  SGSave->setChecked(SGp.saving);
-  SGLUTableCombo->setCurrentIndex(SGp.LUTables);
-  num.setNum(SGp.VSpike*1e3);
-  VSpikeE->setText(num);
-  num.setNum(5e3/SGp.spkTimeScaling);
-  WidthE->setText(num);
-  num.setNum(SGp.VRest*1e3);
-  VRestE->setText(num);
-  
-  BurstDetectionCombo->setCurrentIndex(SGp.bdType);
-  SGbdChannelCombo->setCurrentIndex(SGp.bdChannel);
-  num.setNum(SGp.bdThresh*1e3);
-  ThresholdE->setText(num);
-  num.setNum(SGp.bdNUnder);
-  NUnderE->setText(num);
-  num.setNum(SGp.bdNOver);
-  NOverE->setText(num);
-  
-  num.setNum(SGp.period*1e3);
-  PeriodE->setText(num);
-  num.setNum(SGp.SpikeNo);
-  NumberE->setText(num);
-  
-  STInputFileE->setText(SGp.STInFName);
-}
-
-void MyMainWindow::updateSGInChn(int chN, int *chns) 
-{
-  QString lb;
-
-  while (SGbdChannelCombo->count() > 0) {
-    SGbdChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    SGbdChannelCombo->addItem(lb);
-  }
-}
-
-void MyMainWindow::showDAQDlg()
-{
-  theDAQDlg->appear();
+  ui->graphtab->importData();
+  updateStartButton();
 }
 
 void MyMainWindow::SaveConfig()
 {
+  ui->DAQTable->exportData();
+
   ofstream os("StdpC.conf");
-  
-  os << DAQComboBox->currentIndex() << endl;
-  os << SDAQp << endl;
-  os << DigiDatap << endl;
+  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
+
+  for ( DAQProxy *proxy : DeviceManager::Register() )
+      for ( AP *ap : proxy->coreAPs() )
+          ap->write(os);
+
   os.close();
 }
 
 void MyMainWindow::LoadConfig()
 {
-  int itmp;
-  ifstream is("StdpC.conf");
-  SDAQData tmpSDAQp;
-  DigiDataData tmpDigiDatap;
-
-  
-  if (is.good()) {
-    is >> itmp;
-    is >> tmpSDAQp;
-    is >> tmpDigiDatap;
-  }
-  if (is.good())
-  {
+    ifstream is("StdpC.conf");
+    if ( readProtocol(is) )
+        ui->DAQTable->importData();
+    else
+        DisplayMessage(QString("No valid config file found; reverting to standard settings"));
     is.close();
-    DAQComboBox->setCurrentIndex(itmp);
-    SDAQp= tmpSDAQp;
-    SDAQDlg->importData(SDAQp);
-    DigiDatap= tmpDigiDatap;
-    DDataDlg->importData(DigiDatap);
-  }
-  else {
-    DisplayMessage(QString("No valid config file found; reverting to standard settings"));
+
+    // special Sample-and-Hold for Attila
+    SampleHoldp.active= false;
+    SampleHoldp.threshV= 0.0;
+}
+
+void MyMainWindow::doSaveProtocol(QString &fname)
+{
+  ofstream os(fname.toLatin1());
+  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
+
+  exportData();
+
+  for ( auto const& ap : AP::params() ) {
+      ap->write(os);
   }
 
-  // special Sample-and-Hold for Attila
-  SampleHoldp.active= false;
-  SampleHoldp.threshV= 0.0;
-  SampleHoldp.trigChn= 0;
+  os.close();
+}
+
+
+void MyMainWindow::doLoadProtocol(QString &fname)
+{
+  ifstream is(fname.toLatin1());
+  if (!is.good()) {
+    DisplayMessage(QString("Error opening Protocol file"));
+    return;
+  }
+
+  // Clear params before loading
+  CSynp.clear();
+  abSynp.clear();
+  ESynp.clear();
+  DxheSynp.clear();
+  mhHHp.clear();
+  abHHp.clear();
+  Models.clear();
+  Devices.clear();
+  Plotp.graphs.clear();
+
+  std::function<bool(QString)> callback = [=](QString name) {
+      DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
+      return false;
+  };
+  readProtocol(is, &callback);
+  is.close();
+
+  importData();
+
+  loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
 }
 
 
@@ -621,7 +334,7 @@ void MyMainWindow::doExportLog(QString &fname)
   QListWidgetItem *it;
   
   while (!done) {
-    it= MessageWindow->item(i);
+    it= ui->MessageWindow->item(i);
     if (it != NULL) {
       os << it->text().toStdString() << endl;
     }
@@ -633,7 +346,7 @@ void MyMainWindow::doExportLog(QString &fname)
     
 void MyMainWindow::ClearLog()
 {
-  MessageWindow->clear();
+  ui->MessageWindow->clear();
 }
 
 void MyMainWindow::LoadProtocol()
@@ -652,21 +365,19 @@ void MyMainWindow::LoadScript()
 {
   QStringList fnlist= LoadScriptFileDlg->selectedFiles();
   if (DCT->LoadScript(*fnlist.begin())) {
-    actionLoad_Script->setEnabled(false);
-    actionUnload_Script->setEnabled(true);
+    ui->actionLoad_Script->setEnabled(false);
+    ui->actionUnload_Script->setEnabled(true);
   }
 }
 
 void MyMainWindow::UnLoadScript()
 {
   DCT->UnloadScript();
-  actionLoad_Script->setEnabled(true);
-  actionUnload_Script->setEnabled(false);
+  ui->actionLoad_Script->setEnabled(true);
+  ui->actionUnload_Script->setEnabled(false);
 }
 
 void MyMainWindow::DisplayAbout()
 {
-    QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC2012."));
+    QMessageBox::information(this,tr("About StdpC"),tr("StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation. \n It is distributed under the GPL v2 license. \n You are running version StdpC 2017."));
 }
-
-#include "AP.cc"

@@ -1,57 +1,81 @@
 #include "SimulDAQDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
+#include "SimulDAQ.h"
+#include <QFileDialog>
 
-SimulDAQDlg::SimulDAQDlg(QWidget *parent) : DAQDlg(parent)
+SimulDAQDlg::SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    DAQDlg(idx, proxy, parent)
 {
   setupUi(this);
+  connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+  connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
+  label = DAQLabel->text();
+  setIndex(idx);
 }
 
-bool SimulDAQDlg::exportData(SDAQData &SDAQp)
+void SimulDAQDlg::setIndex(size_t no)
+{
+    DAQLabel->setText(label.arg(no));
+    DAQDlg::setIndex(no);
+}
+
+void SimulDAQDlg::exportData(bool forceInit)
 {
   bool change= false;
-  getEntry(SDAQp.inFileName, InputFileE->text(), change);
-  getEntry(SDAQp.outFileName, OutputFileE->text(), change);
-  getEntry(SDAQp.inChnNo, inChannelE->text().toShort(), change);
-  getEntry(SDAQp.outChnNo, outChannelE->text().toShort(), change);
-  getEntry(SDAQp.inTFac, inTFacE->text().toDouble(), change);
-  getEntry(SDAQp.outDt, outDtE->text().toDouble()*1e-3, change);
-  return change;
+  uint inChnNo = SimulDAQProxy::p[idx].inChn.size(), outChnNo = SimulDAQProxy::p[idx].outChn.size();
+  getEntry(inChnNo, inChannelE->text().toUInt(), change);
+  getEntry(outChnNo, outChannelE->text().toUInt(), change);
+  if ( change ) {
+      SimulDAQProxy::p[idx].inChn.resize(inChnNo);
+      SimulDAQProxy::p[idx].outChn.resize(outChnNo);
+      for ( inChnData &i : SimulDAQProxy::p[idx].inChn )
+          i.active = true;
+      for ( outChnData &i : SimulDAQProxy::p[idx].outChn )
+          i.active = true;
+  }
+  getEntry<QString>(SimulDAQProxy::p[idx].inFileName, InputFileE->text(), change);
+  getEntry<QString>(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
+  getEntry(SimulDAQProxy::p[idx].inTFac, inTFacE->text().toDouble(), change);
+  getEntry(SimulDAQProxy::p[idx].outDt, outDtE->text().toDouble()*1e-3, change);
+
+  DAQDlg::exportData(change || forceInit);
 }
 
-void SimulDAQDlg::importData(SDAQData SDAQp)
+void SimulDAQDlg::importData()
 {
   QString num;
-  InputFileE->setText(SDAQp.inFileName); 
-  OutputFileE->setText(SDAQp.outFileName);
-  num.setNum(SDAQp.inChnNo);
-  inChannelE->setText(num);
-  num.setNum(SDAQp.outChnNo);
-  outChannelE->setText(num);
-  num.setNum(SDAQp.inTFac);
+  InputFileE->setText(SimulDAQProxy::p[idx].inFileName);
+  OutputFileE->setText(SimulDAQProxy::p[idx].outFileName);
+  inChannelE->setText(QString::number(SimulDAQProxy::p[idx].inChn.size()));
+  outChannelE->setText(QString::number(SimulDAQProxy::p[idx].outChn.size()));
+  num.setNum(SimulDAQProxy::p[idx].inTFac);
   inTFacE->setText(num);
-  num.setNum(SDAQp.outDt*1e3);
+  num.setNum(SimulDAQProxy::p[idx].outDt*1e3);
   outDtE->setText(num);
+
+  DAQDlg::importData();
 }
 
-void SimulDAQDlg::accept()
+void SimulDAQDlg::backup()
 {
-  bool change= exportData(SDAQp);
-  if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+    bak = SimulDAQProxy::p[idx];
 }
 
-void SimulDAQDlg::reject()
+void SimulDAQDlg::restoreBackup()
 {
-  importData(SDAQp);
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  SimulDAQProxy::p[idx] = bak;
 }
 
-void SimulDAQDlg::appear()
+void SimulDAQDlg::on_InputFileB_clicked()
 {
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+    QString file = QFileDialog::getOpenFileName(this, "Select input file...", InputFileE->text());
+    if ( !file.isEmpty() )
+        InputFileE->setText(file);
 }
 
+void SimulDAQDlg::on_OutputFileB_clicked()
+{
+    QString file = QFileDialog::getSaveFileName(this, "Select input file...", OutputFileE->text());
+    if ( !file.isEmpty() )
+        OutputFileE->setText(file);
+}

@@ -1,9 +1,45 @@
 
 #include "AbSyn.h"
 #include <cmath>
+#include "DCThread.h"
     
-abSyn::abSyn() 
+abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
+    p(inp),
+    pre(pre),
+    post(post),
+    out(out),
+    a(a),
+    buffered(false),
+    S(0.0),
+    R(0.0),
+    g(p->gSyn)
 {
+    if (p->LUTables) {
+      theExp= &expLU;
+      expLU.require(-50.0, 50.0, 0.02);
+      theExpSigmoid= &expSigmoidLU;
+      expSigmoidLU.require(-50.0, 50.0, 0.02);
+      theTanh= &tanhLU;
+      tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+      theExp= &expFunc;
+      theExpSigmoid= &expSigmoidFunc;
+      theTanh= &tanhFunc;
+    }
+
+    graw= invGFilter(g);
+    if (p->Plasticity == 2) {
+      P= p->ODE.InitialP;
+      D= p->ODE.InitialD;
+      Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
+      Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( a->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
+        buffered = true;
+    }
 }
 
 double abSyn::invGFilter(double ing)
@@ -36,45 +72,16 @@ double abSyn::gFilter(double ingr)
   return ng;
 }
 
-void abSyn::init(abSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->PreSynChannel]];
-  post= &inChn[inIdx[p->PostSynChannel]];
-  out= &outChn[outIdx[p->OutSynChannel]];
-
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  S= 0.0;
-  R= 0.0;
-  g= p->gSyn;
-  graw= invGFilter(g);
-  if (p->Plasticity == 2) {
-    P= p->ODE.InitialP;
-    D= p->ODE.InitialD;
-    Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
-    Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
-  }
-}
-
 void abSyn::currentUpdate(double t, double dt)
 {
   static double dS, dR;
+
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+      return;
   
   // calculate synaptic current
   dS= (1.0 - S)*p->aS*R - S*p->bS;
-  dR= (1.0 - R)*p->aR*(*theExpSigmoid)((pre->V-p->VaR)/p->saR) - R*p->bR;
+  dR= (1.0 - R)*p->aR*(*theExpSigmoid)(((buffered ? pre->getBufferedV(bufferHandle) : pre->V)-p->VaR)/p->saR) - R*p->bR;
   // Linear Euler:
   S+= dS*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
@@ -185,6 +192,6 @@ void abSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

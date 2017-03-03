@@ -9,24 +9,27 @@
 class abHH
 {
   private:
-    int initial;
     abHHData *p;
     inChannel *pre;
     outChannel *out;
-    function *theExp;
-    function *theExpSigmoid;
-    function *theTanh;
+    CurrentAssignment *a;
+    stdpc::function *theExp;
+    stdpc::function *theExpSigmoid;
+    stdpc::function *theTanh;
     
   protected:
     double m, h;
     double ma, mb, ha, hb;
     double I;
+    double km[4], kh[4], mi, hi;
     
   public:
-    abHH();
-    void init(abHHData *, short int *, short int*, inChannel *, outChannel *);
+    abHH(abHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out);
     void currentUpdate(double, double);
     double mhFunc(double, int);
+    void RK4(double t, double dt, size_t n);
+
+    typedef abHHData param_type;
 };
 
 #endif

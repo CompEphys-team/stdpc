@@ -13,21 +13,20 @@ class DestexheSynDlg : public QDialog, private Ui::DestexheSynDlg
      Q_OBJECT
 
   public:
-     DestexheSynDlg(int, QWidget *parent= 0);
+     DestexheSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(DestexheSynData &);
      void importData(DestexheSynData);
+     void setIndex(int);
 
-     int No;
+     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+
+     typedef DestexheSynData param_type;
 
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
-
-  private:
 };
 
 #endif

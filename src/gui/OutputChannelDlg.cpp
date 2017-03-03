@@ -1,8 +1,11 @@
 #include "OutputChannelDlg.h"
 #include <QMessageBox>
+#include "DeviceManager.h"
 
-OutputChannelDlg::OutputChannelDlg(QWidget *parent)
-     : QDialog(parent)
+OutputChannelDlg::OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    QDialog(parent),
+    idx(idx),
+    proxy(proxy)
 {
   setupUi(this);
 }
@@ -43,7 +46,7 @@ void OutputChannelDlg::clearAll()
 }
 
 
-void OutputChannelDlg::init(DAQ *board)
+void OutputChannelDlg::init()
 {
   #define Y0 90
   #define DY 22
@@ -60,9 +63,12 @@ void OutputChannelDlg::init(DAQ *board)
   QComboBox *qctmp;
   QLineEdit *letmp; 
   QString nm;
+
+  DAQ *board = Devices.getDevice(ChannelIndex(proxy, idx));
      
   clearAll();
   ChnNo= board->outChnNo;
+  board->params()->outChn.resize(ChnNo);
 
   outLow = QVector<double>(board->outGainNo);
   for(int i= 0; i < board->outGainNo; i++){
@@ -132,11 +138,10 @@ void OutputChannelDlg::init(DAQ *board)
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
-  this->setGeometry(geo);
+  this->resize(geo.size());
   geo= buttonBox->geometry();
   geo.moveBottom(Y0+ChnNo*DY+50);
   buttonBox->setGeometry(geo);
-  accept();  // export the current state, update chn info in other dialogs
 }    
 
 OutputChannelDlg::~OutputChannelDlg()
@@ -146,58 +151,39 @@ OutputChannelDlg::~OutputChannelDlg()
 
 void OutputChannelDlg::exportData()
 {
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
-    outChnp[i].active= (act[i]->checkState() > 0);
-    outChnp[i].gain= rng[i]->currentIndex();
-    outChnp[i].gainFac= factor[i]->text().toDouble();
-    outChnp[i].bias= bias[i]->text().toDouble()*1e-9;
-    outChnp[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/outChnp[i].gainFac;
-    outChnp[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/outChnp[i].gainFac;
-    outChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    p->outChn[i].active= (act[i]->checkState() > 0);
+    p->outChn[i].gain= rng[i]->currentIndex();
+    double gainFac = factor[i]->text().toDouble();
+    p->outChn[i].gainFac= gainFac;
+    p->outChn[i].bias= bias[i]->text().toDouble()*1e-9;
+    p->outChn[i].minCurrent= 1e-9*outLow[rng[i]->currentIndex()]/gainFac;
+    p->outChn[i].maxCurrent= 1e-9*outHigh[rng[i]->currentIndex()]/gainFac;
+    p->outChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
   }
 }
 
 void OutputChannelDlg::importData()
 {
-  QString lb;
-  
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
-    if (outChnp[i].active) act[i]->setCheckState(Qt::Checked);
-    else act[i]->setCheckState(Qt::Unchecked);
-    rng[i]->setCurrentIndex(outChnp[i].gain);
-    lb.setNum(outChnp[i].gainFac);
-    factor[i]->setText(lb);
-    lb.setNum(outChnp[i].bias*1e9);
-    bias[i]->setText(lb);
-    if (outChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
-    else saveChnl[i]->setCheckState(Qt::Unchecked);
+    act[i]->setChecked(p->outChn[i].active);
+    rng[i]->setCurrentIndex(p->outChn[i].gain);
+    factor[i]->setText(QString::number(p->outChn[i].gainFac));
+    bias[i]->setText(QString::number(p->outChn[i].bias*1e9));
+    saveChnl[i]->setChecked(p->outChn[i].chnlSaving);
   }
 }
 
 void OutputChannelDlg::accept()
 {
-  int chns[ChnNo];
-  int chN= 0;
-  
   exportData();
-  for (int i= 0; i < ChnNo; i++) {
-    if (act[i]->checkState() > 0) chns[chN++]= i;
-  }
-  updateOutChn(chN, chns);
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  QDialog::accept();
 }
 
 void OutputChannelDlg::reject()
 {
   importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
-}
-
-void OutputChannelDlg::appear()
-{
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+  QDialog::reject();
 }

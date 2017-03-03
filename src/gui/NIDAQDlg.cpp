@@ -1,42 +1,42 @@
 #include "NIDAQDlg.h"
-#include "Tools.cpp"
+#include "Util.h"
+#include "Nidaq.h"
 
-NIDAQDlg::NIDAQDlg(QWidget *parent) : DAQDlg(parent)
+NIDAQDlg::NIDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    DAQDlg(idx, proxy, parent)
 {
-  setupUi(this);
+    setupUi(this);
+    connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+    connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
+    label = DAQLabel->text();
+    setIndex(idx);
 }
 
-bool NIDAQDlg::exportData(NIDAQData &NDAQp)
+void NIDAQDlg::setIndex(size_t no)
 {
-  bool change= false;
-  getEntry(NDAQp.deviceName, DeviceNameE->text(), change);
-  return change;
+    DAQLabel->setText(label.arg(no));
+    DAQDlg::setIndex(no);
 }
 
-void NIDAQDlg::importData(NIDAQData NDAQp)
+void NIDAQDlg::exportData(bool forceInit)
 {
-  DeviceNameE->setText(NDAQp.deviceName);
+    bool change= false;
+    getEntry(NIDAQProxy::p[idx].deviceName, DeviceNameE->text(), change);
+    DAQDlg::exportData(change || forceInit);
 }
 
-void NIDAQDlg::accept()
+void NIDAQDlg::importData()
 {
-  bool change= exportData(NIDAQp);
-  if (change) reinitDAQ();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+    DeviceNameE->setText(NIDAQProxy::p[idx].deviceName);
+    DAQDlg::importData();
 }
 
-void NIDAQDlg::reject()
+void NIDAQDlg::backup()
 {
-//  importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+    bak = NIDAQProxy::p[idx];
 }
 
-void NIDAQDlg::appear()
+void NIDAQDlg::restoreBackup()
 {
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+    NIDAQProxy::p[idx] = bak;
 }
-

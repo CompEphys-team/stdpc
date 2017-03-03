@@ -2,25 +2,26 @@
 #define INPUTCHANNELDLG_H
 
 
-#include <QAbstractButton>
+#include <QPushButton>
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QComboBox>
 
 #include "ui_InputChannelDlg.h"
 #include "ObjectDataTypes.h"
-#include "DigiData.h"
+#include "Daq.h"
 
 class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
 {
      Q_OBJECT
 
   public:
-     InputChannelDlg(QWidget *parent= 0);
-     void init(DAQ *);
-     void exportData();
+     InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     void init();
      void importData();
      virtual ~InputChannelDlg();
+
+     inline void setIndex(size_t i) { idx = i; }
      
      int ChnNo;
      int lbNum;
@@ -36,18 +37,22 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      QVector<QLineEdit *> SDThresh;
      QVector<QLineEdit *> bias;
      QVector<QCheckBox *> saveChnl;
+     QVector<QPushButton *> calib;
+
+     QVector<elecCalibParams> calibBackup;
+
+     size_t idx;
+     DAQProxy *proxy;
 
   public slots:
     void accept();
     void reject();
-    void appear();
+    void open();
+
+    void exportData();
       
   private:
-     bool initial;
      void clearAll();
-     
-  signals:
-     void updateInChn(int, int*);
 }; 
 
 #endif

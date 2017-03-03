@@ -1,9 +1,49 @@
 
 #include "ChemSyn.h"
 #include <cmath>
+#include "DCThread.h"
     
-ChemSyn::ChemSyn() 
+ChemSyn::ChemSyn(CSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
+    p(inp),
+    pre(pre),
+    post(post),
+    out(out),
+    a(a),
+    buffered(false),
+    Sinf(0.0),
+    S(0.0),
+    hinf(1.0),
+    tauh(1.0),
+    h(1.0),
+    g(p->gSyn),
+    gfac(1.0)
 {
+    if (p->LUTables) {
+        theExp= &expLU;
+        expLU.require(-50.0, 50.0, 0.02);
+        theExpSigmoid= &expSigmoidLU;
+        expSigmoidLU.require(-50.0, 50.0, 0.02);
+        theTanh= &tanhLU;
+        tanhLU.require(-10.0, 10.0, 0.01);
+    }
+    else {
+        theExp= &expFunc;
+        theExpSigmoid= &expSigmoidFunc;
+        theTanh= &tanhFunc;
+    }
+
+    graw= invGFilter(g);
+    if (p->Plasticity == 2) {
+        P= p->ODE.InitialP;
+        D= p->ODE.InitialD;
+        Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
+        Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
+    }
+
+    if ( a->delay > 0. ) {
+        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
+        buffered = true;
+    }
 }
 
 double ChemSyn::invGFilter(double ing)
@@ -36,46 +76,13 @@ double ChemSyn::gFilter(double ingr)
   return ng;
 }
 
-void ChemSyn::init(CSynData *inp, short int *inIdx, short int *outIdx, inChannel *inChn, outChannel *outChn)
-{
-  p= inp;
-  pre= &inChn[inIdx[p->PreSynChannel]];
-  post= &inChn[inIdx[p->PostSynChannel]];
-  out= &outChn[outIdx[p->OutSynChannel]];
-
-  if (p->LUTables) {
-    theExp= &expLU;
-    expLU.require(-50.0, 50.0, 0.02);
-    theExpSigmoid= &expSigmoidLU;
-    expSigmoidLU.require(-50.0, 50.0, 0.02);
-    theTanh= &tanhLU;
-    tanhLU.require(-10.0, 10.0, 0.01);
-  }
-  else {
-    theExp= &expFunc;
-    theExpSigmoid= &expSigmoidFunc;
-    theTanh= &tanhFunc;
-  }
-  Sinf= 0.0;
-  S= 0.0;
-  hinf= 1.0;
-  h= 1.0;
-  tauh= 1.0;
-  g= p->gSyn;
-  graw= invGFilter(g);
-  gfac= 1.0;
-  if (p->Plasticity == 2) {
-    P= p->ODE.InitialP;
-    D= p->ODE.InitialD;
-    Pslope= 1.0/(p->ODE.highP - p->ODE.lowP);
-    Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
-  }
-}
-
 void ChemSyn::currentUpdate(double t, double dt)
 {
   static double tmp, V;
   
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+      return;
+
   // calculate synaptic current
   tmp= (1.0 - Sinf)*p->tauSyn;
   //  if (tmp < 1e-8) tmp= 1e-8;
@@ -83,17 +90,19 @@ void ChemSyn::currentUpdate(double t, double dt)
   S+= (Sinf - S)/tmp*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
   if (S < 0.0) S= 0.0;
+
+  double preV = buffered ? pre->getBufferedV(bufferHandle) : pre->V;
   
-  if (pre->V > p->VThresh)
-    Sinf= (*theTanh)((pre->V - p->VThresh)/p->VSlope);
+  if (preV > p->VThresh)
+    Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
   else Sinf= 0.0;
 
   if(p->STD){
     // Linear Euler:
     h+= (hinf - h)/tauh*dt;   // use previous values of hinf, h, tauh
-    tmp= (*theExpSigmoid)((pre->V - p->STDVThresh)/p->STDVSlope); 
+    tmp= (*theExpSigmoid)((preV - p->STDVThresh)/p->STDVSlope);
     hinf= p->STDAmpl*tmp;
-    tmp= (*theExpSigmoid)((pre->V - p->STDtauVThresh)/p->STDtauVSlope); 
+    tmp= (*theExpSigmoid)((preV - p->STDtauVThresh)/p->STDtauVSlope);
     tauh= p->STDtau0 - p->STDtauAmpl*tmp;
   }
   else h= 1.0;
@@ -204,6 +213,6 @@ void ChemSyn::ODElearn(double dt)
   graw+= dt * p->ODE.gamma*(P*tmp1 - D*tmp2);
   g= gFilter(graw);
 
-  P+= dt * (P_f(pre->V) - p->ODE.betaP * P);
+  P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(post->V) - p->ODE.betaD * D);
 }

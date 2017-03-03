@@ -7,13 +7,17 @@
 class DestexheSyn {
   private:
     DestexheSynData *p;
-    function *theExp;
-    function *theTanh;
-    function *theExpSigmoid;
+    stdpc::function *theExp;
+    stdpc::function *theTanh;
+    stdpc::function *theExpSigmoid;
     void learn();
     inChannel *pre;
     inChannel *post;
     outChannel *out;
+    SynapseAssignment *a;
+
+    size_t bufferHandle;
+    bool buffered;
 
     double P_f(double);
     double D_f(double);
@@ -32,12 +36,13 @@ class DestexheSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    DestexheSyn();
-    void init(DestexheSynData *, short int *, short int *, inChannel *, outChannel *);
+    DestexheSyn(DestexheSynData *, DCThread *, SynapseAssignment *, inChannel *pre, inChannel *post, outChannel *out);
     void currentUpdate(double, double);
     void STlearn(double);
     double STDPFunc(double);
     void ODElearn(double);
+
+    typedef DestexheSynData param_type;
 };
 
 #endif

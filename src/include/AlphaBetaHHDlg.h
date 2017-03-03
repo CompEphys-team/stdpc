@@ -10,16 +10,13 @@ class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
      Q_OBJECT
 
   public:
-     AlphaBetaHHDlg(int, QWidget *parent= 0);
+     AlphaBetaHHDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(abHHData &);
      void importData(abHHData);
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
+     void setIndex(int);
+     typedef abHHData param_type;
 
-  private:
-   
+     QString label;
 }; 
 
 #endif

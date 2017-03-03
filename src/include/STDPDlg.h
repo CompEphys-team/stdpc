@@ -10,14 +10,10 @@ class STDPDlg : public QDialog, private Ui::STDPDlg
      Q_OBJECT
 
   public:
-     STDPDlg(QWidget *parent= 0, int no= 0);
+     STDPDlg(QWidget *parent= 0);
      void exportData(STPlast &);
      void importData(STPlast);
-
-  public slots:
-
-  private:
-     int No;
+     void setLabel(const QString&);
 }; 
 
 #endif

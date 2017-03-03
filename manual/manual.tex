@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{myapalike}
+\usepackage{tabularx}
 
 %\renewcommand{\rmdefault}{phv}
 %\renewcommand{\ttdefault}{phv}
@@ -42,14 +43,14 @@
 \begin{titlepage}
   \begin{center}
   {{\bf \Large 
-    StdpC 2011 }\\[0.3cm]
+    StdpC 2017 }\\[0.3cm]
     \large (Spike timing dependent plasticity Clamp)}, \\[1cm]
   {\large 
     in parts based on {\bf DYNCLAMP2} \cite{Pinto2001} 
   } \\[2cm]
   {\sc \Large Manual }
   \end{center}
-\vspace*{5cm}
+\vspace*{2cm}
 
 \noindent
 {\large Thomas Nowotny} \\[0.5cm]
@@ -58,6 +59,11 @@ School of Engineering and Informatics, \\
 University of Sussex, \\
 Brighton BN1 9QJ, UK \\
 E-mail: t.nowotny@sussex.ac.uk
+ \\[1cm]
+{\large Felix B. Kern} \\[0.5cm]
+School of Life Sciences, \\
+University of Sussex, \\
+Brighton BN1 9QG, UK
  \\[1cm]
 Original DYNCLAMP2 developers: \\[0.2cm]
 Reynaldo Daniel Pinto, \\
@@ -75,21 +81,21 @@ La Jolla, CA 92093-0402, USA \\
 
 StdpC is software building on the ideas that led
 to the development of the earlier DYNCLAMP2
-software. The new software is based on QT and has in addition to the
+software. The new software is based on Qt and has in addition to the
 original native support for the old DigiData 1200/A interface now also
 support for all National Instruments devices that support NI's NIDAQmx
 API.
  
-This is the second beta version of the software. Some functionality has
+Some functionality in this software has
 not been tested thoroughly. Any feedback on problems with the
-software or potential bugs is greatly appreciated.  An older version
-of the software (StdpC) is described in Journal of Neuroscience
-Methods \cite{Nowotny2006}. A more recent description of StdpC can be
-found in Nature Protocols \cite{Kemenes2011}. {\em If you use StdpC and publish results
+software or potential bugs is greatly appreciated.  Older versions
+of the software (StdpC) are described in Journal of Neuroscience
+Methods \cite{Nowotny2006} and, more recently, in Nature Protocols 
+\cite{Kemenes2011}. {\em If you use StdpC and publish results
 based on its use, please cite the website and these papers.} Please
 contact us for any further questions (t.nowotny@sussex.ac.uk).
 
-Copyright 2011 T.~Nowotny
+Copyright 2017 T.~Nowotny \& F.~B.~Kern
 
 StdpC is free software; you can redistribute it and/or modify  
 it under the terms of the GNU General Public License as published by 
@@ -113,17 +119,17 @@ The Dynamic Clamp protocol, developed by \cite{Sharp1993} and
 independently by \cite{Robinson1993} allows inserting simulated
 membrane conductances into cells, and/or adding synapses between cells
 as well as a variety of other manipulations. Here, we describe StdpC
-2011, a software for controlling biological neurons and an internal
+2017, a software for controlling biological neurons and an internal
 spike generator in (soft) real time.
 
-The software allows to define up to $6$ artificial synapses, $6$
-Hodgkin-Huxley conductances \cite{Hodgkin1949} and one presynaptic
-artificial neuron (spike generator). The parameters of these simulated
+The software allows its user to define artificial synapses, Hodgkin-Huxley conductances
+\cite{Hodgkin1949}, simulated neurons built from such conductances, and
+presynaptic spike generators. The parameters of these simulated
 entities can be controlled on the graphical user interface (GUI) or
 through script files.  
 
-The StdpC has a built in electrode compensation method (Active
-Electrode Compensation \cite{Brette2008}, which is optionally usable after
+StdpC has a built in electrode compensation method (Active
+Electrode Compensation \cite{Brette2008}), which is optionally usable after
 going through a short and automatic calibration procedure. This
 compensation technique allows for application of a single electrode both
 for stimulation and recording with higher signal fidelity than conventional
@@ -137,27 +143,29 @@ results analysis.
 The software supports the DIGIDATA 1200A data acquisition card of Axon
 Instruments, Inc (now part of MDS Analytical Technologies), all
 NIDAQmx capable devices of National Instruments, and a pure simulation
-mode for testing. The program was written in C++ (using the Bloodshed
-Dev-C++ environment which is based on the popular gcc compiler
-(mingw)). The graphical user interface is based on Nokia's (formerly Trolltech's) QT
-libraries. The program has been tested on Windows XP but should also
-be compatible with earlier versions of Windows (Windows NT, Windows
-2000). The actual performance of the dynamic clamp cycle depends
+mode for testing. The program was written in C++ (using the MinGW version of
+QtCreator). The graphical user interface is based on Nokia's (formerly 
+Trolltech's) Qt
+libraries. The program has been tested on Windows 7 but should also
+be compatible with earlier versions of Windows.
+The actual performance of the dynamic clamp cycle depends
 on the speed of the PC hardware used. The DIGIDATA driver is
 based on a modified/extended version of PortTalk by Craig Peacock and
 is unlikely to work in Windows Vista. The NIDAQmx based driver may
 work with Windows Vista but has not been tested in this environment.
+Newer DIGIDATA versions are currently not supported; contact us if you
+wish to change this.
 
 \section{Hardware and software requirements} 
  
-A standard PC (Pentium IV and up recommended), Windows XP (potentially
-Windows NT, 2000 ok). A DIGIDATA 1200A ADC/DAC board from Axon
+A standard PC (Pentium IV and up recommended), Windows 7 (potentially
+Windows Vista, XP, NT, 2000 ok). A DIGIDATA 1200A ADC/DAC board from Axon
 Instruments, or a National Instruments DAQ and installed NIDAQmx
 driver.
 
-The program was tested on a PC with Windows XP professional and a
-DigiData 1200A board as well as with a NI PCI-MIO-16-4 DAQ using NIDAQmx for
-Windows, version 8.7.2.
+The program was tested on a PC with Windows 7 Professional and a
+National Instruments PCIe-6251 DAQ using NIDAQmx for
+Windows, version 15.5.1.
 
 \section{Asynchronous Dynamic Clamp Cycle}
  
@@ -171,9 +179,8 @@ processes. Since Windows is not a real time operating system, the
 actual time from one cycle to the next can not be controlled in a
 strict way. Instead of aiming at such a control StdpC is based on an
 asynchronous dynamic clamp cycle.  Every time the program updates the
-membrane potential of the cells it also reads the real time clock in
-the Digidata 1200A board (the system clock in case of using NI
-devices) which allows to calculate the duration of the previous
+membrane potential of the cells it also reads the system clock,
+which allows it to calculate the duration of the previous
 Dynamic Clamp cycle. The measured time intervals between voltage
 updates are used in the computation of the currents. This limits the
 impact of unequal delays during repeated cycles unless these delays
@@ -189,15 +196,17 @@ the quality of the Dynamic Clamp interaction will improve over time.
 \subsection{Binary package}
 Download the package and unzip it to a convenient location, e.g.,
 C:$\backslash$ Program Files$\backslash$ StdpC. Then execute ``StdpC.exe''.
+To use StdpC with a National Instruments card, use the ``NIDAQ'' version.
 
 \subsection{Source package}
 Download the source package and unzip it to a convenient
-location. Open a shell and execute ``myqmake.bat''. Then open the
-dev-c++ project ``StdC.dev'' and compile. Make sure that the Makefile
-generated by qmake is used. Note that you will need Dev-C++/mingw and
-QT 4 installed on your computer. If you are compiling for the NIDAQmx
-interface you need to have NIDAQmx installed and to enable the option
-``NIDAQmx'' in the ``.config'' file.
+location. To build StdpC from source, you will need Qt 5. 
+We recommend using the MinGW version of Qt and building from within QtCreator, 
+but you may find it more convenient to run 
+``qmake.exe C:$\backslash$path$\backslash$to$\backslash$stdpc$\backslash$StdpC.pro -r -spec win32-g++''
+and ``mingw32-make'' from a shell instead. Building with the msvc toolchain is not actively supported.
+To build with National Instruments support, add ``nidaqmx'' to the CONFIG environment variable 
+(e.g. ``qmake.exe [...] CONFIG+=nidaqmx'').
 
 \section{Troubleshooting}
 \subsection{I/O conflicts}
@@ -207,7 +216,7 @@ DigiData board and other hardware devices. If you are experiencing
 problems, you may need to change the base address of the DigiData
 board. Hardware conflicts can occur even if the DIGIDATA board works
 fine with Axon programs like Axoscope because, unlike these, StdpC
-2011 does read the Real Time Counter (RTC) in the Digidata
+2017 does read the Real Time Counter (RTC) in the Digidata
 board. Usually, the DigiData board is configured to use the I/O base
 address 0x320, and in this case the RTC reading ports are in the range
 of 0x330 - 0x332. Many computers use the address 0x330 for some devices like
@@ -223,7 +232,7 @@ cursor to browse the list of used ports.  You should look for 330. Note that
 320 will not appear because the Digidata Board is not detected by Windows. If
 you find any reference in the range 330 - 33F and your Digidata board is
 configured to use the base address 320 you need to change I/O address of your
-Digidata board to run DynClamp and avoid other problems due to the I/O
+Digidata board to run StdpC and avoid other problems due to the I/O
 conflict.
 
 \noindent
@@ -234,7 +243,7 @@ use the cursor to browse the list of used ports. You should look for
 330.  Note that 320 will not appear because the Digidata Board is not
 detected by Windows. If you find any reference in the range 330 - 33F
 and your Digidata board is configured to use the base address 320 you
-need to change the I/O address of your Digidata board to run DynClamp
+need to change the I/O address of your Digidata board to run StdpC
 and avoid other problems due to the I/O conflict.
  
 \noindent
@@ -244,7 +253,7 @@ in use, addresses around 340-370 are usually available which is
 sufficient for the Digidata ports. Reconfigure the Digidata
 board for the base address 340 or 350 manually (the RTC will be 350 or
 360 and no conflicts!) and run the StdpC program. The Digidata base
-address can be changed within StdpC on the Settings->DAQ dialog.
+address can be changed within StdpC on the Digidata settings dialog.
 
 \section{Changes from previous versions/programs}
 \subsection{Changes DYNCLAMP2 to StdpC version 3}
@@ -358,37 +367,62 @@ The following is a list of features which were new in StdpC v3:
   and if disabled, the overheads of this mechanism can be avoided.
 \end{myitem}
 
+\subsection{Changes from StdpC 2012 to StdpC 2017}
+\begin{myitem}
+\item m/h/tau HH currents received two new tau formulations.
+\item AEC computed currents can now be directed to a separate channel for data output
+ purposes in addition to its usual function. In addition, there is no longer any restriction
+ on the number of AEC channels.
+\item It is now possible to use several data sources (DAQs, files, spike generators, models) simultaneously.
+\item There is now an option to simulate entire (single-compartment) Hodgkin-Huxley neurons, see
+ section \ref{HHmodels} for details.
+\item It is now possible to define an arbitrary number of HH conductances and synapses.
+\item Currents and synapses can now be assigned to more than one set of channels.
+ Each assignment draws on the common parameter set, but is functionally independent
+ from other assignments. As a consequence of this update, the channel assignments
+ in protocols and scripts written for/by older StdpC versions may be wrongly converted.
+ Please check for correctness and/or update your scripts and protocols, see section \ref{scriptsect} for details.
+\item Synapses (but not gap junctions) now support conduction delays.
+\item Currents, synapses, channel assignments, neuron models and model instances can now all be
+ turned on or off by script while the clamp cycle is running, provided that they were active when
+ the clamp cycle was started.
+\item Graph performance and handling has been improved.
+\item A performance indicator has been added to the main window showing the actual clamp cycle
+frequency.
+\item Large parts of the code have been cleaned up and refactored/rewritten into a more modular design.
+\end{myitem}
+
 \section{How to use StdpC}
 
-\subsection{"Connecting" the program to the cells}
+\subsection{``Connecting'' the program to the cells}
  
 To avoid the generation of wrong current commands due to artifacts
 introduced into the membrane measurement by the current injection,
 one must either (1) insert of two electrodes into each cell (one for
 injection, the other one for recording), or
-(2) use of a careful compensation of a single electrode in order to recover the
+(2) use a careful compensation of a single electrode in order to recover the
 actual membrane potential from the raw artefactual voltage. For the
 latter solution StdpC has a built-in artifact compensation method, AEC
 (Active Electrode Compensation \cite{Brette2008}), that allows for a
-convenient, software-based electrode compensation. One can thought of
-special experiment configurations, like simultaneously recoding in multiple
+convenient, software-based electrode compensation. One can think of
+special experiment configurations, like simultaneously recording in multiple
 machines, in which AEC might not be found appropriate for compensation. In
-these cases any external analogue technique the microelectrode amplifier features could
-be applied instead of (and NOT in conjunction with) AEC. However we
+these cases any external analogue technique like microelectrode amplifier 
+features could
+be applied instead of (and NOT in conjunction with) AEC. However, we
 generally encourage the application of AEC, as it is an automatic method
-that provides high quality signals at arbitrary high time resolution.
+that provides high quality signals at arbitrarily high time resolution.
 See section \ref{eleccomp} for more detail about electrode compensation.
 
 The membrane potential output of the microelectrode amplifiers should
-be connected to the analog inputs channels chosen to be scanned in the
+be connected to the analog input channels chosen to be scanned in the
 ``input channels'' dialog. The command voltage for the injection of
-current into the cells will be in the analog output channels chosen in
+current into the cells will be applied to the analog output channels chosen in
 the corresponding drop-down boxes. For specific channels to appear in
 these boxes, they need to be activated in the ``output channels''
-dialog. The built-in spike generator is internally mapped to be input
-channel SG. 
+dialog, and the data source they belong to must be activated.
 
-The currents are calculated individually for each conductance and
+The currents are calculated individually for each active conductance and
 synapse and then are summed for each cell to generate the
 corresponding voltage command for the microelectrode amplifiers. It is
 recommended to turn on the dynamic clamp cycle and to monitor the
@@ -409,12 +443,12 @@ microelectrode amplifiers.
 \vspace*{0.5cm}
 
 The main control panel contains different blocks of control for the
-different functions of the software -- simulating synapses (synapse
-control block; 1), simulating ionic conductances (Hodgkin-Huxley (HH)
-type conductances; HH control block; 2), simulating presynaptic
-activity (spike generator block; 3) and displaying data (data
-displays; for debugging only; 4). The control blocks are front-ends to
-more detailed control dialogs. There is a message window in the upper
+different functions of the software -- setting up and configuring acquisition
+devices and neuron models (data source control block), simulating synapses
+(synapse control block), and simulating ionic conductances (Hodgkin-Huxley (HH)
+type conductances; conductance control block). The control blocks are front-ends to
+more detailed control dialogs. A second tab, labelled ``Graph'', serves
+to display data while the clamp cycle is running. There is a message window in the
 left part of the panel that shows system messages. These messages can
 be saved for future reference. They are also automatically written to
 a local file ``StdpC\_last.log''.
@@ -430,52 +464,40 @@ a local file ``StdpC\_last.log''.
   ``StdpC.conf''). Other parameters are initialized with standard
   values that are pre-compiled into the software. The message window
   will show a message whether the chosen hardware was successfully
-  initialized (which was not the case in the example shown on the left).
-
+  initialized (which was partly the case in the example shown on the left).
+} \\
 Failing hardware initialization can have several causes: \\[-0.2cm]
 \begin{myenum}
 \item If using the DigiData 1200(A): \\
-StdpCs default address for the board is 0x320 (hexadecimal), which
+StdpC's default address for the board is 0x320 (hexadecimal), which
 is the default address of the board, but the specific board can have been
 configured to use another range of addresses. Possible values are 0x340,
 0x360, 0x380, 0x3A0, 0x3C0, etc. Make sure that the correct address is
-entered in the ``DAQ'' dialog.
-\end{myenum}
-} \\
-
-\begin{myenum}
-\addtocounter{enumi}{1}
+entered in the ``Digidata'' dialog.
 \item If using a National Instruments board: \\
 Make sure that NIDAQmx is installed and the board is working properly
 (using the NI Automation explorer). Make sure your device is in the
 list of devices that support NIDAQmx (as opposed to the older devices
-supporting ``old style'' NIDAQ / NIDAQ legacy only.
-\item I you are running with simulated data acquisition: \\
+supporting ``old style'' NIDAQ / NIDAQ legacy only).
+\item I you are running with simulated data acquisition (SimulDAQ): \\
 Make sure that you have a correctly formatted input file for the
-membrane potential of cells and that the file name in the ``DAQ''
+membrane potential of cells and that the file name in the ``SimulDAQ''
 dialog points to the right location of this file. Also make sure that the
-location the output file name points to is writable to you.
+location the output file name points to is writeable to you.
 \end{myenum}
 
 The remaining controls are the ``start'' and the ``stop'' button.  The
 ``start'' button initiates the start of dynamic clamp cycles. In
 particular, pressing this button will stop a running dynamic clamp
-thread, load the settings from (almost) all dialogs into memory, and
+thread, load the settings from all dialogs into memory, and
 start the dynamic clamp thread again with the new settings. The
 dynamic clamp thread will then run until stopped by pressing the
 ``stop'' button.
 
-The data acquisition hardware can be chosen in the combo box on the
-top. Note that the software that has been compiled with support for
-the NIDAQmx libraries will not run if these are not installed {\em
-  even if a different device is chosen}. The specific hardware
-settings can be adjusted in the ``DAQ'' dialog int the ``Config''
-menu of the main menu bar.
-
-The choice of hardware, its settings and the settings for input and
-output channels are the only exception to the rule that changes only
-apply after a restart of the dynamic clamp thread (by pressing the ``start''
-button).
+The data acquisition hardware can be chosen in the data source control block in the setup tab.
+Note that the NIDAQ version of the software will not run if these are not installed {\em
+  even if no such device is chosen}. The specific hardware
+settings can be adjusted in the ``Settings'' dialog of each added device.
 
 Other general control elements can be found in the menus of the main
 menu bar. 
@@ -499,74 +521,312 @@ menu bar.
 \end{itemize}
 \item ``Config'' menu:
 \begin{itemize}
-\item[-] ``DAQ'': Controls for the properties of the data acquisition
-  hardware. This will show a dialog window that is specific to the
-  chosen hardware.
-\item[-] ``Input Channels'': Brings up a dialog to change settings for
-  the analog input channels, see below for more details.
-\item[-] ``Output channels'': Brings up a corresponding dialog for the
-  output channels, see below.
-\item[-] ``Electrode compensation''Shows Electrode Compensation dialog
- for electrode calibration, see below.
-\item[-] ``Data saving'' Shows Data Saving dialog to configure data saving
+\item[-] ``Data saving'' Shows a dialog to configure data saving
   settings, see below.
 \end{itemize}
 \item ``Help'': Offers a one-line description about StdpC. 
 \end{myitem}
 
-%% new Address: Button used to change the hardware address of the Digidata
-%% board. A new hexadecimal value should be typed in the corresponding field
-%% before pressing this button. When the board is found the Status Window will
-%% display the respective message.
-%% \item AMP X: field that indicates the gain factor of the microelectrode
-%% amplifier connected to the channel X. To change the default value
-%% click in the field containing the address and edit the value using the
-%% keyboard.
-%% \item ADC X: configures the input gain of the ADC channel X in the Digidata
-%% board. It is related to the precision of the A/D conversion and should be
-%% selected as big as possible. Allowed values for this parameter are: 8, 4, 2,
-%% 1, respectively corresponding to the ranges of input voltages -1.25V to
-%% +1.25V, -2.5V to +2.5V, -5.0V to + 5.0V, and -10.0V to +10.0V.
-%% \item mV/nA: correspond to the calibration of the current input command
-%%   voltage in the microelectrode amplifiers in mV/nA for each channel. Since
-%%   the range of the current voltage command output is -10V to +10V, one can
-%%   select a higher ratio mv/nA and use a divider to match it to the input of
-%%   the microelectrode amplifier, increasing the precision of the current
-%%   generation.
-%% \item The output channel 1 is either used for clamping in which case the
-%%   settings are as for channel 0 or it outputs the membrane voltage of the
-%%   spike generator if it is used. Then, the setting CN\_Vm =$>$ CH1 sets a gain
-%%   factor for the output of the spike generator membrane voltage.
-%% \item Write State: Upon pressing this button the state of the StdpC, {\em
-%%   i.e.} the values of {\em all} prameters and {\em all} status buttons is
-%%   saved in a file (typically with extension ``.set'').
-%% \item Read State: Upon pressing this button a file dialog appears and one can
-%%   choose a previously ``.set'' file to be loaded. This will update {\em all}
-%%   parameters and status buttons.
-%% \item Exit: Exits the StdpC program.
 
-
-\subsection{Electrical synapses}
+\subsection{Data sources}
 
 \noindent
 \parbox{\textwidth}{
-\includegraphics[scale=0.5]{synapseBlock}
+	\includegraphics[scale=0.5]{datasources}
 } \\[0.2cm]
 
-Each subunit in the synapses block can be configured to be a
-chemical or an electrical synapse (gap junction). Clicking the
-``Parameters'' button will open a control panel that allows to change
-properties of the synapse. \\
+The data sources control block is used to configure all acquisition devices,
+recorded inputs, spike generators and Hodgkin-Huxley models. Sources are added
+by selecting the appropriate type in the rightmost box in the list, labelled
+``New...'', and clicking ``Add''. An initially inactive data source is then added
+to the list, which can be configured by clicking the ``Settings'' button and
+activated by checking the ``Active'' checkbox. If the configuration fails, the
+failed data source's title will be highlighted in red. When a data source is no
+longer required, it can be removed by deactivating it and clicking the
+``Clear inactive'' button to the right of the list.
+
+\subsubsection{Digidata 1200(A)}
+The Digidata 1200/1200A settings are limited to device address, which is given
+in hexadecimal. Channels are configured in subordinate dialogs (see below).
+\\
+\emph{Scripting:} Script access is given through the \texttt{DigiDatap[\#]} variable.
+Only input/output channels are available for scripting, see below.
+
+\subsubsection{National Instruments}
+National Instruments devices are configured by giving the exact name of the device,
+usually ``Dev1'' or similar. This can be found e.g. by running the NI MAX utility
+that comes with the device drivers. Channels are configured in subordinate dialogs (see below).
+\\
+\emph{Scripting:} Script access is given through the \texttt{NIDAQp[\#]} variable.
+Only input/output channels are available for scripting, see below.
+
+\subsubsection{SimulDAQ}
+For testing and debugging, you can use a text file with recorded voltages in place of
+an acquisition device. Each line corresponds to a set of data points: The first column
+gives the time, while subsequent columns (separated by any non-numeric character(s)) give
+voltage values. In the SimulDAQ settings dialog, configure the number of input channels
+to reflect the data - note that all data are read, and a mismatch between the settings and
+the data will most likely result in garbage. SimulDAQ output provides an alternative to
+normal data saving. Both input and output channels are configured in subordinate dialogs (see below).
+\\
+\emph{Scripting:} Script access is given through the \texttt{SDAQp[\#]} variable.
+Only input/output channels are available for scripting, see below.
+
+\subsubsection{Input channel configuration} \label{inchnconfig}
+
+The \emph{Input Channels} dialog contains the basic configurable properties
+for the input channels, like whether they are going to be active or not,
+their acquisition range and conversion factor, along with some more StdpC specific
+properties, like whether spike detection is going to be on or
+off on them (required for spike-time dependent plasticity rules in synapses), and if it is on, what spike
+detection threshold will be applied, and finally whether the channel is
+going to be saved or not during dynamic clamping (Section \ref{datasaving}). Always make sure that the
+right conversion factor is applied for each active channel, and a
+sufficiently wide acquisition range is set in order to prevent out of range
+data being cut off of the recorded data. \\
+Input channels of an active, fully configured acquisition device can be AEC-calibrated from here by
+clicking ``Calibrate''. For more details about AEC and the calibration process, see section \ref{eleccomp}.\\
+
+\noindent
+\parbox{\textwidth}{
+	\includegraphics[scale=0.5]{inputChnDialog}
+} \\[0.2cm]
+
+\noindent
+\emph{Scripting:} Script access to input channels is given through the \texttt{<device>.inChn[\#]} variable
+(e.g. \texttt{NIDAQp[0].inChn[0].active}).
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf \textless{}device\textgreater.inChn[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Channels must be initially active. Deactivating a channel suspends all
+	  synapses and conductances that rely on it. \\
+	\texttt{spkDetect} & 0,1 & Spike detection on/off \\
+	\texttt{spkDetectThreshold} & double & \\
+	\texttt{bias} & double & Bias voltage \\
+	\hline
+\end{tabularx}
+
+
+\subsubsection{Output channel configuration} \label{outchnconfig}
+
+The \emph{Output Channels} dialog contains the basic configurable properties
+for the output channels, like whether they are going to be active or not,
+their acquisition range and conversion factor, what is the bias current
+level applied on that channel if any, and finally whether the channel is
+going to be saved or not during dynamic clamping (Section
+\ref{datasaving}). Always make sure that the right conversion factor is
+applied for each active channel, and a sufficiently wide acquisition range
+is set in order to prevent out of range values being cut off of the
+injected current.\\
+
+\noindent
+\parbox{\textwidth}{
+	\includegraphics[scale=0.5]{outputChnDialog}
+} \\[0.2cm]
+
+\noindent
+\emph{Scripting:} Script access to output channels is given through the \texttt{<device>.outChn[\#]} variable
+(e.g. \texttt{NIDAQp[0].outChn[0].active}).
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf \textless{}device\textgreater.outChn[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Channels must be initially active. Deactivating a channel suspends all
+	synapses and conductances that rely on it. \\
+	\texttt{bias} & double & Bias current \\
+	\hline
+\end{tabularx}
+
+
+\subsubsection{Hodgkin-Huxley model neurons} \label{HHmodels}
+
+This data source type creates a single-compartment ionic conductance model.
+The base parameters for a model are its capacitance and a passive leak conductance,
+defined with its conductivity ``g Leak'' and its reversal potential ``E Leak''.
+Below these parameters, there is a list of instances, which can be thought of as
+individual neurons. Each instance can be active or inactive, and it creates a voltage
+channel (``VChan'', with options for data saving, voltage offset, and spike detection),
+and a current channel (``IChan'', with options for data saving and current offset).
+These channels appear alongside analog input and output channels, respectively, in
+channel selection dialogs elsewhere. Instance-specific channels are labelled ``HH X:Y'',
+where X is the model number, and Y is the instance number. \\
+In order to complete a neuron model, you will need to define a number of Hodgkin-Huxley
+conductances (see section \ref{HHcurrents}) and assign these to the model. This is done
+by selecting the model's ``All'' channel (``HH X:all'') for both the voltage and the current channel
+assignment of the conductance. Using the ``All'' channel guarantees that the conductance
+is applied to all active instances of the model. \\
+In a similar manner, synapses can be assigned to all active instances of a model
+using the ``All'' channel, or to a specific instance using that instance's numbered
+channel.\\
+
+\noindent
+\parbox{\textwidth}{
+	\includegraphics[scale=0.5]{HHmodel}
+} \\[0.2cm]
+
+\noindent
+\emph{Scripting:} Script access to models is given through the \texttt{HHNeuronp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf HHNeuronp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Models must be initially active. Deactivating a model suspends all of
+	its instances. \\
+	\texttt{C} & double & \\
+	\texttt{gLeak} & double & \\
+	\texttt{ELeak} & double & \\
+	\texttt{inst[\#].active} & 0,1 & Model instances must be initially active. Deactivating a model instance
+	suspends its input and output channels and all synapses and conductances that rely on them. \\
+	\texttt{inst[\#].inChn.spkDetect} & 0,1 & Spike detection on/off \\
+	\texttt{inst[\#].inChn.spkDetectThreshold} & double & \\
+	\texttt{inst[\#].inChn.bias} & double & Bias voltage \\
+	\texttt{inst[\#].outChn.bias} & double & Bias current \\
+	\hline
+\end{tabularx}
+
+\subsubsection{Spike generator} \label{spikegen}
+The spike generator unit can replace a presynaptic cell. It generates spikes of a 
+predefined shape, in a temporal pattern defined by the user. It can operate in
+a triggered mode, producing spike patterns (bursts) in response to a threshold crossing
+on a different (measured) channel, or in stand-alone mode, producing bursts in
+periodic fashion. \\
+Note: In earlier versions of StdpC, the spike generator could also be used to
+replay recorded voltages from files. This function is no longer available
+here, but can easily be replaced by using a SimulDAQ data source instead.\\
+
+\noindent
+\parbox{\textwidth}{
+	\includegraphics[scale=0.5]{spikeGenBlock}
+} \\[0.2cm]
+
+The control elements for the spike generator are: \\
+
+``Spikes'' : Each spike rises exponentially from the resting potential, reaches its peak
+at the designated spike time, then drops off symmetrically to its rise.
+\begin{myitem}
+	\item VSpike: The amplitude of the spikes generated
+	\item Width: The width of spikes in ms
+	\item VRest: The resting potential from which the spikes depart
+\end{myitem}
+
+``Burst detection''
+\begin{myitem}
+	\item The transition combo allows to choose whether to trigger bursts
+	independently of external events (Off), or whether to trigger an
+	event for low to high or high to low transitions through a threshold
+	value. Threshold detection is performed on a separate channel for each
+	instance of the spike generator, see below.
+	\item Threshold: For low$\rightarrow$high detection, an event
+	is triggered whenever tUnder milliseconds were below threshold and
+	afterwards tOver milliseconds were above. Note that for noisy
+	signals it may be  necessary to increase both numbers for reliable
+	detection.
+	\item When the respective ``Contiguous'' box is checked, the events
+	below and above are required to be contiguous. Otherwise, time spent
+	below or above threshold is added up cumulatively.
+	\item Strictly contiguous: Checking this box means that an event is
+	triggered if and only if the burst detection voltage makes a single,
+	smooth threshold crossing.
+\end{myitem}
+
+``Instances''
+\begin{myitem}
+	\item The spike generator can be instantiated multiple times. Each instance
+	has options to save the output, to offset it by a fixed value, and to detect
+	threshold crossings on a specific channel, at a given threshold voltage.
+	\item Each spike generator instance creates a voltage channel named ``SG X:Y'',
+	where X is the spike generator number, and Y is the instance number.
+\end{myitem}
+
+``Spike times''
+\begin{myitem}
+	\item Loop burst sequence: If this box is checked, the burst sequence is repeated.
+	Otherwise, the spike generator will turn itself off once all bursts are generated.
+	\item Period: If burst detection is turned off, each burst is generated in order,
+	triggered at the start of the clamp cycle, and once for each period. Bursts that last
+	longer than the period are truncated.
+	\item Spike times are given in the table at the bottom of the dialog. Each line
+	corresponds to one burst, which has an unrestricted number of spikes. Spike times
+	are given in milliseconds relative to the start of the burst. Note: Spike times
+	are sorted in ascending order when the dialog is closed and before saving to file.
+	Spike times at t=0.0 are ignored.
+	\item Load, Save buttons: Burst patterns can be read from and written to files.
+	StdpC expects descriptions of spike patterns containing 
+	\begin{myitem}
+		\item[-] An integer denoting the number of spikes in the pattern
+		\item[-] A matching number of spike times in seconds, measured from the
+		detection event. 
+	\end{myitem}
+	These pattern descriptions are best separated by newlines. Note: Previous versions
+	of StdpC allowed input files with a single spike sequence in untriggered mode. Since
+	all modes now allow several bursts, such files must be converted; simply add the number
+	of spikes before the first spike time value.
+\end{myitem}
+
+\noindent
+\emph{Scripting:} Script access to spike generators is given through the \texttt{SGp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf SGp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Spike generators must be initially active. Deactivating a spike generator
+	suspends all of	its instances. \\
+	\texttt{VSpike} & double & \\
+	\texttt{spkTimeScaling} & double & = 5000 / Spike width (ms)\\
+	\texttt{VRest} & double & \\
+	\texttt{bdType} & 0,1,2 & Burst detection: 0-off, 1-low to high, 2-high to low \\
+	\texttt{bdtUnder} & double & \\
+	\texttt{bdtUnderCont} & 0,1 & Contiguous on/off \\
+	\texttt{bdtOver} & double & \\
+	\texttt{bdtOverCont} & double & \\
+	\texttt{bdStrictlyCont} & double & \\
+	\texttt{period} & double & \\
+	\texttt{loopBursts} & double & \\
+	\texttt{SpikeT[\#][\#]} & double & Spike times in s relative to burst initiation.
+	 The first index is for the burst, the second for the spike. Both indices are zero-based.
+	 Note that if bursts or spikes are added by a script, they will exist from the moment the clamp
+	 cycle is started. E.g., if the protocol specifies one burst, and the script defines SpikeT[2][5]
+	 at any time,
+	 there will be one empty burst (index 1) and one burst with 6 spikes at time 0 (index 2). Empty
+	 bursts are not skipped, they just happen to produce no spikes. Spike times at or below 0 are ignored. \\
+	\texttt{inst[\#].active} & 0,1 & Spike generator instances must be initially active.
+	 Deactivating an instance suspends its voltage channel and all synapses and conductances that rely on it. \\
+	\texttt{inst[\#].inChn.bias} & double & Bias voltage \\
+	\texttt{inst[\#].bdThresh} & double & Burst detection threshold \\
+	\hline
+\end{tabularx}
+
+
+\subsection{Synapses}
+
+\noindent
+\parbox{\textwidth}{
+	\includegraphics[scale=0.5]{synapseBlock}
+} \\[0.2cm]
+
+The synapse control block contains an arbitrary number of synapse configurations.
+Synapses are added by selecting the appropriate type in the rightmost box in the
+list, labelled ``New...'', and clicking ``Add''. An initially active synapse is
+then added to the list, which can be configured by clicking the ``Parameters'' button and
+activated or deactivated by checking or unchecking the ``Active'' checkbox. When a synapse is no
+longer required, it can be removed by deactivating it and clicking the
+``Clear inactive'' button to the right of the list. The ``Reset'' button just below that
+resets the entire control block to its last saved state, i.e. the state it was in upon
+program start, loading or saving a protocol, or clicking the ``Start'' button.
+
+\subsubsection{Electrical synapses (Gap Junctions)}
 
 \noindent
 \parbox{0.4\textwidth}{
-\includegraphics[scale=0.5]{gapJunctionDialog}
+\includegraphics[scale=0.4]{gapJunctionDialog}
 }
 \hfill
 \parbox{0.55\textwidth}{
-If configured as an electrical synapse the control window on the left
-will appear. 
-
 The currents $I_{\text{pre}}$ and $I_{\text{post}}$ to be injected
 into the pre- and post-synaptic cells, respectively, are calculated
 according to:
@@ -578,36 +838,52 @@ where $V_{\text{pre}}(t)$ and $V_{\text{post}}(t)$ are the membrane
 potential of the two cells. If the gap junction is chosen as
 rectifying, $I_x (t)= 0$ if $V_{\text{pre}}(t) < V_{\text{post}}(t)$.
 } \\[0.2cm]
- The control elements are
+The controls in the gap junction dialog are
 \begin{myitem}
-\item Presynaptic input channel: Combo to choose the input channel
-  that contains the membrane potential of the presynaptic cell (SP= spike
-  generator) 
-\item Postsynaptic input channel: Combo to choose the input channel
-  that contains the membrane potential of the postsynaptic cell 
-\item Presynaptic output channel: Combo to choose the output channel
-  that will contain the current command for the presynaptic cell. 
-\item Postsynaptic output channel: Combo to choose the output channel
-  for the current command intended for the postsynaptic cell.
-\item Type combo: Choose whether the gap junction is ordinary (the
-  current can flow from the pre-synaptic cell to the postsynaptic cell
-  an vice versa; both cells have perfectly symmetrical roles in this
-  case) or rectifying (positive current can only from the presynaptic
-  cell to the postsynaptic cell but not in the other direction). 
-\item gSyn: Conductance of the gap junction in nS.  
+	\item Channel assignments: Each individual gap junction is assigned to presynaptic
+	and postsynaptic voltage (input) and current (output) channels and can be individually
+	turned on and off. \\
+	Note that assignments to neuron model ``All'' channels are resolved intelligently
+	(e.g. assigning presynaptic V and I to HH 0:All and postsynaptic V and I to analog channels
+	gives rise to one synapse per active model instance)
+	and on an all-to-all basis (e.g. assigning presynaptic V and I to HH 0:All and 
+	postsynaptic V and I to HH 1:All causes every instance of HH 0 to form synapses with
+	each instance of HH 1).
+	\item Rectification: You can choose whether the gap junction is ordinary (``Normal (symmetric)'', the
+	current can flow from the pre-synaptic cell to the postsynaptic cell
+	an vice versa; both cells have perfectly symmetrical roles in this
+	case) or rectifying (positive current can only flow from the presynaptic
+	cell to the postsynaptic cell but not in the other direction).
+	\item gSyn: The synaptic conductance in nS.
 \end{myitem}
 
-\subsection{Chemical Synapses}
+\noindent
+\emph{Scripting:} Script access to gap junctions is given through the \texttt{ESynp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf ESynp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Synapses must be initially active. Deactivating a synapse suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{type} & 0,1 & 0-normal, 1-rectifying \\
+	\texttt{gSyn} & double & \\
+	\hline
+\end{tabularx}
+
+
+\subsubsection{Chemical Synapses}
 % add description of Mg block; It's a model according to (Fellous,
 % Sejnowski, 2003, Cerebral Cortex)
-If the type of synapse is chemical, the control dialog of a chemical
-synapse is displayed on pressing ``Parameters''. The current to be
+The current to be
 injected into the postsynaptic cell, $I_{\text{post}}$, is calculated
 in each dynamic clamp cycle using a first order kinetics model of the
-release of neurotransmitter and an additional
-inactivation term, $h(t)$, to simulate short term depression:
+release of neurotransmitter, an additional
+inactivation term, $h(t)$, to simulate short term depression, and
+an optional magnesium block term, $g_{\text{Mg}}(t)$:
 \begin{align}
-  I_{\text{post}} = g_{\text{Syn}} \, S(t) \, h(t) [V_{\text{Syn}} -
+  I_{\text{post}} = g_{\text{Syn}} \, g_{\text{Mg}}(t) \, S(t) \, h(t) [V_{\text{Syn}} -
     V_{\text{post}}(t)],
 \end{align}
 where the instantaneous activation, S(t), and inactivation, h(t), terms are
@@ -633,16 +909,18 @@ h_\infty(V_{\text{pre}})&=
 \tau_h(V_{\text{pre}})&= \tau_{0} -
 \frac{A_\tau}{1+\exp\left(\frac{V_{\text{pre}} -
     V_{\text{Thresh},\tau}}{V_{\text{Slope},\tau}} \right)}
-\end{align}                                              
+\end{align}
+and the optional magnesium block term is given by
+\begin{align}
+g_{\text{Mg}}(t) &= \frac{1}{1 + F_{\text{Mg}} \, \exp(X_{\text{Mg}} \, V_{\text{post}}(t))}
+\end{align}
+
   The controls in the parameter dialog for the chemical synapse are
   \begin{myitem}
-  \item Presynaptic Channel: Combo box to choose the input channel
-    that contains the membrane potential of the presynaptic cell (SP = spike
-    generator) 
-  \item Postsynaptic Channel: Combo box that contains the membrane
-    potential of the postsynaptic cell
-\item Output Channel: The output channel to which the current command
-  for the synapse will be added
+  \item Channel assignments: Each individual synapse is assigned to a presynaptic input channel
+  (Presyn V) and postsynaptic input and output channels (Postsyn V, I).
+  \item Delay: Each assignment comes with a fixed delay (in ms), which can be used to mimic
+  conduction latencies.
 \end{myitem}
 ``Standard'':
 \begin{myitem}
@@ -655,10 +933,26 @@ h_\infty(V_{\text{pre}})&=
 \item VSlope: The ``slope'' parameter $V_{\text{Slope}}$ of the
   activation curve in mV.  
   \end{myitem}
-                                                          
+``Fix Vpost'':
+\begin{myitem}
+	\item Select ``Fixed'' to draw $V_{\text{post}}$ from a set value, rather than from the
+	postsynaptic voltage channel.
+	\item Vpost: The fixed value to use for $V_{\text{post}}$.
+\end{myitem}
+``Mg Block'':
+\begin{myitem}
+	\item Select ``Fixed'' to enable the magnesium block term $g_{\text{Mg}}$, defined
+	after \cite{FellousSejnowski2003}.
+	\item Mg factor: The scaled magnesium concentration $F_{\text{Mg}}$, a unitless value.
+	\item Mg exponent: The exponential factor $X_{\text{Mg}}$ in 1/V.
+\end{myitem}
+``Method'': Any sigmoid, tanh and exponential functions can optionally be computed using
+lookup tables. This is less precise than direct methods, but may increase speed
+on old computers.
+
 \noindent
 \parbox[b]{0.48\textwidth}{
-  \includegraphics[scale=0.5]{chemicalDialog}
+  \includegraphics[scale=0.45]{chemicalDialog}
 }
 \hfill
 \parbox[b]{0.5\textwidth}{
@@ -676,7 +970,7 @@ h_\infty(V_{\text{pre}})&=
 \item tau0, tauAmpl, tauVThresh, and tauVSlope: Parameters $\tau_0$,
   $A_\tau$, $V_{\text{Thresh},\tau}$ and $V_{\text{Slope},\tau}$ for
   the voltage-dependent characteristic time $\tau_h$ of short term depression.
-\item The plasticity combo box allows to choose whether the synapse is
+\item The plasticity combo box allows you to choose whether the synapse is
   subject to long term plasticity and according to which model the
   plasticity is determined.\end{myitem}
 } \\[0.2cm]
@@ -684,14 +978,47 @@ h_\infty(V_{\text{pre}})&=
 For ``Spike STDP'' a spike-timing based
   rule is applied according to the parameters defined in the
   corresponding control panel that appears upon clicking the
-  ``Parameters'' button. If ``ODE STDP'' is chosen, the synaptic
+  ``Parameters'' button.
+  If ``ODE STDP'' is chosen, the synaptic
   plasticity is implemented according to the ordinary differential
   equation (ODE) description in \cite{Abarbanel2002}. Parameters again
   are adjusted in the separate panel that appears after pressing
-  ``Parameters''.
+  ``Parameters''. For details on both methods, see section \ref{STDP}.\\
+
+\noindent
+\emph{Scripting:} Script access to chemical synapses is given through the \texttt{CSynp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf CSynp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Synapses must be initially active. Deactivating a synapse suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{gSyn} & double & \\
+	\texttt{VSyn} & double & \\
+	\texttt{tauSyn} & double & \\
+	\texttt{VThresh} & double & \\
+	\texttt{VSlope} & double & \\
+	\texttt{fixVpost} & 0,1 & \\
+	\texttt{Vpost} & double & \\
+	\texttt{STD} & 0,1 & Short-term depression on/off \\
+	\texttt{STDAmpl} & double & \\
+	\texttt{STDVThresh} & double & \\
+	\texttt{STDVSlope} & double & \\
+	\texttt{STDtau0} & double & \\
+	\texttt{STDtauAmpl} & double & \\
+	\texttt{STDtauVTresh} & double & \\
+	\texttt{STDtauVSlope} & double & \\
+	\texttt{MgBlock} & 0,1 & \\
+	\texttt{MgFac} & double & \\
+	\texttt{MgExpo} & double & \\
+	\texttt{Plasticity} & 0,1,2 & 0-off, 1-Spike 2-ODE. See below for STDP scripting.\\
+	\hline
+\end{tabularx}
 
 
-\subsection{Alpha beta synapse}
+\subsubsection{Alpha beta synapse}
 The $\alpha\beta$ synapse implemented in StdpC is a variation on the
 classic Rall synapse \cite{Rall1967} with a pre-synaptic release variable $R$ and a
 post-synaptic binding variable $S$ which then gates the synaptic
@@ -709,33 +1036,51 @@ V_{\text{post}}) \\
 \hfill
 \parbox[b]{0.5\textwidth}{
 \begin{itemize}
-\item Presynaptic Channel, Postsynaptic Channel and Output Channel are
-  as in other synapse models
-\item The method for evaluating the sigmoid function is chosen in the
-  Method combo. Unless speed problems are encountered ``Direct
-  Functions'' is recommended.
+\item Channel assignments, method, fixed Vpost and plasticity are described above.
 \item gSyn: Maximal synaptic conductance
 \item Vrev: Reversal potential of the synapse
 \item aS: Rate of transmitter binding to post-synaptic targets
-\item bS': Rate of transmitter removal (channel closing)
+\item bS: Rate of transmitter removal (channel closing)
   postsynaptically
 \item aR: Rate of transmitter release when pre-synaptic potential is
   elevated
-\end{itemize}
-}
-\begin{itemize}
 \item VaR: Midpoint of the sigmoid function expressing the level of
   pre-synaptic release as a function of pre-synaptic membrane
   potential
-\item saR: Width of the release sigmoid function
-\item bR: Fall rate of the presynaptic release
-\item The remaining parameters, including plasticity are as in the
-  other synapse models.
+\end{itemize}
+}
+\begin{itemize}
+	\item saR: Width of the release sigmoid function
+	\item bR: Fall rate of the presynaptic release
 \end{itemize}
 
+\noindent
+\emph{Scripting:} Script access to alpha-beta synapses is given through the \texttt{abSynp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf abSynp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Synapses must be initially active. Deactivating a synapse suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{gSyn} & double & \\
+	\texttt{Vrev} & double & \\
+	\texttt{aS} & double & \\
+	\texttt{bS} & double & \\
+	\texttt{aR} & double & \\
+	\texttt{VaR} & double & \\
+	\texttt{saR} & double & \\
+	\texttt{bR} & double & \\
+	\texttt{fixVpost} & 0,1 & \\
+	\texttt{Vpost} & double & \\
+	\texttt{Plasticity} & 0,1,2 & 0-off, 1-Spike, 2-ODE. See below for STDP scripting. \\
+	\hline
+\end{tabularx}
 
-\subsection{Destexhe synapse}
-his synapse model is the simple first order synapse description
+
+\subsubsection{Destexhe synapse}
+This synapse model is the simple first order synapse description
 introduced in \cite{Destexhe1994}. In brief,
 \begin{align}
 I_{\text{syn}}&= g_{\text{syn}} S (V_{\text{rev}} -
@@ -745,19 +1090,16 @@ V_{\text{post}}) \\
 - \beta S & \text{otherwise} 
 \end{array} \right.
 \end{align}
-where $t_{\text{spike}}$ is the time of the occurence of the last
+where $t_{\text{spike}}$ is the time of the occurrence of the last
 spike in the pre-synaptic neuron.
 
+\noindent
 \parbox[b]{0.48\textwidth}{
-\includegraphics[scale=0.5]{destexheSynDialog} \\[1.5cm]}
+\includegraphics[scale=0.5]{destexheSynDialog}}
 \hfill
 \parbox[b]{0.5\textwidth}{
 \begin{itemize}
-\item Presynaptic Channel, Postsynaptic Channel and Output Channel are
-  as in other synapse models
-\item The method for evaluating the sigmoid function is chosen in the
-  Method combo. Unless speed problems are encountered ``Direct
-  Functions'' is recommended.
+\item Channel assignments, method, fixed Vpost and plasticity are described above.
 \item gSyn: Maximal synaptic conductance
 \item Vpre: pre-synaptic threshold for triggering synaptic transmitter
   release
@@ -766,12 +1108,32 @@ spike in the pre-synaptic neuron.
   presynaptic spike
 \item alpha: The rise rate for the EPSCs
 \item beta: the fall (decay) rate for the EPSCs
-\item The remaining parameters, including plasticity are as in the
-  other synapse models.
 \end{itemize}
-}
+}\\
 
-\subsection{Spike Timing Dependent Plasticity}
+\noindent
+\emph{Scripting:} Script access to Destexhe synapses is given through the \texttt{DxheSynp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf abSynp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Synapses must be initially active. Deactivating a synapse suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{gSyn} & double & \\
+	\texttt{Vpre} & double & \\
+	\texttt{Vrev} & double & \\
+	\texttt{trelease} & double & \\
+	\texttt{alpha} & double & \\
+	\texttt{beta} & double & \\
+	\texttt{fixVpost} & 0,1 & \\
+	\texttt{Vpost} & double & \\
+	\texttt{Plasticity} & 0,1,2 & 0-off, 1-Spike, 2-ODE. See below for STDP scripting. \\
+	\hline
+\end{tabularx}
+
+\subsubsection{Spike Timing Dependent Plasticity} \label{STDP}
 As described above, synapses can be equipped with a form of Spike
 Timing Dependent Plasticity (STDP).
 The typical way of implementation, denoted as ``Spike STDP'',
@@ -786,8 +1148,8 @@ define
 $\Delta g$ is then added to the ``raw'' synaptic conductance
 $g_{\text{raw}}$ whenever a pre- or postsynaptic spike occurs. Note
 that for correct function, spike detection needs to be switched on
-for the pre- and postsynaptic input channels (see input channel
-dialog). The synaptic conductance $g_{\text{Syn}}$ is then
+for the pre- and postsynaptic input channels (see section \ref{inchnconfig}).
+The synaptic conductance $g_{\text{Syn}}$ is then
 determined from $g_{\text{raw}}$ through a sigmoid filter
 \begin{align}
   g= g_{\text{max}} \tanh\left(\frac{g_{raw} -
@@ -824,7 +1186,7 @@ The control parameters are: \\
   $\Delta g$ will only be calculated and applied for the last spike
   that occurred in the presynaptic neuron. If it was $2$ it would be
   calculated for the last and the next to last spike in the
-  presynaptic neuron.
+  presynaptic neuron. Note, history is capped at 20 spikes.
 \item The method combo box allows to choose whether the STDP function is
   calculated directly with the appropriate C functions when needed or
   whether it is tabled up front and this lookup-table is being used.
@@ -845,8 +1207,24 @@ The control parameters are: \\
 \item maxEntry: The maximal $g_{\text{raw}}$ entry in the table.
 \end{myitem}
 
+\noindent
+\emph{Scripting:} Script access to Spike STDP is given through the \texttt{<synapse>.ST} variable.
+The following members are available for scripting: \\
+\begin{tabular}[b]{|ll|ll|}
+	\hline
+	{\bf \textless{}synapse\textgreater.ST.\textvisiblespace} & {\bf Value range} 
+	& {\bf \textless{}synapse\textgreater.ST.\textvisiblespace} & {\bf Value range} \\
+	\hline
+	\texttt{AMinus} & double 	& \texttt{Shift} & double \\
+	\texttt{tauMinus} & double 	& \texttt{History} & integer [0..20] \\
+	\texttt{APlus} & double 	& \texttt{gMax} & double \\
+	\texttt{tauPlus} & double & \texttt{gMid} & double \\
+	\texttt{Exponent} & integer & \texttt{gSlope} & double \\
+	\hline
+\end{tabular}\\
 
-Alternatively the synaptic strength is governed by a set of differential
+Alternatively, if the ``ODE STDP'' option is chosen,
+the synaptic strength is governed by a set of differential
 equations according to the model of synaptic plasticity in
 \cite{Abarbanel2002}. In this case, the maximal synaptic conductance
 $g_{\text{Syn}}$ is subject to a differential equation system
@@ -915,20 +1293,47 @@ The control parameters for ODE based STDP are: \\
 \item maxEntry: The maximum of $g_{\text{raw}}$ for which table
   entries are generated.
 \end{myitem}  
-\subsection{Hodgkin-Huxley Type Conductances}
+
+\noindent
+\emph{Scripting:} Script access to ODE STDP is given through the \texttt{<synapse>.ODE} variable.
+The following members are available for scripting: \\
+\begin{tabular}[b]{|ll|ll|}
+	\hline
+	{\bf \textless{}synapse\textgreater.ODE.\textvisiblespace} & {\bf Value range} 
+	& {\bf \textless{}synapse\textgreater.ODE.\textvisiblespace} & {\bf Value range} \\
+	\hline
+	\texttt{InitialP} & double 	& \texttt{highP} & double \\
+	\texttt{InitialD} & double 	& \texttt{lowP} & integer [0..20] \\
+	\texttt{betaP} & double 	& \texttt{highD} & double \\
+	\texttt{betaD} & double 	& \texttt{lowD} & double \\
+	\texttt{gamma} & double 	& \texttt{gMax} & double \\
+	\texttt{eta} & integer 		& \texttt{gMid} & double \\
+					 &  		& \texttt{gSlope} & double \\
+	\hline
+\end{tabular}
+
+
+\subsection{Hodgkin-Huxley Type Conductances} \label{HHcurrents}
 
 \parbox{\textwidth}{
   \includegraphics[scale=0.5]{HHBlock}
 } \\[0.2cm]
- 
-StdpC can inject up to six Hodgkin-Huxley type ionic conductances into
-cells. The six conductances can be inserted into a single cell
-or into several cells in any desired combination. The control blocks
-of Hodgkin- Huxley type conductances allow to choose two different
-types for the description.
 
-For the ``m/h/tau'' description, the current $I_{HH}$ to be injected
-into a cell with membrane potential V(t) is calculated according to
+The conductance control block contains an arbitrary number of Hodgkin-Huxley type
+conductance configurations.
+Conductances are added by selecting the appropriate type in the rightmost box in the
+list, labelled ``New...'', and clicking ``Add''. An initially active conductance is
+then added to the list, which can be configured by clicking the ``Parameters'' button and
+activated or deactivated by checking or unchecking the ``Active'' checkbox. When a conductance is no
+longer required, it can be removed by deactivating it and clicking the
+``Clear inactive'' button to the right of the list. The ``Reset'' button just below that
+resets the entire control block to its last saved state, i.e. the state it was in upon
+program start, loading or saving a protocol, or clicking the ``Start'' button.
+
+\subsubsection{m/h/tau Hodgkin-Huxley conductances}
+
+For the ``m/h/tau'' conductance description, the current $I_{HH}$ to be injected
+into a cell with membrane potential $V(t)$ is calculated according to
 \begin{align}
   I_{HH}(t) = g_{\text{Max}} m(t)^p h(t)^q (V_{\text{rev}}-V(t)),
 \end{align}
@@ -939,32 +1344,40 @@ where $m$ and $h$ are modelled as
 \end{align}
 with steady state values
 \begin{align}
-  m_\infty &= \frac{1}{1+\exp \left(\frac{V - V_m}{s_m}
-  \right)}, \\
-  h_\infty &= \frac{1}{1+\exp \left(\frac{V - V_h}{s_h}
-  \right)}, 
+  m_\infty &= \frac{1-C_m}{1+\exp \left(\frac{V - V_m}{s_m}
+  \right)}+C_m, \\
+  h_\infty &= \frac{1-C_h}{1+\exp \left(\frac{V - V_h}{s_h}
+  \right)}+C_h, 
 \end{align}
 and time scales 
 \begin{align}
-  \tau_m &= \tau_{0,m} - 
-  \frac{A_{\tau,m}}{1+\exp\left(\frac{V-V_{\tau,m}}{s_{\tau,m}}\right)}, \\
-  \tau_h &= \tau_{0,h} - 
-  \frac{A_{\tau,h}}{1+\exp\left(\frac{V-V_{\tau,h}}{s_{\tau,h}}\right)}, 
+  \tau_m &= \tau_{0,m} + A_{\tau,m} F_{\tau,m}(V), \\
+  \tau_h &= \tau_{0,h} + A_{\tau,h} F_{\tau,h}(V).
 \end{align}
-  
+The time scale function $F_{\tau,\bullet}$ can be one of the following four choices:
+\begin{align}
+  \text{``1/(1+exp)''} : F_{\tau,\bullet} &=
+    \frac{-1}{1+\exp\left(\frac{V-V_{\tau,\bullet}}{s_{\tau,\bullet}}\right)}, \\
+  \text{``tanh\string^2''} : F_{\tau,\bullet} &=
+    1 - \tanh^2 \left( \frac{V - V_{\tau,\bullet}}{s_{\tau,\bullet}}\right), \\
+  \text{``exp2/(1+exp1)''} : F_{\tau,\bullet} &=
+    \exp\left(\frac{V-V_{\tau,\bullet}}{s_{\tau,\bullet}}\right) \bullet_\infty(V), \\
+  \text{``Linear''} : F_{\tau,\bullet} &= V.
+\end{align}
+
 \noindent
 \parbox{0.48\textwidth}{
-\includegraphics[scale= 0.5]{mhtauDialog}
+\includegraphics[scale= 0.45]{mhtauDialog}
 } 
 \hfill
 \parbox{0.5\textwidth}{
 Control parameters of the ionic conductances in the m/h/tau formalism
 are:
 \begin{myitem}
-\item V in Channel: The input channel that contains the membrane
-  potential of the cell the conductance is injected into
-\item I out Channel: The output channel to which the current command
-  for the inserted ionic conductance will be added
+\item Channel assignments: Conductances can be assigned to multiple pairs of voltage input (``V in'')
+  and current output (``I out'') channels. Each such assignment can be turned on or off individually.
+  Assignments to model ``All'' channels are resolved intelligently, such that each active instance of the
+  model receives one conductance.
 \item gMax: The maximal conductance $g_{\text{Max}}$ of the inserted
   channel
 \item Vrev: The reversal potential $V_{\text{rev}}$ of the inserted
@@ -975,238 +1388,161 @@ are:
 } \\[0.2cm]
 
 \noindent
-``Activation''
+``Activation'' and ``Inactivation'' (substituting h for m as appropriate): 
 \begin{myitem}
-\item Exponent: The exponent $p$ in the current equation
+\item Exponent: The exponent $p$ (Activation) or $q$ (Inactivation) in the current equation
 \item Vm: The activation potential $V_m$
 \item sm: The width $s_m$ of the activation function
-\item Cm: The offset parameter $C_m$ for persistent currents 
-\item taum: The minimal time scale $\tau_{0,m}$ for $\tau_m$.
-\item taumAmpl: The range (Amplitude) $A_{\tau\,m}$ for the time scale $\tau_m$.
+\item Cm: The offset parameter $C_m$ for persistent currents
+\item taum type: Selects the time scale function $F_{\tau,m}$.
+\item taum0: The minimal time scale $\tau_{0,m}$ for $\tau_m$.
+\item taumAmpl: The range (Amplitude) $A_{\tau\,m}$ for the time scale $\tau_m$ in ms
+ (or, when taum type is ``Linear'', ms/mV).
 \item Vtaum: The mid point $V_{\tau,m}$ for the time scale sigmoid function.
 \item staum: The ``slope'' parameter $s_{\tau,m}$ for the time scale
 sigmoid function  
 \end{myitem}
-``Inactivation''
-\begin{myitem}
-\item Exponent: The exponent $q$ in the current equation
-\item Vh: The inactivation potential $V_h$
-\item sh: The width $s_h$ of the inactivation function
-\item Ch: The offset parameter $C_h$ for persistently inactivated currents 
-\item tauh: The minimal time scale $\tau_{0,h}$ for $\tau_h$.
-\item tauhAmpl: The range (Amplitude) $A_{\tau,h}$ for the time scale $\tau_h$.
-\item Vtauh: The mid point $V_{\tau,h}$ for the time scale sigmoid function.
-\item stauh: The ``slope'' parameter $s_{\tau,h}$ for the time scale
-sigmoid function.  
-\end{myitem}
+
+\noindent
+\emph{Scripting:} Script access to m/h/tau conductances is given through the \texttt{mhHHp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf mhHHp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Conductances must be initially active. Deactivating a conductance suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{gMax} & double & \\
+	\texttt{Vrev} & double & \\
+	\texttt{mExpo}, \texttt{hExpo} & integer & Exponent \\
+	\texttt{Vm}, \texttt{Vh} & double & \\
+	\texttt{sm}, \texttt{sh} & double & \\
+	\texttt{Cm}, \texttt{Ch} & double & \\
+	\texttt{taumType}, \texttt{tauhType} & 0,1,2,3 & Ordered as above \\
+	\texttt{taum}, \texttt{tauh} & double & taum0, tauh0\\
+	\texttt{taumAmpl}, \texttt{tauhAmpl} & double & Units: For linear tau type, the value is
+	interpreted as s/mV, otherwise as s.\\
+	\texttt{Vtaum}, \texttt{Vtauh} & double & \\
+	\texttt{staum}, \texttt{stauh} & double & \\
+	\hline
+\end{tabularx}
+
+\subsubsection{Alpha-Beta Hodgkin-Huxley conductances}
 
 \noindent
 Alternatively, the ionic conductances can be described in a
 $\alpha$/$\beta$ formalism, where
 \begin{align}
-I_{\text{Syn}}= g_{\text{Max}} m^p h^q (V-V_{\text{rev}}) \\
-\frac{dm}{dt}= \alpha_m (1-m) - \beta m \\
-\alpha_m= k_{\alpha,m} F_{\alpha,m}\left(\frac{V-V_{\alpha,n}}{s_{\alpha,m}}
+I_{\text{HH}}= g_{\text{Max}} m^p h^q (V_{\text{rev}}-V) \\
+\frac{dm}{dt}= \alpha_m (1-m) - \beta_m m \\
+\alpha_m= k_{\alpha,m} F_{\alpha,m}\left(\frac{V-V_{\alpha,m}}{s_{\alpha,m}}
 \right) \\
-\beta_m= k_{\beta,m} F_{\beta,m}\left(\frac{V-V_{\beta,n}}{s_{\beta,m}}
+\beta_m= k_{\beta,m} F_{\beta,m}\left(\frac{V-V_{\beta,m}}{s_{\beta,m}}
 \right) \\
 \frac{dh}{dt}= \alpha_h (1 - h) - \beta_h h \\
-\alpha_h= k_{\alpha,h} F_{\alpha,h}\left(\frac{V-V_{\alpha,n}}{s_{\alpha,h}}
+\alpha_h= k_{\alpha,h} F_{\alpha,h}\left(\frac{V-V_{\alpha,h}}{s_{\alpha,h}}
 \right) \\
-\beta_h= k_{\beta,h} F_{\beta,h}\left(\frac{V-V_{\beta,n}}{s_{\beta,h}}
+\beta_h= k_{\beta,h} F_{\beta,h}\left(\frac{V-V_{\beta,h}}{s_{\beta,h}}
 \right).
 \end{align}
-The ``activation''/''inactivation'' functions $F_{\bullet , \bullet}$ can
-be chosen from three choices,
+The ``activation'' and ``inactivation'' functions $F_{\bullet , \bullet}$ can
+be chosen from three options,
 \begin{align}
-F_1(x)= \frac{x}{\exp(x)-1} \\
-F_2(x)= \exp(x) \\
-F_3(x)= \frac{1}{1+\exp(x)}.
+\text{``k*V/(exp(V)-1)''} : F_{\bullet , \bullet}(x) &= \frac{x}{\exp(x)-1} \\
+\text{``k*exp(V)''} : F_{\bullet , \bullet}(x) &= \exp(x) \\
+\text{``k*1/(1+exp(V))''} : F_{\bullet , \bullet}(x) &= \frac{1}{1+\exp(x)}.
 \end{align}
-Note, that this formalism allows to implement, for example, the classic
+Note that this formalism allows you to implement, for example, the classic
 neuron model by Traub and Miles \cite{Traub1991}. \\
 
 \noindent
-\parbox{0.58\textwidth}{
+\parbox{0.54\textwidth}{
 \includegraphics[scale= 0.5]{alphaBetaDialog}
 }
 \hfill
-\parbox{0.4\textwidth}{
+\parbox{0.45\textwidth}{
 The control parameters are
 \begin{myitem}
-\item V in Channel: The input channel that contains the membrane
-  potential of the cell the conductance is injected into
-\item I out Channel: The output channel to which the current command
-  for the inserted ionic conductance will be added
-\item gMax: The maximal conductance $g_{\text{Max}}$ of the inserted
-  channel
-\item Vrev: The reversal potential $V_{\text{rev}}$ of the inserted
-  channel
-\item Method: The combo box allows to choose between direct evaluation of C
-  functions or a pre-calculated lookup table.
+\item Channel assignments, gMax, Vrev, Method as above;
 \end{myitem}
-} \\[0.2cm]
-
-\noindent
-``Activation''
+``Activation'' and ``Inactivation'' (substituting h for m as appropriate):
 \begin{myitem}
-\item Exponent: The exponent $p$ in the current equation
-\item ma type: The choice of the functional form for $F_{\alpha,m}$.
-\item mka: Rate parameter $k_{\alpha,m}$ for the rise of $m$
-\item mVa: The midpoint $V_{\alpha,m}$ for the sigmoid function
-  for $\alpha_m$ 
-\item msa: The ``slope'' parameter $s_{\alpha,m}$ for the sigmoid function
-  for $\alpha_m$
-\item mb type: The choice of the functional form for $F_{\beta,m}$.
-\item mkb: Rate parameter $k_{\beta,m}$ for the decay of $m$
-\item mVb: The midpoint $V_{\beta,m}$ for the sigmoid function
-  for $\beta_m$ 
-\item msb: The ``slope'' parameter $s_{\beta,m}$ for the sigmoid function
-  for $\beta_m$
+	\item Exponent: The exponent $p$ (Activation) or $q$ (Inactivation) in the current equation
+	\item ma type: The choice of the functional form for $F_{\alpha,m}$.
+	\item mka: Rate parameter $k_{\alpha,m}$ for the rise of $m$
+	\item mVa: The midpoint $V_{\alpha,m}$ for the sigmoid function
+	for $\alpha_m$ 
+	\item msa: The ``slope'' parameter $s_{\alpha,m}$ for the sigmoid function
+	for $\alpha_m$
+	\item mb type: The choice of the functional form for $F_{\beta,m}$.
+	\item mkb: Rate parameter $k_{\beta,m}$ for the decay of $m$
 \end{myitem}
-``Inactivation''
+} 
 \begin{myitem}
-\item Exponent: The exponent $q$ in the current equation
-\item ha type: The choice of the functional form for $F_{\alpha,h}$.
-\item hka: Rate parameter $k_{\alpha,h}$ for the rise of $h$
-\item hVa: The midpoint $V_{\alpha,h}$ for the sigmoid function
-  for $\alpha_h$ 
-\item hsa: The ``slope'' parameter $s_{\alpha,h}$ for the sigmoid function
-  for $\alpha_h$
-\item hb type: The choice of the functional form for $F_{\beta,h}$.
-\item hkb: Rate parameter $k_{\beta,h}$ for the decay of $h$
-\item hVb: The midpoint $V_{\beta,h}$ for the sigmoid function
-  for $\beta_h$ 
-\item hsb: The ``slope'' parameter $s_{\beta,h}$ for the sigmoid function
-  for $\beta_h$
-\end{myitem}
-
-
-\subsection{Spike generator} \label{spikegen}
-The spike generator unit can replace a presynaptic cell. It can
-operate in several very different modes. When its input are spike
-timings, the spikes have a
-pre-defined form. Alternatively it can replay a voltage waveform from
-a file directly. The spike time information can either be explicit
-spike times from a file, spike patterns (bursts) specified in a file,
-or a spike pattern defined explicitly through the graphical interface.
-The pattern options can be combined with burst detection, in which
-each spike pattern is triggered by a detected threshold event in
-another (measured) neuron.
-
-The control elements for the spike generator are
-\begin{myitem}
-\item The ``Spike Method'' combo allows to choose the type of operating
-  method -- explicit spike times from the GUI, spike times from a file
-  (that includes explicit times if burst detection is not enabled, or
-  burst patterns if it is), and replay of a voltage waveform from a
-  file.
-\item The ``Save Spike Generator'' checkbox allows the user to choose if
-  the spike generator channel would be saved or not (only if the spike
-  generator is on in any of its possible modes)
-\item The method combo allows to choose for the use of functions or
-  lookup tables.
+	\addtocounter{enumi}{7}
+	\item mVb: The midpoint $V_{\beta,m}$ for the sigmoid function
+	for $\beta_m$ 
+	\item msb: The ``slope'' parameter $s_{\beta,m}$ for the sigmoid function
+	for $\beta_m$
 \end{myitem}
 
 \noindent
-\parbox{0.48\textwidth}{
-    \includegraphics[scale=0.5]{spikeGenBlock}
-}
-\hfill
-\parbox{0.5\textwidth}{
-``Spikes''
-\begin{myitem}
-\item VSpike: The amplitude of the spikes generated
-\item Width: The width of spikes in ms
-\item VRest: Th resting potential from which the spikes depart
-\end{myitem}
-``Explicit Spike Times'' \\
-If this method was chosen, the parameters are
-\begin{myitem}
-\item Number: The number of spikes in the pattern (burst)
-\item Period: The period with which to repeat the spike pattern
-  periodically 
-\item The ``Spike Times'' button will make the window visible, in
-  which explicit spike times can be entered
-\end{myitem}
-}\\[0.2cm]
+\emph{Scripting:} Script access to alpha-beta conductances is given through the \texttt{abHHp[\#]} variable.
+The following members are available for scripting: \\
+\begin{tabularx}{\linewidth}{|ll|X|}
+	\hline
+	{\bf abHHp[\#].\textvisiblespace} & {\bf Value range} & {\bf Notes} \\
+	\hline
+	\texttt{active} & 0,1 & Conductances must be initially active. Deactivating a conductance suspends all
+	its assignments. \\
+	\texttt{assign[\#].active} & 0,1 & Assignments must be initially active. \\
+	\texttt{gMax} & double & \\
+	\texttt{Vrev} & double & \\
+	\texttt{mExpo}, \texttt{hExpo} & integer & Exponent \\
+	\texttt{maFunc}, \texttt{mbFunc}, \texttt{haFunc}, \texttt{hbFunc} & 0,1,2 & Activation/inactivation 
+	functions, ordered as above. \\
+	\texttt{mka}, \texttt{mkb}, \texttt{hka}, \texttt{hkb} & double & \\
+	\texttt{mVa}, \texttt{mVb}, \texttt{hVa}, \texttt{hVb} & double & \\
+	\texttt{msa}, \texttt{msb}, \texttt{hsa}, \texttt{hsb} & double & \\
+	\hline
+\end{tabularx}
 
-\noindent
-\parbox{0.48\textwidth}{
-    \includegraphics[scale=0.5]{spikeTimeDialog}
-}
-\hfill
-\parbox{0.5\textwidth}{
-``Burst detection''
-\begin{myitem}
-\item The transition combo allows to choose whether to trigger an
-  event for low to high or high to low transitions through a threshold
-  value
-\item Channel: The input channel on which to detect events
-\end{myitem}
-}
-\begin{myitem} 
-\item Threshold: The trigger threshold for event detection. For
-  low$\rightarrow$high detection, an event
-  is triggered whenever NUnder measurements were below threshold and
-  afterwards NOver measurements were above. Note that for noisy
-  signals it may be  necessary to increase both numbers for reliable
-  detection. The events below and above are not required to be
-  contiguous in the current implementation.
-\item NUnder: see ``Threshold'' above.
-\item NOver: see ``Threshold'' above.
-\end{myitem}
-``Spike Time Input File''
-\begin{myitem}
-\item The input file name for the file that contains the spike time
-  information. If burst detection is off, the file should contain one
-  clear text column containing times in seconds when spikes shall
-  occur.
-If burst detection is on, StdpC expects descriptions of spike
-patterns containing of 
-\begin{myitem}
-\item[-] An integer denoting the number of spikes in the pattern
-\item[-] A matching number of spike times in seconds, measured from the
-  detection event. 
-\end{myitem}
-These pattern descriptions are best separated by newlines.
-\end{myitem}
 
-\subsection{Data displays}
-The two data displays in StdpC are very useful to check the parameter
+\subsection{Data display}
+The data display in StdpC is very useful to check the parameter
 settings chosen. Typical errors in dynamic clamp setups are wrong
-conversion factors on input- and output channels. By displaying the
+conversion factors on input and output channels. By displaying the
 data acquired on input channels in the graph displays, some of these
-errors can easily be detected and corrected. \\[0.2cm]
+errors can easily be detected and corrected. On reasonably modern
+hardware (i.e., any computer with multiple processor cores), graphing
+should have very little impact on clamp cycle performance. \\[0.2cm]
 \parbox{\textwidth}{
   \includegraphics[scale=0.6]{graphBlock}
 } \\[0.2cm]
-The graph panels are controlled by the dialog that appears when
-pressing ``Settings''. \\
+The graph panel control elements are:
+\begin{myitem}
+\item Sampling interval: Sets the graph sampling frequency that StdpC aims for.
+The achieved sampling frequency is displayed to the right and is usually a little
+smaller than the desired rate.
+\item Buffer size: Sets the number of samples that can be held in each trace's buffer.
+It may be necessary to increase this for high sampling rates. Tell-tale signs of a
+buffer overflow are gaps in the data, which appear as straight line segments,
+interspersed with smooth curve sections.
+\item The data display is controlled with the mouse. To zoom in or out, use the scroll
+wheel while mousing over the display. To move the plot, click and drag it. You can also select
+each of the axes by clicking them (the axis will turn blue) in order to zoom/drag along
+this axis only. Data display adjustments can be made at any time and do not interfere with
+the data displayed.
+\item Below the data display, you can select channels for plotting. Analog input and output
+channels are plotted to the voltage and current axis, respectively. Spike generators
+do not have an output channel and are therefore always plotted on the voltage axis.
+For model instances, the Type selection becomes available, which lets you choose either
+the input (voltage) or the output (current) channel. Note, entries that are marked
+active when the clamp cycle is started can be hidden by unchecking the ``Active'' checkbox,
+but data will continue to be gathered until the clamp cycle is stopped.
+\end{myitem}
 
-\noindent
-\parbox{0.62\textwidth}{
-  \includegraphics[scale=0.5]{graphDialog}
-}
-\hfill
-\parbox{0.36\textwidth}{
-The control elements are:
-\begin{myitem}
-\item Data column: Combo boxes to choose which data to display
-\item Min: Minimum on the y axis for this data
-\item Max: Maximum ion the y axis for this data
-\item Unit: Units in which Min and Max are expressed
-\item Color: Choice of color of the data trace.
-\end{myitem}
-}
-\begin{myitem}
-\item time range: The length of the x axis in ms
-\item time ticks: Number of ticks on the x axis. 
-\item update frequency: The rate with which points on the display are
-  updated. Note that a too high rate will likely lead to an overload
-  and subsequent freeze of the program. A more efficient and safe
-  implementation of the displays is on the todo list.
-\end{myitem}
 
 \section{Experiment automation} \label{scriptsect}
 
@@ -1227,127 +1563,14 @@ The script file will be read into a list of events in memory such that
 changes to the file have no effect after the script was loaded.
 
 The parameter names are the same as used when the state of the GUI is
-saved (``save protocol''). However, not all parameters can reasonably
-changed while the clamp is running. A list of the most common
-parameters one may want to change through scripting are given in the table. \\
-\begin{table}
-\begin{tabular}[t]{|ll|}
-\hline
-{\bf Name} & {\bf value range} \\
-\hline
-CSynp[i].ST.AMinus & double \\
-CSynp[i].ST.tauMinus & double \\
-CSynp[i].ST.APlus & double \\
-CSynp[i].ST.tauPlus & double \\
-CSynp[i].ST.Exponent & int \\
-CSynp[i].ST.Shift & double \\
-CSynp[i].ST.History & int \\
-CSynp[i].ST.tableDt & double \\
-CSynp[i].ST.tableDgMin & double \\
-CSynp[i].ST.gMax & double \\
-CSynp[i].ST.gMid & double \\
-CSynp[i].ST.gSlope & double \\
-CSynp[i].ODE.InitialP & double \\
-CSynp[i].ODE.InitialD & double \\
-CSynp[i].ODE.betaP & double \\
-CSynp[i].ODE.betaD & double \\
-CSynp[i].ODE.gamma & double \\ 
-CSynp[i].ODE.eta & int \\
-CSynp[i].ODE.highP & double \\
-CSynp[i].ODE.lowP & double \\
-CSynp[i].ODE.highD & double \\
-CSynp[i].ODE.lowD & double \\
-CSynp[i].ODE.gMax & double \\
-CSynp[i].ODE.gMid & double \\
-CSynp[i].ODE.gSlope & double \\
-CSynp[i].gSyn & double \\
-CSynp[i].VSyn & double \\
-CSynp[i].tauSyn & double \\
-CSynp[i].VThresh & double \\
-CSynp[i].VSlope & double \\
-CSynp[i].STD & 0-1 \\
-CSynp[i].STDAmpl & double \\
-CSynp[i].STDVThresh & double \\
-CSynp[i].STDVSlope & double \\
-CSynp[i].STDtauAmpl & double \\
-CSynp[i].STDtau0 & double \\
-CSynp[i].STDtauVThresh & double \\
-CSynp[i].STDtauVSlope & double \\
-CSynp[i].fixVpost & 0-1 \\
-CSynp[i].Vpost & double \\
-CSynp[i].Plasticity & 0-2 \\
-ESynp[i].type & 0-1 \\
-ESynp[i].gSyn & double \\
-mhHHp[i].gMax & double \\
-mhHHp[i].Vrev & double \\
-mhHHp[i].mExpo & int \\
-mhHHp[i].hExpo & int \\
-mhHHp[i].Vm & double \\
-mhHHp[i].sm & double \\ \hline
-\end{tabular}
-\quad 
-\begin{tabular}[t]{|ll|}
-\hline
-{\bf Name} & {\bf value range} \\
-\hline
-mhHHp[i].Cm & double \\
-mhHHp[i].taum & double \\
-mhHHp[i].taumAmpl & double \\
-mhHHp[i].Vtaum & double \\
-mhHHp[i].staum & double \\
-mhHHp[i].Vh & double \\
-mhHHp[i].sh & double \\
-mhHHp[i].Ch & double \\
-mhHHp[i].tauh & double \\
-mhHHp[i].tauhAmpl & double \\
-mhHHp[i].Vtauh & double \\
-mhHHp[i].stauh & double \\
-abHHp[i].gMax & double \\
-abHHp[i].Vrev & double \\
-abHHp[i].mExpo & int \\
-abHHp[i].hExpo & int \\
-abHHp[i].maFunc & 0-2 \\
-abHHp[i].mka & double \\
-abHHp[i].mVa & double \\
-abHHp[i].msa & double \\
-abHHp[i].mbFunc & double \\
-abHHp[i].mkb & double \\
-abHHp[i].mVb & double \\
-abHHp[i].msb & double \\
-abHHp[i].haFunc & 0-2 \\
-abHHp[i].hka & double \\
-abHHp[i].hVa & double \\
-abHHp[i].hsa & double \\
-abHHp[i].hbFunc & 0-2 \\
-abHHp[i].hkb & double \\
-abHHp[i].hVb & double \\
-abHHp[i].hsb & double \\
-SGp.VSpike & double \\
-SGp.spkTimeScaling & double \\
-SGp.VRest & double \\
-SGp.bdThresh & double \\
-SGp.bdNUnder & double \\
-SGp.bdNOver & double \\
-SGp.period & double \\ 
-SGp.SpikeNo & int \\
-SGp.SpikeT[0] & double \\
-SGp.SpikeT[1] & double \\
-SGp.SpikeT[2] & double \\
-SGp.SpikeT[3] & double \\
-SGp.SpikeT[4] & double \\
-SGp.SpikeT[5] & double \\
-SGp.SpikeT[6] & double \\
-SGp.SpikeT[7] & double \\
-SGp.SpikeT[8] & double \\
-SGp.SpikeT[9] & double \\ \hline
-\end{tabular}
-\end{table}
+saved (``save protocol''), and are listed in the relevant sections above.
+Note that protocols contain further parameters that cannot be changed
+while the clamp is running, and which are therefore not listed above.
+Their inclusion in a script file is discouraged and may lead
+to unexpected behaviour.
 
-Please note that internally, all parameters and variables are in SI
-units V, A, s, S, etc. The same applies to values in the script files. The
-variable $i$ in the variable names in the table has to be replaced by the
-appropriate number of the synapse or conductance, $i \in \{0, \ldots,
-5\}$. 
+Please note that in script and protocol files, all parameters and variables are in SI
+units V, A, s, S, etc. unless noted otherwise.
 
 
 \section{Electrode compensation} \label{eleccomp}
@@ -1356,7 +1579,7 @@ For the compensation of electrode artifacts, StdpC uses the so-called Active
 Electrode Compensation (AEC) algorithm, developed by Romain Brette and his 
 colleagues. Here we only discuss those parts of this cutting-edge
 compensation technique, that are necessary for the StdpC end-user to be aware of,
-however we also encourage to user to consult \cite{Brette2008} 
+however we also encourage the user to consult \cite{Brette2008} 
 and its supplementary material for the full description of the algorithm.
 
 The AEC method consist of two parts: an initial calibration phase and the
@@ -1521,26 +1744,30 @@ electrode (ie. time constant is lower than 1ms).
 
 \includegraphics[scale=0.6]{elecCalibDialog}
 
-The dialog allows for the calibration of four electrodes (Electrode 1 to
-Electrode 4) through the tabular menus on the top of the calibration
-panel. The control and result elements on each tab page are the following:  
+The calibration dialog is reached through the input channel setup dialog.
+The control and result elements are the following:  
 \begin{myitem}
 \item Information line: Each page has a text line on the top (saying
   \emph{Uncalibrated} on the included picture) to provide some basic
   information about the calibration process for the user. 
 \item \emph{Compensation on}: after calibration, this checkbox allows the
   user to turn the compensation on and off on the corresponding electrode.
-\item \emph{General settings}: This panel contains the settings that
-  applies to all the available features (ie. the electrode measurement, the
-  membrane measurement and the calibration) on the current tabular page.
-\item \emph{Input channel}: The number of the input channel assigned to the
-  electrode, must be one of the active input channels.
-\item \emph{Output channel}: The number of the output channel assigned to the
+\end{myitem}
+\emph{General settings}: This panel contains the settings that
+  apply to all the available features (ie. the electrode measurement, the
+  membrane measurement and the calibration).
+\begin{myitem}
+\item \emph{Output channel}: The output channel assigned to the
   electrode, must be one of the active output channels.
+\item \emph{Output compensated voltage to channel} Check and select a different
+  channel to copy the compensated voltage to. This can be used to record the
+  voltage actually used by StdpC on a separate machine, for example.
 \item \emph{Desired sampling rate}: The sampling frequency that StdpC will
   aim to keep during the calibration or the electrode/membrane measurement.
-\item \emph{Electrode linearity check}: This panel contains the settings specific for
-  the electrode measurement feature. See also \emph{General settings}.
+\end{myitem}
+\emph{Electrode linearity check}: This panel contains the settings specific for
+  the electrode measurement feature.
+\begin{myitem}
 \item \emph{I\_max}: Maximal current level injected into the electrode.
 \item \emph{I\_min}: Minimal current level injected into the electrode.
 \item \emph{Number of injection levels}: Number of current levels
@@ -1565,9 +1792,10 @@ panel. The control and result elements on each tab page are the following:
   of the injections. 
 \item \emph{Inj. length per repeat}: defines how long each injection will
   lasts. Also defines the recovery time in between current level injections. 
-\item \emph{Calibration}: This panel contains the settings specific for
-  the electrode electrode calibration feature. See also \emph{General
-    settings}.
+\end{myitem}
+\emph{Calibration}: This panel contains the settings specific for
+  the electrode electrode calibration feature.
+\begin{myitem}
 \item \emph{Hyperpol. current level}: allows for the injection of a certain
   constant level of  hyperpolarization current into the cell during the
   whole duration of the calibration in order to minimize the number of
@@ -1576,9 +1804,9 @@ panel. The control and result elements on each tab page are the following:
   characteristics.
 \item \emph{Injection amplitude}: the amplitude of the injected
   white noise current signal. Setting 1 nA here usually means a good
-  tradeoff between reachin a high signal-to-noise ratio and avoiding
+  tradeoff between reaching a high signal-to-noise ratio and avoiding
   driving the cell into 
-  an active state (like spiking) in the same time. Always make sure, that
+  an active state (like spiking) in the same time. Always make sure that
   the DAQ hardware allows for the issuing of this current level (both to
   positive and negative levels).
 \item \emph{Injection length}: defines how long the current injection during
@@ -1604,14 +1832,13 @@ panel. The control and result elements on each tab page are the following:
 
 \section{Saving of experiment data} \label{datasaving}
 
-A new feature in StdpC is the experiment data saving
-facility. The user can choose between binary of ASCII data formats, pick
+StdpC allows saving experiment data to disk.
+The user can choose between binary of ASCII data formats, pick
 any subset of the active channels (see Section \ref{inchnconfig} and
-\ref{outchnconfig}) including the voltage of spike generator as an input
-channel, set the data saving frequency and also find a file which the
-experiment data will be saved into. After starting the dynamic clamping,  in
-each clamping cycle the software decides whether it is time to perform a
-saving by compering the last saving time and the current time. This way the
+\ref{outchnconfig}), set the data saving frequency and select a file which the
+experiment data will be saved into. After starting the dynamic clamping, in
+each clamping cycle the software decides whether it is time to write samples
+to file by comparing the last saving time and the current time. This way the
 saving frequency is quasi independent of the dynamic clamping
 frequency. When a data saving occurs, a new line is being added to the
 data file obeying the following pattern:
@@ -1619,8 +1846,6 @@ data file obeying the following pattern:
 Time\_stamp\ \ \ Input\_chnl\_1
 \ \ \ ...\ \ \ Input\_chnl\_n\ \ \  Output\_chnl\_1\ \ \ ...\ \ \ Output\_chnl\_n  
 \end{equation*}
-where the spike generator is always the last input channel
-($Input\_channel\_n$), if it has been set to be saved.
 
 Please be aware, that, as no offline compression is implemented in the
 current version, StdpC can generate huge data files during long
@@ -1628,7 +1853,7 @@ experiments. The size of the saved data can be reduced by
 \begin{myitem} 
 \item choosing binary format rather than ASCII
 \item decreasing the saving frequency
-\item only saving the channels which are going to be important for the data
+\item only saving the channels which are going to be important for data
   post-processing and analysis
 \end{myitem}
 For a simple comparison, the simulation of a gap junction (electrical
@@ -1640,9 +1865,10 @@ membrane voltages of the two cells (2 input channels + the extra time
 stamp) at 5kHz in binary mode. 
 Having finished the experiment, the user can load the experiment data file
 into any data analysis platform they prefer (Matlab, R, Octave, Scilab,
-etc) for the offline processing and analysis of the data.
+etc) for offline processing and analysis of the data.
 
-\includegraphics[scale=0.6]{dataSavingDialog}
+\noindent
+\includegraphics[scale=0.6]{dataSavingDialog}\\
 
 The configuration settings on the \emph{Data saving settings} dialog are
 the following:
@@ -1659,41 +1885,10 @@ the following:
 \end{myitem}
 
 
-\section{Input channel configuration} \label{inchnconfig}
-
-The \emph{Input Channels} dialog contains the basic configurable properties
-for the input channels, like whether they are going to be active or not,
-their acquisition range and conversion factor, along with some more StdpC specific
-properties, like whether spike detection is going to be on or
-off on them (see Section \ref{spikegen}), and if it is on, what spike
-detection threshold will be applied, and finally whether the channel is
-going to be saved or not during dynamic clamping (Section \ref{datasaving}). Always make sure that the
-right conversion factor is applied for each active channel, and a
-sufficiently wide acquisition range is set in order to prevent out of range
-data being cut off of the recorded data.
-
-\includegraphics[scale=0.6]{inputChnDialog}
-
-
-\section{Output channel configuration} \label{outchnconfig}
-
-The \emph{Output Channels} dialog contains the basic configurable properties
-for the output channels, like whether they are going to be active or not,
-their acquisition range and conversion factor, what is the bias current
-level applied on that channel if any, and finally whether the channel is
-going to be saved or not during dynamic clamping (Section
-\ref{datasaving}). Always make sure that the right conversion factor is
-applied for each active channel, and a sufficiently wide acquisition range
-is set in order to prevent out of range values being cut off of the
-injected current.
-
-\includegraphics[scale=0.6]{outputChnDialog}
-
-
 \section{User feedback} 
 Please do give feedback if you found the software useful, buggy, or
 have general comments or questions. Please send correspondence through
-the sourceforge email or directly to T.Nowotny@sussex.ac.uk.
+GitHub or directly to T.Nowotny@sussex.ac.uk.
 If you are interested in contributing to the future development please
 do not hesitate to contact me as well.  
  
@@ -1703,7 +1898,8 @@ The StdpC software would not exist without the early dynamic clamp
 versions developed by Reynaldo D. Pinto and I (TN) am grateful to him for supplying the source code for further
 development back then. I am also grateful to Attila Sz\"ucs for his excellent
 suggestions for improving and extending the software and his tireless
-testing of new and buggy versions.
+testing of new and buggy versions. The features added in version 2017 were inspired
+by Naoki Kogo.
 
 \bibliographystyle{apalike}
 \bibliography{master}

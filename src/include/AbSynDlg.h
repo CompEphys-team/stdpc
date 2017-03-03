@@ -3,7 +3,7 @@
 
 
 #include <QAbstractButton>
-#include "ui_abSynDlg.h"
+#include "ui_AbSynDlg.h"
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
@@ -13,21 +13,20 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
      Q_OBJECT
 
   public:
-     abSynDlg(int, QWidget *parent= 0);
+     abSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(abSynData &);
      void importData(abSynData);
+     void setIndex(int);
 
-     int No;   
+     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+
+     typedef abSynData param_type;
      
   public slots:
      void PlastMethodChange();
      void ResCloseClicked(QAbstractButton *);
-     void updateOutChn(int, int*);
-     void updateInChn(int, int*);
-     
-  private:
 }; 
 
 #endif

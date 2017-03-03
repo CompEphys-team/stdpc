@@ -1,17 +1,62 @@
-
+#include "AP.h"
 #include "Nidaq.h"
 #include "limits.h"
 #include <sstream>
-#include "NIDAQmx.h"
 #include <QMessageBox>
 #include <QString>
 #include <cmath>
+#include "NIDAQDlg.h"
 
 // NIDAQmx device driver
 
+/// Construct a single self-registering proxy
+static NIDAQProxy prox;
+std::vector<NIDAQData> NIDAQProxy::p;
+DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID, &prox); }
+DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, &prox, parent); }
+
+NIDAQProxy::NIDAQProxy() :
+    regAP {
+        addAP("NIDAQp[#].active", &p, &NIDAQData::active),
+        addAP("NIDAQp[#].deviceName", &p, &NIDAQData::deviceName),
+        addAP("NIDAQp[#].inChn[#].active", &p, &NIDAQData::inChn, &inChnData::active),
+        addAP("NIDAQp[#].inChn[#].gain", &p, &NIDAQData::inChn, &inChnData::gain),
+        addAP("NIDAQp[#].inChn[#].gainFac", &p, &NIDAQData::inChn, &inChnData::gainFac),
+        addAP("NIDAQp[#].inChn[#].spkDetect", &p, &NIDAQData::inChn, &inChnData::spkDetect),
+        addAP("NIDAQp[#].inChn[#].spkDetectThresh", &p, &NIDAQData::inChn, &inChnData::spkDetectThresh),
+        addAP("NIDAQp[#].inChn[#].bias", &p, &NIDAQData::inChn, &inChnData::bias),
+        addAP("NIDAQp[#].inChn[#].chnlSaving", &p, &NIDAQData::inChn, &inChnData::chnlSaving),
+        addAP("NIDAQp[#].outChn[#].active", &p, &NIDAQData::outChn, &outChnData::active),
+        addAP("NIDAQp[#].outChn[#].gain", &p, &NIDAQData::outChn, &outChnData::gain),
+        addAP("NIDAQp[#].outChn[#].gainFac", &p, &NIDAQData::outChn, &outChnData::gainFac),
+        addAP("NIDAQp[#].outChn[#].bias", &p, &NIDAQData::outChn, &outChnData::bias),
+        addAP("NIDAQp[#].outChn[#].chnlSaving", &p, &NIDAQData::outChn, &outChnData::chnlSaving),
+
+        addAP("NIDAQp[#].inChn[#].calib.copyChnOn", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChnOn),
+        addAP("NIDAQp[#].inChn[#].calib.copyChn", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::copyChn),
+        addAP("NIDAQp[#].inChn[#].calib.samplingRate", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::samplingRate),
+        addAP("NIDAQp[#].inChn[#].calib.outputChannelNumber", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::outputChannelNumber),
+        addAP("NIDAQp[#].inChn[#].calib.iMaxElec", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMaxElec),
+        addAP("NIDAQp[#].inChn[#].calib.iMinElec", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMinElec),
+        addAP("NIDAQp[#].inChn[#].calib.numberOfLevels", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfLevels),
+        addAP("NIDAQp[#].inChn[#].calib.injLenPerLevel", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerLevel),
+        addAP("NIDAQp[#].inChn[#].calib.iMembStep", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::iMembStep),
+        addAP("NIDAQp[#].inChn[#].calib.numberOfRepeats", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::numberOfRepeats),
+        addAP("NIDAQp[#].inChn[#].calib.injLenPerRepeat", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injLenPerRepeat),
+        addAP("NIDAQp[#].inChn[#].calib.hyperpolCurr", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::hyperpolCurr),
+        addAP("NIDAQp[#].inChn[#].calib.injCalAmp", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalAmp),
+        addAP("NIDAQp[#].inChn[#].calib.injCalLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::injCalLen),
+        addAP("NIDAQp[#].inChn[#].calib.fullKernelLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::fullKernelLen),
+        addAP("NIDAQp[#].inChn[#].calib.electrodeKernelLen", &p, &NIDAQData::inChn, &inChnData::calib, &elecCalibParams::electrodeKernelLen)
+    }
+{
+    DeviceManager::RegisterDAQ(daqClass(), this);
+}
+
 //---------------------------------------------------------------------------
 
-NIDAQ::NIDAQ()
+NIDAQ::NIDAQ(size_t devID, DAQProxy *proxy) :
+    DAQ(devID, proxy)
 {
   char data[1024];
   float64 fdata[128];
@@ -20,7 +65,7 @@ NIDAQ::NIDAQ()
   char cbuf;
   
   devName= new char[80];
-  strcpy(devName, (const char *) NIDAQp.deviceName.toLatin1());
+  strcpy(devName, (const char *) NIDAQProxy::p[devID].deviceName.toLatin1());
   
   DevicePresent= (DAQmxGetDevAIPhysicalChans (devName, data, 1024) == 0);
   //if (!DevicePresent)
@@ -98,17 +143,13 @@ NIDAQ::NIDAQ()
   inTaskActive= 0;
   outTaskActive= 0;  
   
-  // setup of the system clock
-  QueryPerformanceFrequency(&intClock_frequency);
-  clock_frequency= (double) intClock_frequency.LowPart;
-  clock_cycle= ((double) UINT_MAX + 1.0)/clock_frequency;
   
 //   QMessageBox::warning(NULL, QString("My Application"),
 //                QString("Finished scanning ouput ranges, exiting NIDAQ constructor"),
 //               QMessageBox::Close); 
 
 //  init();
-};
+}
 
 NIDAQ::~NIDAQ()
 {
@@ -153,40 +194,17 @@ bool NIDAQ::initialize_board(QString &name)
     else name= QString(devName);
     DAQmxResetDevice(devName);
     initialized= success;
-  }
+  } else name = QString(devName);
   return success;
 }
 
-//---------------------------------------------------------------------------
-void NIDAQ::reset_RTC()
+void NIDAQ::start()
 {
   // this is called when the dynamic clamp starts ... start tasks
-  static LARGE_INTEGER inT;
-   
   if (DevicePresent) {
     DAQmxStartTask(inTask);
     DAQmxStartTask(outTask);
   }
-
-  QueryPerformanceCounter(&inT);
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  t= 0.0;
-}
-
-//---------------------------------------------------------------------------
-double NIDAQ::get_RTC(void)
-{
-  static LARGE_INTEGER inT;
-  static double dt, lastT;
-  
-  QueryPerformanceCounter(&inT);
-  lastT= sysT;
-  sysT= ((double) inT.LowPart)/clock_frequency;
-  dt= sysT-lastT;
-  if (dt < 0.0) dt+= clock_cycle;
-  t+= dt;
- 
-  return dt;
 }
 
 //---------------------------------------------------------------------------
@@ -207,12 +225,17 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
     }
     inBuf= new float64[chnNo];
     DAQmxCreateTask ("", &inTask);
+
+    DAQData *p = params();
+    ChannelIndex dex(&prox, devID, 0, true);
   
     for (int i= 0; i < chnNo; i++) {
       inIdx[i]= Chns[i];
-      DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[inChnp[inIdx[i]].gain],
-                                inHigh[inChnp[inIdx[i]].gain], DAQmx_Val_Volts, "");
-      inGainFac[i]= inChnp[inIdx[i]].gainFac;
+      DAQmxCreateAIVoltageChan (inTask, iChnNm[inIdx[i]], "", DAQmx_Val_RSE, inLow[p->inChn[inIdx[i]].gain],
+                                inHigh[p->inChn[inIdx[i]].gain], DAQmx_Val_Volts, "");
+      inGainFac[i]= p->inChn[inIdx[i]].gainFac;
+      dex.chanID = inIdx[i];
+      inChnLabels[inIdx[i]] = dex.toString();
     }
     DAQmxSetSampTimingType(inTask, DAQmx_Val_OnDemand);
     DAQmxSetReadOverWrite(inTask, DAQmx_Val_OverwriteUnreadSamps);
@@ -222,7 +245,7 @@ void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_scan(inChannel *in)
+void NIDAQ::get_scan()
 {
   // assume device is present if this is called (responsibility of calling code!)
   static int i;
@@ -238,7 +261,7 @@ void NIDAQ::get_scan(inChannel *in)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_single_scan(inChannel *in, int which)
+void NIDAQ::get_single_scan(inChannel *in)
 {
   // assume device is present if this is called (responsibility of calling code!)
   static int i;
@@ -251,8 +274,8 @@ void NIDAQ::get_single_scan(inChannel *in, int which)
 //                temp,
 //                QMessageBox::Ok);
   for (i= 0; i < actInChnNo; i++) {
-      if (inIdx[i] == which) {
-          in[inIdx[i]].V= inGainFac[i]*inBuf[i];
+      if (&(this->in[inIdx[i]]) == in) {
+          in->V= inGainFac[i]*inBuf[i];
       }
   }
 }
@@ -269,12 +292,17 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
     }
     outBuf= new float64[actOutChnNo];
     DAQmxCreateTask("", &outTask);
+
+    DAQData *p = params();
+    ChannelIndex dex(&prox, devID, 0, false);
    
     for (int i= 0; i < chnNo; i++) {
       outIdx[i]= Chns[i];
-      DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[outChnp[outIdx[i]].gain],
-                                outHigh[outChnp[outIdx[i]].gain], DAQmx_Val_Volts, "");
-      outGainFac[i]= outChnp[outIdx[i]].gainFac*1e9;
+      DAQmxCreateAOVoltageChan (outTask, oChnNm[outIdx[i]], "", outLow[p->outChn[outIdx[i]].gain],
+                                outHigh[p->outChn[outIdx[i]].gain], DAQmx_Val_Volts, "");
+      outGainFac[i]= p->outChn[outIdx[i]].gainFac*1e9;
+      dex.chanID = outIdx[i];
+      outChnLabels[outIdx[i]] = dex.toString();
     }
     DAQmxSetSampTimingType(outTask, DAQmx_Val_OnDemand);
     //DAQmxSetBufOutputBufSize(outTask, actOutChnNo*10);
@@ -284,7 +312,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::write_analog_out(outChannel *out)
+void NIDAQ::write_analog_out()
 {
   static int i;
   static int32 spw;

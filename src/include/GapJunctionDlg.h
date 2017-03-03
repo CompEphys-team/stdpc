@@ -10,16 +10,14 @@ class GapJunctionDlg : public QDialog, private Ui::GapJunctionDlg
      Q_OBJECT
 
   public:
-     GapJunctionDlg(int, QWidget *parent= 0);
+     GapJunctionDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
      void exportData(GJunctData &);
      void importData(GJunctData);
+     void setIndex(int);
+
+     typedef GJunctData param_type;
      
-     int No;
-     
-  public slots:
-    void updateOutChn(int, int*);
-    void updateInChn(int, int*);
-         
+     QString label;
 }; 
 
 #endif

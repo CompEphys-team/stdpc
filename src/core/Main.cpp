@@ -5,7 +5,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include "MainWin.h"
-#include "Main.h"
 
 int main(int argc, char **argv)
 {

@@ -2,6 +2,7 @@
 #include "ObjectDataTypes.h"
 #include "DCThread.h"
 #include "KernelCalculator.h"
+#include "ChannelIndex.h"
 #include <QObject>
 
 #ifndef CALIBRATOR_H
@@ -17,14 +18,14 @@ private:
     QString fname; // for testing results    
 
     // Referenced objects
-    DAQ *board;
+    DAQ *inBoard, *outBoard;
     KernelCalculator *kerCalc;
 
     // Channel related objects
     inChannel *inChn;
     outChannel *outChn;
-    short int inputChannelNumber;
-    short int outputChannelNumber;
+    ChannelIndex inputChannelNumber;
+    ChannelIndex outputChannelNumber;
 
     // General params
     double samplingPeriod;
@@ -49,8 +50,6 @@ private:
     void saveData(QString &fname, QVector<double> data);
 
 public:
-
-    DCThread *DCT;
 
     int incorrectMeasurement; // for error checking
 
@@ -86,16 +85,15 @@ public:
     double stdPerAverRate;
 
     Calibrator();
-    void GeneralInit(DAQ*, DCThread*);
-    int  ChannelInit(int, int);
+    int  ChannelInit(ChannelIndex, ChannelIndex);
     void ElectrodeMeasurement(double, double, int, double, double);
     void MembraneMeasurement(double, double, int, double);
-    void Calibration(double, double, int, int, int, double, double);
+    void Calibration(double, double, int, int, double, double);
     void CalcSamplingStats();
-    void SetChannelActivation(int, bool);
+    void SetChannelActivation(bool);
 
 signals:
-    void CloseToLimit(QString, int, double, double, double);
+    void CloseToLimit(QString, QString, double, double, double);
 
 };
 

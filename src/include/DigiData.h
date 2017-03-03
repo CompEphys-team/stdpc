@@ -2,8 +2,7 @@
 #define DIGIDATA_H
 
 #include "Pt_ioctl_tn.h"
-#include "Channels.h"
-#include "DAQ.h"
+#include "DeviceManager.h"
 
 // we need to translate commands because we are using portTalkX instead of the Borland IOport
 
@@ -74,6 +73,38 @@
 #define COUNTS                  2048.0
 
 
+class DigiDataData : public DAQData
+{
+  public:
+    short int baseAddress;
+    short int syncIOMask;
+    DigiDataData() : DAQData(),
+        baseAddress(0x320),
+        syncIOMask(0x0000)
+    {}
+};
+
+
+class DigiDataProxy : public DAQProxy {
+public:
+    DigiDataProxy();
+    inline DAQData &param(size_t i) { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString daqClass() { return "DigiData1200"; }
+    inline QString prettyName() { return "DigiData 1200(A)"; }
+
+    DAQ *createDAQ(size_t devID);
+    DAQDlg *createDialog(size_t devID, QWidget *parent=nullptr);
+
+    std::vector<AP*> regAP;
+    inline const std::vector<AP*> &coreAPs() const { return regAP; }
+
+    static std::vector<DigiDataData> p;
+};
+
 class DigiData: public DAQ
 {
   private:
@@ -98,18 +129,17 @@ class DigiData: public DAQ
    double t;
             
   public:
-    DigiData();
+    DigiData(size_t devID, DAQProxy *proxy);
     virtual ~DigiData();
     void init();
     virtual bool initialize_board(QString &);
-    virtual void reset_RTC();
-    virtual double get_RTC();
+    virtual void start() {}
     virtual void digital_out(unsigned char);
     virtual void generate_scan_list(short int, short int *);
     virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan(inChannel *);
-    virtual void get_single_scan(inChannel *, int);
-    virtual void write_analog_out(outChannel *);
+    virtual void get_scan();
+    virtual void get_single_scan(inChannel *);
+    virtual void write_analog_out();
     virtual void reset_board();
     short int* inChnGain;
     short int* DACEnable;

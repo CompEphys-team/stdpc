@@ -1,10 +1,12 @@
 #include "InputChannelDlg.h"
 #include <QMessageBox>
+#include "ElectrodeCompDlg.h"
 
-InputChannelDlg::InputChannelDlg(QWidget *parent)
-     : QDialog(parent)
+InputChannelDlg::InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
+    QDialog(parent),
+    idx(idx),
+    proxy(proxy)
 {
-     
   setupUi(this);
 }
 
@@ -48,9 +50,13 @@ void InputChannelDlg::clearAll()
     delete *saveIter;
   }
   saveChnl.clear();
+  for ( QPushButton *btn : calib ) {
+      delete btn;
+  }
+  calib.clear();
 }
 
-void InputChannelDlg::init(DAQ *board)
+void InputChannelDlg::init()
 {
   #define Y0 100
   #define DY 22
@@ -64,15 +70,20 @@ void InputChannelDlg::init(DAQ *board)
   #define X7 600
   #define X8 675
   #define X9 700
+  #define X10 750
 
   QCheckBox *cbtmp;
   QComboBox *qctmp;
   QLineEdit *letmp;
+  QPushButton *btntmp;
   QLabel *lb;
   QString nm;
 
+  DAQ *board = Devices.getDevice(ChannelIndex(proxy, idx));
+
   clearAll();
   ChnNo= board->inChnNo;
+  board->params()->inChn.resize(ChnNo);
   inLow = QVector<double>(board->inGainNo);
   for(int i= 0; i < board->inGainNo; i++){
     inLow[i]= board->inLow[i];
@@ -120,6 +131,7 @@ void InputChannelDlg::init(DAQ *board)
     cbtmp->setObjectName(QString("Analog In ")+nm);
     cbtmp->setText(QString("Analog ")+nm);
     if (i < 2) cbtmp->setCheckState(Qt::Checked);
+    connect(cbtmp, SIGNAL(clicked(bool)), this, SLOT(exportData()));
     act.append(cbtmp);
     qctmp= new QComboBox(this);
     qctmp->setGeometry(QRect(X1, Y0+i*DY, 100, 18));
@@ -166,17 +178,28 @@ void InputChannelDlg::init(DAQ *board)
     cbtmp->setGeometry(QRect(X9+15, Y0+i*DY, 15, 18));
     cbtmp->setObjectName(QString("Save Channel ")+nm);
     saveChnl.append(cbtmp);
+    btntmp= new QPushButton("Calibration", this);
+    btntmp->setGeometry(QRect(X10, Y0+i*DY-1, 70, 20));
+    btntmp->setObjectName(QString("Calibrate ")+nm);
+    connect(btntmp, &QPushButton::clicked, [=](){
+        ChannelIndex dex(proxy, idx, i, true);
+        ElectrodeCompDlg *calibDlg = new ElectrodeCompDlg(proxy->param(idx).inChn[i].calib, dex, this);
+        connect(calibDlg, SIGNAL(message(QString)), this->parent(), SIGNAL(message(QString)));
+        connect(&calibDlg->calibrator, SIGNAL(CloseToLimit(QString,QString,double,double,double)),
+                this->parent(), SIGNAL(CloseToLimit(QString,QString,double,double,double)));
+        if ( calibDlg->exec() == QDialog::Accepted )
+            calibDlg->exportData();
+        delete calibDlg;
+    });
+    btntmp->setEnabled(false);
+    calib.append(btntmp);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);
-  this->setGeometry(geo);
+  this->resize(geo.size());
   geo= buttonBox->geometry();
   geo.moveBottom(Y0+ChnNo*DY+50);
   buttonBox->setGeometry(geo);
-//  QMessageBox::warning((QWidget *)parent(), tr("My Application"),
-//                tr("The signal for index change has been received"),
-//               QMessageBox::Close);
-  accept();   // export the current state, update chn info in other dialogs
 }    
 
 InputChannelDlg::~InputChannelDlg()
@@ -186,66 +209,57 @@ InputChannelDlg::~InputChannelDlg()
 
 void InputChannelDlg::exportData()
 {
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
-    inChnp[i].active= (act[i]->checkState() > 0);
-    inChnp[i].gain= rng[i]->currentIndex();
-    inChnp[i].gainFac= factor[i]->text().toDouble();
-    inChnp[i].spkDetect= (sDetect[i]->checkState() > 0);
-    inChnp[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
-    inChnp[i].bias= bias[i]->text().toDouble()*1e-3;
-    inChnp[i].minVoltage = inLow[rng[i]->currentIndex()]*inChnp[i].gainFac;
-    inChnp[i].maxVoltage = inHigh[rng[i]->currentIndex()]*inChnp[i].gainFac;
-    inChnp[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    p->inChn[i].active= (act[i]->checkState() > 0);
+    p->inChn[i].gain= rng[i]->currentIndex();
+    double gainFac = factor[i]->text().toDouble();
+    p->inChn[i].gainFac= gainFac;
+    p->inChn[i].spkDetect= (sDetect[i]->checkState() > 0);
+    p->inChn[i].spkDetectThresh= SDThresh[i]->text().toDouble()*1e-3;
+    p->inChn[i].bias= bias[i]->text().toDouble()*1e-3;
+    p->inChn[i].minVoltage = inLow[rng[i]->currentIndex()]*gainFac;
+    p->inChn[i].maxVoltage = inHigh[rng[i]->currentIndex()]*gainFac;
+    p->inChn[i].chnlSaving= (saveChnl[i]->checkState() > 0);
+    calib[i]->setEnabled(Devices.getDevice(ChannelIndex(proxy, idx))->initialized
+                         && p->inChn[i].active && proxy->daqClass() != "SimulDAQ");
   }
 }
 
 void InputChannelDlg::importData()
 {
-  QString lb;
-  
+  DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
-    if (inChnp[i].active) act[i]->setCheckState(Qt::Checked);
-    else act[i]->setCheckState(Qt::Unchecked);
-    rng[i]->setCurrentIndex(inChnp[i].gain); 
-    lb.setNum(inChnp[i].gainFac);
-    factor[i]->setText(lb);
-    if (inChnp[i].spkDetect) sDetect[i]->setCheckState(Qt::Checked);
-    else sDetect[i]->setCheckState(Qt::Unchecked);
-    lb.setNum(inChnp[i].spkDetectThresh*1e3);
-    SDThresh[i]->setText(lb);
-    lb.setNum(inChnp[i].bias*1e3);
-    bias[i]->setText(lb);
-    if (inChnp[i].chnlSaving) saveChnl[i]->setCheckState(Qt::Checked);
-    else saveChnl[i]->setCheckState(Qt::Unchecked);
+    act[i]->setChecked(p->inChn[i].active);
+    rng[i]->setCurrentIndex(p->inChn[i].gain);
+    factor[i]->setText(QString::number(p->inChn[i].gainFac));
+    sDetect[i]->setChecked(p->inChn[i].spkDetect);
+    SDThresh[i]->setText(QString::number(p->inChn[i].spkDetectThresh*1e3));
+    bias[i]->setText(QString::number(p->inChn[i].bias*1e3));
+    saveChnl[i]->setChecked(p->inChn[i].chnlSaving);
   }
 }
 
 void InputChannelDlg::accept()
 {
-  int chns[ChnNo];
-  int chN= 0;
-  
   exportData();
-  for (int i= 0; i < ChnNo; i++) {
-    if (act[i]->checkState() > 0) chns[chN++]= i;
-  }
-  updateInChn(chN, chns);
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  QDialog::accept();
 }
 
 void InputChannelDlg::reject()
 {
   importData();
-  ((QWidget *)parent())->setEnabled(true);
-  hide();
+  DAQData *p =& proxy->param(idx);
+  for ( int i = 0; i < ChnNo; i++ )
+      p->inChn[i].calib = calibBackup[i];
+  QDialog::reject();
 }
 
-void InputChannelDlg::appear()
+void InputChannelDlg::open()
 {
-  ((QWidget *)parent())->setEnabled(false);
-  this->setEnabled(true);
-  show();
+    DAQData *p =& proxy->param(idx);
+    calibBackup.resize(ChnNo);
+    for ( int i = 0; i < ChnNo; i++ )
+        calibBackup[i] = p->inChn[i].calib;
+    QDialog::open();
 }
-
-

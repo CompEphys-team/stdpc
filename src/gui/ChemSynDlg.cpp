@@ -1,23 +1,42 @@
-
+#include <QDoubleSpinBox>
 #include "ChemSynDlg.h"
 #include <QMessageBox>
 
-ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
+ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
      : QDialog(parent)
  {
-     QString lb;
      setupUi(this);
      
-     No= no;
-     lb.setNum(No);
-     ChemSynDlgLabel->setText(QString("Synapse ")+lb);
-     
-     STDP= new STDPDlg(this, No);
-     ODESTDP= new ODESTDPDlg(this, No);
+     STDP= new STDPDlg(this);
+     ODESTDP= new ODESTDPDlg(this);
+
+     label = ChemSynDlgLabel->text();
+     setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
-     connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));                   
+     connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));
+
+     QVector<AssignmentCellBase<SynapseAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PreSynChannel, "Presyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PostSynChannel, "Postsyn V", 95, in));
+     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::OutSynChannel, "Postsyn I", 95, out));
+     AssignmentCellDouble<SynapseAssignment> *tmp = new AssignmentCellDouble<SynapseAssignment>
+             (&SynapseAssignment::delay, "Delay (ms)", 95);
+     tmp->setRange(0., 1000.);
+     tmp->setDecimals(3);
+     tmp->setFactor(1e-3);
+     vec.push_back(tmp);
+     assignments->init(vec);
+}
+
+void ChemSynDlg::setIndex(int no)
+{
+    QString lb = label.arg(no);
+    ChemSynDlgLabel->setText(lb);
+    STDP->setLabel(lb);
+    ODESTDP->setLabel(lb);
 }
 
 void ChemSynDlg::ResCloseClicked(QAbstractButton *but)
@@ -85,9 +104,6 @@ void ChemSynDlg::exportData(CSynData &p)
 {
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.MgBlock= (MgBlockCombo->currentIndex() == 1);
-  p.PreSynChannel= PreSynChannelCombo->currentIndex();
-  p.PostSynChannel= PostSynChannelCombo->currentIndex();
-  p.OutSynChannel= OutSynChannelCombo->currentIndex();
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.VSyn= VSynE->text().toDouble()*1e-3;
   p.tauSyn= tauSynE->text().toDouble()*1e-3;
@@ -110,6 +126,8 @@ void ChemSynDlg::exportData(CSynData &p)
   STDP->exportData(p.ST);
   // ODE plasticity
   ODESTDP->exportData(p.ODE);
+
+  assignments->exportData(p.assign);
 }
 
 void ChemSynDlg::importData(CSynData p)
@@ -118,10 +136,7 @@ void ChemSynDlg::importData(CSynData p)
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   if (p.MgBlock) MgBlockCombo->setCurrentIndex(1);
-  else MgBlockCombo->setCurrentIndex(0);  
-  PreSynChannelCombo->setCurrentIndex(p.PreSynChannel);
-  PostSynChannelCombo->setCurrentIndex(p.PostSynChannel);
-  OutSynChannelCombo->setCurrentIndex(p.OutSynChannel);
+  else MgBlockCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
   num.setNum(p.VSyn*1e3);
@@ -159,55 +174,6 @@ void ChemSynDlg::importData(CSynData p)
   STDP->importData(p.ST);
   // ODE plasticity
   ODESTDP->importData(p.ODE);
-}
 
-
-void ChemSynDlg::updateOutChn(int chN, int *chns) 
-{
-  QString current;
-  QString lb;
-  int newInd;
-
-  current= OutSynChannelCombo->currentText();
-  while (OutSynChannelCombo->count() > 0) {
-    OutSynChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    OutSynChannelCombo->addItem(lb);
-  }
-  newInd= OutSynChannelCombo->findText(current);
-  if (newInd >= 0) OutSynChannelCombo->setCurrentIndex(newInd);
-  else OutSynChannelCombo->setCurrentIndex(0);
-}
-
-void ChemSynDlg::updateInChn(int chN, int *chns) 
-{
-  QString currentPre, currentPost;
-  QString lb;
-  int newInd;
-
-  currentPre= PreSynChannelCombo->currentText();
-  while (PreSynChannelCombo->count() > 0) {
-    PreSynChannelCombo->removeItem(0);
-  }
-  currentPost= PostSynChannelCombo->currentText();
-  while (PostSynChannelCombo->count() > 0) {
-    PostSynChannelCombo->removeItem(0);
-  }
-  for (int i= 0; i < chN; i++) {
-    lb.setNum(chns[i]);
-    PreSynChannelCombo->addItem(lb);
-    PostSynChannelCombo->addItem(lb);
-  }
-  lb= QString("SG");
-  PreSynChannelCombo->addItem(lb);
-  PostSynChannelCombo->addItem(lb);
-
-  newInd= PreSynChannelCombo->findText(currentPre);
-  if (newInd >= 0) PreSynChannelCombo->setCurrentIndex(newInd);
-  else PreSynChannelCombo->setCurrentIndex(0);
-  newInd= PostSynChannelCombo->findText(currentPost);
-  if (newInd >= 0) PostSynChannelCombo->setCurrentIndex(newInd);
-  else PostSynChannelCombo->setCurrentIndex(0);
+  assignments->importData(p.assign);
 }
