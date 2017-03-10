@@ -1,4 +1,12 @@
 # StdpC project file #
+
+# To enable NI support, uncomment the following line (requires NIDAQmx 15.5.1 or newer)
+# If NIDAQmx is detected, this has no effect.
+#CONFIG += nidaqmx
+
+# To disable NI support (despite NIDAQmx being present in the system), uncomment the following line:
+#CONFIG += nonidaqmx
+
 TARGET = StdpC
 QT+= widgets printsupport
 DEPENDPATH += $$PWD/ \
@@ -186,6 +194,14 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Util.cpp
 
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+
+NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
+isEmpty(NIDAQPATH) {
+    message("No NIDAQMx installation detected, building without NI support.")
+    message("To force enable, add CONFIG+=nidaqmx to the qmake call.")
+} else {
+    CONFIG(!nonidaqmx): CONFIG += nidaqmx
+}
 
 nidaqmx {
     # NIDAQmx static build based on NI DAQmx 15.5.1
