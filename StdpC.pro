@@ -24,6 +24,8 @@ CONFIG += qt \
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
 
+QMAKE_CXXFLAGS += -std=c++11
+
 static {
     QMAKE_LFLAGS += -static
 }
