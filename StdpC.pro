@@ -200,7 +200,7 @@ isEmpty(NIDAQPATH) {
     message("No NIDAQMx installation detected, building without NI support.")
     message("To force enable, add CONFIG+=nidaqmx to the qmake call.")
 } else {
-    CONFIG(!nonidaqmx): CONFIG += nidaqmx
+    !CONFIG(nonidaqmx): CONFIG += nidaqmx
 }
 
 nidaqmx {
