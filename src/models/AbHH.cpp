@@ -48,7 +48,7 @@ inline double abHH::mhFunc(double x, int thetype)
    return 0.0;
 }
 
-void abHH::currentUpdate(double t, double dt) 
+void abHH::currentUpdate(double, double dt)
 {
   static double powm, powh;
   static double V;

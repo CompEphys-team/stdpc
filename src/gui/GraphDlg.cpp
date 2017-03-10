@@ -186,6 +186,9 @@ void GraphDlg::setInteractive(bool maybe)
         colors[i]->setEnabled(maybe);
         types[i]->setEnabled(maybe);
         channels[i]->setEnabled(maybe);
+        if ( maybe ) {
+            checkChannelTypes();
+        }
     }
 }
 
@@ -265,11 +268,27 @@ void GraphDlg::growTable(bool reactive)
     channelc = connect(channel, SIGNAL(currentIndexChanged(int)), this, SLOT(growTable()));
 }
 
+void GraphDlg::checkChannelTypes()
+{
+    for ( int i = 0; i < actives.size(); i++ ) {
+        ChannelIndex sel = channels[i]->currentData().value<ChannelIndex>();
+        if ( sel.isVirtual && sel.modelClass != "SG" ) {
+            types[i]->setEnabled(true);
+        } else if ( sel.isAnalog && !sel.isInChn ) {
+            types[i]->setCurrentIndex(1);
+            types[i]->setEnabled(false);
+        } else {
+            types[i]->setCurrentIndex(0);
+            types[i]->setEnabled(false);
+        }
+    }
+}
+
 void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel)
 {
     ui->table->insertRow(row);
 
-    connect(active, QCheckBox::stateChanged, [=](int state){
+    connect(active, &QCheckBox::stateChanged, [=](int state){
         ChannelIndex chan = channel->currentData().value<ChannelIndex>();
         bool isVoltage = !type->currentIndex();
         for ( size_t i = 0; i < activeGraphs.size(); i++ ) {
@@ -295,24 +314,15 @@ void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox
     ui->table->setCellWidget(row, 2, type);
 
     channel->setModel(&clm);
-    connect(channel, static_cast<void (WideComboBox::*)(int)>(&WideComboBox::currentIndexChanged), [=](int){
-        ChannelIndex sel = channel->currentData().value<ChannelIndex>();
-        if ( sel.isVirtual && sel.modelClass != "SG" ) {
-            type->setEnabled(true);
-        } else if ( sel.isAnalog && !sel.isInChn ) {
-            type->setCurrentIndex(1);
-            type->setEnabled(false);
-        } else {
-            type->setCurrentIndex(0);
-            type->setEnabled(false);
-        }
-    });
+    connect(channel, SIGNAL(currentIndexChanged(int)), this, SLOT(checkChannelTypes()));
     ui->table->setCellWidget(row, 3, channel);
 
     actives.insert(row, active);
     colors.insert(row, colBtn);
     types.insert(row, type);
     channels.insert(row, channel);
+
+    checkChannelTypes();
 }
 
 void GraphDlg::on_TraceActivate_clicked()

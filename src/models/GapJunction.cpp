@@ -12,7 +12,7 @@ GapJunction::GapJunction(GJunctData *inp, GapJunctionAssignment *a, inChannel *p
 {
 }
 
-void GapJunction::currentUpdate(double t, double dt)
+void GapJunction::currentUpdate(double, double)
 {
   if ( p->active && a->active && pre->active && post->active && outpre->active && outpost->active ) {
       // calculate synaptic current

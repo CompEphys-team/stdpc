@@ -25,7 +25,7 @@ class abHH
     
   public:
     abHH(abHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out);
-    void currentUpdate(double, double);
+    void currentUpdate(double t, double dt);
     double mhFunc(double, int);
     void RK4(double t, double dt, size_t n);
 

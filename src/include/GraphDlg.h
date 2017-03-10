@@ -68,6 +68,7 @@ private:
 private slots:
     void replot();
     void growTable(bool reactive = true);
+    void checkChannelTypes();
 
     void on_TraceActivate_clicked();
     void on_TraceDeactivate_clicked();

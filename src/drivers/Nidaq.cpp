@@ -208,7 +208,7 @@ void NIDAQ::start()
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::digital_out(unsigned char outbyte)
+void NIDAQ::digital_out(unsigned char)
 {
 // not supported for the NIDAQ driver
 }

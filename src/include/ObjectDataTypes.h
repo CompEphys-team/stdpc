@@ -230,9 +230,9 @@ typedef struct {
 struct inChnData {
   bool active;
   int gain;
-  double gainFac;
+  double gainFac = 0.1;
   bool spkDetect;
-  double spkDetectThresh;
+  double spkDetectThresh = -0.01;
   double bias;
   double minVoltage;
   double maxVoltage;
@@ -243,7 +243,7 @@ struct inChnData {
 struct outChnData {
   bool active;
   int gain;
-  double gainFac;
+  double gainFac = 0.1;
   double bias;
   double minCurrent;
   double maxCurrent;
