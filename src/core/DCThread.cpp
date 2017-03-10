@@ -203,26 +203,26 @@ void DCThread::setup_and_go()
        for ( auto &b : Devices.active() ) {
            QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
            QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
-           headerIn.append(its.first);
-           headerOut.append(ots.first);
-           inChnsToSave.append(its.second);
-           outChnsToSave.append(ots.second);
+           headerIn += its.first;
+           headerOut += ots.first;
+           inChnsToSave += its.second;
+           outChnsToSave += ots.second;
        }
        for ( auto const& m : Models.active() ) {
            QPair<QVector<QString>, QVector<inChannel*>> its = m->inChans_to_save();
            QPair<QVector<QString>, QVector<outChannel*>> ots = m->outChans_to_save();
-           headerIn.append(its.first);
-           headerOut.append(ots.first);
-           inChnsToSave.append(its.second);
-           outChnsToSave.append(ots.second);
+           headerIn += its.first;
+           headerOut += ots.first;
+           inChnsToSave += its.second;
+           outChnsToSave += ots.second;
        }
 
        QVector<QString> header(1, "Time");
-       header.append(headerIn);
-       header.append(headerOut);
+       header += headerIn;
+       header += headerOut;
 #ifdef TEST_VERSION
        for ( AECChannel *aec : aecChannels ) {
-           header.append(QString("VAEC_%1").arg(aec->inChnNum.toString('_')));
+           header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
        }
 #endif
        dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
