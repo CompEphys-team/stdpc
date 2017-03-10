@@ -269,7 +269,7 @@ void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox
 {
     ui->table->insertRow(row);
 
-    connect(active, QCheckBox::stateChanged, [=](int state){
+    connect(active, &QCheckBox::stateChanged, [=](int state){
         ChannelIndex chan = channel->currentData().value<ChannelIndex>();
         bool isVoltage = !type->currentIndex();
         for ( size_t i = 0; i < activeGraphs.size(); i++ ) {
