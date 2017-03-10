@@ -41,7 +41,7 @@ void ComponentTable::importData(bool activeOnly)
             p->clearInactive();
         else
             p->createAll(in, out);
-        comp.append(p->inst);
+        comp += p->inst;
         idx[i++] = p->inst.size();
     }
     i = 0;

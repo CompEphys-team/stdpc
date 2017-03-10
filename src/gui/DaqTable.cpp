@@ -41,7 +41,7 @@ void DaqTable::importData(bool activeOnly)
             p->clearInactive();
         else
             p->createAll(parent);
-        comp.append(p->inst);
+        comp += p->inst;
         idx[i++] = p->inst.size();
     }
     i = 0;
