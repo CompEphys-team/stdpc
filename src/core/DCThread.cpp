@@ -471,8 +471,10 @@ void DCThread::run()
          // Check channel limits
          DAQ::ChannelLimitWarning w;
          for ( auto &b : Devices.active() ) {
-             if ( b->check_limits(!limitWarningEmitted, w) )
+             if ( b->check_limits(!limitWarningEmitted, w) ) {
                  emit CloseToLimit(w.what, w.chan_label, w.loLim, w.hiLim, w.value);
+                 limitWarningEmitted = true;
+             }
          }
 
      // --- Calculate end --- //
