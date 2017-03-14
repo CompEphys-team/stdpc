@@ -95,6 +95,7 @@ public:
     }
 
     inline QString const& name() { return _name; }
+    virtual QString const& canonicalName() { return name(); }
 
     static inline std::vector<std::unique_ptr<AP>> &params() { static std::vector<std::unique_ptr<AP>> p; return p; }
 
@@ -337,6 +338,8 @@ public:
     }
 
     virtual void write(std::ostream &) {}
+
+    virtual QString const& canonicalName() { return target->name(); }
 
 private:
     AP *target;

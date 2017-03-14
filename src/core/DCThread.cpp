@@ -705,6 +705,8 @@ bool DCThread::LoadScript(QString &fname)
                     .arg(dev->devID));
         }
         it = AP::find(rawname, &deprecChannels);
+        if ( it )
+            message(QString("Note: %1 (%2) -> %3").arg(rawname, it->name(), it->canonicalName()));
     }
     if ( it ) {
         scriptq.append(qMakePair(et, it->readLater(rawname, is, &success)));
