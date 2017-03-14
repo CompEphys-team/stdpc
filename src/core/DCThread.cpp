@@ -440,16 +440,6 @@ void DCThread::run()
          }
          //--------------- Data saving end ---------------------//
 
-         // Updated display
-         if ( graph ) {
-             if ( t - lastWrite > graphDt ) {
-                 lastWrite = t;
-                 i = 0;
-                 for ( double *val : graphVar )
-                    graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
-             }
-         }
-
          // Rate update
          ++rateCounter;
          if ( t - lastRateReport > 1 ) {
@@ -474,6 +464,16 @@ void DCThread::run()
              if ( b->check_limits(!limitWarningEmitted, w) ) {
                  emit CloseToLimit(w.what, w.chan_label, w.loLim, w.hiLim, w.value);
                  limitWarningEmitted = true;
+             }
+         }
+
+         // Updated display
+         if ( graph ) {
+             if ( t - lastWrite > graphDt ) {
+                 lastWrite = t;
+                 i = 0;
+                 for ( double *val : graphVar )
+                    graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
              }
          }
 
