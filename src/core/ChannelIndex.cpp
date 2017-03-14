@@ -195,7 +195,7 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
             return is;
 
         if ( DeviceManager::Register().contains(parts.at(1)) )
-            dex.daqClass = parts.at(2);
+            dex.daqClass = parts.at(1);
         else
             return is;
 
