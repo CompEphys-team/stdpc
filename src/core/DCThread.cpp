@@ -678,6 +678,8 @@ bool DCThread::LoadScript(QString &fname)
   QString qn;
   char buf[80];
 
+  std::vector<std::unique_ptr<AP>> deprecChannels;
+
   ifstream is(fname.toLatin1());
 
   is >> et;
@@ -688,6 +690,22 @@ bool DCThread::LoadScript(QString &fname)
     is >> buf;
     rawname= QString(buf);
     AP *it = AP::find(rawname);
+    if ( !it && (rawname.startsWith("inChnp") || rawname.startsWith("outChnp")) ) {
+        if ( deprecChannels.empty() && !Devices.active().empty() ) {
+            // Get the first active device
+            DAQ *dev = Devices.active().first().get();
+            // Take its first coreAP's name, use the first part of that, e.g. "NIDAQp[#]"
+            QString prefix = dev->proxy->coreAPs().at(0)->name().split('.').at(0);
+            deprecChannels = deprecateChannelsTo(prefix);
+            message(QString("Note: Deprecated channels assigned to %1 %2")
+                    .arg(dev->proxy->prettyName())
+                    .arg(dev->devID));
+            message(QString("Update script from e.g. \"inChnp[0].bias\" to \"%1.inChn[0].bias\" to prevent confusion.")
+                    .arg(prefix.replace("[#]", "[%2]"))
+                    .arg(dev->devID));
+        }
+        it = AP::find(rawname, &deprecChannels);
+    }
     if ( it ) {
         scriptq.append(qMakePair(et, it->readLater(rawname, is, &success)));
     } else {
