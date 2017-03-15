@@ -231,7 +231,10 @@ void InputChannelDlg::importData()
   DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
     act[i]->setChecked(p->inChn[i].active);
-    rng[i]->setCurrentIndex(p->inChn[i].gain);
+    if ( p->inChn[i].gain >= 0 && p->inChn[i].gain < rng[i]->count() )
+        rng[i]->setCurrentIndex(p->inChn[i].gain);
+    else
+        rng[i]->setCurrentIndex(rng[i]->count()-1);
     factor[i]->setText(QString::number(p->inChn[i].gainFac));
     sDetect[i]->setChecked(p->inChn[i].spkDetect);
     SDThresh[i]->setText(QString::number(p->inChn[i].spkDetectThresh*1e3));
