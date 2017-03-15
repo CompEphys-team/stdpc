@@ -96,7 +96,7 @@ void InputChannelDlg::init()
 
   lb= new QLabel(this);
   lb->setGeometry(QRect(X1, Y0-45, 100, 36));
-  lb->setText(QString("Aquisition Range"));
+  lb->setText(QString("Acquisition Range"));
   allLabel.append(lb);
 
   lb= new QLabel(this);
