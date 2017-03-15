@@ -80,7 +80,7 @@ void OutputChannelDlg::init()
   }
   lb= new QLabel(this);
   lb->setGeometry(QRect(X1, Y0-40, 100, 36));
-  lb->setText(QString("Aquisition Range"));
+  lb->setText(QString("Acquisition Range"));
   allLabel.append(lb);
   
   lb= new QLabel(this);
@@ -169,7 +169,10 @@ void OutputChannelDlg::importData()
   DAQData *p =& proxy->param(idx);
   for (int i= 0; i < ChnNo; i++) {
     act[i]->setChecked(p->outChn[i].active);
-    rng[i]->setCurrentIndex(p->outChn[i].gain);
+    if ( p->outChn[i].gain >= 0 && p->outChn[i].gain < rng[i]->count() )
+        rng[i]->setCurrentIndex(p->outChn[i].gain);
+    else
+        rng[i]->setCurrentIndex(rng[i]->count()-1);
     factor[i]->setText(QString::number(p->outChn[i].gainFac));
     bias[i]->setText(QString::number(p->outChn[i].bias*1e9));
     saveChnl[i]->setChecked(p->outChn[i].chnlSaving);
