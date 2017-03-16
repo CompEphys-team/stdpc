@@ -17,7 +17,8 @@ ChannelIndex::ChannelIndex() :
     daqClass(""),
     devID(0),
     isInChn(true),
-    chanID(0)
+    chanID(0),
+    isLegacy(false)
 {
 
 }
@@ -31,7 +32,8 @@ ChannelIndex::ChannelIndex(DAQProxy *proxy, size_t devID, size_t chanID, bool is
     daqClass(proxy->daqClass()),
     devID(devID),
     isInChn(isInChn),
-    chanID(chanID)
+    chanID(chanID),
+    isLegacy(false)
 {}
 
 ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
@@ -42,7 +44,8 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
     modelClass(proxy->modelClass()),
     modelID(modelID),
     instID(0),
-    isAnalog(false)
+    isAnalog(false),
+    isLegacy(false)
 {}
 
 ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
@@ -53,7 +56,8 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
     modelClass(proxy->modelClass()),
     modelID(modelID),
     instID(instID),
-    isAnalog(false)
+    isAnalog(false),
+    isLegacy(false)
 {}
 
 ChannelIndex ChannelIndex::toInstance(size_t instID) const
@@ -128,57 +132,6 @@ std::ostream &operator<<(std::ostream &os, const ChannelIndex &dex)
     return os;
 }
 
-static void legacyRescue_0(QString str, ChannelIndex &dex)
-{
-    // Attempt legacy rescue
-    // Caveats: - inChn/outChn is unknowable; uses heuristics
-    //          - Graph channels are likely to fail
-    //          - Explicit NONE on pre-2016 collapses onto SG
-    bool ok = false;
-    int ch = str.toInt(&ok);
-    if ( !ok )
-        return;
-    DAQData *d =& DeviceManager::Register()[LEGACY_DAQ_CLASS]->param(0);
-    dex.daqClass = LEGACY_DAQ_CLASS;
-    dex.devID = 0;
-    if ( ch >= 0 && ch <= (int)(d->inChn.size()+d->outChn.size()+1) ) { // Pre-2016
-        dex.chanID = ch;
-        if ( ch < (int) d->inChn.size() && ch < (int)d->outChn.size() ) {
-            dex.isAnalog = true;
-            dex.isInChn = d->inChn.size() > d->outChn.size(); // Statistically...
-        } else if ( d->inChn.size() >= d->outChn.size() && ch < (int)d->inChn.size() ) {
-            dex.isAnalog = true;
-            dex.isInChn = true;
-        } else if ( d->inChn.size() < d->outChn.size() && ch < (int)d->outChn.size() ) {
-            dex.isAnalog = true;
-            dex.isInChn = false;
-        } else {
-            dex.isNone = true;
-        }
-        dex.isValid = true; // One hopes.
-    } else if ( ch == -1 ) { // 2016-RC1 : None
-        dex.isNone = true;
-        dex.isValid = true;
-    } else if ( ch == 1000 ) { // 2016-RC1 : SG
-        dex.isVirtual = true;
-        dex.modelClass = "SG";
-        dex.modelID = 0;
-        dex.instID = 0;
-        dex.isValid = true;
-    } else if ( ch >= 1100000000 ) { // 2016-RC1 : HH Proto
-        dex.isPrototype = true;
-        dex.modelClass = "HH";
-        dex.modelID = ((ch - 1100000000) / 100000) - 1;
-        dex.isValid = true;
-    } else if ( ch >= 100000000 ) { // 2016-RC1 : HH Inst
-        dex.isVirtual = true;
-        dex.modelClass = "HH";
-        dex.modelID = ((ch - 100000000) / 100000) - 1;
-        dex.instID = ch % 100000;
-        dex.isValid = true;
-    }
-}
-
 std::istream &operator>>(std::istream &is, ChannelIndex &dex)
 {
     ChannelIndex blank;
@@ -236,7 +189,8 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.instID = parts.at(3).toUInt();
         dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
-        legacyRescue_0(str, dex);
+        dex.isLegacy = true;
+        dex.chanID = parts.at(0).toInt();
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION < 3 ) {
         if ( !parts.at(0).compare("SpikeGen", Qt::CaseInsensitive) ) {
             dex.isVirtual = true;
@@ -258,5 +212,6 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&
             (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID)) &&
             a.isAnalog==b.isAnalog &&
-            (!a.isAnalog || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID));
+            (!a.isAnalog || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
+            a.isLegacy == b.isLegacy;
 }
