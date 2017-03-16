@@ -342,6 +342,19 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     NIDAQData nidaq;
 #endif
 
+    struct legacyGraphData {
+      bool active[4] = {0,0,0,0};
+      QString color[4] = {"","","",""};
+      int chn[4] = {0,0,0,0};
+      double miny[4];
+      double maxy[4];
+      double xrange;
+      double dt;
+      int xtNo;
+      int ytNo;
+      double yfac[4];
+    } legacyGraphp[2];
+
     if ( is.good() ) {
         is >> header;
         if ( is.good() && !header.isEmpty() ) {
@@ -399,6 +412,17 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 #endif
         if ( !is.good() )
             return false;
+
+        addAP(deprec, "Graphp[#].active[#]", &legacyGraphp, &legacyGraphData::active);
+        addAP(deprec, "Graphp[#].color[#]", &legacyGraphp, &legacyGraphData::color);
+        addAP(deprec, "Graphp[#].chn[#]", &legacyGraphp, &legacyGraphData::chn);
+        addAP(deprec, "Graphp[#].miny[#]", &legacyGraphp, &legacyGraphData::miny);
+        addAP(deprec, "Graphp[#].maxy[#]", &legacyGraphp, &legacyGraphData::maxy);
+        addAP(deprec, "Graphp[#].xrange", &legacyGraphp, &legacyGraphData::xrange);
+        addAP(deprec, "Graphp[#].dt", &legacyGraphp, &legacyGraphData::dt);
+        addAP(deprec, "Graphp[#].xtNo", &legacyGraphp, &legacyGraphData::xtNo);
+        addAP(deprec, "Graphp[#].ytNo", &legacyGraphp, &legacyGraphData::ytNo);
+        addAP(deprec, "Graphp[#].yfac[#]", &legacyGraphp, &legacyGraphData::yfac);
     }
 
     // before version 2: 4 AEC channels only
@@ -542,6 +566,30 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 
         if ( SampleHoldp.trigChn.isLegacy && SampleHoldp.trigChn.chanID < legacyIn.size() )
             SampleHoldp.trigChn = legacyIn[SampleHoldp.trigChn.chanID];
+
+        for ( int j = 0; j < 2; j++ ) {
+            legacyGraphData &graphp = legacyGraphp[j];
+            if ( graphp.dt )
+                Plotp.interval = graphp.dt;
+            for ( int i = 0; i < 4; i++ ) {
+                GraphData g;
+                g.active = graphp.active[i];
+                // legacy chan: 0=None, 1,...,m=in, m+1,...,n=out, last=SG
+                // legacyIn includes SG
+                int chan = graphp.chn[i];
+                if ( chan == 0 )
+                    g.chan = ChannelIndex::None();
+                else if ( chan == int(legacyIn.size() + legacyOut.size()) )
+                    g.chan = legacyIn.back(); // SG
+                else if ( chan < int(legacyIn.size()) )
+                    g.chan = legacyIn[chan-1]; // In
+                else
+                    g.chan = legacyOut[chan - legacyIn.size()]; // Out
+                g.color = QColor(graphp.color[i]);
+                g.isVoltage = g.chan.isInChn || g.chan.isVirtual;
+                Plotp.graphs.push_back(g);
+            }
+        }
     }
 
     return true;
