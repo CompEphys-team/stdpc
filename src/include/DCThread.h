@@ -15,6 +15,7 @@
 #include "ChannelBufferHelper.h"
 
 class GraphDlg;
+class PerformanceMonitor;
 
 class DCThread : public QThread 
 {
@@ -37,6 +38,7 @@ private:
      void UnloadScript();
 
      void setGraph(GraphDlg * = nullptr, double dt = 0.0);
+     void setPerformanceMonitor(PerformanceMonitor * = nullptr, double dt = 0.0);
 
      void setup_and_go();
 
@@ -94,6 +96,9 @@ private:
      QVector<double *> graphVar;
      double graphDt;
      double graphDummy;
+
+     PerformanceMonitor *perfmon;
+     double perfDt;
 
      QList<QPair<double, std::function<void()>>> scriptq;
      QList<QPair<double, std::function<void()>>>::iterator scrIter;

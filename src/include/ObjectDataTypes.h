@@ -94,6 +94,9 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  int legacy_PreSyn = -1;
+  int legacy_PostSyn = -1;
+  int legacy_OutSyn = -1;
 } CSynData;
 
 typedef struct {
@@ -113,6 +116,9 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  int legacy_PreSyn = -1;
+  int legacy_PostSyn = -1;
+  int legacy_OutSyn = -1;
 } abSynData;
 
 typedef struct {
@@ -130,6 +136,9 @@ typedef struct {
   STPlast ST;
   ODEPlast ODE;
   std::vector<SynapseAssignment> assign;
+  int legacy_PreSyn = -1;
+  int legacy_PostSyn = -1;
+  int legacy_OutSyn = -1;
 } DestexheSynData;
 
 typedef struct {
@@ -137,6 +146,10 @@ typedef struct {
   int type;
   double gSyn;
   std::vector<GapJunctionAssignment> assign;
+  int legacy_PreIn = -1;
+  int legacy_PostIn= -1;
+  int legacy_PreOut = -1;
+  int legacy_PostOut = -1;
 } GJunctData;
 
 typedef struct {
@@ -163,6 +176,8 @@ typedef struct {
   double Vtauh;
   double stauh;
   std::vector<CurrentAssignment> assign;
+  int legacy_V = -1;
+  int legacy_I = -1;
 } mhHHData;
 
 typedef struct {
@@ -189,6 +204,8 @@ typedef struct {
   double hVb;
   double hsb;
   std::vector<CurrentAssignment> assign;
+  int legacy_V = -1;
+  int legacy_I = -1;
 } abHHData;
 
 struct elecCalibParams {
@@ -217,6 +234,9 @@ struct elecCalibParams {
   double injCalLen;
   double fullKernelLen;
   double electrodeKernelLen;
+
+  int legacy_in = -1;
+  int legacy_out = -1;
 };
 
 typedef struct {
@@ -272,6 +292,12 @@ struct PlotData {
     int bufferExp;
     std::vector<GraphData> graphs;
     PlotData() : interval(1e-3), bufferExp(4) {}
+};
+
+struct PerformanceMonitorData {
+    bool active;
+    double interval;
+    PerformanceMonitorData() : active(false), interval(1) {}
 };
 
 typedef struct {

@@ -1,5 +1,6 @@
 #include "AP.h"
 #include "Global.h"
+#include "ModelManager.h"
 
 void initAP()
 {
@@ -62,14 +63,14 @@ void initAP()
     addAP("CSynp[#].Mgexpo", &CSynp, &CSynData::Mgexpo);
     addAP("CSynp[#].Plasticity", &CSynp, &CSynData::Plasticity);
     addAP("CSynp[#].assign[#].active", &CSynp, &CSynData::assign, &SynapseAssignment::active);
-    AP *CSyn_pre = addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
-    AP *CSyn_pst = addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
-    AP *CSyn_out = addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("CSynp[#].assign[#].delay", &CSynp, &CSynData::assign, &SynapseAssignment::delay);
 
-    addDeprecatedAP("CSynp[#].PreSynChannel", CSyn_pre);
-    addDeprecatedAP("CSynp[#].PostSynChannel", CSyn_pst);
-    addDeprecatedAP("CSynp[#].OutSynChannel", CSyn_out);
+    addAP("CSynp[#].PreSynChannel", &CSynp, &CSynData::legacy_PreSyn);
+    addAP("CSynp[#].PostSynChannel", &CSynp, &CSynData::legacy_PostSyn);
+    addAP("CSynp[#].OutSynChannel", &CSynp, &CSynData::legacy_OutSyn);
 
 
     // abSynp STPlast
@@ -123,14 +124,14 @@ void initAP()
     addAP("abSynp[#].Vpost", &abSynp, &abSynData::Vpost);
     addAP("abSynp[#].Plasticity", &abSynp, &abSynData::Plasticity);
     addAP("abSynp[#].assign[#].active", &abSynp, &abSynData::assign, &SynapseAssignment::active);
-    AP *abSyn_pre = addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
-    AP *abSyn_pst = addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
-    AP *abSyn_out = addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("abSynp[#].assign[#].delay", &abSynp, &abSynData::assign, &SynapseAssignment::delay);
 
-    addDeprecatedAP("abSynp[#].PreSynChannel", abSyn_pre);
-    addDeprecatedAP("abSynp[#].PostSynChannel", abSyn_pst);
-    addDeprecatedAP("abSynp[#].OutSynChannel", abSyn_out);
+    addAP("abSynp[#].PreSynChannel", &abSynp, &abSynData::legacy_PreSyn);
+    addAP("abSynp[#].PostSynChannel", &abSynp, &abSynData::legacy_PostSyn);
+    addAP("abSynp[#].OutSynChannel", &abSynp, &abSynData::legacy_OutSyn);
 
 
     // DxheSynp STPlast
@@ -182,14 +183,14 @@ void initAP()
     addAP("DxheSynp[#].Vpost", &DxheSynp, &DestexheSynData::Vpost);
     addAP("DxheSynp[#].Plasticity", &DxheSynp, &DestexheSynData::Plasticity);
     addAP("DxheSynp[#].assign[#].active", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::active);
-    AP *DxSyn_pre = addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
-    AP *DxSyn_pst = addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
-    AP *DxSyn_out = addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("DxheSynp[#].assign[#].delay", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::delay);
 
-    addDeprecatedAP("DxheSynp[#].PreSynChannel", DxSyn_pre);
-    addDeprecatedAP("DxheSynp[#].PostSynChannel", DxSyn_pst);
-    addDeprecatedAP("DxheSynp[#].OutSynChannel", DxSyn_out);
+    addAP("DxheSynp[#].PreSynChannel", &DxheSynp, &DestexheSynData::legacy_PreSyn);
+    addAP("DxheSynp[#].PostSynChannel", &DxheSynp, &DestexheSynData::legacy_PostSyn);
+    addAP("DxheSynp[#].OutSynChannel", &DxheSynp, &DestexheSynData::legacy_OutSyn);
 
 
     // ESynp
@@ -197,15 +198,15 @@ void initAP()
     addAP("ESynp[#].type", &ESynp, &GJunctData::type);
     addAP("ESynp[#].gSyn", &ESynp, &GJunctData::gSyn);
     addAP("ESynp[#].assign[#].active", &ESynp, &GJunctData::assign, &GapJunctionAssignment::active);
-    AP *ESyn_prein = addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
-    AP *ESyn_pstin = addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
-    AP *ESyn_preut = addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
-    AP *ESyn_pstut = addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
+    addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
+    addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
+    addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
+    addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
 
-    addDeprecatedAP("ESynp[#].preInChannel", ESyn_prein);
-    addDeprecatedAP("ESynp[#].postInChannel", ESyn_pstin);
-    addDeprecatedAP("ESynp[#].preOutChannel", ESyn_preut);
-    addDeprecatedAP("ESynp[#].postOutChannel", ESyn_pstut);
+    addAP("ESynp[#].preInChannel", &ESynp, &GJunctData::legacy_PreIn);
+    addAP("ESynp[#].postInChannel", &ESynp, &GJunctData::legacy_PostIn);
+    addAP("ESynp[#].preOutChannel", &ESynp, &GJunctData::legacy_PreOut);
+    addAP("ESynp[#].postOutChannel", &ESynp, &GJunctData::legacy_PostOut);
 
 
     // mhHH
@@ -232,11 +233,11 @@ void initAP()
     addAP("mhHHp[#].Vtauh", &mhHHp, &mhHHData::Vtauh);
     addAP("mhHHp[#].stauh", &mhHHp, &mhHHData::stauh);
     addAP("mhHHp[#].assign[#].active", &mhHHp, &mhHHData::assign, &CurrentAssignment::active);
-    AP *mhHH_V = addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
-    AP *mhHH_I = addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
+    addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
+    addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
 
-    addDeprecatedAP("mhHHp[#].VChannel", mhHH_V);
-    addDeprecatedAP("mhHHp[#].IChannel", mhHH_I);
+    addAP("mhHHp[#].VChannel", &mhHHp, &mhHHData::legacy_V);
+    addAP("mhHHp[#].IChannel", &mhHHp, &mhHHData::legacy_I);
 
 
     // abHH
@@ -263,11 +264,11 @@ void initAP()
     addAP("abHHp[#].hVb", &abHHp, &abHHData::hVb);
     addAP("abHHp[#].hsb", &abHHp, &abHHData::hsb);
     addAP("abHHp[#].assign[#].active", &abHHp, &abHHData::assign, &CurrentAssignment::active);
-    AP *abHH_V = addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
-    AP *abHH_I = addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
+    addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
+    addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
 
-    addDeprecatedAP("abHHp[#].VChannel", abHH_V);
-    addDeprecatedAP("abHHp[#].IChannel", abHH_I);
+    addAP("abHHp[#].VChannel", &abHHp, &abHHData::legacy_V);
+    addAP("abHHp[#].IChannel", &abHHp, &abHHData::legacy_I);
 
 
     // Data saving
@@ -295,6 +296,10 @@ void initAP()
     addAP("SampleHoldp.threshV", &(SampleHoldp.threshV));
     addAP("SampleHoldp.trigChn", &(SampleHoldp.trigChn));
 
+
+    // Performance monitor
+    addAP("PerfMonp.active", &PerfMonp, &PerformanceMonitorData::active);
+    addAP("PerfMonp.interval", &PerfMonp, &PerformanceMonitorData::interval);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
@@ -340,6 +345,19 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 #ifdef NATIONAL_INSTRUMENTS
     NIDAQData nidaq;
 #endif
+
+    struct legacyGraphData {
+      bool active[4] = {0,0,0,0};
+      QString color[4] = {"","","",""};
+      int chn[4] = {0,0,0,0};
+      double miny[4];
+      double maxy[4];
+      double xrange;
+      double dt;
+      int xtNo;
+      int ytNo;
+      double yfac[4];
+    } legacyGraphp[2];
 
     if ( is.good() ) {
         is >> header;
@@ -398,37 +416,40 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 #endif
         if ( !is.good() )
             return false;
+
+        addAP(deprec, "Graphp[#].active[#]", &legacyGraphp, &legacyGraphData::active);
+        addAP(deprec, "Graphp[#].color[#]", &legacyGraphp, &legacyGraphData::color);
+        addAP(deprec, "Graphp[#].chn[#]", &legacyGraphp, &legacyGraphData::chn);
+        addAP(deprec, "Graphp[#].miny[#]", &legacyGraphp, &legacyGraphData::miny);
+        addAP(deprec, "Graphp[#].maxy[#]", &legacyGraphp, &legacyGraphData::maxy);
+        addAP(deprec, "Graphp[#].xrange", &legacyGraphp, &legacyGraphData::xrange);
+        addAP(deprec, "Graphp[#].dt", &legacyGraphp, &legacyGraphData::dt);
+        addAP(deprec, "Graphp[#].xtNo", &legacyGraphp, &legacyGraphData::xtNo);
+        addAP(deprec, "Graphp[#].ytNo", &legacyGraphp, &legacyGraphData::ytNo);
+        addAP(deprec, "Graphp[#].yfac[#]", &legacyGraphp, &legacyGraphData::yfac);
     }
 
     // before version 2: 4 AEC channels only
     std::vector<elecCalibParams> elecCalibPs;
-    std::vector<ChannelIndex> elecInChn;
-    std::vector<std::unique_ptr<AP>> elecAP;
     if ( version < 2 ) {
-        QVector<QString> names(17);
         deprec.reserve(deprec.size() + 17);
-        elecAP.reserve(17);
-        int i = 0;
-        addAP(elecAP, names[i++] = "elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].inputChannelNumber", &elecInChn);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::outputChannelNumber);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
-        addAP(elecAP, names[i++] = "elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
-        for ( i = 0; i < names.size(); i++ ) {
-            deprec.push_back(std::unique_ptr<AP>(new APDeprec(names[i], elecAP.at(i).get())));
-        }
+        addAP(deprec, "elecCalibPs[#].copyChnOn", &elecCalibPs, &elecCalibParams::copyChnOn);
+        addAP(deprec, "elecCalibPs[#].copyChn", &elecCalibPs, &elecCalibParams::copyChn);
+        addAP(deprec, "elecCalibPs[#].samplingRate", &elecCalibPs, &elecCalibParams::samplingRate);
+        addAP(deprec, "elecCalibPs[#].inputChannelNumber", &elecCalibPs, &elecCalibParams::legacy_in);
+        addAP(deprec, "elecCalibPs[#].outputChannelNumber", &elecCalibPs, &elecCalibParams::legacy_out);
+        addAP(deprec, "elecCalibPs[#].iMaxElec", &elecCalibPs, &elecCalibParams::iMaxElec);
+        addAP(deprec, "elecCalibPs[#].iMinElec", &elecCalibPs, &elecCalibParams::iMinElec);
+        addAP(deprec, "elecCalibPs[#].numberOfLevels", &elecCalibPs, &elecCalibParams::numberOfLevels);
+        addAP(deprec, "elecCalibPs[#].injLenPerLevel", &elecCalibPs, &elecCalibParams::injLenPerLevel);
+        addAP(deprec, "elecCalibPs[#].iMembStep", &elecCalibPs, &elecCalibParams::iMembStep);
+        addAP(deprec, "elecCalibPs[#].numberOfRepeats", &elecCalibPs, &elecCalibParams::numberOfRepeats);
+        addAP(deprec, "elecCalibPs[#].injLenPerRepeat", &elecCalibPs, &elecCalibParams::injLenPerRepeat);
+        addAP(deprec, "elecCalibPs[#].hyperpolCurr", &elecCalibPs, &elecCalibParams::hyperpolCurr);
+        addAP(deprec, "elecCalibPs[#].injCalAmp", &elecCalibPs, &elecCalibParams::injCalAmp);
+        addAP(deprec, "elecCalibPs[#].injCalLen", &elecCalibPs, &elecCalibParams::injCalLen);
+        addAP(deprec, "elecCalibPs[#].fullKernelLen", &elecCalibPs, &elecCalibParams::fullKernelLen);
+        addAP(deprec, "elecCalibPs[#].electrodeKernelLen", &elecCalibPs, &elecCalibParams::electrodeKernelLen);
     }
 
     LOADED_PROTOCOL_VERSION = version;
@@ -449,11 +470,121 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         is >> name;
     }
 
-    if ( version < 2 && elecInChn.size() ) {
-        for ( size_t i = 0; i < elecInChn.size(); i++ ) {
-            inChnData *chn = elecInChn[i].getInChnData();
-            if ( chn ) {
-                chn->calib = elecCalibPs[i];
+    if ( version == 0 ) {
+        // Set up legacy index to new index conversion tables
+        std::vector<ChannelIndex> legacyIn, legacyOut;
+        DAQProxy *legacyDAQ = Devices.Register()[LEGACY_DAQ_CLASS];
+        for ( size_t i = 0; i < legacyDAQ->param(0).inChn.size(); i++ ) {
+            if ( legacyDAQ->param(0).inChn[i].active ) {
+                legacyIn.push_back(ChannelIndex(legacyDAQ, 0, i, true));
+            }
+        }
+        legacyIn.push_back(ChannelIndex(Models.Register()["SG"], 0, 0));
+        for ( size_t i = 0; i < legacyDAQ->param(0).outChn.size(); i++ ) {
+            if ( legacyDAQ->param(0).outChn[i].active ) {
+                legacyOut.push_back(ChannelIndex(legacyDAQ, 0, i, false));
+            }
+        }
+
+        for ( CSynData &syn : CSynp ) {
+            SynapseAssignment assign;
+            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
+                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
+            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
+                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
+            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
+                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
+            syn.assign.push_back(assign);
+        }
+
+        for ( abSynData &syn : abSynp ) {
+            SynapseAssignment assign;
+            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
+                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
+            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
+                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
+            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
+                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
+            syn.assign.push_back(assign);
+        }
+
+        for ( DestexheSynData &syn : DxheSynp ) {
+            SynapseAssignment assign;
+            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
+                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
+            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
+                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
+            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
+                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
+            syn.assign.push_back(assign);
+        }
+
+        for ( GJunctData &syn : ESynp ) {
+            GapJunctionAssignment assign;
+            if ( syn.legacy_PreIn >= 0 && syn.legacy_PreIn < int(legacyIn.size()) )
+                assign.preInChannel = legacyIn[syn.legacy_PreIn];
+            if ( syn.legacy_PostIn >= 0 && syn.legacy_PostIn < int(legacyIn.size()) )
+                assign.postInChannel = legacyIn[syn.legacy_PostIn];
+            if ( syn.legacy_PreOut >= 0 && syn.legacy_PreOut < int(legacyOut.size()) )
+                assign.preOutChannel = legacyOut[syn.legacy_PreOut];
+            if ( syn.legacy_PostOut >= 0 && syn.legacy_PostOut < int(legacyOut.size()) )
+                assign.postOutChannel = legacyOut[syn.legacy_PostOut];
+            syn.assign.push_back(assign);
+        }
+
+        for ( mhHHData &current : mhHHp ) {
+            CurrentAssignment assign;
+            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
+                assign.VChannel = legacyIn[current.legacy_V];
+            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
+                assign.IChannel = legacyOut[current.legacy_I];
+            current.assign.push_back(assign);
+        }
+
+        for ( abHHData &current : abHHp ) {
+            CurrentAssignment assign;
+            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
+                assign.VChannel = legacyIn[current.legacy_V];
+            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
+                assign.IChannel = legacyOut[current.legacy_I];
+            current.assign.push_back(assign);
+        }
+
+        for ( int i(elecCalibPs.size() - 1); i >= 0; i-- ) {
+            if ( elecCalibPs[i].legacy_in >= 0 && elecCalibPs[i].legacy_in < int(legacyIn.size()) ) {
+                inChnData *in = legacyIn[elecCalibPs[i].legacy_in].getInChnData();
+                if ( !in )
+                    continue;
+                in->calib = elecCalibPs[i];
+                if ( in->calib.legacy_out >= 0 && in->calib.legacy_out < int(legacyOut.size()) )
+                    in->calib.outputChannelNumber = legacyOut[in->calib.legacy_out];
+            }
+        }
+
+        if ( SampleHoldp.trigChn.isLegacy && SampleHoldp.trigChn.chanID < legacyIn.size() )
+            SampleHoldp.trigChn = legacyIn[SampleHoldp.trigChn.chanID];
+
+        for ( int j = 0; j < 2; j++ ) {
+            legacyGraphData &graphp = legacyGraphp[j];
+            if ( graphp.dt )
+                Plotp.interval = graphp.dt;
+            for ( int i = 0; i < 4; i++ ) {
+                GraphData g;
+                g.active = graphp.active[i];
+                // legacy chan: 0=None, 1,...,m=in, m+1,...,n=out, last=SG
+                // legacyIn includes SG
+                int chan = graphp.chn[i];
+                if ( chan == 0 )
+                    g.chan = ChannelIndex::None();
+                else if ( chan == int(legacyIn.size() + legacyOut.size()) )
+                    g.chan = legacyIn.back(); // SG
+                else if ( chan < int(legacyIn.size()) )
+                    g.chan = legacyIn[chan-1]; // In
+                else
+                    g.chan = legacyOut[chan - legacyIn.size()]; // Out
+                g.color = QColor(graphp.color[i]);
+                g.isVoltage = g.chan.isInChn || g.chan.isVirtual;
+                Plotp.graphs.push_back(g);
             }
         }
     }

@@ -7,9 +7,11 @@
 #include "DeviceManager.h"
 #include "ModelManager.h"
 #include "GraphDlg.h"
+#include "PerformanceMonitor.h"
 
 DCThread::DCThread() :
-    graph(nullptr)
+    graph(nullptr),
+    perfmon(nullptr)
 {
   stopped= true;
   finished= true;
@@ -38,6 +40,14 @@ void DCThread::setGraph(GraphDlg *g, double dt)
     if ( stopped ) {
         graph = g;
         graphDt = dt;
+    }
+}
+
+void DCThread::setPerformanceMonitor(PerformanceMonitor *pt, double dt)
+{
+    if ( stopped ) {
+        perfmon = pt;
+        perfDt = dt;
     }
 }
 
@@ -235,6 +245,7 @@ void DCThread::run()
 {
    int rateCounter = 0;
    double lastRateReport = 0.;
+   PerformanceMonitor::DataPoint perfData { 0, 0, perfDt, 0 };
    static int i;
    static double evt;
    bool SampleHoldOn= false;
@@ -446,6 +457,22 @@ void DCThread::run()
              lastRateReport = t;
              emit updateRate(rateCounter);
              rateCounter = 0;
+         }
+
+         // Performance monitor
+         if ( perfmon ) {
+             ++perfData.n;
+             if ( dt < perfData.minDt )
+                 perfData.minDt = dt;
+             if ( dt > perfData.maxDt )
+                 perfData.maxDt = dt;
+             if ( t - perfData.t > perfDt ) {
+                 perfData.t = t;
+                 perfmon->q.push(perfData);
+                 // Set min, max to mean rather than boundary to reduce initial flurry of updates
+                 perfData.minDt = perfData.maxDt = perfDt / perfData.n;
+                 perfData.n = 0;
+             }
          }
 
          // Scripting

@@ -44,6 +44,8 @@ public:
     bool isInChn;
     size_t chanID;
 
+    bool isLegacy;
+
     friend std::ostream &operator<<(std::ostream &os, ChannelIndex const&);
     friend std::istream &operator>>(std::istream &is, ChannelIndex &);
 
