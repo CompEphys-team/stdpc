@@ -204,6 +204,8 @@ void MyMainWindow::StartButClicked()
 
   if ( !ui->graphtab->startPlotting(DCT) )
       ui->tabWidget->setTabEnabled(1, false);
+  if ( !ui->performancetab->startPlotting(DCT) )
+      ui->tabWidget->setTabEnabled(2, false);
   rateIndicator->setText("Started");
   DCT->setup_and_go();
 }
@@ -224,7 +226,9 @@ void MyMainWindow::StopButClicked()
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
   ui->graphtab->stopPlotting();
+  ui->performancetab->stopPlotting();
   ui->tabWidget->setTabEnabled(1, true);
+  ui->tabWidget->setTabEnabled(2, true);
 }
 
 void MyMainWindow::exportData(bool ignoreDAQ)
@@ -234,6 +238,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
   ui->graphtab->exportData();
+  ui->performancetab->exportData();
 }
  
 void MyMainWindow::importData()
@@ -243,6 +248,7 @@ void MyMainWindow::importData()
   ui->currentTable->importData();
   DSDlg->importData();
   ui->graphtab->importData();
+  ui->performancetab->importData();
   updateStartButton();
 }
 

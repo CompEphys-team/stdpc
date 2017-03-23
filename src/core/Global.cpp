@@ -14,6 +14,7 @@ std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 
 PlotData Plotp;
+PerformanceMonitorData PerfMonp;
 
 dataSavingParams dataSavingPs;
 

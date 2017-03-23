@@ -32,6 +32,7 @@ extern std::vector<abHHData> abHHp;
 extern dataSavingParams dataSavingPs;
 
 extern PlotData Plotp;
+extern PerformanceMonitorData PerfMonp;
 
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;

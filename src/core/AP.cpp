@@ -296,6 +296,10 @@ void initAP()
     addAP("SampleHoldp.threshV", &(SampleHoldp.threshV));
     addAP("SampleHoldp.trigChn", &(SampleHoldp.trigChn));
 
+
+    // Performance monitor
+    addAP("PerfMonp.active", &PerfMonp, &PerformanceMonitorData::active);
+    addAP("PerfMonp.interval", &PerfMonp, &PerformanceMonitorData::interval);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)

@@ -361,6 +361,11 @@
         <string>Graph</string>
        </attribute>
       </widget>
+      <widget class="PerformanceMonitor" name="performancetab">
+       <attribute name="title">
+        <string>Performance</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
     <item row="1" column="0" colspan="2">
@@ -513,6 +518,12 @@
    <class>GraphDlg</class>
    <extends>QWidget</extends>
    <header>GraphDlg.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PerformanceMonitor</class>
+   <extends>QWidget</extends>
+   <header>PerformanceMonitor.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

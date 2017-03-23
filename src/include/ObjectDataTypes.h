@@ -294,6 +294,12 @@ struct PlotData {
     PlotData() : interval(1e-3), bufferExp(4) {}
 };
 
+struct PerformanceMonitorData {
+    bool active;
+    double interval;
+    PerformanceMonitorData() : active(false), interval(1) {}
+};
+
 typedef struct {
   bool active;
   double threshV;
