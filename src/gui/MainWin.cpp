@@ -84,6 +84,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
      connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
 
+     connect(this, &MyMainWindow::channelsChanged, &ChannelListModel::updateChns_static_noargs);
+     connect(this, &MyMainWindow::modelRemoved, &ChannelListModel::updateChns_static);
+
      connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
      connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
      connect(ui->HHClear, &QPushButton::clicked, [=](){ui->currentTable->importData(true);});

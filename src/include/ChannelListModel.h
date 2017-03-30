@@ -24,6 +24,8 @@ public:
         AnalogOut =  32,
         Prototype =  64, // Model prototypes, applies multiplexed over all instances
 
+        __MAX = 128, // Internal use only: Maximum enum value
+
         In = AnalogIn | Virtual | Prototype,
         Out = AnalogOut | Virtual | Prototype
     };
@@ -36,6 +38,10 @@ public:
 
     int index(const ChannelIndex &dex) const;
     QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
+
+    static ChannelListModel *getModel(int displayFlags);
+    static void updateChns_static(ChannelIndex removeDeviceDex);
+    static void updateChns_static_noargs();
 
 public slots:
     void updateChns(ChannelIndex removeDeviceDex = ChannelIndex());
@@ -76,6 +82,8 @@ protected:
     std::vector<ModelHelper> modelHelpers;
 
     ChannelIndex rmDevDex;
+
+    static std::unique_ptr<ChannelListModel> ownedModels[ChannelType::__MAX];
 };
 
 #endif // CHANNELLISTMODEL_H
