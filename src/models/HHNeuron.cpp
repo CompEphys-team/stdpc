@@ -17,6 +17,8 @@ HHNeuronProxy::HHNeuronProxy()
     addAP("HHNeuronp[#].C", &HHNeuronProxy::p, &HHNeuronData::C);
     addAP("HHNeuronp[#].gLeak", &HHNeuronProxy::p, &HHNeuronData::gLeak);
     addAP("HHNeuronp[#].ELeak", &HHNeuronProxy::p, &HHNeuronData::ELeak);
+    addAP("HHNeuronp[#].Vmin", &HHNeuronProxy::p, &HHNeuronData::Vmin);
+    addAP("HHNeuronp[#].Vmax", &HHNeuronProxy::p, &HHNeuronData::Vmax);
     addAP("HHNeuronp[#].inst[#].active", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::active);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
@@ -43,8 +45,15 @@ void HHNeuron::RK4(double, double dt, size_t n)
     if ( n < 3 ) {
         Vi = V + kV[n]*dt;
     } else {
-        Vi = V = V + (kV[0] + 2*kV[1] + 2*kV[2] + kV[3]) * dt / 6;
+        Vi = V + (kV[0] + 2*kV[1] + 2*kV[2] + kV[3]) * dt / 6;
     }
+
+    if ( Vi < p.Vmin ) Vi = p.Vmin;
+    else if ( Vi > p.Vmax ) Vi = p.Vmax;
+
+    if ( n == 3 )
+        V = Vi;
+
     in.V = Vi + params().inChn.bias;
 
     // restore current (except on last step, where it's better to keep the final value for output/graphing)

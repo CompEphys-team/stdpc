@@ -82,6 +82,8 @@ void HHModelDlg::importData()
     ui->C->setValue(HHNeuronProxy::p[idx].C * 1e9);
     ui->gLeak->setValue(HHNeuronProxy::p[idx].gLeak * 1e9);
     ui->ELeak->setValue(HHNeuronProxy::p[idx].ELeak * 1e3);
+    ui->Vmin->setValue(HHNeuronProxy::p[idx].Vmin * 1e3);
+    ui->Vmax->setValue(HHNeuronProxy::p[idx].Vmax * 1e3);
 }
 
 void HHModelDlg::exportData()
@@ -103,6 +105,8 @@ void HHModelDlg::exportData()
     HHNeuronProxy::p[idx].C = ui->C->value() * 1e-9;
     HHNeuronProxy::p[idx].gLeak = ui->gLeak->value() * 1e-9;
     HHNeuronProxy::p[idx].ELeak = ui->ELeak->value() * 1e-3;
+    HHNeuronProxy::p[idx].Vmin = ui->Vmin->value() * 1e-3;
+    HHNeuronProxy::p[idx].Vmax = ui->Vmax->value() * 1e-3;
     emit channelsChanged();
     emit modelStatusChanged();
 }
