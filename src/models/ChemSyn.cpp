@@ -89,10 +89,10 @@ void ChemSyn::currentUpdate(double t, double dt)
   // Linear Euler:
   S+= (Sinf - S)/tmp*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
-  if (S < 0.0) S= 0.0;
+  else if (S < 0.0 || std::isnan(S)) S= 0.0;
 
   double preV = buffered ? pre->getBufferedV(bufferHandle) : pre->V;
-  
+
   if (preV > p->VThresh)
     Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
   else Sinf= 0.0;

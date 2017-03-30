@@ -85,10 +85,10 @@ void abSyn::currentUpdate(double t, double dt)
   // Linear Euler:
   S+= dS*dt;   /// use previous values of Sinf, S
   if (S > 1.0) S= 1.0;
-  if (S < 0.0) S= 0.0;
+  else if (S < 0.0 || std::isnan(S)) S= 0.0;
   R+= dR*dt;
   if (R > 1.0) R= 1.0;
-  if (R < 0.0) R= 0.0;
+  else if (R < 0.0 || std::isnan(R)) R= 0.0;
   
 
   // if plastic, learn

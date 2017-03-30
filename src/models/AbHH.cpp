@@ -104,8 +104,10 @@ void abHH::RK4(double, double dt, size_t n)
           } else {
               mi = m + (km[0] + 2*km[1] + 2*km[2] + km[3]) * dt / 6;
           }
-          if ( mi < 0.0 ) mi = 0.0;
+
           if ( mi > 1.0 ) mi = 1.0;
+          else if ( mi < 0.0 || std::isnan(mi) ) mi = 0.0;
+
           if ( n == 3 ) {
               m = mi;
           }
@@ -125,8 +127,10 @@ void abHH::RK4(double, double dt, size_t n)
           } else {
               hi = h + (kh[0] + 2*kh[1] + 2*kh[2] + kh[3]) * dt / 6;
           }
-          if ( hi < 0.0 ) hi = 0.0;
+
           if ( hi > 1.0 ) hi = 1.0;
+          else if ( hi < 0.0 || std::isnan(hi) ) hi = 0.0;
+
           if ( n == 3 ) {
               h = hi;
           }
