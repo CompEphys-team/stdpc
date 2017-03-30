@@ -9,7 +9,7 @@ class HHDlg : public QDialog, private Ui::HHDlg
      Q_OBJECT
 
   public:
-     HHDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
+     HHDlg(int, QWidget *parent= 0);
      void exportData(mhHHData &);
      void importData(mhHHData);
      void setIndex(int);

@@ -21,12 +21,10 @@ void ComponentTable::makeFactory()
         factory->combo->addItem(p->label);
 }
 
-void ComponentTable::init(QVector<ComponentPrototypeBase *> prototypes, ChannelListModel *in, ChannelListModel *out)
+void ComponentTable::init(QVector<ComponentPrototypeBase *> prototypes)
 {
     proto = prototypes;
     idx = QVector<int>(proto.size(), 0);
-    this->in = in;
-    this->out = out;
     makeFactory();
     setCellWidget(0, 0, factory);
 }
@@ -40,7 +38,7 @@ void ComponentTable::importData(bool activeOnly)
         if ( activeOnly )
             p->clearInactive();
         else
-            p->createAll(in, out);
+            p->createAll();
         comp += p->inst;
         idx[i++] = p->inst.size();
     }
@@ -75,7 +73,7 @@ void ComponentTable::deactivateAll()
 void ComponentTable::addComponent()
 {
     int i = factory->combo->currentIndex();
-    GenericComponent *c = proto[i]->create(idx[i]++, in, out);
+    GenericComponent *c = proto[i]->create(idx[i]++);
     insertColumn(comp.size());
     setCellWidget(0, comp.size(), c->widget());
     comp.append(c);

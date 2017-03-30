@@ -18,15 +18,14 @@ ElectrodeCompDlg::ElectrodeCompDlg(elecCalibParams &p, ChannelIndex dex, QWidget
     QDialog(parent),
     p(p),
     dex(dex),
-    outChnModel(ChannelListModel::AnalogOut, this),
+    outChnModel(ChannelListModel::getModel(ChannelListModel::AnalogOut)),
     ui(new Ui::ElectrodeCompDlg)
 {
     ui->setupUi(this);
     setWindowTitle(windowTitle().arg(dex.prettyName()));
 
-    outChnModel.updateChns();
-    ui->leGenOutChannelNum_1->setModel(&outChnModel);
-    ui->leGenCopyChannelNum_1->setModel(&outChnModel);
+    ui->leGenOutChannelNum_1->setModel(outChnModel);
+    ui->leGenCopyChannelNum_1->setModel(outChnModel);
 
     if ( p.samplingRate == 0 ) // Use unset samplingRate as proxy for uninitialised p => export defaults
         exportData();
@@ -85,12 +84,12 @@ void ElectrodeCompDlg::importData()
 
     // copy channel
     ui->CopyChannelCheckBox_1->setChecked(p.copyChnOn);
-    ui->leGenCopyChannelNum_1->setCurrentIndex(outChnModel.index(p.copyChn));
+    ui->leGenCopyChannelNum_1->setCurrentIndex(outChnModel->index(p.copyChn));
 
     // General params
     num.setNum(p.samplingRate / 1e3);  // Hz -> kHz
     ui->leGenSamplingRate_1->setText(num);
-    ui->leGenOutChannelNum_1->setCurrentIndex(outChnModel.index(p.outputChannelNumber));
+    ui->leGenOutChannelNum_1->setCurrentIndex(outChnModel->index(p.outputChannelNumber));
 
     // Calibration params
     num.setNum(p.hyperpolCurr * 1e9);  // A -> nA

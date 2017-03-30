@@ -13,24 +13,19 @@ MyMainWindow::MyMainWindow(QWidget *parent)
  {
      ui->setupUi(this);
 
-     inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
-     outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
-
      DSDlg= new DataSavingDlg(this);
-
-     ui->graphtab->link(this);
 
      QVector<ComponentPrototypeBase *> prototypes;
      prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
      prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
-     ui->currentTable->init(prototypes, nullptr, nullptr);
+     ui->currentTable->init(prototypes);
 
      prototypes.clear();
      prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));
      prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
      prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
      prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
-     ui->synapseTable->init(prototypes, inChnModel, outChnModel);
+     ui->synapseTable->init(prototypes);
 
      QVector<DaqOptsPrototypeBase*> dprot;
      for ( DAQProxy *proxy : DeviceManager::Register() )
@@ -79,11 +74,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
 
-     connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
-     connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
-     connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
-     connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
-
      connect(this, &MyMainWindow::channelsChanged, &ChannelListModel::updateChns_static_noargs);
      connect(this, &MyMainWindow::modelRemoved, &ChannelListModel::updateChns_static);
 
@@ -118,9 +108,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
 MyMainWindow::~MyMainWindow()
 {
-  delete inChnModel;
-  delete outChnModel;
-  
   delete ExportLogFileDlg;
   delete LoadProtocolFileDlg;
   delete SaveProtocolFileDlg;

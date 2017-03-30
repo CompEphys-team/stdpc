@@ -9,7 +9,7 @@
 SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
     ModelDlg(idx, parent),
     ui(new Ui::SpikeGenDlg),
-    clm(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::None, this)
+    clm(ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::None))
 {
     ui->setupUi(this);
     label = ui->titleLabel->text();
@@ -86,9 +86,6 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
         ui->bdStrict->setEnabled(ui->tOContiguous->isChecked() && ui->tUContiguous->isChecked());
     });
 
-    connect(parent, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
-    connect(parent, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
-
     std::vector<std::vector<double>> defaults(1, {.03,.05,.068,.088,.112,.138,.168,.204,.248,.308});
     importST(defaults);
 }
@@ -145,7 +142,7 @@ void SpikeGenDlg::importData()
         active->setChecked(inst.active);
         vSave->setChecked(inst.inChn.chnlSaving);
         vBias->setValue(inst.inChn.bias * 1e3);
-        bdChannel->setCurrentIndex(clm.index(inst.bdChannel));
+        bdChannel->setCurrentIndex(clm->index(inst.bdChannel));
         bdThreshold->setValue(inst.bdThresh * 1e3);
     }
     growInstTable(false);
@@ -289,7 +286,7 @@ void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoub
     vBias->setRange(-1000, 1000);
 
     ui->instTable->setCellWidget(row, 5, bdChannel);
-    bdChannel->setModel(&clm);
+    bdChannel->setModel(clm);
     ui->instTable->setCellWidget(row, 6, bdThresh);
     bdThresh->setRange(-1000, 1000);
 

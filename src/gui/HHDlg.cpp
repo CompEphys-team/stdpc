@@ -2,7 +2,7 @@
 #include "HHDlg.h"
 #include <QMessageBox>
 
-HHDlg::HHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+HHDlg::HHDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
      setupUi(this);

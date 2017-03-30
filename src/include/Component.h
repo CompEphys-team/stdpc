@@ -24,9 +24,9 @@ class Component : public GenericComponent
 {
 public:
     Component(QString label, std::vector<typename ComponentDlg::param_type> *params,
-              int idx, ChannelListModel *in, ChannelListModel *out) :
+              int idx) :
         params(params),
-        dlg(new ComponentDlg(idx, in, out)),
+        dlg(new ComponentDlg(idx)),
         idx(idx),
         label(label)
     {

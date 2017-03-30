@@ -45,7 +45,7 @@ class GraphDlg : public QWidget
      Q_OBJECT
 private:
     Ui::GraphDlg *ui;
-    ChannelListModel clm;
+    ChannelListModel *clm;
 
     QTimer dataTimer;
 
@@ -77,7 +77,6 @@ private slots:
 
 public:
      GraphDlg(QWidget *parent = 0);
-     void link(QWidget *mainwin);
      ~GraphDlg();
 
      struct DataPoint { double t; double value; };

@@ -13,7 +13,7 @@ class abSynDlg : public QDialog, private Ui::abSynDlg
      Q_OBJECT
 
   public:
-     abSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
+     abSynDlg(int, QWidget *parent= 0);
      void exportData(abSynData &);
      void importData(abSynData);
      void setIndex(int);

@@ -27,7 +27,7 @@ private:
     Ui::SpikeGenDlg *ui;
     QString label;
 
-    ChannelListModel clm;
+    ChannelListModel *clm;
 
     QVector<QCheckBox*> actives, vSaves;
     QVector<QDoubleSpinBox*> vBiases, bdThresholds;

@@ -11,7 +11,6 @@
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
 #include "DCThread.h"
-#include "ChannelListModel.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,8 +32,6 @@ class MyMainWindow : public QMainWindow
 
      DataSavingDlg *DSDlg;
      DCThread *DCT;
-
-     ChannelListModel *inChnModel, *outChnModel;
      
   public slots:
      void CloseToLimitWarning(QString, QString, double, double, double);

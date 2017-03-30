@@ -2,7 +2,7 @@
 #include "DestexheSynDlg.h"
 #include <QMessageBox>
 
-DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
      setupUi(this);
@@ -15,6 +15,9 @@ DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *o
 
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
+
+     ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
+     ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
      QVector<AssignmentCellBase<SynapseAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));

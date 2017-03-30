@@ -22,7 +22,7 @@ class ElectrodeCompDlg : public QDialog
         elecCalibParams &p;
         ChannelIndex dex;
 
-        ChannelListModel outChnModel;
+        ChannelListModel *outChnModel;
 
         bool InitCalibrator();        
         void TimingTest();

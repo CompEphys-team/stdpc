@@ -1,13 +1,16 @@
 
 #include "GapJunctionDlg.h"
 
-GapJunctionDlg::GapJunctionDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
      setupUi(this);
      
      label = gapJunctDlgLabel->text();
      setIndex(no);
+
+     ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
+     ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
      QVector<AssignmentCellBase<GapJunctionAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<GapJunctionAssignment>(&GapJunctionAssignment::active, "Active", 47));

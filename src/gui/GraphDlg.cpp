@@ -8,9 +8,10 @@
 GraphDlg::GraphDlg(QWidget *parent)
      : QWidget(parent),
        ui(new Ui::GraphDlg),
-       clm(ChannelListModel::AnalogIn
+       clm(ChannelListModel::getModel(
+           ChannelListModel::AnalogIn
          | ChannelListModel::AnalogOut
-         | ChannelListModel::Virtual, this),
+         | ChannelListModel::Virtual)),
        dataTimer(this)
  {
     ui->setupUi(this);
@@ -57,12 +58,6 @@ GraphDlg::GraphDlg(QWidget *parent)
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(replot()));
 }
 
-void GraphDlg::link(QWidget *mainwin)
-{
-    connect(mainwin, SIGNAL(channelsChanged()), &clm, SLOT(updateChns()));
-    connect(mainwin, SIGNAL(modelRemoved(ChannelIndex)), &clm, SLOT(updateChns(ChannelIndex)));
-}
-
 GraphDlg::~GraphDlg()
 {
     dataTimer.stop();
@@ -88,7 +83,7 @@ void GraphDlg::importData()
         addRow(row++, active, colBtn, type, channel);
         colBtn->setColor(p.color);
         type->setCurrentIndex(!p.isVoltage);
-        channel->setCurrentIndex(clm.index(p.chan));
+        channel->setCurrentIndex(clm->index(p.chan));
         active->setChecked(p.active);
     }
     growTable(false);
@@ -313,7 +308,7 @@ void GraphDlg::addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox
     type->addItem("Current");
     ui->table->setCellWidget(row, 2, type);
 
-    channel->setModel(&clm);
+    channel->setModel(clm);
     connect(channel, SIGNAL(currentIndexChanged(int)), this, SLOT(checkChannelTypes()));
     ui->table->setCellWidget(row, 3, channel);
 

@@ -2,7 +2,7 @@
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
-AlphaBetaHHDlg::AlphaBetaHHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
   setupUi(this);

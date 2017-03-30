@@ -13,7 +13,7 @@ class ChemSynDlg : public QDialog, private Ui::ChemSynDlg
      Q_OBJECT
 
   public:
-     ChemSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
+     ChemSynDlg(int, QWidget *parent= 0);
      void exportData(CSynData &);
      void importData(CSynData);
      void setIndex(int);

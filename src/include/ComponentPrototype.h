@@ -18,8 +18,8 @@ public:
             delete c;
     }
 
-    virtual GenericComponent *create(int idx, ChannelListModel *in, ChannelListModel *out) = 0;
-    virtual void createAll(ChannelListModel *in, ChannelListModel *out) = 0;
+    virtual GenericComponent *create(int idx) = 0;
+    virtual void createAll() = 0;
 
     void clearInactive()
     {
@@ -51,21 +51,21 @@ public:
     {}
     ~ComponentPrototype() {}
 
-    GenericComponent *create(int idx, ChannelListModel *in, ChannelListModel *out)
+    GenericComponent *create(int idx)
     {
-        Component<ComponentDlg> *c = new Component<ComponentDlg>(label, params, idx, in, out);
+        Component<ComponentDlg> *c = new Component<ComponentDlg>(label, params, idx);
         inst.push_back(c);
         return c;
     }
 
-    void createAll(ChannelListModel *in, ChannelListModel *out)
+    void createAll()
     {
         for ( GenericComponent *c : inst )
             delete c;
         inst.clear();
         inst.reserve(params->size());
         for ( size_t i = 0; i < params->size(); i++ ) {
-            create(i, in, out)->importData();
+            create(i)->importData();
         }
     }
 

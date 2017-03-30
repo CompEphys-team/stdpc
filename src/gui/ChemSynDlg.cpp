@@ -2,7 +2,7 @@
 #include "ChemSynDlg.h"
 #include <QMessageBox>
 
-ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
+ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      : QDialog(parent)
  {
      setupUi(this);
@@ -16,6 +16,9 @@ ChemSynDlg::ChemSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWid
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
      connect(STDCombo, SIGNAL(currentIndexChanged(QString)), SLOT(STDComboChange()));
+
+     ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
+     ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
      QVector<AssignmentCellBase<SynapseAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));

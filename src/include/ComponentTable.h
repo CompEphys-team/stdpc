@@ -20,7 +20,7 @@ public:
     ComponentTable(QWidget *parent = 0);
     ~ComponentTable();
 
-    void init(QVector<ComponentPrototypeBase *> prototypes, ChannelListModel *in, ChannelListModel *out);
+    void init(QVector<ComponentPrototypeBase *> prototypes);
 
 public slots:
     void importData(bool activeOnly = false);
@@ -37,7 +37,6 @@ private:
     QVector<GenericComponent *> comp;
     QVector<int> idx;
     ComponentFactoryWidget *factory;
-    ChannelListModel *in, *out;
 
     void makeFactory();
 };
