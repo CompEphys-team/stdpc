@@ -8,13 +8,14 @@ struct HHNeuronData : public ModelData
     double C;
     double gLeak;
     double ELeak;
+    bool Vlimit;
     double Vmin;
     double Vmax;
     std::vector<vInstData> inst;
 
     inline vInstData &instance(size_t i) { return inst[i]; }
     inline size_t numInst() const { return inst.size(); }
-    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3), Vmin(-0.2), Vmax(0.2) {}
+    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3), Vlimit(false), Vmin(-0.2), Vmax(0.2) {}
 };
 
 class HHNeuronProxy : public ModelProxy {

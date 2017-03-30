@@ -32,6 +32,11 @@ HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
     growTable(false);
 
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addMultiple()));
+
+    connect(ui->Vlimit, &QCheckBox::toggled, [=](bool y){
+        ui->Vmax->setEnabled(y);
+        ui->Vmin->setEnabled(y);
+    });
 }
 
 void HHModelDlg::setIndex(size_t no)
@@ -82,6 +87,7 @@ void HHModelDlg::importData()
     ui->C->setValue(HHNeuronProxy::p[idx].C * 1e9);
     ui->gLeak->setValue(HHNeuronProxy::p[idx].gLeak * 1e9);
     ui->ELeak->setValue(HHNeuronProxy::p[idx].ELeak * 1e3);
+    ui->Vlimit->setChecked(HHNeuronProxy::p[idx].Vlimit);
     ui->Vmin->setValue(HHNeuronProxy::p[idx].Vmin * 1e3);
     ui->Vmax->setValue(HHNeuronProxy::p[idx].Vmax * 1e3);
 }
@@ -105,6 +111,7 @@ void HHModelDlg::exportData()
     HHNeuronProxy::p[idx].C = ui->C->value() * 1e-9;
     HHNeuronProxy::p[idx].gLeak = ui->gLeak->value() * 1e-9;
     HHNeuronProxy::p[idx].ELeak = ui->ELeak->value() * 1e-3;
+    HHNeuronProxy::p[idx].Vlimit = ui->Vlimit->isChecked();
     HHNeuronProxy::p[idx].Vmin = ui->Vmin->value() * 1e-3;
     HHNeuronProxy::p[idx].Vmax = ui->Vmax->value() * 1e-3;
     emit channelsChanged();
