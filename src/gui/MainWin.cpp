@@ -23,7 +23,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      QVector<ComponentPrototypeBase *> prototypes;
      prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
      prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
-     ui->currentTable->init(prototypes, inChnModel, outChnModel);
+     ui->currentTable->init(prototypes, nullptr, nullptr);
 
      prototypes.clear();
      prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));

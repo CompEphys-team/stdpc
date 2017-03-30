@@ -11,7 +11,7 @@
 #define MAX_IN_CHN_NO 64
 #define VTHRESH -30
 
-#define STDPC_PROTOCOL_VERSION 3
+#define STDPC_PROTOCOL_VERSION 4
 #define STDPC_PROTOCOL_HEADER "#StdpC_config_version"
 extern int LOADED_PROTOCOL_VERSION;
 extern QString LEGACY_DAQ_CLASS;

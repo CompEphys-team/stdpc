@@ -589,5 +589,52 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         }
     }
 
+    if ( version < 4 ) {
+        // version 4 introduced a restriction on HH channel assignments: no model instances.
+        // Compat: Reassigns all model instances to model prototypes
+        for ( mhHHData &p : mhHHp ) {
+            std::vector<ChannelIndex> mod;
+            std::vector<CurrentAssignment> dest;
+            dest.reserve(p.assign.size());
+            for ( CurrentAssignment &a : p.assign ) {
+                if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
+                    a.IChannel.isPrototype = true;
+                    a.VChannel.isPrototype = true;
+                    a.IChannel.isVirtual = false;
+                    a.VChannel.isVirtual = false;
+                    if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
+                        continue; // Drop duplicate entries
+                    }
+                    mod.push_back(a.IChannel);
+                } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
+                    mod.push_back(a.IChannel);
+                }
+                dest.push_back(a);
+            }
+            p.assign = dest;
+        }
+        for ( abHHData &p : abHHp ) {
+            std::vector<ChannelIndex> mod;
+            std::vector<CurrentAssignment> dest;
+            dest.reserve(p.assign.size());
+            for ( CurrentAssignment &a : p.assign ) {
+                if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
+                    a.IChannel.isPrototype = true;
+                    a.VChannel.isPrototype = true;
+                    a.IChannel.isVirtual = false;
+                    a.VChannel.isVirtual = false;
+                    if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
+                        continue; // Drop duplicate entries
+                    }
+                    mod.push_back(a.IChannel);
+                } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
+                    mod.push_back(a.IChannel);
+                }
+                dest.push_back(a);
+            }
+            p.assign = dest;
+        }
+    }
+
     return true;
 }
