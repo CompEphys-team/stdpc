@@ -20,12 +20,13 @@ public:
     enum ChannelType {
         Blank =      1,
         None =       2,
+        Conductance = 4,
         Virtual   =  8, // Model instances
         AnalogIn =   16,
         AnalogOut =  32,
         Prototype =  64, // Model prototypes, applies multiplexed over all instances
 
-        __MAX = 128, // Internal use only: Maximum enum value
+        __MAX = 256, // Internal use only: Maximum enum value
 
         In = AnalogIn | Virtual | Prototype,
         Out = AnalogOut | Virtual | Prototype
@@ -76,11 +77,25 @@ protected:
         std::vector<size_t> nInst;
     };
 
+    class ConductanceHelper {
+    private:
+        ChannelListModel *const parent;
+        ConductanceProxy *proxy;
+    public:
+        ConductanceHelper(ConductanceProxy *proxy, ChannelListModel *parent) : parent(parent), proxy(proxy), nAssign(0) {}
+        void updateCount();
+        void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
+        bool data(int row, int role, int &offset, QVariant &ret) const;
+        bool index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const;
+        std::vector<size_t> nAssign;
+    };
+
     const int displayFlags;
     int size;
 
     std::vector<DAQHelper> daqHelpers;
     std::vector<ModelHelper> modelHelpers;
+    std::vector<ConductanceHelper> conductanceHelpers;
 
     ChannelIndex rmDevDex;
 

@@ -230,6 +230,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   DSDlg->exportData();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
+  emit channelsChanged();
 }
  
 void MyMainWindow::importData()

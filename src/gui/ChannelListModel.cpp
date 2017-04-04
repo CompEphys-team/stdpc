@@ -36,6 +36,8 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
         daqHelpers.push_back(DAQHelper(proxy, this));
     for ( ModelProxy *proxy : ModelManager::Register() )
         modelHelpers.push_back(ModelHelper(proxy, this));
+    for ( ConductanceProxy *proxy : ConductanceManager::Register() )
+        conductanceHelpers.push_back(ConductanceHelper(proxy, this));
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
     // Owner connects model removals
 }
@@ -51,6 +53,8 @@ void ChannelListModel::updateCount(ChannelListModel *from)
             daqHelpers[i].nAI = from->daqHelpers[i].nAI;
             daqHelpers[i].nAO = from->daqHelpers[i].nAO;
         }
+        for ( size_t i = 0; i < conductanceHelpers.size(); i++ )
+            conductanceHelpers[i].nAssign = from->conductanceHelpers[i].nAssign;
     } else {
         size = 0;
         if ( displayFlags & Blank )
@@ -61,6 +65,8 @@ void ChannelListModel::updateCount(ChannelListModel *from)
         for ( ModelHelper &h : modelHelpers )
             h.updateCount();
         for ( DAQHelper &h : daqHelpers )
+            h.updateCount();
+        for ( ConductanceHelper &h : conductanceHelpers )
             h.updateCount();
     }
 }
@@ -99,6 +105,18 @@ void ChannelListModel::ModelHelper::updateCount()
     }
 }
 
+void ChannelListModel::ConductanceHelper::updateCount()
+{
+    if ( parent->displayFlags & Conductance ) {
+        nAssign.clear();
+        for ( size_t i = 0; i < proxy->size(); i++ ) {
+            int s = proxy->param(i).numAssignments();
+            nAssign.push_back(s);
+            parent->size += s;
+        }
+    }
+}
+
 void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
 {
     rmDevDex = removeDeviceDex;
@@ -111,6 +129,8 @@ void ChannelListModel::updateChns(ChannelIndex removeDeviceDex)
     for ( ModelHelper &h : modelHelpers )
         h.updateChns(currentIdx, newIdx, newM);
     for ( DAQHelper &h : daqHelpers )
+        h.updateChns(currentIdx, newIdx, newM);
+    for ( ConductanceHelper &h : conductanceHelpers )
         h.updateChns(currentIdx, newIdx, newM);
 
     emit layoutAboutToBeChanged();
@@ -204,6 +224,19 @@ void ChannelListModel::ModelHelper::updateChns(QModelIndexList &currentIdx, QMod
     }
 }
 
+void ChannelListModel::ConductanceHelper::updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM)
+{
+    if ( parent->displayFlags & Conductance ) {
+        ChannelIndex dex(proxy, 0, 0);
+        for ( dex.conductanceID = 0; dex.conductanceID < nAssign.size(); dex.conductanceID++ ) {
+            for ( dex.assignID = 0; dex.assignID < nAssign[dex.conductanceID]; dex.assignID++ ) {
+                currentIdx.append(parent->index(dex, Conductance));
+                newIdx.append(parent->createIndex(newM.index(dex, Conductance).row(), 0));
+            }
+        }
+    }
+}
+
 int ChannelListModel::rowCount(const QModelIndex &) const
 {
     return size;
@@ -246,6 +279,9 @@ QVariant ChannelListModel::data(const QModelIndex &index, int role) const
         if ( h.data(row, role, offset, ret) )
             return ret;
     for ( DAQHelper const& h : daqHelpers )
+        if ( h.data(row, role, offset, ret) )
+            return ret;
+    for ( ConductanceHelper const& h : conductanceHelpers )
         if ( h.data(row, role, offset, ret) )
             return ret;
 
@@ -364,6 +400,25 @@ bool ChannelListModel::ModelHelper::data(int row, int role, int &offset, QVarian
     return false;
 }
 
+bool ChannelListModel::ConductanceHelper::data(int row, int role, int &offset, QVariant &ret) const
+{
+    if ( parent->displayFlags & Conductance ) {
+        for ( size_t i = 0; i < nAssign.size(); i++ ) {
+            if ( row-offset < (int)nAssign[i] ) {
+                ChannelIndex dex(proxy, i, row - offset);
+                ConductanceData &p = proxy->param(dex.conductanceID);
+                switch ( role ) {
+                case Qt::DisplayRole:   ret = dex.prettyName();                              return true;
+                case Qt::UserRole:      ret.setValue(dex);                                   return true;
+                case Qt::UserRole + 1:  ret = p.active && p.assignment(dex.assignID).active; return true;
+                }
+            }
+            offset += nAssign[i];
+        }
+    }
+    return false;
+}
+
 Qt::ItemFlags ChannelListModel::flags(const QModelIndex &index) const
 {
     return data(index, Qt::UserRole + 1).toBool()
@@ -384,6 +439,8 @@ int ChannelListModel::index(const ChannelIndex &dex) const
         type = AnalogOut;
     } else if ( dex.isAnalog && dex.isInChn ) {
         type = AnalogIn;
+    } else if ( dex.isConductance ) {
+        type = Conductance;
     }
     return index(dex, type).row();
 }
@@ -407,6 +464,9 @@ QModelIndex ChannelListModel::index(const ChannelIndex &dex, ChannelType type) c
             if ( h.index(dex, type, row, ret) )
                 return ret;
         for ( DAQHelper const& h : daqHelpers )
+            if ( h.index(dex, type, row, ret) )
+                return ret;
+        for ( ConductanceHelper const& h : conductanceHelpers )
             if ( h.index(dex, type, row, ret) )
                 return ret;
     }
@@ -456,6 +516,21 @@ bool ChannelListModel::ModelHelper::index(const ChannelIndex &dex, ChannelType t
                 return true;
             }
             offset += nInst[i];
+        }
+    }
+    return false;
+}
+
+bool ChannelListModel::ConductanceHelper::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
+{
+    if ( parent->displayFlags & Conductance ) {
+        for ( size_t i = 0; i < nAssign.size(); i++ ) {
+            if ( type & Conductance && dex.conductanceClass == proxy->conductanceClass() && dex.conductanceID == i ) {
+                if ( dex.assignID < nAssign[i] )
+                    ret = parent->createIndex(dex.assignID + offset, 0);
+                return true;
+            }
+            offset += nAssign[i];
         }
     }
     return false;

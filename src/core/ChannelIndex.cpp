@@ -4,6 +4,7 @@
 #include "Global.h"
 #include "ModelManager.h"
 #include "DeviceManager.h"
+#include "ConductanceManager.h"
 
 ChannelIndex::ChannelIndex() :
     isValid(false),
@@ -18,6 +19,9 @@ ChannelIndex::ChannelIndex() :
     devID(0),
     isInChn(true),
     chanID(0),
+    isConductance(false),
+    conductanceID(0),
+    assignID(0),
     isLegacy(false)
 {
 
@@ -33,6 +37,7 @@ ChannelIndex::ChannelIndex(DAQProxy *proxy, size_t devID, size_t chanID, bool is
     devID(devID),
     isInChn(isInChn),
     chanID(chanID),
+    isConductance(false),
     isLegacy(false)
 {}
 
@@ -45,6 +50,7 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
     modelID(modelID),
     instID(0),
     isAnalog(false),
+    isConductance(false),
     isLegacy(false)
 {}
 
@@ -57,6 +63,20 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
     modelID(modelID),
     instID(instID),
     isAnalog(false),
+    isConductance(false),
+    isLegacy(false)
+{}
+
+ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID) :
+    isValid(proxy != nullptr),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(false),
+    isAnalog(false),
+    isConductance(true),
+    conductanceClass(proxy->conductanceClass()),
+    conductanceID(conductanceID),
+    assignID(assignID),
     isLegacy(false)
 {}
 
@@ -105,6 +125,8 @@ QString ChannelIndex::prettyName() const
             ret = QString("%1 %2:all (model %2, all instances)").arg(modelClass).arg(modelID);
         else
             ret = QString("%1 %2:%3 (model %2, instance %3)").arg(modelClass).arg(modelID).arg(instID);
+    } else if ( isConductance ) {
+        ret = QString("%1 %2, assignment %3").arg(conductanceClass).arg(conductanceID).arg(assignID);
     } else ret = "Oops: Invalid channel index";
     return ret;
 }
@@ -120,6 +142,8 @@ QString ChannelIndex::toString(QChar sep) const
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
         ret = QString("Virtual/%1/%2/%3").arg(modelClass).arg(modelID).arg(instID);
+    } else if ( isConductance ) {
+        ret = QString("Conductance/%1/%2/%3").arg(conductanceClass).arg(conductanceID).arg(assignID);
     }
     if ( sep != QChar('/') )
         ret.replace('/', sep);
@@ -188,6 +212,19 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.modelID = parts.at(2).toUInt();
         dex.instID = parts.at(3).toUInt();
         dex.isValid = true;
+    } else if ( !parts.at(0).compare("Conductance", Qt::CaseInsensitive) ) {
+        if ( parts.size() != 4 )
+            return is;
+
+        if ( ConductanceManager::Register().contains(parts.at(1)) )
+            dex.conductanceClass = parts.at(1);
+        else
+            return is;
+
+        dex.isConductance = true;
+        dex.conductanceID = parts.at(2).toUInt();
+        dex.assignID = parts.at(3).toUInt();
+        dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
         dex.isLegacy = true;
         dex.chanID = parts.at(0).toInt();
@@ -213,5 +250,7 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID)) &&
             a.isAnalog==b.isAnalog &&
             (!a.isAnalog || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
+            a.isConductance==b.isConductance &&
+            (!a.isConductance || (a.conductanceClass==b.conductanceClass && a.conductanceID==b.conductanceID && a.assignID==b.assignID)) &&
             a.isLegacy == b.isLegacy;
 }
