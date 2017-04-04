@@ -1,9 +1,10 @@
 #include <QDoubleSpinBox>
 #include "ChemSynDlg.h"
 #include <QMessageBox>
+#include "ChemSyn.h"
 
 ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
      
@@ -103,8 +104,9 @@ void ChemSynDlg::STDComboChange()
 }
 
 
-void ChemSynDlg::exportData(CSynData &p)
+void ChemSynDlg::exportData()
 {
+  CSynData &p = ChemSynProxy::p[idx];
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.MgBlock= (MgBlockCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
@@ -133,8 +135,9 @@ void ChemSynDlg::exportData(CSynData &p)
   assignments->exportData(p.assign);
 }
 
-void ChemSynDlg::importData(CSynData p)
+void ChemSynDlg::importData()
 {
+  CSynData &p = ChemSynProxy::p[idx];
   QString num;   
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);

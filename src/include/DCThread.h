@@ -59,8 +59,7 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-     std::vector<ChemSyn> csynPre;
-     std::vector<ChemSyn> csynPost;
+
      std::vector<abSyn> absynPre;
      std::vector<abSyn> absynPost;
 

@@ -91,16 +91,9 @@ void DCThread::setup_and_go()
    // Prepare the buffer helper for delayed synapses
    bufferHelper.reset(new ChannelBufferHelper);
 
+   Conductances.init(this);
+
    // Populate synapses and currents
-   csynPre.clear();
-   csynPost.clear();
-   for ( CSynData &p : CSynp ) {
-       if ( p.active ) {
-           for ( SynapseAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(csynPre, csynPost, p, a);
-       }
-   }
    absynPre.clear();
    absynPost.clear();
    for ( abSynData &p : abSynp ) {
@@ -147,8 +140,7 @@ void DCThread::setup_and_go()
            }
        }
    }
-   if (csynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(csynPre.size()));
-   if (csynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(csynPost.size()));
+
    if (absynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
    if (absynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(absynPost.size()));
    if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
@@ -343,8 +335,8 @@ void DCThread::run()
              m->updateChannels(t);
 
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
-         for ( ChemSyn &obj : csynPre )
-             obj.currentUpdate(t, dt);
+         for ( Conductance *c : Conductances.preDigital() )
+             c->step(t, dt);
          for ( abSyn &obj : absynPre )
              obj.currentUpdate(t, dt);
          for ( DestexheSyn &obj : dsynPre )
@@ -394,6 +386,9 @@ void DCThread::run()
                      for ( abHH &obj : abhhIn )
                          obj.RK4(subT, rkDT, rkStep);
 
+                     for ( Conductance *c : Conductances.inDigital() )
+                         c->RK4(subT, rkDT, rkStep);
+
                      for ( auto const& m : Models.active() )
                          m->RK4(subT, rkDT, rkStep);
                  }
@@ -411,8 +406,8 @@ void DCThread::run()
          } // end RK4
 
          // Dynamic clamp: d2a synapses
-         for ( ChemSyn &obj : csynPost )
-             obj.currentUpdate(t, dt);
+         for ( Conductance *c : Conductances.postDigital() )
+             c->step(t, dt);
          for ( abSyn &obj : absynPost )
              obj.currentUpdate(t, dt);
          for ( DestexheSyn &obj : dsynPost )

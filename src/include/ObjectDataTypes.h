@@ -86,8 +86,7 @@ typedef struct {
   double sigmoidTableMaxEntry;
 } ODEPlast;
 
-typedef struct {
-  bool active;
+struct CSynData : public SynapseData {
   bool LUTables;
   bool MgBlock;
   double gSyn;
@@ -110,11 +109,7 @@ typedef struct {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
-  std::vector<SynapseAssignment> assign;
-  int legacy_PreSyn = -1;
-  int legacy_PostSyn = -1;
-  int legacy_OutSyn = -1;
-} CSynData;
+};
 
 typedef struct {
   bool active;

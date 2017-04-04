@@ -1,31 +1,48 @@
 #ifndef CHEMSYN_H
 #define CHEMSYN_H
 
+#include "Synapse.h"
 #include "Global_func.h"
-#include "Channels.h"
 
-class ChemSyn {
+class ChemSynProxy : public SynapseProxy {
+public:
+    ChemSynProxy();
+    inline CSynData &param(size_t i) const { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString conductanceClass() { return "CSyn"; }
+    inline QString prettyName() { return "ChemSyn"; }
+
+    Synapse *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+                            inChannel *pre, inChannel *post, outChannel *out);
+
+    ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
+
+    static std::vector<CSynData> p;
+};
+
+class ChemSyn : public Synapse
+{
   private:
-    CSynData *p;
+    const CSynData *p;
+    const SynapseAssignment *a;
+
     stdpc::function *theExp;
     stdpc::function *theTanh;
     stdpc::function *theExpSigmoid;
-    void learn();
-    inChannel *pre;
-    inChannel *post;
-    outChannel *out;
-    SynapseAssignment *a;
-
-    size_t bufferHandle;
-    bool buffered;
 
     double P_f(double);
     double D_f(double);
     double invGFilter(double);
     double gFilter(double);
+
+    void STlearn(double);
+    double STDPFunc(double);
+    void ODElearn(double);
     
   protected:
-    double I;
     double Sinf;
     double S;
     double hinf, tauh;
@@ -39,13 +56,11 @@ class ChemSyn {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    ChemSyn(CSynData *, DCThread *, SynapseAssignment *, inChannel *pre, inChannel *post, outChannel *out);
-    void currentUpdate(double, double);
-    void STlearn(double);
-    double STDPFunc(double);
-    void ODElearn(double);
+    ChemSyn(size_t condID, size_t assignID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
+    inline const CSynData &params() const { return ChemSynProxy::p[condID]; }
+    void step(double t, double dt);
 
-    typedef CSynData param_type;
+    ChemSynProxy *proxy() const;
 };
 
 #endif
