@@ -19,6 +19,7 @@ extern QString LEGACY_DAQ_CLASS;
 // Forward
 class DeviceManager;
 class ModelManager;
+class ConductanceManager;
 
 
 extern std::vector<CSynData> CSynp;
@@ -45,5 +46,6 @@ extern expSigmoidLUtable expSigmoidLU;
 extern Clock DAQClock;
 extern DeviceManager Devices;
 extern ModelManager Models;
+extern ConductanceManager Conductances;
 
 #endif

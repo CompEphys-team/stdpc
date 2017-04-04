@@ -9,26 +9,43 @@ using namespace std;
 #include "ChannelIndex.h"
 #include "Util.h"
 
-struct SynapseAssignment {
+struct AssignmentData {
     bool active;
+};
+
+struct SynapseAssignment : public AssignmentData {
     ChannelIndex PreSynChannel;
     ChannelIndex PostSynChannel;
     ChannelIndex OutSynChannel;
     double delay;
 };
 
-struct GapJunctionAssignment {
-    bool active;
+struct GapJunctionAssignment : public AssignmentData {
     ChannelIndex preInChannel;
     ChannelIndex postInChannel;
     ChannelIndex preOutChannel;
     ChannelIndex postOutChannel;
 };
 
-struct CurrentAssignment {
-    bool active;
+struct CurrentAssignment : public AssignmentData {
     ChannelIndex VChannel;
     ChannelIndex IChannel;
+};
+
+struct ConductanceData {
+    bool active;
+    virtual const AssignmentData &assignment(size_t i) const = 0;
+    virtual size_t numAssignments() const = 0;
+    ConductanceData() : active(false) {}
+};
+
+struct SynapseData : public ConductanceData {
+    inline const SynapseAssignment &assignment(size_t i) const { return assign[i]; }
+    inline size_t numAssignments() const { return assign.size(); }
+    std::vector<SynapseAssignment> assign;
+    int legacy_PreSyn = -1;
+    int legacy_PostSyn = -1;
+    int legacy_OutSyn = -1;
 };
 
 typedef struct {
