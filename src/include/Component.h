@@ -19,6 +19,54 @@ public:
     virtual void regenerateWidget() = 0;
 };
 
+class ProxiedComponent : public GenericComponent
+{
+public:
+    ProxiedComponent(ConductanceProxy *proxy, size_t idx) :
+        proxy(proxy), idx(idx), dlg(proxy->createDialog(idx))
+    {
+        regenerateWidget();
+        _widget->label->setText(proxy->prettyName() + " " + QString::number(idx));
+    }
+    ~ProxiedComponent() { delete dlg; }
+
+    void importData()
+    {
+        dlg->importData();
+        _widget->active->setChecked(proxy->param(idx).active);
+    }
+
+    void exportData()
+    {
+        if ( idx >= proxy->size() )
+            proxy->resize(idx+1);
+        proxy->param(idx).active = _widget->active->isChecked();
+        dlg->exportData();
+    }
+
+    void setIndex(int i)
+    {
+        idx = i;
+        _widget->label->setText(proxy->prettyName() + " " + QString::number(idx));
+        dlg->setIndex(idx);
+    }
+
+    inline ComponentWidget *widget() { return _widget; }
+
+    void regenerateWidget()
+    {
+        _widget = new ComponentWidget();
+        QObject::connect(_widget->params, SIGNAL(clicked(bool)), dlg, SLOT(show()));
+        QObject::connect(_widget->params, SIGNAL(clicked(bool)), dlg, SLOT(raise()));
+    }
+
+private:
+    ConductanceProxy *proxy;
+    size_t idx;
+    ComponentWidget *_widget;
+    ConductanceDlg *dlg;
+};
+
 template <class ComponentDlg>
 class Component : public GenericComponent
 {

@@ -18,7 +18,7 @@ void ComponentTable::makeFactory()
     factory = new ComponentFactoryWidget(this);
     connect(factory->button, SIGNAL(clicked(bool)), this, SLOT(addComponent()));
     for ( ComponentPrototypeBase *p : proto )
-        factory->combo->addItem(p->label);
+        factory->combo->addItem(p->label());
 }
 
 void ComponentTable::init(QVector<ComponentPrototypeBase *> prototypes)

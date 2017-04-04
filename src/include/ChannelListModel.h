@@ -8,6 +8,7 @@
 #include "ObjectDataTypes.h"
 #include "ModelManager.h"
 #include "DeviceManager.h"
+#include "ConductanceManager.h"
 
 class ChannelListModel : public QAbstractListModel
 {
