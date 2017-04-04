@@ -53,6 +53,9 @@ public:
     /// Returns false if at least one registered parameter set is active (active conductance with at least one active assignment)
     bool empty() const;
 
+    /// Returns a pointer to the (first, if multiplexed) assignment indicated by dex
+    const double *conductance(const ChannelIndex &dex);
+
     inline const std::vector<Conductance *> &preDigital() const { return preD; }
     inline const std::vector<Conductance *> &inDigital() const { return inD; }
     inline const std::vector<Conductance *> &postDigital() const { return postD; }

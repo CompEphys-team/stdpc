@@ -63,6 +63,11 @@ void DCThread::setup_and_go()
            Models.initSingle(proxy, j);
    Models.initActive(this);
 
+   // Prepare the buffer helper for delayed synapses
+   bufferHelper.reset(new ChannelBufferHelper);
+
+   Conductances.init(this);
+
    // set up the graphic display channels
    graphDummy = 0.0;
    if ( graph ) {
@@ -75,6 +80,9 @@ void DCThread::setup_and_go()
                continue;
            } else if ( !p.chan.isValid || p.chan.isNone ) {
                graphVar.push_back(&graphDummy);
+           } else if ( p.chan.isConductance ) {
+               const double *ret = Conductances.conductance(p.chan);
+               graphVar.push_back(ret ? ret : &graphDummy);
            } else if ( p.chan.isVirtual ) {
                graphVar.push_back(p.isVoltage
                        ? &((itmp = getInChan(p.chan)) ? itmp->V : graphDummy)
@@ -87,11 +95,6 @@ void DCThread::setup_and_go()
        }
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
-
-   // Prepare the buffer helper for delayed synapses
-   bufferHelper.reset(new ChannelBufferHelper);
-
-   Conductances.init(this);
 
    // Populate synapses and currents
    absynPre.clear();
@@ -494,7 +497,7 @@ void DCThread::run()
              if ( t - lastWrite > graphDt ) {
                  lastWrite = t;
                  i = 0;
-                 for ( double *val : graphVar )
+                 for ( const double *val : graphVar )
                     graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
              }
          }

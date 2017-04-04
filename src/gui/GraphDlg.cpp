@@ -11,7 +11,8 @@ GraphDlg::GraphDlg(QWidget *parent)
        clm(ChannelListModel::getModel(
            ChannelListModel::AnalogIn
          | ChannelListModel::AnalogOut
-         | ChannelListModel::Virtual)),
+         | ChannelListModel::Virtual
+         | ChannelListModel::Conductance)),
        dataTimer(this)
  {
     ui->setupUi(this);
@@ -36,7 +37,7 @@ GraphDlg::GraphDlg(QWidget *parent)
     ui->plot->xAxis->setRange(0, 10);
     ui->plot->yAxis->setLabel("Voltage (mV)");
     ui->plot->yAxis->setRange(-100, 50);
-    ui->plot->yAxis2->setLabel("Current (nA)");
+    ui->plot->yAxis2->setLabel("Current (nA) or Conductance (nS)");
     ui->plot->yAxis2->setRange(-100, 100);
     ui->plot->yAxis2->setTickLabels(true);
 
@@ -118,7 +119,9 @@ void GraphDlg::reloadGraphs()
         if ( p.active ) {
             activeGraphs.push_back(p);
             q.push_back(std::unique_ptr<CircularFifo<DataPoint>>(new CircularFifo<DataPoint>(bufferSize[Plotp.bufferExp])));
-            if ( p.isVoltage ) {
+            if ( p.chan.isConductance ) {
+                graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
+            } else if ( p.isVoltage ) {
                 graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis);
             } else {
                 graph = ui->plot->addGraph(ui->plot->xAxis, ui->plot->yAxis2);
@@ -203,7 +206,9 @@ void GraphDlg::replot()
     double fac;
     double tNow = 0.;
     for ( auto &queue : q ) {
-        if ( activeGraphs[i].isVoltage )
+        if ( activeGraphs[i].chan.isConductance )
+            fac = 1e9;
+        else if ( activeGraphs[i].isVoltage )
             fac = 1e3;
         else
             fac = 1e9;

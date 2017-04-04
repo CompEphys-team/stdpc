@@ -92,7 +92,7 @@ private:
      QVector<outChannel*> aecOut, aecCopy;
 
      GraphDlg *graph;
-     QVector<double *> graphVar;
+     QVector<const double *> graphVar;
      double graphDt;
      double graphDummy;
 
