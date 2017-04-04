@@ -58,6 +58,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
      connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
+     connect(ui->ApplyBut, &QPushButton::clicked, this, &MyMainWindow::exportData);
      
      connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
      connect(ui->actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
@@ -197,6 +198,7 @@ void MyMainWindow::StartButClicked()
       ui->tabWidget->setTabEnabled(1, false);
   if ( !ui->performancetab->startPlotting(DCT) )
       ui->tabWidget->setTabEnabled(2, false);
+  ui->ApplyBut->setEnabled(false);
   rateIndicator->setText("Started");
   DCT->setup_and_go();
 }
@@ -220,6 +222,7 @@ void MyMainWindow::StopButClicked()
   ui->performancetab->stopPlotting();
   ui->tabWidget->setTabEnabled(1, true);
   ui->tabWidget->setTabEnabled(2, true);
+  ui->ApplyBut->setEnabled(true);
 }
 
 void MyMainWindow::exportData(bool ignoreDAQ)
