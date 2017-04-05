@@ -48,6 +48,14 @@ struct SynapseData : public ConductanceData {
     int legacy_OutSyn = -1;
 };
 
+struct CurrentData : public ConductanceData {
+    inline const CurrentAssignment &assignment(size_t i) const { return assign[i]; }
+    inline size_t numAssignments() const { return assign.size(); }
+    std::vector<CurrentAssignment> assign;
+    int legacy_V = -1;
+    int legacy_I = -1;
+};
+
 typedef struct {
   double AMinus;
   double tauMinus;
