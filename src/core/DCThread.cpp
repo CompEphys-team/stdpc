@@ -97,15 +97,6 @@ void DCThread::setup_and_go()
    }
 
    // Populate synapses and currents
-   absynPre.clear();
-   absynPost.clear();
-   for ( abSynData &p : abSynp ) {
-       if ( p.active ) {
-           for ( SynapseAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(absynPre, absynPost, p, a);
-       }
-   }
    dsynPre.clear();
    dsynPost.clear();
    for ( DestexheSynData &p : DxheSynp ) {
@@ -144,8 +135,6 @@ void DCThread::setup_and_go()
        }
    }
 
-   if (absynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
-   if (absynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(absynPost.size()));
    if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
    if (dsynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(dsynPre.size()));
    if (dsynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(dsynPost.size()));
@@ -340,8 +329,6 @@ void DCThread::run()
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
          for ( Conductance *c : Conductances.preDigital() )
              c->step(t, dt);
-         for ( abSyn &obj : absynPre )
-             obj.currentUpdate(t, dt);
          for ( DestexheSyn &obj : dsynPre )
              obj.currentUpdate(t, dt);
          for ( GapJunction &obj : esyn )
@@ -411,8 +398,6 @@ void DCThread::run()
          // Dynamic clamp: d2a synapses
          for ( Conductance *c : Conductances.postDigital() )
              c->step(t, dt);
-         for ( abSyn &obj : absynPost )
-             obj.currentUpdate(t, dt);
          for ( DestexheSyn &obj : dsynPost )
              obj.currentUpdate(t, dt);
 

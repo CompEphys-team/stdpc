@@ -1,9 +1,10 @@
 #include <QDoubleSpinBox>
 #include "AbSynDlg.h"
 #include <QMessageBox>
+#include "AbSyn.h"
 
 abSynDlg::abSynDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
      
@@ -73,8 +74,9 @@ void abSynDlg::PlastMethodChange()
   }
 }
 
-void abSynDlg::exportData(abSynData &p)
+void abSynDlg::exportData()
 {
+  abSynData &p = abSynProxy::p[idx];
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -95,8 +97,9 @@ void abSynDlg::exportData(abSynData &p)
   assignments->exportData(p.assign);
 }
 
-void abSynDlg::importData(abSynData p)
+void abSynDlg::importData()
 {
+  abSynData &p = abSynProxy::p[idx];
   QString num;   
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);

@@ -90,28 +90,6 @@ typedef struct {
   bool active;
   bool LUTables;
   double gSyn;
-  double Vrev;
-  double aS;
-  double bS;
-  double aR;
-  double VaR;
-  double saR;
-  double bR;
-  int fixVpost;
-  double Vpost;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-  std::vector<SynapseAssignment> assign;
-  int legacy_PreSyn = -1;
-  int legacy_PostSyn = -1;
-  int legacy_OutSyn = -1;
-} abSynData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gSyn;
   double Vpre;
   double Vrev;
   double trelease;

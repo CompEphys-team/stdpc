@@ -1,15 +1,86 @@
-
 #include "AbSyn.h"
 #include <cmath>
 #include "DCThread.h"
+#include "AbSynDlg.h"
+
+static abSynProxy prox;
+std::vector<abSynData> abSynProxy::p;
+abSynProxy *abSyn::proxy() const { return &prox; }
+ConductanceDlg *abSynProxy::createDialog(size_t condID, QWidget *parent) { return new abSynDlg(condID, parent); }
+Synapse *abSynProxy::createAssigned(size_t conductanceID, size_t assignID, DCThread *DCT,
+                                    inChannel *pre, inChannel *post, outChannel *out) {
+    return new abSyn(conductanceID, assignID, DCT, pre, post, out);
+}
+
+abSynProxy::abSynProxy()
+{
+    ConductanceManager::RegisterSynapse(this);
+    // abSynp STPlast
+    addAP("abSynp[#].ST.AMinus", &p, &abSynData::ST, &STPlast::AMinus);
+    addAP("abSynp[#].ST.tauMinus", &p, &abSynData::ST, &STPlast::tauMinus);
+    addAP("abSynp[#].ST.APlus", &p, &abSynData::ST, &STPlast::APlus);
+    addAP("abSynp[#].ST.tauPlus", &p, &abSynData::ST, &STPlast::tauPlus);
+    addAP("abSynp[#].ST.Exponent", &p, &abSynData::ST, &STPlast::Exponent);
+    addAP("abSynp[#].ST.Shift", &p, &abSynData::ST, &STPlast::Shift);
+    addAP("abSynp[#].ST.History", &p, &abSynData::ST, &STPlast::History);
+    addAP("abSynp[#].ST.Table", &p, &abSynData::ST, &STPlast::Table);
+    addAP("abSynp[#].ST.tableDt", &p, &abSynData::ST, &STPlast::tableDt);
+    addAP("abSynp[#].ST.tableDgMin", &p, &abSynData::ST, &STPlast::tableDgMin);
+    addAP("abSynp[#].ST.gMax", &p, &abSynData::ST, &STPlast::gMax);
+    addAP("abSynp[#].ST.gMid", &p, &abSynData::ST, &STPlast::gMid);
+    addAP("abSynp[#].ST.gSlope", &p, &abSynData::ST, &STPlast::gSlope);
+    addAP("abSynp[#].ST.sigmoidTable", &p, &abSynData::ST, &STPlast::sigmoidTable);
+    addAP("abSynp[#].ST.sigmoidTableDg", &p, &abSynData::ST, &STPlast::sigmoidTableDg);
+    addAP("abSynp[#].ST.sigmoidTableMaxEntry", &p, &abSynData::ST, &STPlast::sigmoidTableMaxEntry);
+
+    // abSynp ODEPlast
+    addAP("abSynp[#].ODE.InitialP", &p, &abSynData::ODE, &ODEPlast::InitialP);
+    addAP("abSynp[#].ODE.InitialD", &p, &abSynData::ODE, &ODEPlast::InitialD);
+    addAP("abSynp[#].ODE.betaP", &p, &abSynData::ODE, &ODEPlast::betaP);
+    addAP("abSynp[#].ODE.betaD", &p, &abSynData::ODE, &ODEPlast::betaD);
+    addAP("abSynp[#].ODE.gamma", &p, &abSynData::ODE, &ODEPlast::gamma);
+    addAP("abSynp[#].ODE.eta", &p, &abSynData::ODE, &ODEPlast::eta);
+    addAP("abSynp[#].ODE.highP", &p, &abSynData::ODE, &ODEPlast::highP);
+    addAP("abSynp[#].ODE.lowP", &p, &abSynData::ODE, &ODEPlast::lowP);
+    addAP("abSynp[#].ODE.highD", &p, &abSynData::ODE, &ODEPlast::highD);
+    addAP("abSynp[#].ODE.lowD", &p, &abSynData::ODE, &ODEPlast::lowD);
+    addAP("abSynp[#].ODE.gMax", &p, &abSynData::ODE, &ODEPlast::gMax);
+    addAP("abSynp[#].ODE.gMid", &p, &abSynData::ODE, &ODEPlast::gMid);
+    addAP("abSynp[#].ODE.gSlope", &p, &abSynData::ODE, &ODEPlast::gSlope);
+    addAP("abSynp[#].ODE.sigmoidTable", &p, &abSynData::ODE, &ODEPlast::sigmoidTable);
+    addAP("abSynp[#].ODE.sigmoidTableDg", &p, &abSynData::ODE, &ODEPlast::sigmoidTableDg);
+    addAP("abSynp[#].ODE.sigmoidTableMaxEntry", &p, &abSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
+
+    // main abSynp
+    addAP("abSynp[#].active", &p, &abSynData::active);
+    addAP("abSynp[#].LUTables", &p, &abSynData::LUTables);
+    addAP("abSynp[#].gSyn", &p, &abSynData::gSyn);
+    addAP("abSynp[#].Vrev", &p, &abSynData::Vrev);
+    addAP("abSynp[#].aS", &p, &abSynData::aS);
+    addAP("abSynp[#].bS", &p, &abSynData::bS);
+    addAP("abSynp[#].aR", &p, &abSynData::aR);
+    addAP("abSynp[#].VaR", &p, &abSynData::VaR);
+    addAP("abSynp[#].saR", &p, &abSynData::saR);
+    addAP("abSynp[#].bR", &p, &abSynData::bR);
+    addAP("abSynp[#].fixVpost", &p, &abSynData::fixVpost);
+    addAP("abSynp[#].Vpost", &p, &abSynData::Vpost);
+    addAP("abSynp[#].Plasticity", &p, &abSynData::Plasticity);
+    addAP("abSynp[#].assign[#].active", &p, &abSynData::assign, &SynapseAssignment::active);
+    addAP("abSynp[#].assign[#].PreSynChannel", &p, &abSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("abSynp[#].assign[#].PostSynChannel", &p, &abSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("abSynp[#].assign[#].OutSynChannel", &p, &abSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("abSynp[#].assign[#].delay", &p, &abSynData::assign, &SynapseAssignment::delay);
+
+    addAP("abSynp[#].PreSynChannel", &p, &abSynData::legacy_PreSyn);
+    addAP("abSynp[#].PostSynChannel", &p, &abSynData::legacy_PostSyn);
+    addAP("abSynp[#].OutSynChannel", &p, &abSynData::legacy_OutSyn);
+}
+
     
-abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
-    p(inp),
-    pre(pre),
-    post(post),
-    out(out),
-    a(a),
-    buffered(false),
+abSyn::abSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
+    Synapse(condID, assignID, DCT, pre, post, out),
+    p(&params()),
+    a(&assignment()),
     S(0.0),
     R(0.0),
     g(p->gSyn)
@@ -36,10 +107,7 @@ abSyn::abSyn(abSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, 
       Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
     }
 
-    if ( a->delay > 0. ) {
-        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
-        buffered = true;
-    }
+    setupBuffer(DCT);
 }
 
 double abSyn::invGFilter(double ing)
@@ -72,7 +140,7 @@ double abSyn::gFilter(double ingr)
   return ng;
 }
 
-void abSyn::currentUpdate(double t, double dt)
+void abSyn::step(double t, double dt)
 {
   static double dS, dR;
 
@@ -90,25 +158,24 @@ void abSyn::currentUpdate(double t, double dt)
   if (R > 1.0) R= 1.0;
   else if (R < 0.0 || std::isnan(R)) R= 0.0;
   
+  double postV = p->fixVpost ? p->Vpost : post->V;
 
   // if plastic, learn
   switch (p->Plasticity) {
     case 0:
-      if (p->fixVpost) I= p->gSyn * S * (p->Vrev - p->Vpost);
-      else I= p->gSyn * S * (p->Vrev - post->V);
+      m_conductance = p->gSyn * S;
       break;
     case 1:
-      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-      else I= g * S * (p->Vrev - post->V);
+      m_conductance = g * S;
       STlearn(t);   
       break; 
     case 2:
-      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-      else I= g * S * (p->Vrev - post->V);
+      m_conductance = g * S;
       ODElearn(dt);
       break; 
   }
-  out->I+= I;
+
+  out->I += m_conductance * (p->Vrev - postV);
 }
 
 void abSyn::STlearn(double t)

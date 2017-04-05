@@ -4,7 +4,6 @@
 #include <QTableWidget>
 #include "ComponentPrototype.h"
 
-#include "AbSynDlg.h"
 #include "GapJunctionDlg.h"
 #include "DestexheSynDlg.h"
 #include "AlphaBetaHHDlg.h"

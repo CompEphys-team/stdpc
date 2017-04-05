@@ -22,7 +22,6 @@ class ModelManager;
 class ConductanceManager;
 
 
-extern std::vector<abSynData> abSynp;
 extern std::vector<GJunctData> ESynp;
 extern std::vector<DestexheSynData> DxheSynp;
 

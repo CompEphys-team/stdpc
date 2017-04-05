@@ -23,7 +23,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      prototypes.clear();
      for ( ConductanceProxy *proxy : ConductanceManager::Synapses() )
          prototypes.push_back(new ProxiedComponentPrototype(proxy));
-     prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
      prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
      prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
      ui->synapseTable->init(prototypes);
@@ -305,7 +304,6 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }
 
   // Clear params before loading
-  abSynp.clear();
   ESynp.clear();
   DxheSynp.clear();
   mhHHp.clear();

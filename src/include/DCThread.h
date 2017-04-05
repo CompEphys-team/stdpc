@@ -4,7 +4,6 @@
 #include <QThread>
 #include <functional>
 #include "Global.h"
-#include "AbSyn.h"
 #include "GapJunction.h"
 #include "DestexheSyn.h"
 #include "HH.h"
@@ -58,9 +57,6 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-
-     std::vector<abSyn> absynPre;
-     std::vector<abSyn> absynPost;
 
      std::vector<GapJunction> esyn;
 
