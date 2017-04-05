@@ -18,7 +18,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      QVector<ComponentPrototypeBase *> prototypes;
      for ( ConductanceProxy *proxy : ConductanceManager::Currents() )
          prototypes.push_back(new ProxiedComponentPrototype(proxy));
-     prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
      ui->currentTable->init(prototypes);
 
      prototypes.clear();
@@ -303,7 +302,6 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }
 
   // Clear params before loading
-  abHHp.clear();
   Models.clear();
   Devices.clear();
   Conductances.clear();

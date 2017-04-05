@@ -1,20 +1,19 @@
 #ifndef AlphaBetaHHDLG_H
 #define AlphaBetaHHDLG_H
 
-
+#include "ConductanceDlg.h"
 #include "ui_AlphaBetaHHDlg.h"
 #include "ObjectDataTypes.h"
 
-class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
+class AlphaBetaHHDlg : public ConductanceDlg, private Ui::AlphaBetaHHDlg
 {
      Q_OBJECT
 
   public:
      AlphaBetaHHDlg(int, QWidget *parent= 0);
-     void exportData(abHHData &);
-     void importData(abHHData);
+     void exportData();
+     void importData();
      void setIndex(int);
-     typedef abHHData param_type;
 
      QString label;
 }; 

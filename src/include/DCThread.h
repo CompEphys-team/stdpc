@@ -4,8 +4,7 @@
 #include <QThread>
 #include <functional>
 #include "Global.h"
-#include "HH.h"
-#include "AbHH.h"
+#include "Channels.h"
 #include "DataSaver.h"
 
 #include "ChannelBufferHelper.h"
@@ -51,9 +50,6 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-
-     std::vector<abHH> abhhPre;
-     std::vector<abHH> abhhIn;
 
      outChnData outNoneData;
      outChannel outChnNone;

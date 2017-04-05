@@ -94,34 +94,6 @@ typedef struct {
   double sigmoidTableMaxEntry;
 } ODEPlast;
 
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gMax;
-  double Vrev;
-  int mExpo;
-  int hExpo;
-  int maFunc;
-  double mka;
-  double mVa;
-  double msa;
-  int mbFunc;
-  double mkb;
-  double mVb;
-  double msb;
-  int haFunc;
-  double hka;
-  double hVa;
-  double hsa;
-  int hbFunc;
-  double hkb;
-  double hVb;
-  double hsb;
-  std::vector<CurrentAssignment> assign;
-  int legacy_V = -1;
-  int legacy_I = -1;
-} abHHData;
-
 struct elecCalibParams {
   // channel copy parameters
   bool copyChnOn;

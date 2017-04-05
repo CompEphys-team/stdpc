@@ -7,37 +7,6 @@
 
 void initAP()
 {
-    // abHH
-    addAP("abHHp[#].active", &abHHp, &abHHData::active);
-    addAP("abHHp[#].LUTables", &abHHp, &abHHData::LUTables);
-    addAP("abHHp[#].gMax", &abHHp, &abHHData::gMax);
-    addAP("abHHp[#].Vrev", &abHHp, &abHHData::Vrev);
-    addAP("abHHp[#].mExpo", &abHHp, &abHHData::mExpo);
-    addAP("abHHp[#].hExpo", &abHHp, &abHHData::hExpo);
-    addAP("abHHp[#].maFunc", &abHHp, &abHHData::maFunc);
-    addAP("abHHp[#].mka", &abHHp, &abHHData::mka);
-    addAP("abHHp[#].mVa", &abHHp, &abHHData::mVa);
-    addAP("abHHp[#].msa", &abHHp, &abHHData::msa);
-    addAP("abHHp[#].mbFunc", &abHHp, &abHHData::mbFunc);
-    addAP("abHHp[#].mkb", &abHHp, &abHHData::mkb);
-    addAP("abHHp[#].mVb", &abHHp, &abHHData::mVb);
-    addAP("abHHp[#].msb", &abHHp, &abHHData::msb);
-    addAP("abHHp[#].haFunc", &abHHp, &abHHData::haFunc);
-    addAP("abHHp[#].hka", &abHHp, &abHHData::hka);
-    addAP("abHHp[#].hVa", &abHHp, &abHHData::hVa);
-    addAP("abHHp[#].hsa", &abHHp, &abHHData::hsa);
-    addAP("abHHp[#].hbFunc", &abHHp, &abHHData::hbFunc);
-    addAP("abHHp[#].hkb", &abHHp, &abHHData::hkb);
-    addAP("abHHp[#].hVb", &abHHp, &abHHData::hVb);
-    addAP("abHHp[#].hsb", &abHHp, &abHHData::hsb);
-    addAP("abHHp[#].assign[#].active", &abHHp, &abHHData::assign, &CurrentAssignment::active);
-    addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
-    addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
-
-    addAP("abHHp[#].VChannel", &abHHp, &abHHData::legacy_V);
-    addAP("abHHp[#].IChannel", &abHHp, &abHHData::legacy_I);
-
-
     // Data saving
     addAP("dataSavingPs.enabled", &(dataSavingPs.enabled));
     addAP("dataSavingPs.fileName", &(dataSavingPs.fileName));
@@ -305,15 +274,6 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             }
         }
 
-        for ( abHHData &current : abHHp ) {
-            CurrentAssignment assign;
-            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
-                assign.VChannel = legacyIn[current.legacy_V];
-            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
-                assign.IChannel = legacyOut[current.legacy_I];
-            current.assign.push_back(assign);
-        }
-
         for ( int i(elecCalibPs.size() - 1); i >= 0; i-- ) {
             if ( elecCalibPs[i].legacy_in >= 0 && elecCalibPs[i].legacy_in < int(legacyIn.size()) ) {
                 inChnData *in = legacyIn[elecCalibPs[i].legacy_in].getInChnData();
@@ -382,27 +342,6 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                     p.assign = dest;
                 }
             }
-        }
-        for ( abHHData &p : abHHp ) {
-            std::vector<ChannelIndex> mod;
-            std::vector<CurrentAssignment> dest;
-            dest.reserve(p.assign.size());
-            for ( CurrentAssignment &a : p.assign ) {
-                if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
-                    a.IChannel.isPrototype = true;
-                    a.VChannel.isPrototype = true;
-                    a.IChannel.isVirtual = false;
-                    a.VChannel.isVirtual = false;
-                    if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
-                        continue; // Drop duplicate entries
-                    }
-                    mod.push_back(a.IChannel);
-                } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
-                    mod.push_back(a.IChannel);
-                }
-                dest.push_back(a);
-            }
-            p.assign = dest;
         }
     }
 

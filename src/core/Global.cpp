@@ -6,8 +6,6 @@
 int LOADED_PROTOCOL_VERSION;
 QString LEGACY_DAQ_CLASS;
 
-std::vector<abHHData> abHHp;
-
 PlotData Plotp;
 PerformanceMonitorData PerfMonp;
 

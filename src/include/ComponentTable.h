@@ -4,9 +4,6 @@
 #include <QTableWidget>
 #include "ComponentPrototype.h"
 
-#include "AlphaBetaHHDlg.h"
-
-
 class ComponentTable : public QTableWidget
 {
     Q_OBJECT

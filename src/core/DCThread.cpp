@@ -66,6 +66,7 @@ void DCThread::setup_and_go()
    // Prepare the buffer helper for delayed synapses
    bufferHelper.reset(new ChannelBufferHelper);
 
+   // Populate synapses and currents
    Conductances.init(this);
 
    // set up the graphic display channels
@@ -96,20 +97,6 @@ void DCThread::setup_and_go()
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
-   // Populate synapses and currents
-   abhhPre.clear();
-   abhhIn.clear();
-   for ( abHHData &p : abHHp ) {
-       if ( p.active ) {
-           for ( CurrentAssignment &a : p.assign ) {
-               if ( a.active )
-                   instantiate(abhhPre, abhhIn, p, a);
-           }
-       }
-   }
-
-   if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
-   if (abhhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(abhhIn.size()));
    for ( auto const& m : Models.active() )
        message(m->getStatus());
 
@@ -298,9 +285,6 @@ void DCThread::run()
          for ( Conductance *c : Conductances.preDigital() )
              c->step(t, dt);
 
-         for ( abHH &obj : abhhPre )
-             obj.currentUpdate(t, dt);
-
          // Dynamic clamp: models (d2d currents)
          if ( Models.active().size() ) { // Runge-Kutta 4
              for ( auto const& m : Models.active() )
@@ -332,9 +316,6 @@ void DCThread::run()
 
                  for ( size_t rkStep = 0; rkStep < 4; rkStep++ ) {
                      double rkDT = rkStep < 2 ? subDT/2 : subDT;
-
-                     for ( abHH &obj : abhhIn )
-                         obj.RK4(subT, rkDT, rkStep);
 
                      for ( Conductance *c : Conductances.inDigital() )
                          c->RK4(subT, rkDT, rkStep);

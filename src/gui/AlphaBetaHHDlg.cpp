@@ -1,9 +1,9 @@
-
+#include "AbHH.h"
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
 AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
   setupUi(this);
 
@@ -24,8 +24,9 @@ void AlphaBetaHHDlg::setIndex(int no)
     HHDlgLabel->setText(label.arg(no));
 }
 
-void AlphaBetaHHDlg::exportData(abHHData &p)
+void AlphaBetaHHDlg::exportData()
 {
+  abHHData &p = abHHProxy::p[idx];
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -52,8 +53,9 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   assignments->exportData(p.assign);
 }
 
-void AlphaBetaHHDlg::importData(abHHData p)
+void AlphaBetaHHDlg::importData()
 {
+  abHHData &p = abHHProxy::p[idx];
   QString num;
      
   if (p.LUTables) LUCombo->setCurrentIndex(1);
