@@ -47,6 +47,7 @@ class MyMainWindow : public QMainWindow
   private slots:
      void StartButClicked();
      void StopButClicked();
+     void TabChanged(int idx);
      
      void SaveConfig();
      void LoadConfig();
