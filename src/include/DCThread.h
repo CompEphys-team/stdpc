@@ -41,9 +41,6 @@ private:
      outChannel *getOutChan(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
-     template <typename T>
-     void instantiate(std::vector<T> &pre, std::vector<T> &in, typename T::param_type &, CurrentAssignment &);
-
      QVector<inChannel *> inChnsToSave;
      QVector<outChannel *> outChnsToSave;
      
