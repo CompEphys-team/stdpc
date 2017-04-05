@@ -1,8 +1,8 @@
-
+#include "GapJunction.h"
 #include "GapJunctionDlg.h"
 
 GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
      
@@ -21,15 +21,17 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
      assignments->init(vec);
 }
 
-void GapJunctionDlg::exportData(GJunctData &p) 
+void GapJunctionDlg::exportData()
 {
+  GJunctData &p = GapJunctionProxy::p[idx];
   p.type= typeCombo->currentIndex();
   p.gSyn= gSynE->text().toDouble()*1e-9;
   assignments->exportData(p.assign);
 }
 
-void GapJunctionDlg::importData(GJunctData p) 
+void GapJunctionDlg::importData()
 {
+  GJunctData &p = GapJunctionProxy::p[idx];
   QString num;
   typeCombo->setCurrentIndex(p.type);
   num.setNum(p.gSyn*1e9);

@@ -88,17 +88,6 @@ typedef struct {
 
 typedef struct {
   bool active;
-  int type;
-  double gSyn;
-  std::vector<GapJunctionAssignment> assign;
-  int legacy_PreIn = -1;
-  int legacy_PostIn= -1;
-  int legacy_PreOut = -1;
-  int legacy_PostOut = -1;
-} GJunctData;
-
-typedef struct {
-  bool active;
   bool LUTables;
   double gMax;
   double Vrev;

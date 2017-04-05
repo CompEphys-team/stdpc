@@ -3,25 +3,10 @@
 #include "ModelManager.h"
 #include "ConductanceManager.h"
 #include "Synapse.h"
+#include "GapJunction.h"
 
 void initAP()
 {
-    // ESynp
-    addAP("ESynp[#].active", &ESynp, &GJunctData::active);
-    addAP("ESynp[#].type", &ESynp, &GJunctData::type);
-    addAP("ESynp[#].gSyn", &ESynp, &GJunctData::gSyn);
-    addAP("ESynp[#].assign[#].active", &ESynp, &GJunctData::assign, &GapJunctionAssignment::active);
-    addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
-    addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
-    addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
-    addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
-
-    addAP("ESynp[#].preInChannel", &ESynp, &GJunctData::legacy_PreIn);
-    addAP("ESynp[#].postInChannel", &ESynp, &GJunctData::legacy_PostIn);
-    addAP("ESynp[#].preOutChannel", &ESynp, &GJunctData::legacy_PreOut);
-    addAP("ESynp[#].postOutChannel", &ESynp, &GJunctData::legacy_PostOut);
-
-
     // mhHH
     addAP("mhHHp[#].active", &mhHHp, &mhHHData::active);
     addAP("mhHHp[#].LUTables", &mhHHp, &mhHHData::LUTables);
@@ -314,20 +299,27 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                     if ( assign.PreSynChannel.isValid && assign.PostSynChannel.isValid && assign.OutSynChannel.isValid )
                         p.assign.push_back(assign);
                 }
+                continue;
             }
-        }
-
-        for ( GJunctData &syn : ESynp ) {
-            GapJunctionAssignment assign;
-            if ( syn.legacy_PreIn >= 0 && syn.legacy_PreIn < int(legacyIn.size()) )
-                assign.preInChannel = legacyIn[syn.legacy_PreIn];
-            if ( syn.legacy_PostIn >= 0 && syn.legacy_PostIn < int(legacyIn.size()) )
-                assign.postInChannel = legacyIn[syn.legacy_PostIn];
-            if ( syn.legacy_PreOut >= 0 && syn.legacy_PreOut < int(legacyOut.size()) )
-                assign.preOutChannel = legacyOut[syn.legacy_PreOut];
-            if ( syn.legacy_PostOut >= 0 && syn.legacy_PostOut < int(legacyOut.size()) )
-                assign.postOutChannel = legacyOut[syn.legacy_PostOut];
-            syn.assign.push_back(assign);
+            GapJunctionProxy *gjprox = dynamic_cast<GapJunctionProxy*>(prox);
+            if ( gjprox ) {
+                for ( size_t i = 0; i < gjprox->size(); i++ ) {
+                    GapJunctionAssignment assign;
+                    GJunctData &p = gjprox->param(i);
+                    if ( p.legacy_PreIn >= 0 && p.legacy_PreIn < int(legacyIn.size()) )
+                        assign.preInChannel = legacyIn[p.legacy_PreIn];
+                    if ( p.legacy_PostIn >= 0 && p.legacy_PostIn < int(legacyIn.size()) )
+                        assign.postInChannel = legacyIn[p.legacy_PostIn];
+                    if ( p.legacy_PreOut >= 0 && p.legacy_PreOut < int(legacyOut.size()) )
+                        assign.preOutChannel = legacyOut[p.legacy_PreOut];
+                    if ( p.legacy_PostOut >= 0 && p.legacy_PostOut < int(legacyOut.size()) )
+                        assign.postOutChannel = legacyOut[p.legacy_PostOut];
+                    if ( assign.preInChannel.isValid && assign.postInChannel.isValid
+                         && assign.preOutChannel.isValid && assign.postOutChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+                continue;
+            }
         }
 
         for ( mhHHData &current : mhHHp ) {

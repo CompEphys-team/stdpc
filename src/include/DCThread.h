@@ -4,7 +4,6 @@
 #include <QThread>
 #include <functional>
 #include "Global.h"
-#include "GapJunction.h"
 #include "HH.h"
 #include "AbHH.h"
 #include "DataSaver.h"
@@ -45,10 +44,6 @@ private:
 
      template <typename T>
      void instantiate(std::vector<T> &pre, std::vector<T> &in, typename T::param_type &, CurrentAssignment &);
-     template <typename T>
-     void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, SynapseAssignment &);
-     template <typename T>
-     void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
 
      QVector<inChannel *> inChnsToSave;
      QVector<outChannel *> outChnsToSave;
@@ -56,8 +51,6 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
-
-     std::vector<GapJunction> esyn;
 
      std::vector<HH> hhPre;
      std::vector<HH> hhIn;

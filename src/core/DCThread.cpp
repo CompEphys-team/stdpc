@@ -97,14 +97,6 @@ void DCThread::setup_and_go()
    }
 
    // Populate synapses and currents
-   esyn.clear();
-   for ( GJunctData &p : ESynp ) {
-       if ( p.active ) {
-           for ( GapJunctionAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(esyn, p, a);
-       }
-   }
    hhPre.clear();
    hhIn.clear();
    for ( mhHHData &p : mhHHp ) {
@@ -126,7 +118,6 @@ void DCThread::setup_and_go()
        }
    }
 
-   if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
    if (hhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(hhPre.size()));
    if (hhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(hhIn.size()));
    if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
@@ -318,8 +309,6 @@ void DCThread::run()
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
          for ( Conductance *c : Conductances.preDigital() )
              c->step(t, dt);
-         for ( GapJunction &obj : esyn )
-             obj.currentUpdate(t, dt);
 
          for ( HH &obj : hhPre )
              obj.currentUpdate(t, dt);
@@ -563,99 +552,6 @@ void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &inModel,
                 outChannel *outC = getOutChan(IChan);
                 if ( inC && outC ) {
                     preModel.push_back(T(&p, &a, inC, outC));
-                }
-            }
-        }
-    }
-}
-
-template <typename T>
-void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
-                           typename T::param_type &p, SynapseAssignment &a)
-{
-    std::vector<ChannelIndex> preSynInst = getChanIndices(a.PreSynChannel);
-    std::vector<ChannelIndex> postSynInst = getChanIndices(a.PostSynChannel);
-    std::vector<ChannelIndex> outSynInst = getChanIndices(a.OutSynChannel);
-    inChannel *preC, *postC;
-    outChannel *outC;
-
-    if ( a.PostSynChannel == a.OutSynChannel ) {
-        for ( ChannelIndex post : postSynInst ) {
-            for ( ChannelIndex pre : preSynInst ) {
-                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) ) {
-                    T tmp(&p, this, &a, preC, postC, outC);
-                    if ( pre.isVirtual && post.isAnalog )
-                        postModel.push_back(tmp);
-                    else
-                        preModel.push_back(tmp);
-                }
-            }
-        }
-    } else {
-        for ( ChannelIndex post : postSynInst ) {
-            for ( ChannelIndex out : outSynInst ) {
-                for ( ChannelIndex pre : preSynInst ) {
-                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) ) {
-                        T tmp(&p, this, &a, preC, postC, outC);
-                        if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
-                            postModel.push_back(tmp);
-                        else
-                            preModel.push_back(tmp);
-                    }
-                }
-            }
-        }
-    }
-}
-
-template <typename T>
-void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJunctionAssignment &a)
-{
-    struct postChanPointers {
-        inChannel *inC;
-        outChannel *outC;
-    };
-    std::vector<postChanPointers> postChans;
-
-    if ( a.postInChannel == a.postOutChannel ) {
-        for ( ChannelIndex post : getChanIndices(a.postInChannel) ) {
-            inChannel *inC = getInChan(post);
-            outChannel *outC = getOutChan(post);
-            if ( inC && outC ) {
-                postChans.push_back({inC, outC});
-            }
-        }
-    } else {
-        for ( ChannelIndex in : getChanIndices(a.postInChannel) ) {
-            for ( ChannelIndex out : getChanIndices(a.postOutChannel) ) {
-                inChannel *inC = getInChan(in);
-                outChannel *outC = getOutChan(out);
-                if ( inC && outC ) {
-                    postChans.push_back({inC, outC});
-                }
-            }
-        }
-    }
-
-    if ( a.preInChannel == a.preOutChannel ) {
-        for ( ChannelIndex pre : getChanIndices(a.preInChannel) ) {
-            inChannel *inC = getInChan(pre);
-            outChannel *outC = getOutChan(pre);
-            if ( inC && outC ) {
-                for ( postChanPointers &post : postChans ) {
-                    inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
-                }
-            }
-        }
-    } else {
-        for ( ChannelIndex in : getChanIndices(a.preInChannel) ) {
-            for ( ChannelIndex out : getChanIndices(a.preOutChannel) ) {
-                inChannel *inC = getInChan(in);
-                outChannel *outC = getOutChan(out);
-                if ( inC && outC ) {
-                    for ( postChanPointers &post : postChans ) {
-                        inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
-                    }
                 }
             }
         }

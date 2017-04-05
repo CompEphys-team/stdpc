@@ -23,7 +23,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      prototypes.clear();
      for ( ConductanceProxy *proxy : ConductanceManager::Synapses() )
          prototypes.push_back(new ProxiedComponentPrototype(proxy));
-     prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
      ui->synapseTable->init(prototypes);
 
      QVector<DaqOptsPrototypeBase*> dprot;
@@ -303,7 +302,6 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }
 
   // Clear params before loading
-  ESynp.clear();
   mhHHp.clear();
   abHHp.clear();
   Models.clear();

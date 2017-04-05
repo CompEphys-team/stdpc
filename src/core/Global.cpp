@@ -6,8 +6,6 @@
 int LOADED_PROTOCOL_VERSION;
 QString LEGACY_DAQ_CLASS;
 
-std::vector<GJunctData> ESynp;
-
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;
 

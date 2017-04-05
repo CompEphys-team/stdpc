@@ -22,8 +22,6 @@ class ModelManager;
 class ConductanceManager;
 
 
-extern std::vector<GJunctData> ESynp;
-
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
