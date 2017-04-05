@@ -43,7 +43,7 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
 }
 
 
-Synapse::Synapse(size_t condID, size_t assignID, DCThread *, inChannel *pre, inChannel *post, outChannel *out) :
+Synapse::Synapse(size_t condID, size_t assignID, inChannel *pre, inChannel *post, outChannel *out) :
     Conductance(condID, assignID),
     pre(pre),
     post(post),

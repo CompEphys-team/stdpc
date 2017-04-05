@@ -76,7 +76,7 @@ DestexheSynProxy::DestexheSynProxy()
 
     
 DestexheSyn::DestexheSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, DCT, pre, post, out),
+    Synapse(condID, assignID, pre, post, out),
     p(&params()),
     a(&assignment()),
     S(0.0),

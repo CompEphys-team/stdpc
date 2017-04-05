@@ -87,7 +87,7 @@ ChemSynProxy::ChemSynProxy()
 
 
 ChemSyn::ChemSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, DCT, pre, post, out),
+    Synapse(condID, assignID, pre, post, out),
     p(&params()),
     a(&assignment()),
     Sinf(0.0),
