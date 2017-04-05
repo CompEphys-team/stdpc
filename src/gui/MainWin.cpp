@@ -305,7 +305,6 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }
 
   // Clear params before loading
-  CSynp.clear();
   abSynp.clear();
   ESynp.clear();
   DxheSynp.clear();
@@ -313,6 +312,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   abHHp.clear();
   Models.clear();
   Devices.clear();
+  Conductances.clear();
   Plotp.graphs.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {

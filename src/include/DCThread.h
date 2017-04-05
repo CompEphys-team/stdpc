@@ -4,7 +4,6 @@
 #include <QThread>
 #include <functional>
 #include "Global.h"
-#include "ChemSyn.h"
 #include "AbSyn.h"
 #include "GapJunction.h"
 #include "DestexheSyn.h"

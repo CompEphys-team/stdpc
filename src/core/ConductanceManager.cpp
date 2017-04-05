@@ -23,7 +23,7 @@ void ConductanceManager::init(DCThread *DCT)
     inD.clear();
     postD.clear();
 
-    for ( ConductanceProxy *proxy : ConductanceManager::Register() ) {
+    for ( ConductanceProxy *proxy : Register() ) {
         for ( size_t j = 0; j < proxy->size(); j++ ) {
             if ( proxy->param(j).active ) {
                 for ( size_t i = 0; i < proxy->param(j).numAssignments(); i++ ) {
@@ -34,6 +34,22 @@ void ConductanceManager::init(DCThread *DCT)
             }
         }
     }
+}
+
+void ConductanceManager::clear()
+{
+    for ( Conductance *c : preD )
+        delete c;
+    for ( Conductance *c : inD )
+        delete c;
+    for ( Conductance *c : postD )
+        delete c;
+    preD.clear();
+    inD.clear();
+    postD.clear();
+    for ( ConductanceProxy *proxy : Register() )
+        while ( proxy->size() )
+            proxy->remove(proxy->size());
 }
 
 const double *match(const std::vector<Conductance*> ref, const ChannelIndex &dex)

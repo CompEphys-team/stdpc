@@ -4,6 +4,31 @@
 #include "Synapse.h"
 #include "Global_func.h"
 
+struct CSynData : public SynapseData {
+  bool LUTables;
+  bool MgBlock;
+  double gSyn;
+  double VSyn;
+  double tauSyn;
+  double VThresh;
+  double VSlope;
+  int STD;
+  double STDAmpl;
+  double STDVThresh;
+  double STDVSlope;
+  double STDtauAmpl;
+  double STDtau0;
+  double STDtauVThresh;
+  double STDtauVSlope;
+  int fixVpost;
+  double Vpost;
+  double Mgfac;
+  double Mgexpo;
+  int Plasticity;
+  STPlast ST;
+  ODEPlast ODE;
+};
+
 class ChemSynProxy : public SynapseProxy {
 public:
     ChemSynProxy();

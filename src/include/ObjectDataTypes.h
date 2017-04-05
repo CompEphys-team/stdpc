@@ -86,31 +86,6 @@ typedef struct {
   double sigmoidTableMaxEntry;
 } ODEPlast;
 
-struct CSynData : public SynapseData {
-  bool LUTables;
-  bool MgBlock;
-  double gSyn;
-  double VSyn;
-  double tauSyn;
-  double VThresh;
-  double VSlope;
-  int STD;
-  double STDAmpl;
-  double STDVThresh;
-  double STDVSlope;
-  double STDtauAmpl;
-  double STDtau0;
-  double STDtauVThresh;
-  double STDtauVSlope;
-  int fixVpost;
-  double Vpost;
-  double Mgfac;
-  double Mgexpo;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-};
-
 typedef struct {
   bool active;
   bool LUTables;

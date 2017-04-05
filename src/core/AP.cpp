@@ -1,6 +1,8 @@
 #include "AP.h"
 #include "Global.h"
 #include "ModelManager.h"
+#include "ConductanceManager.h"
+#include "Synapse.h"
 
 void initAP()
 {
@@ -417,17 +419,6 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             }
         }
 
-        for ( CSynData &syn : CSynp ) {
-            SynapseAssignment assign;
-            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
-                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
-            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
-                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
-            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
-                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
-            syn.assign.push_back(assign);
-        }
-
         for ( abSynData &syn : abSynp ) {
             SynapseAssignment assign;
             if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
@@ -448,6 +439,24 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
                 assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
             syn.assign.push_back(assign);
+        }
+
+        for ( ConductanceProxy *prox : Conductances.Register() ) {
+            SynapseProxy *synprox  = dynamic_cast<SynapseProxy*>(prox);
+            if ( synprox ) {
+                for ( size_t i = 0; i < synprox->size(); i++ ) {
+                    SynapseAssignment assign;
+                    SynapseData &p = synprox->param(i);
+                    if ( p.legacy_PreSyn >= 0 && p.legacy_PreSyn < int(legacyIn.size()) )
+                        assign.PreSynChannel = legacyIn[p.legacy_PreSyn];
+                    if ( p.legacy_PostSyn >= 0 && p.legacy_PostSyn < int(legacyIn.size()) )
+                        assign.PostSynChannel = legacyIn[p.legacy_PostSyn];
+                    if ( p.legacy_OutSyn >= 0 && p.legacy_OutSyn < int(legacyIn.size()) )
+                        assign.OutSynChannel = legacyIn[p.legacy_OutSyn];
+                    if ( assign.PreSynChannel.isValid && assign.PostSynChannel.isValid && assign.OutSynChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+            }
         }
 
         for ( GJunctData &syn : ESynp ) {
