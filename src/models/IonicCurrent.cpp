@@ -17,7 +17,7 @@ void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DC
             inChannel *inC = DCT->getInChan(VIChan);
             outChannel *outC = DCT->getOutChan(VIChan);
             if ( inC && outC ) {
-                inD.push_back(createAssigned(condID, assignID, DCT, inC, outC));
+                inD.push_back(createAssigned(condID, assignID, inC, outC));
             }
         }
     } else { // NOTE: These channels are assumed to be analog only, although technically, a/d combos are permitted
@@ -26,7 +26,7 @@ void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DC
                 inChannel *inC = DCT->getInChan(VChan);
                 outChannel *outC = DCT->getOutChan(IChan);
                 if ( inC && outC ) {
-                    preD.push_back(createAssigned(condID, assignID, DCT, inC, outC));
+                    preD.push_back(createAssigned(condID, assignID, inC, outC));
                 }
             }
         }

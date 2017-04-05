@@ -30,7 +30,7 @@ public:
                      std::vector<Conductance*> &inD,
                      std::vector<Conductance*> &postD);
 
-    virtual IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+    virtual IonicCurrent *createAssigned(size_t conductanceID, size_t assignID,
                                          inChannel *in, outChannel *out) = 0;
 };
 
