@@ -5,7 +5,6 @@
 #include <functional>
 #include "Global.h"
 #include "GapJunction.h"
-#include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
 #include "DataSaver.h"
@@ -59,9 +58,6 @@ private:
      bool scripting;
 
      std::vector<GapJunction> esyn;
-
-     std::vector<DestexheSyn> dsynPre;
-     std::vector<DestexheSyn> dsynPost;
 
      std::vector<HH> hhPre;
      std::vector<HH> hhIn;

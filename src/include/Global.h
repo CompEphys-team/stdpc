@@ -23,7 +23,6 @@ class ConductanceManager;
 
 
 extern std::vector<GJunctData> ESynp;
-extern std::vector<DestexheSynData> DxheSynp;
 
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;

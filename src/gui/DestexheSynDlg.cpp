@@ -1,9 +1,10 @@
 #include <QDoubleSpinBox>
 #include "DestexheSynDlg.h"
 #include <QMessageBox>
+#include "DestexheSyn.h"
 
 DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
 
@@ -73,8 +74,9 @@ void DestexheSynDlg::PlastMethodChange()
   }
 }
 
-void DestexheSynDlg::exportData(DestexheSynData &p)
+void DestexheSynDlg::exportData()
 {
+  DestexheSynData &p = DestexheSynProxy::p[idx];
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vpre= VpreE->text().toDouble()*1e-3;
@@ -93,8 +95,9 @@ void DestexheSynDlg::exportData(DestexheSynData &p)
   assignments->exportData(p.assign);
 }
 
-void DestexheSynDlg::importData(DestexheSynData p)
+void DestexheSynDlg::importData()
 {
+  DestexheSynData &p = DestexheSynProxy::p[idx];
   QString num;
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);

@@ -6,65 +6,6 @@
 
 void initAP()
 {
-    // DxheSynp STPlast
-    addAP("DxheSynp[#].ST.AMinus", &DxheSynp, &DestexheSynData::ST, &STPlast::AMinus);
-    addAP("DxheSynp[#].ST.tauMinus", &DxheSynp, &DestexheSynData::ST, &STPlast::tauMinus);
-    addAP("DxheSynp[#].ST.APlus", &DxheSynp, &DestexheSynData::ST, &STPlast::APlus);
-    addAP("DxheSynp[#].ST.tauPlus", &DxheSynp, &DestexheSynData::ST, &STPlast::tauPlus);
-    addAP("DxheSynp[#].ST.Exponent", &DxheSynp, &DestexheSynData::ST, &STPlast::Exponent);
-    addAP("DxheSynp[#].ST.Shift", &DxheSynp, &DestexheSynData::ST, &STPlast::Shift);
-    addAP("DxheSynp[#].ST.History", &DxheSynp, &DestexheSynData::ST, &STPlast::History);
-    addAP("DxheSynp[#].ST.Table", &DxheSynp, &DestexheSynData::ST, &STPlast::Table);
-    addAP("DxheSynp[#].ST.tableDt", &DxheSynp, &DestexheSynData::ST, &STPlast::tableDt);
-    addAP("DxheSynp[#].ST.tableDgMin", &DxheSynp, &DestexheSynData::ST, &STPlast::tableDgMin);
-    addAP("DxheSynp[#].ST.gMax", &DxheSynp, &DestexheSynData::ST, &STPlast::gMax);
-    addAP("DxheSynp[#].ST.gMid", &DxheSynp, &DestexheSynData::ST, &STPlast::gMid);
-    addAP("DxheSynp[#].ST.gSlope", &DxheSynp, &DestexheSynData::ST, &STPlast::gSlope);
-    addAP("DxheSynp[#].ST.sigmoidTable", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTable);
-    addAP("DxheSynp[#].ST.sigmoidTableDg", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTableDg);
-    addAP("DxheSynp[#].ST.sigmoidTableMaxEntry", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTableMaxEntry);
-
-    // DxheSynp ODEPlast
-    addAP("DxheSynp[#].ODE.InitialP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::InitialP);
-    addAP("DxheSynp[#].ODE.InitialD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::InitialD);
-    addAP("DxheSynp[#].ODE.betaP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::betaP);
-    addAP("DxheSynp[#].ODE.betaD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::betaD);
-    addAP("DxheSynp[#].ODE.gamma", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gamma);
-    addAP("DxheSynp[#].ODE.eta", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::eta);
-    addAP("DxheSynp[#].ODE.highP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::highP);
-    addAP("DxheSynp[#].ODE.lowP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::lowP);
-    addAP("DxheSynp[#].ODE.highD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::highD);
-    addAP("DxheSynp[#].ODE.lowD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::lowD);
-    addAP("DxheSynp[#].ODE.gMax", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gMax);
-    addAP("DxheSynp[#].ODE.gMid", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gMid);
-    addAP("DxheSynp[#].ODE.gSlope", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gSlope);
-    addAP("DxheSynp[#].ODE.sigmoidTable", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTable);
-    addAP("DxheSynp[#].ODE.sigmoidTableDg", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTableDg);
-    addAP("DxheSynp[#].ODE.sigmoidTableMaxEntry", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
-
-    // main DxheSynp
-    addAP("DxheSynp[#].active", &DxheSynp, &DestexheSynData::active);
-    addAP("DxheSynp[#].LUTables", &DxheSynp, &DestexheSynData::LUTables);
-    addAP("DxheSynp[#].gSyn", &DxheSynp, &DestexheSynData::gSyn);
-    addAP("DxheSynp[#].Vpre", &DxheSynp, &DestexheSynData::Vpre);
-    addAP("DxheSynp[#].Vrev", &DxheSynp, &DestexheSynData::Vrev);
-    addAP("DxheSynp[#].trelease", &DxheSynp, &DestexheSynData::trelease);
-    addAP("DxheSynp[#].alpha", &DxheSynp, &DestexheSynData::alpha);
-    addAP("DxheSynp[#].beta", &DxheSynp, &DestexheSynData::beta);
-    addAP("DxheSynp[#].fixVpost", &DxheSynp, &DestexheSynData::fixVpost);
-    addAP("DxheSynp[#].Vpost", &DxheSynp, &DestexheSynData::Vpost);
-    addAP("DxheSynp[#].Plasticity", &DxheSynp, &DestexheSynData::Plasticity);
-    addAP("DxheSynp[#].assign[#].active", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::active);
-    addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
-    addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
-    addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
-    addAP("DxheSynp[#].assign[#].delay", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::delay);
-
-    addAP("DxheSynp[#].PreSynChannel", &DxheSynp, &DestexheSynData::legacy_PreSyn);
-    addAP("DxheSynp[#].PostSynChannel", &DxheSynp, &DestexheSynData::legacy_PostSyn);
-    addAP("DxheSynp[#].OutSynChannel", &DxheSynp, &DestexheSynData::legacy_OutSyn);
-
-
     // ESynp
     addAP("ESynp[#].active", &ESynp, &GJunctData::active);
     addAP("ESynp[#].type", &ESynp, &GJunctData::type);
@@ -356,17 +297,6 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             if ( legacyDAQ->param(0).outChn[i].active ) {
                 legacyOut.push_back(ChannelIndex(legacyDAQ, 0, i, false));
             }
-        }
-
-        for ( DestexheSynData &syn : DxheSynp ) {
-            SynapseAssignment assign;
-            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
-                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
-            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
-                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
-            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
-                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
-            syn.assign.push_back(assign);
         }
 
         for ( ConductanceProxy *prox : Conductances.Register() ) {

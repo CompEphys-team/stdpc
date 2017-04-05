@@ -5,7 +5,6 @@
 #include "ComponentPrototype.h"
 
 #include "GapJunctionDlg.h"
-#include "DestexheSynDlg.h"
 #include "AlphaBetaHHDlg.h"
 #include "HHDlg.h"
 
