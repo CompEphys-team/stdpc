@@ -97,6 +97,8 @@ void DCThread::setup_and_go()
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
+   for ( const QString &status : Conductances.getStatus() )
+       message(status);
    for ( auto const& m : Models.active() )
        message(m->getStatus());
 

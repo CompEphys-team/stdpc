@@ -71,3 +71,28 @@ const double *ConductanceManager::conductance(const ChannelIndex &dex)
         return ret;
     return ret;
 }
+
+QStringList ConductanceManager::getStatus() const
+{
+    QStringList statuses;
+    // Assume that preD/inD/postD are ordered, i.e. set up through init()
+    for ( ConductanceProxy *proxy : Register() ) {
+        int euler = 0, rk4 = 0;
+        for ( Conductance *c : preD )
+            if ( c->proxy() == proxy )
+                ++euler;
+        for ( Conductance *c : inD )
+            if ( c->proxy() == proxy )
+                ++rk4;
+        for ( Conductance *c : postD )
+            if ( c->proxy() == proxy )
+                ++euler;
+        if ( euler+rk4 > 0 )
+            statuses << QString("DC: %1 %2 conductances (%3 Euler, %4 Runge-Kutta)")
+                        .arg(euler+rk4)
+                        .arg(proxy->prettyName())
+                        .arg(euler)
+                        .arg(rk4);
+    }
+    return statuses;
+}

@@ -56,6 +56,8 @@ public:
     /// Returns a pointer to the (first, if multiplexed) assignment indicated by dex
     const double *conductance(const ChannelIndex &dex);
 
+    QStringList getStatus() const;
+
     inline const std::vector<Conductance *> &preDigital() const { return preD; }
     inline const std::vector<Conductance *> &inDigital() const { return inD; }
     inline const std::vector<Conductance *> &postDigital() const { return postD; }
