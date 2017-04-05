@@ -9,7 +9,7 @@ ComponentTable::ComponentTable(QWidget *parent) :
 
 ComponentTable::~ComponentTable()
 {
-    for ( ComponentPrototypeBase *p : proto )
+    for ( ComponentPrototype *p : proto )
         delete p;
 }
 
@@ -17,11 +17,11 @@ void ComponentTable::makeFactory()
 {
     factory = new ComponentFactoryWidget(this);
     connect(factory->button, SIGNAL(clicked(bool)), this, SLOT(addComponent()));
-    for ( ComponentPrototypeBase *p : proto )
+    for ( ComponentPrototype *p : proto )
         factory->combo->addItem(p->label());
 }
 
-void ComponentTable::init(QVector<ComponentPrototypeBase *> prototypes)
+void ComponentTable::init(QVector<ComponentPrototype *> prototypes)
 {
     proto = prototypes;
     idx = QVector<int>(proto.size(), 0);
@@ -34,7 +34,7 @@ void ComponentTable::importData(bool activeOnly)
     clear();
     comp.clear();
     int i = 0;
-    for ( ComponentPrototypeBase *p : proto ) {
+    for ( ComponentPrototype *p : proto ) {
         if ( activeOnly )
             p->clearInactive();
         else
@@ -44,7 +44,7 @@ void ComponentTable::importData(bool activeOnly)
     }
     i = 0;
     setColumnCount(comp.size() + 1);
-    for ( GenericComponent *c : comp ) {
+    for ( Component *c : comp ) {
         setCellWidget(0, i++, c->widget());
     }
 
@@ -54,26 +54,26 @@ void ComponentTable::importData(bool activeOnly)
 
 void ComponentTable::exportData()
 {
-    for ( ComponentPrototypeBase *p : proto )
+    for ( ComponentPrototype *p : proto )
         p->exportData();
 }
 
 void ComponentTable::activateAll()
 {
-    for ( GenericComponent *c : comp )
+    for ( Component *c : comp )
         c->widget()->active->setChecked(true);
 }
 
 void ComponentTable::deactivateAll()
 {
-    for ( GenericComponent *c : comp )
+    for ( Component *c : comp )
         c->widget()->active->setChecked(false);
 }
 
 void ComponentTable::addComponent()
 {
     int i = factory->combo->currentIndex();
-    GenericComponent *c = proto[i]->create(idx[i]++);
+    Component *c = proto[i]->create(idx[i]++);
     insertColumn(comp.size());
     setCellWidget(0, comp.size(), c->widget());
     comp.append(c);

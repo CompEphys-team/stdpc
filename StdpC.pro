@@ -120,7 +120,6 @@ HEADERS += \
     $$PWD/src/include/DaqTable.h \
     $$PWD/src/include/DaqWidget.h \
     $$PWD/src/include/DeviceManager.h \
-    $$PWD/src/include/ComponentPrototype.h \
     $$PWD/src/include/Component.h \
     $$PWD/src/include/WideComboBox.h \
     $$PWD/src/include/DaqOpts.h \
@@ -202,7 +201,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/PerformanceMonitor.cpp \
     $$PWD/src/core/ConductanceManager.cpp \
     $$PWD/src/models/Synapse.cpp \
-    $$PWD/src/models/IonicCurrent.cpp
+    $$PWD/src/models/IonicCurrent.cpp \
+    src/gui/Component.cpp
 
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 

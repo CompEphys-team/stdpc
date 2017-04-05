@@ -15,14 +15,14 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
      DSDlg= new DataSavingDlg(this);
 
-     QVector<ComponentPrototypeBase *> prototypes;
+     QVector<ComponentPrototype *> prototypes;
      for ( ConductanceProxy *proxy : ConductanceManager::Currents() )
-         prototypes.push_back(new ProxiedComponentPrototype(proxy));
+         prototypes.push_back(new ComponentPrototype(proxy));
      ui->currentTable->init(prototypes);
 
      prototypes.clear();
      for ( ConductanceProxy *proxy : ConductanceManager::Synapses() )
-         prototypes.push_back(new ProxiedComponentPrototype(proxy));
+         prototypes.push_back(new ComponentPrototype(proxy));
      ui->synapseTable->init(prototypes);
 
      QVector<DaqOptsPrototypeBase*> dprot;

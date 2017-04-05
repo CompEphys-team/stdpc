@@ -2,7 +2,7 @@
 #define COMPONENTTABLE_H
 
 #include <QTableWidget>
-#include "ComponentPrototype.h"
+#include "Component.h"
 
 class ComponentTable : public QTableWidget
 {
@@ -12,7 +12,7 @@ public:
     ComponentTable(QWidget *parent = 0);
     ~ComponentTable();
 
-    void init(QVector<ComponentPrototypeBase *> prototypes);
+    void init(QVector<ComponentPrototype *> prototypes);
 
 public slots:
     void importData(bool activeOnly = false);
@@ -25,8 +25,8 @@ private slots:
     void addComponent();
 
 private:
-    QVector<ComponentPrototypeBase *> proto;
-    QVector<GenericComponent *> comp;
+    QVector<ComponentPrototype *> proto;
+    QVector<Component *> comp;
     QVector<int> idx;
     ComponentFactoryWidget *factory;
 
