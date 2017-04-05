@@ -1,9 +1,10 @@
 #include <QString>
 #include "HHDlg.h"
 #include <QMessageBox>
+#include "HH.h"
 
 HHDlg::HHDlg(int no, QWidget *parent)
-     : QDialog(parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
      label = HHDlgLabel->text();
@@ -23,8 +24,9 @@ void HHDlg::setIndex(int no)
     HHDlgLabel->setText(label.arg(no));
 }
 
-void HHDlg::exportData(mhHHData &p)
+void HHDlg::exportData()
 {
+  mhHHData &p = HHProxy::p[idx];
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -51,8 +53,9 @@ void HHDlg::exportData(mhHHData &p)
   assignments->exportData(p.assign);
 }
 
-void HHDlg::importData(mhHHData p)
+void HHDlg::importData()
 {
+  mhHHData &p = HHProxy::p[idx];
   QString num;
   
   if (p.LUTables) LUCombo->setCurrentIndex(1);

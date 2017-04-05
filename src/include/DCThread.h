@@ -52,8 +52,6 @@ private:
      bool finished;
      bool scripting;
 
-     std::vector<HH> hhPre;
-     std::vector<HH> hhIn;
      std::vector<abHH> abhhPre;
      std::vector<abHH> abhhIn;
 

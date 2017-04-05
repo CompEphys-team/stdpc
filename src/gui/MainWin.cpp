@@ -16,7 +16,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DSDlg= new DataSavingDlg(this);
 
      QVector<ComponentPrototypeBase *> prototypes;
-     prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
+     for ( ConductanceProxy *proxy : ConductanceManager::Currents() )
+         prototypes.push_back(new ProxiedComponentPrototype(proxy));
      prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
      ui->currentTable->init(prototypes);
 
@@ -302,7 +303,6 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   }
 
   // Clear params before loading
-  mhHHp.clear();
   abHHp.clear();
   Models.clear();
   Devices.clear();

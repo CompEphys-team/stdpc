@@ -3,17 +3,17 @@
 
 #include "ui_HHDlg.h"
 #include "ObjectDataTypes.h"
+#include "ConductanceDlg.h"
 
-class HHDlg : public QDialog, private Ui::HHDlg
+class HHDlg : public ConductanceDlg, private Ui::HHDlg
 {
      Q_OBJECT
 
   public:
      HHDlg(int, QWidget *parent= 0);
-     void exportData(mhHHData &);
-     void importData(mhHHData);
+     void exportData();
+     void importData();
      void setIndex(int);
-     typedef mhHHData param_type;
 
      QString label;
 }; 

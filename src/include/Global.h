@@ -21,8 +21,6 @@ class DeviceManager;
 class ModelManager;
 class ConductanceManager;
 
-
-extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
 
 extern dataSavingParams dataSavingPs;

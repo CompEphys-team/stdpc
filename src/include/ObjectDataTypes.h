@@ -101,34 +101,6 @@ typedef struct {
   double Vrev;
   int mExpo;
   int hExpo;
-  double Vm;
-  double sm;
-  double Cm;
-  int taumType;
-  double taum;
-  double taumAmpl;
-  double Vtaum;
-  double staum;
-  double Vh;
-  double sh;
-  double Ch;
-  int tauhType;
-  double tauh;
-  double tauhAmpl;
-  double Vtauh;
-  double stauh;
-  std::vector<CurrentAssignment> assign;
-  int legacy_V = -1;
-  int legacy_I = -1;
-} mhHHData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gMax;
-  double Vrev;
-  int mExpo;
-  int hExpo;
   int maFunc;
   double mka;
   double mVa;

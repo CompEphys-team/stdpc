@@ -5,7 +5,6 @@
 #include "ComponentPrototype.h"
 
 #include "AlphaBetaHHDlg.h"
-#include "HHDlg.h"
 
 
 class ComponentTable : public QTableWidget

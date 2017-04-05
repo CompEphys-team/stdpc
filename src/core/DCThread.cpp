@@ -97,16 +97,6 @@ void DCThread::setup_and_go()
    }
 
    // Populate synapses and currents
-   hhPre.clear();
-   hhIn.clear();
-   for ( mhHHData &p : mhHHp ) {
-       if ( p.active ) {
-           for ( CurrentAssignment &a : p.assign ) {
-               if ( a.active )
-                   instantiate(hhPre, hhIn, p, a);
-           }
-       }
-   }
    abhhPre.clear();
    abhhIn.clear();
    for ( abHHData &p : abHHp ) {
@@ -118,8 +108,6 @@ void DCThread::setup_and_go()
        }
    }
 
-   if (hhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(hhPre.size()));
-   if (hhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(hhIn.size()));
    if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
    if (abhhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(abhhIn.size()));
    for ( auto const& m : Models.active() )
@@ -310,8 +298,6 @@ void DCThread::run()
          for ( Conductance *c : Conductances.preDigital() )
              c->step(t, dt);
 
-         for ( HH &obj : hhPre )
-             obj.currentUpdate(t, dt);
          for ( abHH &obj : abhhPre )
              obj.currentUpdate(t, dt);
 
@@ -347,8 +333,6 @@ void DCThread::run()
                  for ( size_t rkStep = 0; rkStep < 4; rkStep++ ) {
                      double rkDT = rkStep < 2 ? subDT/2 : subDT;
 
-                     for ( HH &obj : hhIn )
-                         obj.RK4(subT, rkDT, rkStep);
                      for ( abHH &obj : abhhIn )
                          obj.RK4(subT, rkDT, rkStep);
 

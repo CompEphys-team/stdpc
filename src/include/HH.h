@@ -2,15 +2,59 @@
 #define HH_H
 
 #include <cmath>
-#include "ObjectDataTypes.h"
-#include "Channels.h"
-#include "LUtables.h"
+#include "IonicCurrent.h"
 #include "Global_func.h"
 
-class HH
+struct mhHHData : public CurrentData {
+  bool LUTables;
+  double gMax;
+  double Vrev;
+  int mExpo;
+  int hExpo;
+  double Vm;
+  double sm;
+  double Cm;
+  int taumType;
+  double taum;
+  double taumAmpl;
+  double Vtaum;
+  double staum;
+  double Vh;
+  double sh;
+  double Ch;
+  int tauhType;
+  double tauh;
+  double tauhAmpl;
+  double Vtauh;
+  double stauh;
+};
+
+class HHProxy : public IonicCurrentProxy
+{
+public:
+    HHProxy();
+    inline mhHHData &param(size_t i) const { return p[i]; }
+    inline size_t size() { return p.size(); }
+    inline void resize(size_t sz) { p.resize(sz); }
+    inline void remove(size_t i) { p.erase(p.begin() + i); }
+
+    inline QString conductanceClass() { return "mhHH"; }
+    inline QString prettyName() { return "m/h/tau HH"; }
+
+    IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+                                 inChannel *in, outChannel *out);
+
+    ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
+
+    static std::vector<mhHHData> p;
+};
+
+class HH : public IonicCurrent
 {
   private:
-    mhHHData *p;
+    const mhHHData *p;
+    const CurrentAssignment *a;
+
     stdpc::function *theExp;
     stdpc::function *theTanh;
     stdpc::function *theExpSigmoid;
@@ -19,17 +63,14 @@ class HH
     double m, h;
     double km[4], kh[4], mi, hi;
     double minf, taum, hinf, tauh;
-    double I;
-    inChannel *pre;
-    outChannel *out;
-    CurrentAssignment *a;
     
   public:
-    HH(mhHHData *p, CurrentAssignment *a, inChannel *pre, outChannel *out);
-    void currentUpdate(double, double);
-    void RK4(double, double, size_t);
+    HH(size_t condID, size_t assignID, DCThread *, inChannel *in, outChannel *out);
+    void step(double t, double dt);
+    void RK4(double t, double dt, size_t n);
 
-    typedef mhHHData param_type;
+    inline const mhHHData &params() const { return HHProxy::p[condID]; }
+    HHProxy *proxy() const;
 };
 
 #endif

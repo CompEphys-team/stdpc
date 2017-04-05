@@ -1,43 +1,12 @@
 #include "AP.h"
 #include "Global.h"
 #include "ModelManager.h"
-#include "ConductanceManager.h"
 #include "Synapse.h"
 #include "GapJunction.h"
+#include "IonicCurrent.h"
 
 void initAP()
 {
-    // mhHH
-    addAP("mhHHp[#].active", &mhHHp, &mhHHData::active);
-    addAP("mhHHp[#].LUTables", &mhHHp, &mhHHData::LUTables);
-    addAP("mhHHp[#].gMax", &mhHHp, &mhHHData::gMax);
-    addAP("mhHHp[#].Vrev", &mhHHp, &mhHHData::Vrev);
-    addAP("mhHHp[#].mExpo", &mhHHp, &mhHHData::mExpo);
-    addAP("mhHHp[#].hExpo", &mhHHp, &mhHHData::hExpo);
-    addAP("mhHHp[#].Vm", &mhHHp, &mhHHData::Vm);
-    addAP("mhHHp[#].sm", &mhHHp, &mhHHData::sm);
-    addAP("mhHHp[#].Cm", &mhHHp, &mhHHData::Cm);
-    addAP("mhHHp[#].taumType", &mhHHp, &mhHHData::taumType);
-    addAP("mhHHp[#].taum", &mhHHp, &mhHHData::taum);
-    addAP("mhHHp[#].taumAmpl", &mhHHp, &mhHHData::taumAmpl);
-    addAP("mhHHp[#].Vtaum", &mhHHp, &mhHHData::Vtaum);
-    addAP("mhHHp[#].staum", &mhHHp, &mhHHData::staum);
-    addAP("mhHHp[#].Vh", &mhHHp, &mhHHData::Vh);
-    addAP("mhHHp[#].sh", &mhHHp, &mhHHData::sh);
-    addAP("mhHHp[#].Ch", &mhHHp, &mhHHData::Ch);
-    addAP("mhHHp[#].tauhType", &mhHHp, &mhHHData::tauhType);
-    addAP("mhHHp[#].tauh", &mhHHp, &mhHHData::tauh);
-    addAP("mhHHp[#].tauhAmpl", &mhHHp, &mhHHData::tauhAmpl);
-    addAP("mhHHp[#].Vtauh", &mhHHp, &mhHHData::Vtauh);
-    addAP("mhHHp[#].stauh", &mhHHp, &mhHHData::stauh);
-    addAP("mhHHp[#].assign[#].active", &mhHHp, &mhHHData::assign, &CurrentAssignment::active);
-    addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
-    addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
-
-    addAP("mhHHp[#].VChannel", &mhHHp, &mhHHData::legacy_V);
-    addAP("mhHHp[#].IChannel", &mhHHp, &mhHHData::legacy_I);
-
-
     // abHH
     addAP("abHHp[#].active", &abHHp, &abHHData::active);
     addAP("abHHp[#].LUTables", &abHHp, &abHHData::LUTables);
@@ -320,15 +289,20 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                 }
                 continue;
             }
-        }
-
-        for ( mhHHData &current : mhHHp ) {
-            CurrentAssignment assign;
-            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
-                assign.VChannel = legacyIn[current.legacy_V];
-            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
-                assign.IChannel = legacyOut[current.legacy_I];
-            current.assign.push_back(assign);
+            IonicCurrentProxy *cprox = dynamic_cast<IonicCurrentProxy*>(prox);
+            if ( cprox ) {
+                for ( size_t i = 0; i < cprox->size(); i++ ) {
+                    CurrentAssignment assign;
+                    CurrentData &p = cprox->param(i);
+                    if ( p.legacy_V >= 0 && p.legacy_V < int(legacyIn.size()) )
+                        assign.VChannel = legacyIn[p.legacy_V];
+                    if ( p.legacy_I >= 0 && p.legacy_I < int(legacyOut.size()) )
+                        assign.IChannel = legacyOut[p.legacy_I];
+                    if ( assign.VChannel.isValid && assign.IChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+                continue;
+            }
         }
 
         for ( abHHData &current : abHHp ) {
@@ -382,26 +356,32 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     if ( version < 4 ) {
         // version 4 introduced a restriction on HH channel assignments: no model instances.
         // Compat: Reassigns all model instances to model prototypes
-        for ( mhHHData &p : mhHHp ) {
-            std::vector<ChannelIndex> mod;
-            std::vector<CurrentAssignment> dest;
-            dest.reserve(p.assign.size());
-            for ( CurrentAssignment &a : p.assign ) {
-                if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
-                    a.IChannel.isPrototype = true;
-                    a.VChannel.isPrototype = true;
-                    a.IChannel.isVirtual = false;
-                    a.VChannel.isVirtual = false;
-                    if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
-                        continue; // Drop duplicate entries
+        for ( ConductanceProxy *prox : Conductances.Currents() ) {
+            IonicCurrentProxy *cprox = dynamic_cast<IonicCurrentProxy*>(prox);
+            if ( cprox ) {
+                for ( size_t i = 0; i < cprox->size(); i++ ) {
+                    CurrentData &p = cprox->param(i);
+                    std::vector<ChannelIndex> mod;
+                    std::vector<CurrentAssignment> dest;
+                    dest.reserve(p.assign.size());
+                    for ( CurrentAssignment &a : p.assign ) {
+                        if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
+                            a.IChannel.isPrototype = true;
+                            a.VChannel.isPrototype = true;
+                            a.IChannel.isVirtual = false;
+                            a.VChannel.isVirtual = false;
+                            if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
+                                continue; // Drop duplicate entries
+                            }
+                            mod.push_back(a.IChannel);
+                        } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
+                            mod.push_back(a.IChannel);
+                        }
+                        dest.push_back(a);
                     }
-                    mod.push_back(a.IChannel);
-                } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
-                    mod.push_back(a.IChannel);
+                    p.assign = dest;
                 }
-                dest.push_back(a);
             }
-            p.assign = dest;
         }
         for ( abHHData &p : abHHp ) {
             std::vector<ChannelIndex> mod;
