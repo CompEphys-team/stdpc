@@ -14,7 +14,7 @@ Synapse *ChemSynProxy::createAssigned(size_t conductanceID, size_t assignID, DCT
 
 ChemSynProxy::ChemSynProxy()
 {
-    ConductanceManager::RegisterConductance(this);
+    ConductanceManager::RegisterSynapse(this);
     // CSynp STPlast
     addAP("CSynp[#].ST.AMinus", &p, &CSynData::ST, &STPlast::AMinus);
     addAP("CSynp[#].ST.tauMinus", &p, &CSynData::ST, &STPlast::tauMinus);

@@ -21,7 +21,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      ui->currentTable->init(prototypes);
 
      prototypes.clear();
-     for ( ConductanceProxy *proxy : ConductanceManager::Register() )
+     for ( ConductanceProxy *proxy : ConductanceManager::Synapses() )
          prototypes.push_back(new ProxiedComponentPrototype(proxy));
      prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
      prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
