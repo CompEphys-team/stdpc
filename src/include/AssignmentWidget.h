@@ -85,6 +85,7 @@ protected:
         if ( row < 0 )
             row = rowCount();
         insertRow(row);
+        setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(row)));
         int i = 0;
         for ( AssignmentCellBase<Assignment> *d : cell ) {
             setCellWidget(row, i++, d->extend(row));

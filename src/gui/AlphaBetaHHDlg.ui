@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
+    <width>474</width>
     <height>572</height>
    </rect>
   </property>
@@ -405,9 +405,6 @@
     <widget class="AssignmentWidget&lt;CurrentAssignment&gt;" name="assignments">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>25</number>

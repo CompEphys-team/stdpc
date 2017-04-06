@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>451</width>
+    <width>521</width>
     <height>236</height>
    </rect>
   </property>
@@ -34,9 +34,6 @@
     <widget class="AssignmentWidget&lt;GapJunctionAssignment&gt;" name="assignments">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
      </attribute>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>25</number>
