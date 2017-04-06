@@ -98,7 +98,9 @@ void GraphWidget::updatePlot(int row)
     if ( !hasGraphs ) { // Add some dummies, but don't overwrite existing traces
         plot->clearGraphs();
         for ( GraphData &g : Plotp.plot[row].graph ) {
-            setupGraph(g, plot->addGraph());
+            if ( g.active ) {
+                setupGraph(g, plot->addGraph());
+            }
         }
     }
     plot->replot();
