@@ -7,7 +7,7 @@
 class Synapse : public Conductance
 {
 public:
-    Synapse(size_t condID, size_t assignID, inChannel *pre, inChannel *post, outChannel *out);
+    Synapse(size_t condID, size_t assignID, size_t multiID, inChannel *pre, inChannel *post, outChannel *out);
     ~Synapse() {}
 
     virtual const SynapseAssignment &assignment() const { return params().assignment(assignID); }
@@ -35,7 +35,7 @@ public:
                     std::vector<Conductance*> &inD,
                     std::vector<Conductance*> &postD);
 
-    virtual Synapse *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+    virtual Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
                                     inChannel *pre, inChannel *post, outChannel *out) = 0;
 };
 

@@ -7,9 +7,9 @@ static abSynProxy prox;
 std::vector<abSynData> abSynProxy::p;
 abSynProxy *abSyn::proxy() const { return &prox; }
 ConductanceDlg *abSynProxy::createDialog(size_t condID, QWidget *parent) { return new abSynDlg(condID, parent); }
-Synapse *abSynProxy::createAssigned(size_t conductanceID, size_t assignID, DCThread *DCT,
+Synapse *abSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
                                     inChannel *pre, inChannel *post, outChannel *out) {
-    return new abSyn(conductanceID, assignID, DCT, pre, post, out);
+    return new abSyn(conductanceID, assignID, multiID, DCT, pre, post, out);
 }
 
 abSynProxy::abSynProxy()
@@ -78,8 +78,8 @@ abSynProxy::abSynProxy()
 }
 
     
-abSyn::abSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, pre, post, out),
+abSyn::abSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
+    Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
     S(0.0),

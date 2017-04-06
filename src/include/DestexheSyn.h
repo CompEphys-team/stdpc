@@ -30,7 +30,7 @@ public:
     inline QString conductanceClass() { return "DxheSyn"; }
     inline QString prettyName() { return "DestexheSyn"; }
 
-    Synapse *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+    Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
                             inChannel *pre, inChannel *post, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
@@ -67,7 +67,7 @@ class DestexheSyn : public Synapse {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    DestexheSyn(size_t condID, size_t assignID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
+    DestexheSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const DestexheSynData &params() const { return DestexheSynProxy::p[condID]; }
     void step(double t, double dt);
 

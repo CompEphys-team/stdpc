@@ -56,13 +56,14 @@ void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT
         }
     }
 
+    size_t multi = 0;
     if ( a.preInChannel == a.preOutChannel ) {
         for ( ChannelIndex pre : DCT->getChanIndices(a.preInChannel) ) {
             inChannel *inC = DCT->getInChan(pre);
             outChannel *outC = DCT->getOutChan(pre);
             if ( inC && outC ) {
                 for ( postChanPointers &post : postChans ) {
-                    preD.push_back(new GapJunction(condID, assignID, inC, outC, post.inC, post.outC));
+                    preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
                 }
             }
         }
@@ -73,7 +74,7 @@ void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT
                 outChannel *outC = DCT->getOutChan(out);
                 if ( inC && outC ) {
                     for ( postChanPointers &post : postChans ) {
-                        preD.push_back(new GapJunction(condID, assignID, inC, outC, post.inC, post.outC));
+                        preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
                     }
                 }
             }
@@ -81,8 +82,8 @@ void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT
     }
 }
 
-GapJunction::GapJunction(size_t condID, size_t assignID, inChannel *pre, outChannel *outpre, inChannel *post, outChannel *outpost) :
-    Conductance(condID, assignID),
+GapJunction::GapJunction(size_t condID, size_t assignID, size_t multiID, inChannel *pre, outChannel *outpre, inChannel *post, outChannel *outpost) :
+    Conductance(condID, assignID, multiID),
     p(&params()),
     a(&assignment()),
     pre(pre),

@@ -13,11 +13,12 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
     inChannel *preC, *postC;
     outChannel *outC;
 
+    size_t multi = 0;
     if ( a.PostSynChannel == a.OutSynChannel ) {
         for ( ChannelIndex post : postSynInst ) {
             for ( ChannelIndex pre : preSynInst ) {
                 if ( (preC=DCT->getInChan(pre)) && (postC=DCT->getInChan(post)) && (outC=DCT->getOutChan(post)) ) {
-                    Synapse *tmp = createAssigned(conductanceID, assignID, DCT, preC, postC, outC);
+                    Synapse *tmp = createAssigned(conductanceID, assignID, multi++, DCT, preC, postC, outC);
                     if ( pre.isVirtual && post.isAnalog )
                         postD.push_back(tmp);
                     else
@@ -30,7 +31,7 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
             for ( ChannelIndex out : outSynInst ) {
                 for ( ChannelIndex pre : preSynInst ) {
                     if ( (preC=DCT->getInChan(pre)) && (postC=DCT->getInChan(post)) && (outC=DCT->getOutChan(out)) ) {
-                        Synapse *tmp = createAssigned(conductanceID, assignID, DCT, preC, postC, outC);
+                        Synapse *tmp = createAssigned(conductanceID, assignID, multi++, DCT, preC, postC, outC);
                         if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
                             postD.push_back(tmp);
                         else
@@ -43,8 +44,8 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
 }
 
 
-Synapse::Synapse(size_t condID, size_t assignID, inChannel *pre, inChannel *post, outChannel *out) :
-    Conductance(condID, assignID),
+Synapse::Synapse(size_t condID, size_t assignID, size_t multiID, inChannel *pre, inChannel *post, outChannel *out) :
+    Conductance(condID, assignID, multiID),
     pre(pre),
     post(post),
     out(out),

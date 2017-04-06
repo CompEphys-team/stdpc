@@ -40,7 +40,7 @@ public:
     inline QString conductanceClass() { return "CSyn"; }
     inline QString prettyName() { return "ChemSyn"; }
 
-    Synapse *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+    Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
                             inChannel *pre, inChannel *post, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
@@ -81,7 +81,7 @@ class ChemSyn : public Synapse
     double Dslope; // slope of the sigmoid for D
 
   public:
-    ChemSyn(size_t condID, size_t assignID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
+    ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const CSynData &params() const { return ChemSynProxy::p[condID]; }
     void step(double t, double dt);
 

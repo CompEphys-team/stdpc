@@ -7,7 +7,7 @@
 class IonicCurrent : public Conductance
 {
 public:
-    IonicCurrent(size_t condID, size_t assignID, inChannel *in, outChannel *out);
+    IonicCurrent(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
     ~IonicCurrent() {}
 
     inline virtual const CurrentAssignment &assignment() const { return params().assignment(assignID); }
@@ -30,7 +30,7 @@ public:
                      std::vector<Conductance*> &inD,
                      std::vector<Conductance*> &postD);
 
-    virtual IonicCurrent *createAssigned(size_t conductanceID, size_t assignID,
+    virtual IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
                                          inChannel *in, outChannel *out) = 0;
 };
 

@@ -41,7 +41,7 @@ public:
     inline QString conductanceClass() { return "mhHH"; }
     inline QString prettyName() { return "m/h/tau HH"; }
 
-    IonicCurrent *createAssigned(size_t conductanceID, size_t assignID,
+    IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
                                  inChannel *in, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
@@ -65,7 +65,7 @@ class HH : public IonicCurrent
     double minf, taum, hinf, tauh;
     
   public:
-    HH(size_t condID, size_t assignID, inChannel *in, outChannel *out);
+    HH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
     void step(double t, double dt);
     void RK4(double t, double dt, size_t n);
 

@@ -6,8 +6,8 @@ static HHProxy prox;
 std::vector<mhHHData> HHProxy::p;
 HHProxy *HH::proxy() const { return &prox; }
 ConductanceDlg *HHProxy::createDialog(size_t condID, QWidget *parent) { return new HHDlg(condID, parent); }
-IonicCurrent *HHProxy::createAssigned(size_t conductanceID, size_t assignID, inChannel *in, outChannel *out) {
-    return new HH(conductanceID, assignID, in, out);
+IonicCurrent *HHProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
+    return new HH(conductanceID, assignID, multiID, in, out);
 }
 
 HHProxy::HHProxy()
@@ -46,8 +46,8 @@ HHProxy::HHProxy()
 }
 
 
-HH::HH(size_t condID, size_t assignID, inChannel *in, outChannel *out) :
-    IonicCurrent(condID, assignID, in, out),
+HH::HH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
+    IonicCurrent(condID, assignID, multiID, in, out),
     p(&params()),
     a(&assignment()),
     m(0.0),

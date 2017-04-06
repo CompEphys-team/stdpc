@@ -7,9 +7,9 @@ static ChemSynProxy prox;
 std::vector<CSynData> ChemSynProxy::p;
 ChemSynProxy *ChemSyn::proxy() const { return &prox; }
 ConductanceDlg *ChemSynProxy::createDialog(size_t condID, QWidget *parent) { return new ChemSynDlg(condID, parent); }
-Synapse *ChemSynProxy::createAssigned(size_t conductanceID, size_t assignID, DCThread *DCT,
+Synapse *ChemSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
                                       inChannel *pre, inChannel *post, outChannel *out) {
-    return new ChemSyn(conductanceID, assignID, DCT, pre, post, out);
+    return new ChemSyn(conductanceID, assignID, multiID, DCT, pre, post, out);
 }
 
 ChemSynProxy::ChemSynProxy()
@@ -87,8 +87,8 @@ ChemSynProxy::ChemSynProxy()
 
 
 
-ChemSyn::ChemSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, pre, post, out),
+ChemSyn::ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
+    Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
     Sinf(0.0),

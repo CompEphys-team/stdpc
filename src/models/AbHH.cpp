@@ -6,8 +6,8 @@ static abHHProxy prox;
 std::vector<abHHData> abHHProxy::p;
 abHHProxy *abHH::proxy() const { return &prox; }
 ConductanceDlg *abHHProxy::createDialog(size_t condID, QWidget *parent) { return new AlphaBetaHHDlg(condID, parent); }
-IonicCurrent *abHHProxy::createAssigned(size_t conductanceID, size_t assignID, inChannel *in, outChannel *out) {
-    return new abHH(conductanceID, assignID, in, out);
+IonicCurrent *abHHProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
+    return new abHH(conductanceID, assignID, multiID, in, out);
 }
 
 abHHProxy::abHHProxy()
@@ -46,8 +46,8 @@ abHHProxy::abHHProxy()
 }
 
 
-abHH::abHH(size_t condID, size_t assignID, inChannel *in, outChannel *out) :
-    IonicCurrent(condID, assignID, in, out),
+abHH::abHH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
+    IonicCurrent(condID, assignID, multiID, in, out),
     p(&params()),
     a(&assignment()),
     m(0.0),

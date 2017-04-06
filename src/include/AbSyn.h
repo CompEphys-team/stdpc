@@ -32,7 +32,7 @@ public:
     inline QString conductanceClass() { return "abSyn"; }
     inline QString prettyName() { return "a/b Syn"; }
 
-    Synapse *createAssigned(size_t conductanceID, size_t assignID, DCThread *,
+    Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
                             inChannel *pre, inChannel *post, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
@@ -69,7 +69,7 @@ class abSyn : public Synapse {
     double Dslope; // slope of the sigmoid for D
 
   public:
-    abSyn(size_t condID, size_t assignID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
+    abSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const abSynData &params() const { return abSynProxy::p[condID]; }
     void step(double t, double dt);
 

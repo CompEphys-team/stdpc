@@ -7,9 +7,9 @@ static DestexheSynProxy prox;
 std::vector<DestexheSynData> DestexheSynProxy::p;
 DestexheSynProxy *DestexheSyn::proxy() const { return &prox; }
 ConductanceDlg *DestexheSynProxy::createDialog(size_t condID, QWidget *parent) { return new DestexheSynDlg(condID, parent); }
-Synapse *DestexheSynProxy::createAssigned(size_t conductanceID, size_t assignID, DCThread *DCT,
+Synapse *DestexheSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
                                           inChannel *pre, inChannel *post, outChannel *out) {
-    return new DestexheSyn(conductanceID, assignID, DCT, pre, post, out);
+    return new DestexheSyn(conductanceID, assignID, multiID, DCT, pre, post, out);
 }
 
 DestexheSynProxy::DestexheSynProxy()
@@ -76,8 +76,8 @@ DestexheSynProxy::DestexheSynProxy()
 }
 
     
-DestexheSyn::DestexheSyn(size_t condID, size_t assignID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, pre, post, out),
+DestexheSyn::DestexheSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
+    Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
     S(0.0),

@@ -8,7 +8,8 @@ class ConductanceProxy;
 class Conductance
 {
 public:
-    Conductance(size_t condID, size_t assignID) : condID(condID), assignID(assignID), m_conductance(0) {}
+    Conductance(size_t condID, size_t assignID, size_t multiID) :
+        condID(condID), assignID(assignID), multiID(multiID), m_conductance(0) {}
     virtual ~Conductance() {}
 
     /// Compute Runke-Kutta step n (n = 0..3), in this order:
@@ -28,6 +29,8 @@ public:
     virtual const ConductanceData &params() const = 0;
     inline size_t conductanceID() const { return condID; }
 
+    inline size_t multiplexID() const { return multiID; }
+
     virtual ConductanceProxy *proxy() const = 0;
 
     inline const double &conductance() const { return m_conductance; }
@@ -35,6 +38,7 @@ public:
 protected:
     const size_t condID;
     const size_t assignID;
+    const size_t multiID;
 
     double m_conductance;
 };
