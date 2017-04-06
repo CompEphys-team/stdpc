@@ -35,7 +35,8 @@ void GraphWidget::addPlot(bool import)
     ui->table->setCellWidget(row, 0, plot);
     plots.push_back(plot);
 
-    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes);
+    plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend);
+    plot->legend->setSelectableParts(QCPLegend::spItems);
     connect(plot, &QCustomPlot::mouseDoubleClick, [=](){
         dialog->setPlot(row);
         dialog->open();
@@ -117,6 +118,16 @@ void GraphWidget::setupGraph(GraphData &p, QCPGraph *graph)
         name = name.arg((p.chan.isInChn = p.isVoltage) ? "mV" : "nA");
     graph->setName(name);
     graph->setPen(QPen(p.color));
+
+    QCPPlottableLegendItem *item = graph->parentPlot()->legend->itemWithPlottable(graph);
+    connect(item, &QCPPlottableLegendItem::selectionChanged, [=](bool on){
+        if ( !on ) return;
+        on = graph->visible();
+        graph->setVisible(!on);
+        item->setTextColor(on ? Qt::lightGray : Qt::black);
+        item->setSelected(false);
+        graph->parentPlot()->replot();
+    });
 }
 
 void GraphWidget::rangeChanged(QCPRange range)
