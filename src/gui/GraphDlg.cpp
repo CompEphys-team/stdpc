@@ -149,6 +149,7 @@ void GraphDlg::on_TraceClear_clicked()
     for ( int i = ui->table->rowCount() - 2; i >= 0; i-- )
         if ( !actives[i]->isChecked() )
             ui->table->removeRow(i);
+    checkChannelTypes();
 }
 
 void GraphDlg::on_removePlot_clicked()
