@@ -14,8 +14,8 @@ public:
 
     inline static size_t requiredSize(double duration)
     {
-        // Assuming max cycle frequency of 50 MHz, which should be plenty:
-        return 1 + (size_t)(duration * 5e7);
+        // Assuming max cycle frequency of 100 kHz, which should be plenty:
+        return 1 + (size_t)(duration * 1e5);
     }
 
     size_t getHandle(double duration);
