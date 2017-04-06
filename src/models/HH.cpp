@@ -39,6 +39,7 @@ HHProxy::HHProxy()
     addAP("mhHHp[#].assign[#].active", &p, &mhHHData::assign, &CurrentAssignment::active);
     addAP("mhHHp[#].assign[#].VChannel", &p, &mhHHData::assign, &CurrentAssignment::VChannel);
     addAP("mhHHp[#].assign[#].IChannel", &p, &mhHHData::assign, &CurrentAssignment::IChannel);
+    addAP("mhHHp[#].assign[#].save", &p, &mhHHData::assign, &CurrentAssignment::save);
 
     addAP("mhHHp[#].VChannel", &p, &mhHHData::legacy_V);
     addAP("mhHHp[#].IChannel", &p, &mhHHData::legacy_I);

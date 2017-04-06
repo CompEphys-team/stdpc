@@ -31,6 +31,7 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
      tmp->setDecimals(3);
      tmp->setFactor(1e-3);
      vec.push_back(tmp);
+     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
 }
 

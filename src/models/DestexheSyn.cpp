@@ -68,6 +68,7 @@ DestexheSynProxy::DestexheSynProxy()
     addAP("DxheSynp[#].assign[#].PostSynChannel", &p, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
     addAP("DxheSynp[#].assign[#].OutSynChannel", &p, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("DxheSynp[#].assign[#].delay", &p, &DestexheSynData::assign, &SynapseAssignment::delay);
+    addAP("DxheSynp[#].assign[#].save", &p, &DestexheSynData::assign, &SynapseAssignment::save);
 
     addAP("DxheSynp[#].PreSynChannel", &p, &DestexheSynData::legacy_PreSyn);
     addAP("DxheSynp[#].PostSynChannel", &p, &DestexheSynData::legacy_PostSyn);

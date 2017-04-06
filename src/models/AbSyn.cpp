@@ -70,6 +70,7 @@ abSynProxy::abSynProxy()
     addAP("abSynp[#].assign[#].PostSynChannel", &p, &abSynData::assign, &SynapseAssignment::PostSynChannel);
     addAP("abSynp[#].assign[#].OutSynChannel", &p, &abSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("abSynp[#].assign[#].delay", &p, &abSynData::assign, &SynapseAssignment::delay);
+    addAP("abSynp[#].assign[#].save", &p, &abSynData::assign, &SynapseAssignment::save);
 
     addAP("abSynp[#].PreSynChannel", &p, &abSynData::legacy_PreSyn);
     addAP("abSynp[#].PostSynChannel", &p, &abSynData::legacy_PostSyn);

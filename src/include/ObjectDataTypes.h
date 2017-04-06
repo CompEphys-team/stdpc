@@ -11,6 +11,7 @@ using namespace std;
 
 struct AssignmentData {
     bool active;
+    bool save = false;
 };
 
 struct SynapseAssignment : public AssignmentData {

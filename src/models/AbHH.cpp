@@ -39,6 +39,7 @@ abHHProxy::abHHProxy()
     addAP("abHHp[#].assign[#].active", &p, &abHHData::assign, &CurrentAssignment::active);
     addAP("abHHp[#].assign[#].VChannel", &p, &abHHData::assign, &CurrentAssignment::VChannel);
     addAP("abHHp[#].assign[#].IChannel", &p, &abHHData::assign, &CurrentAssignment::IChannel);
+    addAP("abHHp[#].assign[#].save", &p, &abHHData::assign, &CurrentAssignment::save);
 
     addAP("abHHp[#].VChannel", &p, &abHHData::legacy_V);
     addAP("abHHp[#].IChannel", &p, &abHHData::legacy_I);

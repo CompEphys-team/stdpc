@@ -78,6 +78,7 @@ ChemSynProxy::ChemSynProxy()
     addAP("CSynp[#].assign[#].PostSynChannel", &p, &CSynData::assign, &SynapseAssignment::PostSynChannel);
     addAP("CSynp[#].assign[#].OutSynChannel", &p, &CSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("CSynp[#].assign[#].delay", &p, &CSynData::assign, &SynapseAssignment::delay);
+    addAP("CSynp[#].assign[#].save", &p, &CSynData::assign, &SynapseAssignment::save);
 
     addAP("CSynp[#].PreSynChannel", &p, &CSynData::legacy_PreSyn);
     addAP("CSynp[#].PostSynChannel", &p, &CSynData::legacy_PostSyn);

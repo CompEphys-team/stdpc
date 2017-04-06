@@ -19,6 +19,7 @@ GapJunctionProxy::GapJunctionProxy()
     addAP("ESynp[#].assign[#].postInChannel", &p, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
     addAP("ESynp[#].assign[#].preOutChannel", &p, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
     addAP("ESynp[#].assign[#].postOutChannel", &p, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
+    addAP("ESynp[#].assign[#].save", &p, &GJunctData::assign, &GapJunctionAssignment::save);
 
     addAP("ESynp[#].preInChannel", &p, &GJunctData::legacy_PreIn);
     addAP("ESynp[#].postInChannel", &p, &GJunctData::legacy_PostIn);

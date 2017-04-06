@@ -18,6 +18,7 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
      vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::preOutChannel, "Presyn I", 95, out));
      vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::postInChannel, "Postsyn V", 95, in));
      vec.push_back(new AssignmentCellChannel<GapJunctionAssignment>(&GapJunctionAssignment::postOutChannel, "Postsyn I", 95, out));
+     vec.push_back(new AssignmentCellBool<GapJunctionAssignment>(&GapJunctionAssignment::save, "Save", 30));
      assignments->init(vec);
 }
 
