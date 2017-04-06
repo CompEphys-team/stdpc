@@ -44,6 +44,7 @@ public:
     static ChannelListModel *getModel(int displayFlags);
     static void updateChns_static(ChannelIndex removeDeviceDex);
     static void updateChns_static_noargs();
+    static void destruct();
 
 public slots:
     void updateChns(ChannelIndex removeDeviceDex = ChannelIndex());
@@ -99,7 +100,7 @@ protected:
 
     ChannelIndex rmDevDex;
 
-    static std::unique_ptr<ChannelListModel> ownedModels[ChannelType::__MAX];
+    static std::unique_ptr<ChannelListModel> &ownedModels(size_t flags);
 };
 
 #endif // CHANNELLISTMODEL_H

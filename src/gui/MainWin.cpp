@@ -112,6 +112,8 @@ MyMainWindow::~MyMainWindow()
   delete SaveProtocolFileDlg;
 
   delete ui;
+
+  ChannelListModel::destruct();
 }
 
 void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double lowLimit, double highLimit, double value)

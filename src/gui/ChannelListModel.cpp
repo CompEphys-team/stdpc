@@ -2,27 +2,37 @@
 #include "Global.h"
 #include "ChannelIndex.h"
 
-std::unique_ptr<ChannelListModel> ChannelListModel::ownedModels[ChannelListModel::__MAX];
+std::unique_ptr<ChannelListModel> &ChannelListModel::ownedModels(size_t flags) {
+    static std::unique_ptr<ChannelListModel> m[ChannelType::__MAX];
+    return m[flags];
+}
 
 ChannelListModel *ChannelListModel::getModel(int displayFlags)
 {
-    if ( !ownedModels[displayFlags] ) {
-        ownedModels[displayFlags].reset(new ChannelListModel(displayFlags));
-        ownedModels[displayFlags]->updateChns();
+    if ( !ownedModels(displayFlags) ) {
+        ownedModels(displayFlags).reset(new ChannelListModel(displayFlags));
+        ownedModels(displayFlags)->updateChns();
     }
-    return ownedModels[displayFlags].get();
+    return ownedModels(displayFlags).get();
 }
 
 void ChannelListModel::updateChns_static(ChannelIndex removeDeviceDex)
 {
     for ( int i = 0; i < ChannelType::__MAX; i++ )
-        if ( ownedModels[i] )
-            ownedModels[i]->updateChns(removeDeviceDex);
+        if ( ownedModels(i) )
+            ownedModels(i)->updateChns(removeDeviceDex);
 }
 
 void ChannelListModel::updateChns_static_noargs()
 {
     updateChns_static(ChannelIndex());
+}
+
+void ChannelListModel::destruct()
+{
+    for ( int i = 0; i < ChannelType::__MAX; i++ )
+        if ( ownedModels(i) )
+            ownedModels(i).release()->deleteLater();
 }
 
 
