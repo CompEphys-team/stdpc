@@ -305,7 +305,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   Models.clear();
   Devices.clear();
   Conductances.clear();
-  Plotp.graphs.clear();
+  Plotp.plot.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));

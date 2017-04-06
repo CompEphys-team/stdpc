@@ -9,7 +9,7 @@
 
 #include "ChannelBufferHelper.h"
 
-class GraphDlg;
+class GraphWidget;
 class PerformanceMonitor;
 
 class DCThread : public QThread 
@@ -32,7 +32,7 @@ private:
      bool LoadScript(QString &);
      void UnloadScript();
 
-     void setGraph(GraphDlg * = nullptr, double dt = 0.0);
+     void setGraph(GraphWidget * = nullptr, double dt = 0.0);
      void setPerformanceMonitor(PerformanceMonitor * = nullptr, double dt = 0.0);
 
      void setup_and_go();
@@ -66,7 +66,7 @@ private:
      QVector<inChannel*> aecIn;
      QVector<outChannel*> aecOut, aecCopy;
 
-     GraphDlg *graph;
+     GraphWidget *graph;
      QVector<const double *> graphVar;
      double graphDt;
      double graphDummy;

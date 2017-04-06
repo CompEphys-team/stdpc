@@ -174,10 +174,15 @@ struct GraphData {
 };
 
 struct PlotData {
+    std::vector<GraphData> graph;
+    int height = 400;
+};
+
+struct BasePlotData {
     double interval;
     int bufferExp;
-    std::vector<GraphData> graphs;
-    PlotData() : interval(1e-3), bufferExp(4) {}
+    std::vector<PlotData> plot;
+    BasePlotData() : interval(1e-3), bufferExp(4) {}
 };
 
 struct PerformanceMonitorData {

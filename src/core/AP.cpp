@@ -15,16 +15,21 @@ void initAP()
 
 
     // Graphs
-    addAP("Plotp.bufferExp", &Plotp, &PlotData::bufferExp);
-    addAP("Plotp.interval", &Plotp, &PlotData::interval);
-    addAP("Plotp.graphs[#].active", &Plotp, &PlotData::graphs, &GraphData::active);
-    AP *graphCol = addAP("Plotp.graphs[#].color", &Plotp, &PlotData::graphs, &GraphData::color);
-    AP *graphVol = addAP("Plotp.graphs[#].isVoltage", &Plotp, &PlotData::graphs, &GraphData::isVoltage);
-    AP *graphChn = addAP("Plotp.graphs[#].chan", &Plotp, &PlotData::graphs, &GraphData::chan);
+    addAP("Plotp.bufferExp", &Plotp, &BasePlotData::bufferExp);
+    addAP("Plotp.interval", &Plotp, &BasePlotData::interval);
+    addAP("Plotp.plot[#].height", &Plotp, &BasePlotData::plot, &PlotData::height);
+    AP *graphActive = addAP("Plotp.plot[#].graph[#].active", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::active);
+    AP *graphChan =   addAP("Plotp.plot[#].graph[#].chan", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::chan);
+    AP *graphVolt =   addAP("Plotp.plot[#].graph[#].isVoltage", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::isVoltage);
+    AP *graphColor =  addAP("Plotp.plot[#].graph[#].color", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::color);
 
-    addDeprecatedAP("Graphp[#].chan", graphChn);
-    addDeprecatedAP("Graphp[#].isVoltage", graphVol);
-    addDeprecatedAP("Graphp[#].color", graphCol);
+    addDeprecatedAP("Plotp.graphs[#].active", graphActive, 1);
+    addDeprecatedAP("Plotp.graphs[#].color", graphColor, 1);
+    addDeprecatedAP("Plotp.graphs[#].isVoltage", graphVolt, 1);
+    addDeprecatedAP("Plotp.graphs[#].chan", graphChan, 1);
+    addDeprecatedAP("Graphp[#].chan", graphChan, 1);
+    addDeprecatedAP("Graphp[#].isVoltage", graphVolt, 1);
+    addDeprecatedAP("Graphp[#].color", graphColor, 1);
 
 
     // Sample & hold
@@ -292,6 +297,7 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             legacyGraphData &graphp = legacyGraphp[j];
             if ( graphp.dt )
                 Plotp.interval = graphp.dt;
+            PlotData plot;
             for ( int i = 0; i < 4; i++ ) {
                 GraphData g;
                 g.active = graphp.active[i];
@@ -308,8 +314,9 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                     g.chan = legacyOut[chan - legacyIn.size()]; // Out
                 g.color = QColor(graphp.color[i]);
                 g.isVoltage = g.chan.isInChn || g.chan.isVirtual;
-                Plotp.graphs.push_back(g);
+                plot.graph.push_back(g);
             }
+            Plotp.plot.push_back(plot);
         }
     }
 

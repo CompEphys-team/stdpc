@@ -3,10 +3,10 @@
 
 #include <QWidget>
 #include "ChannelListModel.h"
-#include "QCustomPlot.h"
-#include "CircularFifo.h"
-#include <memory>
 #include "WideComboBox.h"
+#include <QCheckBox>
+#include <QToolButton>
+#include <QColorDialog>
 
 namespace Ui {
 class GraphDlg;
@@ -40,20 +40,12 @@ public slots:
 };
 
 
-class GraphDlg : public QWidget
+class GraphDlg : public QDialog
 {
      Q_OBJECT
 private:
     Ui::GraphDlg *ui;
     ChannelListModel *clm;
-
-    QTimer dataTimer;
-
-    bool initial;
-    long long nPoints;
-    double t0;
-
-    std::vector<GraphData> activeGraphs;
 
     QVector<QCheckBox*> actives;
     QVector<ColorButton*> colors;
@@ -61,33 +53,37 @@ private:
     QVector<WideComboBox*> channels;
     QMetaObject::Connection activec, typec, channelc;
 
+    int m_plot;
+    bool interactive;
+
     void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel);
 
-    void setInteractive(bool maybe);
-
 private slots:
-    void replot();
     void growTable(bool reactive = true);
     void checkChannelTypes();
 
     void on_TraceActivate_clicked();
     void on_TraceDeactivate_clicked();
     void on_TraceClear_clicked();
-    void on_TraceReset_clicked();
+
+    void on_removePlot_clicked();
 
 public:
      GraphDlg(QWidget *parent = 0);
      ~GraphDlg();
 
-     struct DataPoint { double t; double value; };
-     std::vector<std::unique_ptr<CircularFifo<DataPoint>>> q;
+     inline void setPlot(int g) { m_plot = g; }
+     inline int plot() const { return m_plot; }
+
+     inline void setInteractive(bool maybe) { interactive = maybe; }
 
 public slots:
-     bool startPlotting(DCThread *);
-     void stopPlotting();
-     void reloadGraphs();
-     void importData();
-     void exportData();
+     void open();
+     void accept();
+
+signals:
+     void updatePlot(int row);
+     void removePlot(int row);
 }; 
 
 #endif

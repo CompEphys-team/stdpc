@@ -316,7 +316,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="GraphDlg" name="graphtab">
+      <widget class="GraphWidget" name="graphtab">
        <attribute name="title">
         <string>Graph</string>
        </attribute>
@@ -515,15 +515,15 @@
    <header>DaqTable.h</header>
   </customwidget>
   <customwidget>
-   <class>GraphDlg</class>
-   <extends>QWidget</extends>
-   <header>GraphDlg.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>PerformanceMonitor</class>
    <extends>QWidget</extends>
    <header>PerformanceMonitor.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>GraphWidget</class>
+   <extends>QWidget</extends>
+   <header>GraphWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

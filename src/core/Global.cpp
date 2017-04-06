@@ -6,7 +6,7 @@
 int LOADED_PROTOCOL_VERSION;
 QString LEGACY_DAQ_CLASS;
 
-PlotData Plotp;
+BasePlotData Plotp;
 PerformanceMonitorData PerfMonp;
 
 dataSavingParams dataSavingPs;

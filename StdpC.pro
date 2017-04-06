@@ -67,7 +67,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqWidget.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
-    $$PWD/src/gui/PerformanceMonitor.ui
+    $$PWD/src/gui/PerformanceMonitor.ui \
+    src/gui/GraphWidget.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -139,7 +140,8 @@ HEADERS += \
     $$PWD/src/include/Conductance.h \
     $$PWD/src/include/Synapse.h \
     $$PWD/src/include/ConductanceDlg.h \
-    $$PWD/src/include/IonicCurrent.h
+    $$PWD/src/include/IonicCurrent.h \
+    $$PWD/src/include/GraphWidget.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -202,7 +204,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/ConductanceManager.cpp \
     $$PWD/src/models/Synapse.cpp \
     $$PWD/src/models/IonicCurrent.cpp \
-    src/gui/Component.cpp
+    $$PWD/src/gui/Component.cpp \
+    $$PWD/src/gui/GraphWidget.cpp
 
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 

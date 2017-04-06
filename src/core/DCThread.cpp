@@ -6,7 +6,7 @@
 #include "ChannelIndex.h"
 #include "DeviceManager.h"
 #include "ModelManager.h"
-#include "GraphDlg.h"
+#include "GraphWidget.h"
 #include "PerformanceMonitor.h"
 
 DCThread::DCThread() :
@@ -35,7 +35,7 @@ DCThread::~DCThread()
 {
 }
 
-void DCThread::setGraph(GraphDlg *g, double dt)
+void DCThread::setGraph(GraphWidget *g, double dt)
 {
     if ( stopped ) {
         graph = g;
@@ -75,23 +75,21 @@ void DCThread::setup_and_go()
        inChannel *itmp;
        outChannel *otmp;
        graphVar.clear();
-       graphVar.reserve(Plotp.graphs.size());
-       for ( GraphData &p : Plotp.graphs ) {
-           if ( !p.active ) {
-               continue;
-           } else if ( !p.chan.isValid || p.chan.isNone ) {
+       graphVar.reserve(graph->q.size());
+       for ( ChannelIndex &chan : graph->plottedChannels ) {
+           if ( !chan.isValid || chan.isNone ) {
                graphVar.push_back(&graphDummy);
-           } else if ( p.chan.isConductance ) {
-               const double *ret = Conductances.conductance(p.chan);
+           } else if ( chan.isConductance ) {
+               const double *ret = Conductances.conductance(chan);
                graphVar.push_back(ret ? ret : &graphDummy);
-           } else if ( p.chan.isVirtual ) {
-               graphVar.push_back(p.isVoltage
-                       ? &((itmp = getInChan(p.chan)) ? itmp->V : graphDummy)
-                       : &((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
-           } else if ( p.chan.isInChn ) {
-               graphVar.push_back(&((itmp = getInChan(p.chan)) ? itmp->V : graphDummy));
+           } else if ( chan.isVirtual ) {
+               graphVar.push_back(chan.isInChn
+                       ? &((itmp = getInChan(chan)) ? itmp->V : graphDummy)
+                       : &((otmp = getOutChan(chan)) ? otmp->I : graphDummy));
+           } else if ( chan.isInChn ) {
+               graphVar.push_back(&((itmp = getInChan(chan)) ? itmp->V : graphDummy));
            } else {
-               graphVar.push_back(&((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
+               graphVar.push_back(&((otmp = getOutChan(chan)) ? otmp->I : graphDummy));
            }
        }
        message(QString("Added %1 channels for display").arg(graphVar.size()));
@@ -424,7 +422,7 @@ void DCThread::run()
                  lastWrite = t;
                  i = 0;
                  for ( const double *val : graphVar )
-                    graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
+                    graph->q[i++]->push(GraphWidget::DataPoint {t, *val});
              }
          }
 
