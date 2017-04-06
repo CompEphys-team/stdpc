@@ -119,14 +119,14 @@ QString ChannelIndex::prettyName() const
     } else if ( isNone ) {
         ret = "None";
     } else if ( isAnalog ) {
-        ret = QString("%1 %2 on %3, device %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(daqClass).arg(devID);
+        ret = QString("%1 %2 on %3 %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(Devices.Register().value(daqClass)->prettyName()).arg(devID);
     } else if ( isPrototype || isVirtual ) {
         if ( isPrototype )
-            ret = QString("%1 %2:all (model %2, all instances)").arg(modelClass).arg(modelID);
+            ret = QString("%1 %2:all (%5 %2, all instances)").arg(modelClass).arg(modelID).arg(Models.Register().value(modelClass)->prettyName());
         else
-            ret = QString("%1 %2:%3 (model %2, instance %3)").arg(modelClass).arg(modelID).arg(instID);
+            ret = QString("%1 %2:%3 (%5 %2, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(Models.Register().value(modelClass)->prettyName());
     } else if ( isConductance ) {
-        ret = QString("%1 %2, assignment %3").arg(conductanceClass).arg(conductanceID).arg(assignID);
+        ret = QString("%1 %2, assignment %3").arg(Conductances.Register().value(conductanceClass)->prettyName()).arg(conductanceID).arg(assignID);
     } else ret = "Oops: Invalid channel index";
     return ret;
 }
