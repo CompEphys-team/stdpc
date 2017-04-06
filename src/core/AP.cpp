@@ -17,7 +17,10 @@ void initAP()
     // Graphs
     addAP("Plotp.bufferExp", &Plotp, &BasePlotData::bufferExp);
     addAP("Plotp.interval", &Plotp, &BasePlotData::interval);
+    addAP("Plotp.xRange", &Plotp, &BasePlotData::xRange);
     addAP("Plotp.plot[#].height", &Plotp, &BasePlotData::plot, &PlotData::height);
+    addAP("Plotp.plot[#].yLower", &Plotp, &BasePlotData::plot, &PlotData::yLower);
+    addAP("Plotp.plot[#].yUpper", &Plotp, &BasePlotData::plot, &PlotData::yUpper);
     AP *graphActive = addAP("Plotp.plot[#].graph[#].active", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::active);
     AP *graphChan =   addAP("Plotp.plot[#].graph[#].chan", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::chan);
     AP *graphVolt =   addAP("Plotp.plot[#].graph[#].isVoltage", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::isVoltage);

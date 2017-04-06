@@ -49,7 +49,6 @@ void GraphWidget::addPlot(bool import)
     if ( !row )
         plot->xAxis->setRange(0, 10);
 
-    plot->yAxis->setRange(-100, 100);
     plot->yAxis->setTickLabels(true);
 
     plot->legend->setVisible(true);
@@ -65,16 +64,18 @@ void GraphWidget::addPlot(bool import)
     plot->axisRect()->setRangeZoomAxes(plot->axisRect()->axes());
     plot->axisRect()->setRangeDragAxes(plot->axisRect()->axes());
 
-    connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(rangeChanged(QCPRange)));
-    plot->xAxis->setRange(plots[0]->xAxis->range());
-
     if ( import ) {
         ui->table->setRowHeight(row, Plotp.plot[row].height);
+        plot->xAxis->setRange(0, Plotp.xRange);
     } else {
         Plotp.plot.resize(row+1);
+        plot->xAxis->setRange(plots[0]->xAxis->range());
         dialog->setPlot(row);
         dialog->open();
     }
+
+    plot->yAxis->setRange(Plotp.plot[row].yLower, Plotp.plot[row].yUpper);
+    connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(rangeChanged(QCPRange)));
 
     updatePlot(row);
 }
@@ -156,8 +157,12 @@ void GraphWidget::exportData()
 {
     Plotp.bufferExp = ui->bufferExp->value();
     Plotp.interval = ui->samplingInterval->value() * 1e-3;
+    if ( !plots.empty() )
+        Plotp.xRange = plots[0]->xAxis->range().size();
     for ( int i = 0; i < ui->table->rowCount()-1; i++ ) {
         Plotp.plot[i].height = ui->table->rowHeight(i);
+        Plotp.plot[i].yLower = plots[i]->yAxis->range().lower;
+        Plotp.plot[i].yUpper = plots[i]->yAxis->range().upper;
     }
 }
 

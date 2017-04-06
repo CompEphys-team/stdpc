@@ -177,11 +177,14 @@ struct GraphData {
 struct PlotData {
     std::vector<GraphData> graph;
     int height = 400;
+    double yLower = -100;
+    double yUpper = 100;
 };
 
 struct BasePlotData {
     double interval;
     int bufferExp;
+    double xRange = 10;
     std::vector<PlotData> plot;
     BasePlotData() : interval(1e-3), bufferExp(4) {}
 };
