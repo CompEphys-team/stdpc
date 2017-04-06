@@ -145,41 +145,36 @@ void DCThread::setup_and_go()
    if (saving) {
        savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
-       inChnsToSave.clear();
-       outChnsToSave.clear();
        valuesToSave.clear();
-       QVector<QString> headerIn, headerOut, headerCond;
+       QVector<QString> header(1, "Time");
 
        for ( auto &b : Devices.active() ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
-           QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
-           headerIn += its.first;
-           headerOut += ots.first;
-           inChnsToSave += its.second;
-           outChnsToSave += ots.second;
+           auto toSave = b->valuesToSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
        }
        for ( auto const& m : Models.active() ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = m->inChans_to_save();
-           QPair<QVector<QString>, QVector<outChannel*>> ots = m->outChans_to_save();
-           headerIn += its.first;
-           headerOut += ots.first;
-           inChnsToSave += its.second;
-           outChnsToSave += ots.second;
+           auto toSave = m->valuesToSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
        }
-       auto cond = Conductances.toSave();
-       headerCond = cond.first;
-       valuesToSave += cond.second;
+       {
+           auto toSave = Conductances.toSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
+       }
 
-       QVector<QString> header(1, "Time");
-       header += headerIn;
-       header += headerOut;
-       header += headerCond;
 #ifdef TEST_VERSION
        for ( AECChannel *aec : aecChannels ) {
            header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
+           valuesToSave += &(aec->v_e);
        }
 #endif
-       dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
+
+       if ( valuesToSave.empty() )
+           saving = false;
+       else
+           dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
    }
 
    start();
@@ -362,17 +357,8 @@ void DCThread::run()
                                    // DataSaver::SaveLine before this call returns
                   dataSaver->q[i-1]->push(t);
               }
-              for ( inChannel *in : inChnsToSave )
-                  dataSaver->q[i++]->push(in->V);
-              for ( outChannel *out : outChnsToSave )
-                  dataSaver->q[i++]->push(out->I);
               for ( const double *value : valuesToSave )
                   dataSaver->q[i++]->push(*value);
-            #ifdef TEST_VERSION
-              for ( AECChannel *aec : aecChannels )
-                  dataSaver->q[i++]->push(aec->v_e);
-            #endif
-
               if ( space )
                   emit saveData();
               lastSave = t;

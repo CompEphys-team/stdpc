@@ -63,28 +63,19 @@ QString ModelPrototype::getStatus() const
     return QString("Model %1 %2: %3 instance%4 active").arg(prefix()).arg(modelID).arg(nInst).arg(nInst>1 ? "s":"");
 }
 
-QPair<QVector<QString>, QVector<inChannel *>> ModelPrototype::inChans_to_save() const
+QPair<QVector<QString>, QVector<const double *>> ModelPrototype::valuesToSave() const
 {
     QVector<QString> labels;
-    QVector<inChannel*> chans;
+    QVector<const double *> values;
     for ( std::shared_ptr<Model> const& m : inst ) {
         if ( m->in.save ) {
             labels.push_back(QString("%1_%2_V%3").arg(prefix()).arg(modelID).arg(m->id()));
-            chans.push_back(&(m->in));
+            values.push_back(&(m->in.V));
         }
-    }
-    return qMakePair(labels, chans);
-}
-
-QPair<QVector<QString>, QVector<outChannel *>> ModelPrototype::outChans_to_save() const
-{
-    QVector<QString> labels;
-    QVector<outChannel*> chans;
-    for ( std::shared_ptr<Model> const& m : inst ) {
         if ( m->out.save ) {
             labels.push_back(QString("%1_%2_I%3").arg(prefix()).arg(modelID).arg(m->id()));
-            chans.push_back(&(m->out));
+            values.push_back(&(m->out.I));
         }
     }
-    return qMakePair(labels, chans);
+    return qMakePair(labels, values);
 }

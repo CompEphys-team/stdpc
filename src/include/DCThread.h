@@ -41,8 +41,6 @@ private:
      outChannel *getOutChan(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
-     QVector<inChannel *> inChnsToSave;
-     QVector<outChannel *> outChnsToSave;
      QVector<const double *> valuesToSave;
      
      bool stopped;

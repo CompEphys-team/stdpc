@@ -39,8 +39,7 @@ class DAQ {
     void init_chans(); // Sets up scan list, analog out list
     void reset_chans();
     void process_scan(double t); // detects spikes, updates channel buffer
-    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save();
-    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save();
+    QPair<QVector<QString>, QVector<const double *>> valuesToSave();
     QVector<AECChannel*> aecChans();
 
     struct ChannelLimitWarning {QString what; QString chan_label; double hiLim; double loLim; double value;};

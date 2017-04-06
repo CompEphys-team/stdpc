@@ -84,31 +84,23 @@ void DAQ::process_scan(double t)
 }
 
 //---------------------------------------------------------------------------
-QPair<QVector<QString>, QVector<inChannel*>> DAQ::inChans_to_save()
+QPair<QVector<QString>, QVector<const double *>> DAQ::valuesToSave()
 {
     QVector<QString> labels;
-    QVector<inChannel*> chans;
+    QVector<const double *> values;
     for ( int i = 0; i < actInChnNo; i++ ) {
         if ( in[inIdx[i]].save ) {
             labels.push_back(QString("%1_%2_V%3").arg(proxy->daqClass()).arg(devID).arg(inIdx[i]));
-            chans.push_back(&in[inIdx[i]]);
+            values.push_back(&in[inIdx[i]].V);
         }
     }
-    return qMakePair(labels, chans);
-}
-
-//---------------------------------------------------------------------------
-QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
-{
-    QVector<QString> labels;
-    QVector<outChannel*> chans;
     for ( int i = 0; i < actOutChnNo; i++ ) {
         if ( out[outIdx[i]].save ) {
             labels.push_back(QString("%1_%2_I%3").arg(proxy->daqClass()).arg(devID).arg(outIdx[i]));
-            chans.push_back(&out[outIdx[i]]);
+            values.push_back(&out[outIdx[i]].I);
         }
     }
-    return qMakePair(labels, chans);
+    return qMakePair(labels, values);
 }
 
 //---------------------------------------------------------------------------
