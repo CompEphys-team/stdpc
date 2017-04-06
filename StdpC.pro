@@ -31,6 +31,8 @@ CONFIG += qt \
     debug_and_release
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
+QMAKE_CXXFLAGS_RELEASE += -O3 -flto
+QMAKE_LFLAGS_RELEASE += -O3 -flto
 
 QMAKE_CXXFLAGS += -std=c++11
 
