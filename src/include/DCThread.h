@@ -43,6 +43,7 @@ private:
 
      QVector<inChannel *> inChnsToSave;
      QVector<outChannel *> outChnsToSave;
+     QVector<const double *> valuesToSave;
      
      bool stopped;
      bool finished;

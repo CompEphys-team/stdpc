@@ -75,7 +75,6 @@ const double *ConductanceManager::conductance(const ChannelIndex &dex)
 QStringList ConductanceManager::getStatus() const
 {
     QStringList statuses;
-    // Assume that preD/inD/postD are ordered, i.e. set up through init()
     for ( ConductanceProxy *proxy : Register() ) {
         int euler = 0, rk4 = 0;
         for ( Conductance *c : preD )
@@ -95,4 +94,23 @@ QStringList ConductanceManager::getStatus() const
                         .arg(rk4);
     }
     return statuses;
+}
+
+QPair<QVector<QString>, QVector<const double *>> ConductanceManager::toSave() const
+{
+    QVector<QString> labels;
+    QVector<const double *> values;
+    for ( auto&& any : {preD, inD, postD} ) {
+        for ( Conductance *c : any ) {
+            if ( c->assignment().save ) {
+                labels.push_back(QString("%1_%2_g%3_multi%4")
+                                 .arg(c->proxy()->conductanceClass())
+                                 .arg(c->conductanceID())
+                                 .arg(c->assignmentID())
+                                 .arg(c->multiplexID()));
+                values.push_back(&c->conductance());
+            }
+        }
+    }
+    return qMakePair(labels, values);
 }

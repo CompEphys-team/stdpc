@@ -58,6 +58,8 @@ public:
 
     QStringList getStatus() const;
 
+    QPair<QVector<QString>, QVector<const double *>> toSave() const;
+
     inline const std::vector<Conductance *> &preDigital() const { return preD; }
     inline const std::vector<Conductance *> &inDigital() const { return inD; }
     inline const std::vector<Conductance *> &postDigital() const { return postD; }

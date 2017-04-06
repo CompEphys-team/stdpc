@@ -147,7 +147,8 @@ void DCThread::setup_and_go()
 
        inChnsToSave.clear();
        outChnsToSave.clear();
-       QVector<QString> headerIn, headerOut;
+       valuesToSave.clear();
+       QVector<QString> headerIn, headerOut, headerCond;
 
        for ( auto &b : Devices.active() ) {
            QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
@@ -165,10 +166,14 @@ void DCThread::setup_and_go()
            inChnsToSave += its.second;
            outChnsToSave += ots.second;
        }
+       auto cond = Conductances.toSave();
+       headerCond = cond.first;
+       valuesToSave += cond.second;
 
        QVector<QString> header(1, "Time");
        header += headerIn;
        header += headerOut;
+       header += headerCond;
 #ifdef TEST_VERSION
        for ( AECChannel *aec : aecChannels ) {
            header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
@@ -361,6 +366,8 @@ void DCThread::run()
                   dataSaver->q[i++]->push(in->V);
               for ( outChannel *out : outChnsToSave )
                   dataSaver->q[i++]->push(out->I);
+              for ( const double *value : valuesToSave )
+                  dataSaver->q[i++]->push(*value);
             #ifdef TEST_VERSION
               for ( AECChannel *aec : aecChannels )
                   dataSaver->q[i++]->push(aec->v_e);
