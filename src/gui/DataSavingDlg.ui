@@ -30,13 +30,10 @@
    </property>
   </widget>
   <widget class="QLineEdit" name="leFileName">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>60</y>
+     <y>20</y>
      <width>371</width>
      <height>20</height>
     </rect>
@@ -55,7 +52,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>60</y>
+     <y>20</y>
      <width>46</width>
      <height>21</height>
     </rect>
@@ -164,7 +161,7 @@
    <property name="geometry">
     <rect>
      <x>480</x>
-     <y>60</y>
+     <y>20</y>
      <width>31</width>
      <height>23</height>
     </rect>
@@ -176,31 +173,21 @@
     <string>...</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="enabledE">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
+  <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>20</y>
-     <width>111</width>
-     <height>17</height>
+     <y>50</y>
+     <width>459</width>
+     <height>38</height>
     </rect>
    </property>
-   <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
-   </property>
    <property name="text">
-    <string>Enable Data saving</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directory will be created if it does not exist.&lt;/p&gt;&lt;p&gt;Use %Y, %M, %D, %h, %m, %s for year, month, day, hours, minutes, seconds, respectively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
  </widget>
  <tabstops>
-  <tabstop>enabledE</tabstop>
   <tabstop>leFileName</tabstop>
   <tabstop>browseButton</tabstop>
   <tabstop>leSavingFreq</tabstop>

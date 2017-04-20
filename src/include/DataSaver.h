@@ -19,7 +19,7 @@ private:
 
 public:
     DataSaver();
-    bool InitDataSaving(const QString &, bool);
+    bool InitDataSaving(QString, bool);
     void SaveHeader(QVector<QString>, double savingFreq);
 
     std::vector<std::unique_ptr<CircularFifo<float>>> q;

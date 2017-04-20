@@ -1,16 +1,30 @@
 #include "DataSaver.h"
+#include <QDir>
+#include <QDateTime>
 
 DataSaver::DataSaver()
 {
 }
 
 // Opens the file
-bool DataSaver::InitDataSaving(const QString &filename, bool isBnry)
+bool DataSaver::InitDataSaving(QString filename, bool isBnry)
 {
     if( !os.good() || os.is_open() ) {
         os.close();
         os.clear();
     }
+
+    QDateTime now = QDateTime::currentDateTime();
+    filename.replace("%Y", now.toString("yyyy"))
+            .replace("%M", now.toString("MM"))
+            .replace("%D", now.toString("dd"))
+            .replace("%h", now.toString("HH"))
+            .replace("%m", now.toString("mm"))
+            .replace("%s", now.toString("ss"));
+    QFileInfo fileinfo(filename);
+    QDir dir(fileinfo.path());
+    if ( !dir.exists() )
+        dir.mkpath(".");
 
     isBinary = isBnry;
     if( isBinary == 0 ) os.open(filename.toLatin1());  // ascii write

@@ -24,7 +24,6 @@ public:
 
 private slots:
     void updateSaveFileName();
-    void toggleEnabled();
 
 };
 

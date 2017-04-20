@@ -56,9 +56,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
      connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
      connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MyMainWindow::TabChanged);
+     connect(ui->btnDatasaving, SIGNAL(clicked(bool)), DSDlg, SLOT(open()));
      
      connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(ui->actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
      connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(ui->actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
      connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
@@ -184,7 +184,8 @@ void MyMainWindow::StartButClicked()
   ui->actionExport_Log->setEnabled(false);
   ui->actionExit->setEnabled(false);
   ui->actionSave_config->setEnabled(false);
-  ui->menuConfig->setEnabled(false);
+  ui->cbDatasaving->setEnabled(false);
+  ui->btnDatasaving->setEnabled(false);
   ui->DAQTable->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -210,7 +211,8 @@ void MyMainWindow::StopButClicked()
   ui->actionExport_Log->setEnabled(true);
   ui->actionExit->setEnabled(true);
   ui->actionSave_config->setEnabled(true);
-  ui->menuConfig->setEnabled(true);
+  ui->cbDatasaving->setEnabled(true);
+  ui->btnDatasaving->setEnabled(true);
   ui->DAQTable->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -236,6 +238,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->currentTable->exportData();
   ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
+  dataSavingPs.enabled = ui->cbDatasaving->isChecked();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
   emit channelsChanged();
@@ -247,6 +250,7 @@ void MyMainWindow::importData()
   ui->synapseTable->importData();
   ui->currentTable->importData();
   DSDlg->importData();
+  ui->cbDatasaving->setChecked(dataSavingPs.enabled);
   ui->graphtab->importData();
   ui->performancetab->importData();
   updateStartButton();
