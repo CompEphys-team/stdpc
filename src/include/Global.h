@@ -6,6 +6,7 @@
 #include "ObjectDataTypes.h"
 #include "LUtables.h"
 #include "Clock.h"
+#include "randutils/randutils.hpp"
 
 #define MAX_ST_HISTORY 20
 #define MAX_IN_CHN_NO 64
@@ -38,5 +39,7 @@ extern Clock DAQClock;
 extern DeviceManager Devices;
 extern ModelManager Models;
 extern ConductanceManager Conductances;
+
+extern randutils::mt19937_rng RNG;
 
 #endif

@@ -23,3 +23,5 @@ Clock DAQClock;
 DeviceManager Devices;
 ModelManager Models;
 ConductanceManager Conductances;
+
+randutils::mt19937_rng RNG;

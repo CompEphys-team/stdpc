@@ -9,22 +9,9 @@
 
 TARGET = StdpC
 QT+= widgets printsupport
-DEPENDPATH += $$PWD/ \
-    $$PWD/src \
-    $$PWD/src/core \
-    $$PWD/src/drivers \
-    $$PWD/src/gui \
-    $$PWD/src/models \
+INCLUDEPATH += \
     $$PWD/src/include \
-    $$PWD/lib
-INCLUDEPATH += $$PWD \
-    $$PWD/src \
-    $$PWD/src/core \
-    $$PWD/src/drivers \
-    $$PWD/src/gui \
-    $$PWD/src/models \
-    $$PWD/src/include \
-    $$PWD/lib
+    $$PWD/src/lib
 TEMPLATE = app
 CONFIG += qt \
     thread \
