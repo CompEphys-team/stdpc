@@ -8,7 +8,7 @@ void DeviceManager::clear()
     allDAQ.clear();
     for ( DAQProxy *proxy : Register() )
         while ( proxy->size() )
-            proxy->remove(proxy->size());
+            proxy->remove(proxy->size()-1);
 }
 
 DeviceStatus DeviceManager::initSingle(QString &name, DAQProxy *proxy, size_t idx)
