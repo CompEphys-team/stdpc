@@ -35,22 +35,26 @@ SynapticNoise::SynapticNoise(size_t condID, size_t assignID, size_t multiID, inC
 
 void SynapticNoise::step(double, double dt)
 {
-    m_conductance = next(dt);
-    if ( !p->ignoreNegative || m_conductance > 0 )
-        out->I += m_conductance * (p->Vrev - in->V);
+    if ( p->active && a->active && in->active && out->active ) {
+        m_conductance = next(dt);
+        if ( !p->ignoreNegative || m_conductance > 0 )
+            out->I += m_conductance * (p->Vrev - in->V);
+    }
 }
 
 void SynapticNoise::RK4(double, double dt, size_t n)
 {
-    if ( n == 0 ) // RK0: Estimate gradient at the step's starting point, m_conductance unchanged from previous
-        gNext = next(2*dt); // 2*dt, because dt on RK step 0 is half the full step length
-    else if ( n == 1 ) // RK1, RK2: Estimate gradient at (temporal) midpoint
-        m_conductance = 0.5 * (m_conductance + gNext);
-    else if ( n == 3 ) // RK3: Estimate gradient at endpoint
-        m_conductance = gNext;
+    if ( p->active && a->active && in->active && out->active ) {
+        if ( n == 0 ) // RK0: Estimate gradient at the step's starting point, m_conductance unchanged from previous
+            gNext = next(2*dt); // 2*dt, because dt on RK step 0 is half the full step length
+        else if ( n == 1 ) // RK1, RK2: Estimate gradient at (temporal) midpoint
+            m_conductance = 0.5 * (m_conductance + gNext);
+        else if ( n == 3 ) // RK3: Estimate gradient at endpoint
+            m_conductance = gNext;
 
-    if ( !p->ignoreNegative || m_conductance > 0 )
-        out->I += m_conductance * (p->Vrev - in->V);
+        if ( !p->ignoreNegative || m_conductance > 0 )
+            out->I += m_conductance * (p->Vrev - in->V);
+    }
 }
 
 double SynapticNoise::next(double dt)
