@@ -130,6 +130,8 @@ void HH::step(double, double dt)
 
     m_conductance = p->gMax * powm * powh;
     out->I += m_conductance * (p->Vrev - V);
+  } else {
+      m_conductance = 0;
   }
 }
 
@@ -219,5 +221,7 @@ void HH::RK4(double, double dt, size_t n)
 
       m_conductance = p->gMax * powm * powh;
       out->I += m_conductance * (p->Vrev - V);
+    } else {
+        m_conductance = 0;
     }
 }

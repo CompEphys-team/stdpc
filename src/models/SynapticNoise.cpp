@@ -39,6 +39,8 @@ void SynapticNoise::step(double, double dt)
         m_conductance = next(dt);
         if ( !p->ignoreNegative || m_conductance > 0 )
             out->I += m_conductance * (p->Vrev - in->V);
+    } else {
+        m_conductance = 0;
     }
 }
 
@@ -54,6 +56,8 @@ void SynapticNoise::RK4(double, double dt, size_t n)
 
         if ( !p->ignoreNegative || m_conductance > 0 )
             out->I += m_conductance * (p->Vrev - in->V);
+    } else {
+        m_conductance = 0;
     }
 }
 

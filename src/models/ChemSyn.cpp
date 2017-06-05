@@ -126,8 +126,10 @@ ChemSyn::ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, 
 
 void ChemSyn::step(double t, double dt)
 {
-    if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+    if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+        m_conductance = 0;
         return;
+    }
 
     // calculate synaptic current
     double tmp = (1.0 - Sinf)*p->tauSyn;

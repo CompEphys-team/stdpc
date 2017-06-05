@@ -143,8 +143,10 @@ void DestexheSyn::step(double t, double dt)
 {
   static double rt, dS;
 
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+      m_conductance = 0;
       return;
+  }
   
   // calculate synaptic current
   rt= t - tlast;

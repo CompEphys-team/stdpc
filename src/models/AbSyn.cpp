@@ -145,8 +145,10 @@ void abSyn::step(double t, double dt)
 {
   static double dS, dR;
 
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+      m_conductance = 0;
       return;
+  }
   
   // calculate synaptic current
   dS= (1.0 - S)*p->aS*R - S*p->bS;

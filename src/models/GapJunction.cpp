@@ -106,6 +106,8 @@ void GapJunction::step(double, double)
       }
       outpost->I+= I;
       outpre->I-= I;
+  } else {
+      m_conductance = 0;
   }
 }
 
