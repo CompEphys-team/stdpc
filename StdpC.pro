@@ -57,7 +57,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
     $$PWD/src/gui/PerformanceMonitor.ui \
-    src/gui/GraphWidget.ui
+    $$PWD/src/gui/GraphWidget.ui \
+    $$PWD/src/gui/SynapticNoiseDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -130,7 +131,9 @@ HEADERS += \
     $$PWD/src/include/Synapse.h \
     $$PWD/src/include/ConductanceDlg.h \
     $$PWD/src/include/IonicCurrent.h \
-    $$PWD/src/include/GraphWidget.h
+    $$PWD/src/include/GraphWidget.h \
+    $$PWD/src/include/SynapticNoise.h \
+    $$PWD/src/include/SynapticNoiseDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -194,7 +197,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/Synapse.cpp \
     $$PWD/src/models/IonicCurrent.cpp \
     $$PWD/src/gui/Component.cpp \
-    $$PWD/src/gui/GraphWidget.cpp
+    $$PWD/src/gui/GraphWidget.cpp \
+    $$PWD/src/models/SynapticNoise.cpp \
+    $$PWD/src/gui/SynapticNoiseDlg.cpp
 
 LIBS += $$PWD/staticlib/pt_ioctl_tn.a
 
