@@ -49,7 +49,7 @@ void ConductanceManager::clear()
     postD.clear();
     for ( ConductanceProxy *proxy : Register() )
         while ( proxy->size() )
-            proxy->remove(proxy->size());
+            proxy->remove(proxy->size()-1);
 }
 
 const double *match(const std::vector<Conductance*> ref, const ChannelIndex &dex)

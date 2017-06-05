@@ -12,7 +12,7 @@ void ModelManager::clear()
     allModels.clear();
     for ( ModelProxy *proxy : Register() )
         while ( proxy->size() )
-            proxy->remove(proxy->size());
+            proxy->remove(proxy->size()-1);
 }
 
 void ModelManager::initSingle(ModelProxy *proxy, size_t idx)
