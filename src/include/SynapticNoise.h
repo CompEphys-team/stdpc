@@ -15,6 +15,7 @@ struct SynapticNoiseData : public CurrentData
     double tau; //!< Time constant
     double g0; //!< Average conductance
     double D; //!< Noise diffusion coefficient
+    bool ignoreNegative;
 };
 
 class SynapticNoiseProxy : public IonicCurrentProxy

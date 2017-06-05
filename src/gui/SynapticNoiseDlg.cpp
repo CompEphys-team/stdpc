@@ -13,9 +13,9 @@ SynapticNoiseDlg::SynapticNoiseDlg(int idx, QWidget *parent) :
     QVector<AssignmentCellBase<CurrentAssignment>*> vec;
     vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 165,
-       ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Prototype | ChannelListModel::Blank)));
+       ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Prototype | ChannelListModel::Virtual | ChannelListModel::Blank)));
     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 165,
-       ChannelListModel::getModel(ChannelListModel::AnalogOut | ChannelListModel::Prototype | ChannelListModel::Blank)));
+       ChannelListModel::getModel(ChannelListModel::AnalogOut | ChannelListModel::Prototype | ChannelListModel::Virtual | ChannelListModel::Blank)));
     vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::save, "Save", 30));
     ui->assignments->init(vec);
 }
@@ -38,6 +38,7 @@ void SynapticNoiseDlg::importData()
     ui->tau->setValue(p.tau * 1e3);
     ui->g0->setValue(p.g0 * 1e9);
     ui->stddev->setValue(std::sqrt(p.D * p.tau / 2e-18));
+    ui->ignoreNegative->setChecked(p.ignoreNegative);
 }
 
 void SynapticNoiseDlg::exportData()
@@ -48,4 +49,5 @@ void SynapticNoiseDlg::exportData()
     p.tau = ui->tau->value() * 1e-3;
     p.g0 = ui->g0->value() * 1e-9;
     p.D = 2e-18 * ui->stddev->value()*ui->stddev->value() / p.tau; // nS^2 / s = 10^-18 S^2/s (variance = D*tau/2)
+    p.ignoreNegative = ui->ignoreNegative->isChecked();
 }

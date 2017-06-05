@@ -36,7 +36,7 @@ SynapticNoise::SynapticNoise(size_t condID, size_t assignID, size_t multiID, inC
 void SynapticNoise::step(double, double dt)
 {
     m_conductance = next(dt);
-    if ( m_conductance > 0 )
+    if ( !p->ignoreNegative || m_conductance > 0 )
         out->I += m_conductance * (p->Vrev - in->V);
 }
 
@@ -49,7 +49,7 @@ void SynapticNoise::RK4(double, double dt, size_t n)
     else if ( n == 3 ) // RK3: Estimate gradient at endpoint
         m_conductance = gNext;
 
-    if ( m_conductance > 0 )
+    if ( !p->ignoreNegative || m_conductance > 0 )
         out->I += m_conductance * (p->Vrev - in->V);
 }
 
