@@ -143,6 +143,7 @@ void GraphWidget::rangeChanged(QCPRange range)
 
 void GraphWidget::importData()
 {
+    ui->active->setChecked(Plotp.active);
     ui->bufferExp->setValue(Plotp.bufferExp);
     ui->samplingInterval->setValue(Plotp.interval * 1e3);
 
@@ -155,6 +156,7 @@ void GraphWidget::importData()
 
 void GraphWidget::exportData()
 {
+    Plotp.active = ui->active->isChecked();
     Plotp.bufferExp = ui->bufferExp->value();
     Plotp.interval = ui->samplingInterval->value() * 1e-3;
     if ( !plots.empty() )
@@ -230,7 +232,7 @@ bool GraphWidget::startPlotting(DCThread *DCT)
             }
         }
     }
-    if ( !isPlotting ) {
+    if ( !isPlotting || !Plotp.active ) {
         DCT->setGraph();
         return false;
     }
@@ -264,6 +266,7 @@ void GraphWidget::setInteractive(bool maybe)
     dialog->setInteractive(maybe);
     ui->samplingInterval->setEnabled(maybe);
     ui->bufferExp->setEnabled(maybe);
+    ui->active->setEnabled(maybe);
 }
 
 void GraphWidget::replot()

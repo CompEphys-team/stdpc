@@ -182,6 +182,7 @@ struct PlotData {
 };
 
 struct BasePlotData {
+    bool active;
     double interval;
     int bufferExp;
     double xRange = 10;

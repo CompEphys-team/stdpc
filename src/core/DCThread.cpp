@@ -218,9 +218,10 @@ void DCThread::run()
            // Wait patiently.
        }
        if ( !stopped )
-           message(QString("DynClamp: Triggered."));
+           message(QString("DynClamp: Triggered, clamping..."));
+   } else {
+       message(QString("DynClamp: Clamping ..."));
    }
-   message(QString("DynClamp: Clamping ..."));
 
    t= 0.0;
    double lastSave = t;

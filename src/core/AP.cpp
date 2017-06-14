@@ -15,6 +15,7 @@ void initAP()
 
 
     // Graphs
+    addAP("Plotp.active", &Plotp, &BasePlotData::active);
     addAP("Plotp.bufferExp", &Plotp, &BasePlotData::bufferExp);
     addAP("Plotp.interval", &Plotp, &BasePlotData::interval);
     addAP("Plotp.xRange", &Plotp, &BasePlotData::xRange);
