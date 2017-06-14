@@ -27,8 +27,8 @@ class DAQ {
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;
-    virtual void generate_scan_list(short int, short int *)= 0;
-    virtual void generate_analog_out_list(short int, short int *)= 0;
+    virtual void generate_scan_list(short int, QVector<short int>)= 0;
+    virtual void generate_analog_out_list(short int, QVector<short int> )= 0;
     virtual void get_scan()= 0;
     virtual void get_single_scan(inChannel *)= 0;
     virtual void write_analog_out()= 0;

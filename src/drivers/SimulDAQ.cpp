@@ -144,7 +144,7 @@ bool SimulDAQ::initialize_board(QString &name)
   return success;
 }
 
-void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
+void SimulDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
   short int i;
   actInChnNo= chnNo;
@@ -222,7 +222,7 @@ void SimulDAQ::get_single_scan(inChannel *in)
  }
 
 
-void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
+void SimulDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
   ChannelIndex dex(&prox, devID, 0, false);
 

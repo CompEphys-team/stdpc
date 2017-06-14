@@ -74,9 +74,11 @@ std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
 }
 
 #include "SimulDAQ.h"
-#include "DigiData.h"
+#ifdef DIGIDATA_PT
+    #include "DigiData.h"
+#endif
 #ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
+    #include "Nidaq.h"
 #endif
 bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 {
@@ -85,7 +87,9 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     int pos = is.tellg();
     std::vector<std::unique_ptr<AP>> deprec;
     SDAQData sdaq;
+#ifdef DIGIDATA_PT
     DigiDataData dd;
+#endif
 #ifdef NATIONAL_INSTRUMENTS
     NIDAQData nidaq;
 #endif
@@ -120,18 +124,23 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     // Unversioned legacy config
     if ( !version ) {
         int selection, sdaqInChnNo, sdaqOutChnNo;
+        short dd_baseAddress;
         is >> selection;
         is >> sdaq.inFileName >> sdaq.outFileName >> sdaqInChnNo >> sdaqOutChnNo >> sdaq.inTFac >> sdaq.outDt;
         sdaq.inChn.resize(sdaqInChnNo);
         sdaq.outChn.resize(sdaqOutChnNo);
-        is >> dd.baseAddress;
+        is >> dd_baseAddress;
         if ( selection == 0 ) {
             sdaq.active = true;
             deprec = deprecateChannelsTo("SDAQp[#]");
-        } else if ( selection == 1 ) {
+        }
+#ifdef DIGIDATA_PT
+        dd.baseAddress = dd_baseAddress;
+        if ( selection == 1 ) {
             dd.active = true;
             deprec = deprecateChannelsTo("DigiDatap[#]");
         }
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( selection == 2 ) {
             is >> nidaq.deviceName;
@@ -142,16 +151,18 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         if ( !is.good() )
             return false;
 
+        SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
+        if ( sdaq.active )
+            LEGACY_DAQ_CLASS = "SimulDAQ";
+#ifdef DIGIDATA_PT
         AP *syncio = AP::find("DigiDatap[#].syncIOMask");
         if ( syncio )
             deprec.push_back(std::unique_ptr<AP>(new APDeprec("DigiDatap.syncIOMask", syncio, 1)));
 
-        SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
-        if ( sdaq.active )
-            LEGACY_DAQ_CLASS = "SimulDAQ";
         DigiDataProxy::p.insert(DigiDataProxy::p.begin(), dd);
         if ( dd.active )
             LEGACY_DAQ_CLASS = "DigiData1200";
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( nidaq.active ) {
             NIDAQProxy::p.insert(NIDAQProxy::p.begin(), nidaq);

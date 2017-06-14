@@ -135,8 +135,8 @@ class DigiData: public DAQ
     virtual bool initialize_board(QString &);
     virtual void start() {}
     virtual void digital_out(unsigned char);
-    virtual void generate_scan_list(short int, short int *);
-    virtual void generate_analog_out_list(short int, short int *);
+    virtual void generate_scan_list(short int, QVector<short int>);
+    virtual void generate_analog_out_list(short int, QVector<short int>);
     virtual void get_scan();
     virtual void get_single_scan(inChannel *);
     virtual void write_analog_out();

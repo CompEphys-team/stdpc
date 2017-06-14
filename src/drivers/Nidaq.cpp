@@ -215,7 +215,7 @@ void NIDAQ::digital_out(unsigned char)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::generate_scan_list(short int chnNo, short int *Chns)
+void NIDAQ::generate_scan_list(short int chnNo, QVector<short int> Chns)
 {
   if (DevicePresent) {
     actInChnNo= chnNo;
@@ -282,7 +282,7 @@ void NIDAQ::get_single_scan(inChannel *in)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
+void NIDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
   if (DevicePresent) {
     actOutChnNo= chnNo;

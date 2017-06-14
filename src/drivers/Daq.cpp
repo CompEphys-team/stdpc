@@ -25,7 +25,7 @@ void DAQ::init_chans()
 {
     DAQData *p = params();
     short int No = 0;
-    short int Chns[p->inChn.size()];
+    QVector<short int> Chns(p->inChn.size());
     in.resize(p->inChn.size());
     vHiLim.resize(p->inChn.size());
     vLoLim.resize(p->inChn.size());

@@ -194,7 +194,7 @@ void DigiData::digital_out(unsigned char outbyte)
 
 
 //---------------------------------------------------------------------------
-void DigiData::generate_scan_list(short int chnNo, short int *Chns)
+void DigiData::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
   short int i, Chan_Gain_Code;
   DAQData *p = params();
@@ -244,7 +244,7 @@ void DigiData::get_single_scan(inChannel *in)
 
 
 //---------------------------------------------------------------------------
-void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
+void DigiData::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
   DAQData *p = params();
   ChannelIndex dex(&prox, devID, 0, false);

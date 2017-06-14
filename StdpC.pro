@@ -15,16 +15,21 @@ INCLUDEPATH += \
 TEMPLATE = app
 CONFIG += qt \
     thread \
-    debug_and_release
+    debug_and_release \
+    c++11
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
-QMAKE_CXXFLAGS_RELEASE += -O3 -flto
-QMAKE_LFLAGS_RELEASE += -O3 -flto
 
-QMAKE_CXXFLAGS += -std=c++11
+mingw {
+    QMAKE_CXXFLAGS_RELEASE += -O3 -flto
+    QMAKE_LFLAGS_RELEASE += -O3 -flto
 
-static {
-    QMAKE_LFLAGS += -static
+    static {
+        QMAKE_LFLAGS += -static
+    }
+}
+msvc {
+    QMAKE_CXXFLAGS_RELEASE += /Ox
 }
 
 # A directory to place intermediary build files.
@@ -45,7 +50,6 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/AlphaBetaHHDlg.ui \
     $$PWD/src/gui/OutputChannelDlg.ui \
     $$PWD/src/gui/SimulDAQDlg.ui \
-    $$PWD/src/gui/DigiDataDlg.ui \
     $$PWD/src/gui/ElectrodeCompDlg.ui \
     $$PWD/src/gui/AbSynDlg.ui \
     $$PWD/src/gui/DataSavingDlg.ui \
@@ -72,12 +76,8 @@ HEADERS += \
     $$PWD/src/include/LUtables.h \
     $$PWD/src/include/InputChannelDlg.h \
     $$PWD/src/include/OutputChannelDlg.h \
-    $$PWD/src/include/DigiData.h \
     $$PWD/src/include/Channels.h \
-    $$PWD/src/include/Pt_ioctl_tn.h \
-    $$PWD/src/include/PortTalkX_IOCTL.h \
     $$PWD/src/include/SimulDAQDlg.h \
-    $$PWD/src/include/DigiDataDlg.h \
     $$PWD/src/include/ChemSyn.h \
     $$PWD/src/include/GapJunction.h \
     $$PWD/src/include/HH.h \
@@ -149,10 +149,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Global.cpp \
     $$PWD/src/core/Global_func.cpp \
     $$PWD/src/gui/OutputChannelDlg.cpp \
-    $$PWD/src/drivers/DigiData.cpp \
     $$PWD/src/core/Channels.cpp \
     $$PWD/src/gui/SimulDAQDlg.cpp \
-    $$PWD/src/gui/DigiDataDlg.cpp \
     $$PWD/src/models/ChemSyn.cpp \
     $$PWD/src/models/GapJunction.cpp \
     $$PWD/src/models/HH.cpp \
@@ -201,7 +199,17 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/SynapticNoise.cpp \
     $$PWD/src/gui/SynapticNoiseDlg.cpp
 
-LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+mingw {
+    LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+    FORMS += $$PWD/src/gui/DigiDataDlg.ui
+    HEADERS += $$PWD/src/include/DigiData.h \
+        $$PWD/src/include/DigiDataDlg.h \
+        $$PWD/src/include/Pt_ioctl_tn.h \
+        $$PWD/src/include/PortTalkX_IOCTL.h
+    SOURCES += $$PWD/src/drivers/DigiData.cpp \
+        $$PWD/src/gui/DigiDataDlg.cpp
+    DEFINES += DIGIDATA_PT
+}
 
 NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
 isEmpty(NIDAQPATH) {
@@ -213,15 +221,26 @@ isEmpty(NIDAQPATH) {
 
 nidaqmx {
     # NIDAQmx static build based on NI DAQmx 15.5.1
-    DEPENDPATH += $$PWD/src/nidaqmx
+    mingw {
+        DEPENDPATH += $$PWD/src/nidaqmx
+        INCLUDEPATH += $$PWD/src/nidaqmx
+        LIBS += $$PWD/src/nidaqmx/nidaqmx.a
+    }
+    msvc {
+        contains(QMAKE_HOST.arch, x86_64) {
+            LIBS += $$NIDAQPATH/lib64/msvc/NIDAQmx.lib
+        } else {
+            LIBS += $$NIDAQPATH/lib32/msvc/NIDAQmx.lib
+        }
+        INCLUDEPATH += $$NIDAQPATH/include
+    }
+
     SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
-    $$PWD/src/drivers/Nidaq.cpp
+        $$PWD/src/drivers/Nidaq.cpp
     FORMS += $$PWD/src/gui/NIDAQDlg.ui
 
     HEADERS += $$PWD/src/include/NIDAQDlg.h \
-    $$PWD/src/include/Nidaq.h
+        $$PWD/src/include/Nidaq.h
 
-    INCLUDEPATH += $$PWD/src/nidaqmx
-    LIBS += $$PWD/src/nidaqmx/nidaqmx.a
     DEFINES += NATIONAL_INSTRUMENTS
 }
