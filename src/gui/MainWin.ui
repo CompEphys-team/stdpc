@@ -15,6 +15,49 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_5">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="StartBut">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <widget class="QListWidget" name="MessageWindow"/>
+    </item>
+    <item row="0" column="1">
+     <widget class="QPushButton" name="StopBut">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Stop</string>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="3" rowspan="3">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
@@ -328,60 +371,17 @@
       </widget>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QPushButton" name="StopBut">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Stop</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QPushButton" name="StartBut">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>30</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>Start</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <widget class="QListWidget" name="MessageWindow"/>
-    </item>
-    <item row="1" column="0">
+    <item row="1" column="1">
      <widget class="QCheckBox" name="cbDatasaving">
       <property name="text">
        <string>Save data</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="btnDatasaving">
+    <item row="1" column="0">
+     <widget class="QCheckBox" name="cbTrigger">
       <property name="text">
-       <string>Configure</string>
+       <string>Triggered start</string>
       </property>
      </widget>
     </item>
@@ -419,6 +419,7 @@
      <string>Configure</string>
     </property>
     <addaction name="actionStart_trigger"/>
+    <addaction name="actionData_saving"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuConfigure"/>

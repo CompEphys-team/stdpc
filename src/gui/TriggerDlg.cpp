@@ -18,7 +18,6 @@ TriggerDlg::~TriggerDlg()
 void TriggerDlg::exportData()
 {
     Triggerp.channel = ui->channel->currentData().value<ChannelIndex>();
-    Triggerp.active = ui->active->isChecked();
 }
 
 void TriggerDlg::importData()
@@ -26,7 +25,6 @@ void TriggerDlg::importData()
     for ( int i = 0; i < ui->channel->count(); i++ )
         if ( ui->channel->itemData(i).value<ChannelIndex>() == Triggerp.channel )
             ui->channel->setCurrentIndex(i);
-    ui->active->setChecked(Triggerp.active);
 }
 
 void TriggerDlg::updateChannels()
