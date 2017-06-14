@@ -207,9 +207,21 @@ void DCThread::run()
    bool limitWarningEmitted = false;
    bool processAnalogs = false;
 
-   message(QString("DynClamp: Clamping ..."));
    stopped= false;
    finished= false;
+
+   DAQ *triggerDev;
+   if ( Triggerp.active && (triggerDev = Devices.getDevice(Triggerp.channel)) ) {
+       message(QString("DynClamp: Waiting for trigger on %1...").arg(Triggerp.channel.prettyName()));
+       triggerDev->armTrigger(Triggerp.channel);
+       while ( !stopped && !triggerDev->triggerFired() ) {
+           // Wait patiently.
+       }
+       if ( !stopped )
+           message(QString("DynClamp: Triggered."));
+   }
+   message(QString("DynClamp: Clamping ..."));
+
    t= 0.0;
    double lastSave = t;
    lastWrite = t;

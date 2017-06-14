@@ -4,7 +4,8 @@
 DAQ::DAQ(size_t devID, DAQProxy *proxy) :
     devID(devID),
     proxy(proxy),
-    t(DAQClock.t)
+    t(DAQClock.t),
+    digInChnNo(0)
 {
   initialized= false;
 }

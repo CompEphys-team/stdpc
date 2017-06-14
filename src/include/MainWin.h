@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include "Global.h"
 #include "DataSavingDlg.h"
+#include "TriggerDlg.h"
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
 #include "DCThread.h"
@@ -31,6 +32,7 @@ class MyMainWindow : public QMainWindow
      void importData();
 
      DataSavingDlg *DSDlg;
+     TriggerDlg *TrigDlg;
      DCThread *DCT;
      
   public slots:

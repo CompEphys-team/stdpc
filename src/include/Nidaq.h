@@ -40,13 +40,19 @@ class NIDAQ: public DAQ
    char *devName;
    char *iChnNm[MAXCHANNELS];
    char *oChnNm[MAXCHANNELS];
+   char *diChnNm[MAXCHANNELS];
           
    TaskHandle inTask;
    int inTaskActive;
    float64 *inBuf;
+
    TaskHandle outTask;
    int outTaskActive;
    float64 *outBuf;
+
+   TaskHandle digInTask;
+   int digInTaskActive;
+
    int DevicePresent;
              
   public:
@@ -62,6 +68,9 @@ class NIDAQ: public DAQ
     virtual void get_single_scan(inChannel *);
     virtual void write_analog_out();
     virtual void reset_board();
+
+    virtual void armTrigger(ChannelIndex trigChn);
+    virtual bool triggerFired();
 };
 
 #endif

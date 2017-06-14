@@ -132,16 +132,29 @@ NIDAQ::NIDAQ(size_t devID, DAQProxy *proxy) :
       outLow[i]= fdata[2*i];
       outHigh[i]= fdata[2*i+1];
     }
+
+    DAQmxGetDevDILines(devName, data, 1024);
+    istr= new istringstream(data);
+    k= 0;
+    while (istr->good()) {
+      diChnNm[k]= new char[80];
+      istr->getline(diChnNm[k++], 80, ',');
+      istr->get(cbuf);
+    }
+    delete istr;
+    digInChnNo= k;
   }
   else {
     inChnNo= 0;
     inGainNo= 0;
     outChnNo= 0;
     outGainNo= 0;
+    digInChnNo= 0;
   }
 
   inTaskActive= 0;
   outTaskActive= 0;  
+  digInTaskActive= 0;
   
   
 //   QMessageBox::warning(NULL, QString("My Application"),
@@ -168,6 +181,9 @@ NIDAQ::~NIDAQ()
       delete[] outGainText[i];
     }
     delete[] outGainText;
+    for (int i= 0; i < digInChnNo; i++) {
+      delete[] diChnNm[i];
+    }
     //delete[] inChnGain;
     delete[] inIdx;
     delete[] inGainFac;
@@ -342,6 +358,36 @@ void NIDAQ::reset_board()
       delete[] inBuf;
       inTaskActive= 0;
     }
+    if ( digInTaskActive ) {
+        DAQmxStopTask(digInTask);
+        DAQmxClearTask(digInTask);
+        digInTaskActive= 0;
+    }
     DAQmxResetDevice(devName);
  }
+}
+
+void NIDAQ::armTrigger(ChannelIndex trigChn)
+{
+    if ( DevicePresent ) {
+        if (digInTaskActive != 0) {
+            DAQmxClearTask(digInTask);
+        }
+        DAQmxCreateTask ("", &digInTask);
+        DAQmxCreateDIChan (digInTask, diChnNm[trigChn.chanID], "", DAQmx_Val_ChanPerLine);
+        DAQmxSetSampTimingType(digInTask, DAQmx_Val_OnDemand);
+        DAQmxSetReadOverWrite(digInTask, DAQmx_Val_OverwriteUnreadSamps);
+        digInTaskActive= 1;
+        DAQmxStartTask(digInTask);
+    }
+}
+
+bool NIDAQ::triggerFired()
+{
+    if ( DevicePresent && digInTaskActive ) {
+        uInt32 buf;
+        DAQmxReadDigitalScalarU32(digInTask, 1e-3, &buf, NULL);
+        return buf;
+    }
+    return true;
 }

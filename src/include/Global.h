@@ -30,6 +30,8 @@ extern PerformanceMonitorData PerfMonp;
 // Attilas Sample-and-Hold
 extern SampleHoldData SampleHoldp;
 
+extern TriggerData Triggerp;
+
 // LU tables
 extern tanhLUtable tanhLU;
 extern expLUtable expLU;

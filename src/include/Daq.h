@@ -34,6 +34,9 @@ class DAQ {
     virtual void write_analog_out()= 0;
     virtual void reset_board()= 0;
 
+    virtual inline void armTrigger(ChannelIndex) {}
+    virtual inline bool triggerFired() { return true; }
+
     DAQData *params();
 
     void init_chans(); // Sets up scan list, analog out list
@@ -52,6 +55,7 @@ class DAQ {
 
     int inChnNo;
     int outChnNo;
+    int digInChnNo;
 
     int inGainNo;
     QVector<double> inLow;

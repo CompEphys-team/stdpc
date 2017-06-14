@@ -214,4 +214,9 @@ struct ModelData {
     ModelData() : active(false) {}
 };
 
+struct TriggerData {
+    bool active;
+    ChannelIndex channel;
+};
+
 #endif

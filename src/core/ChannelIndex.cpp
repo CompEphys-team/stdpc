@@ -15,6 +15,7 @@ ChannelIndex::ChannelIndex() :
     modelID(0),
     instID(0),
     isAnalog(false),
+    isDigital(false),
     daqClass(""),
     devID(0),
     isInChn(true),
@@ -33,6 +34,7 @@ ChannelIndex::ChannelIndex(DAQProxy *proxy, size_t devID, size_t chanID, bool is
     isPrototype(false),
     isVirtual(false),
     isAnalog(proxy != nullptr),
+    isDigital(false),
     daqClass(proxy->daqClass()),
     devID(devID),
     isInChn(isInChn),
@@ -50,6 +52,7 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
     modelID(modelID),
     instID(0),
     isAnalog(false),
+    isDigital(false),
     isConductance(false),
     isLegacy(false)
 {}
@@ -63,6 +66,7 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
     modelID(modelID),
     instID(instID),
     isAnalog(false),
+    isDigital(false),
     isConductance(false),
     isLegacy(false)
 {}
@@ -73,6 +77,7 @@ ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t
     isPrototype(false),
     isVirtual(false),
     isAnalog(false),
+    isDigital(false),
     isConductance(true),
     conductanceClass(proxy->conductanceClass()),
     conductanceID(conductanceID),
@@ -120,6 +125,8 @@ QString ChannelIndex::prettyName() const
         ret = "None";
     } else if ( isAnalog ) {
         ret = QString("%1 %2 on %3 %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(Devices.Register().value(daqClass)->prettyName()).arg(devID);
+    } else if ( isDigital ) {
+        ret = QString("%1 %2 on %3 %4").arg(isInChn ? "DI" : "DO").arg(chanID).arg(Devices.Register().value(daqClass)->prettyName()).arg(devID);
     } else if ( isPrototype || isVirtual ) {
         if ( isPrototype )
             ret = QString("%1 %2:all (%5 %2, all instances)").arg(modelClass).arg(modelID).arg(Models.Register().value(modelClass)->prettyName());
@@ -138,6 +145,8 @@ QString ChannelIndex::toString(QChar sep) const
         ret = "None";
     } else if ( isAnalog ) {
         ret = QString("Analog/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "ai" : "ao").arg(chanID);
+    } else if ( isDigital ) {
+        ret = QString("Digital/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "di" : "do").arg(chanID);
     } else if ( isPrototype ) {
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
@@ -184,6 +193,26 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
             return is;
 
         dex.isAnalog = true;
+        dex.devID = parts.at(2).toUInt();
+        dex.chanID = parts.at(3).mid(2).toUInt();
+        dex.isValid = true;
+    } else if ( !parts.at(0).compare("Digital", Qt::CaseInsensitive) ) {
+        if ( parts.size() != 4 )
+            return is;
+
+        if ( DeviceManager::Register().contains(parts.at(1)) )
+            dex.daqClass = parts.at(1);
+        else
+            return is;
+
+        if ( parts.at(3).startsWith("di", Qt::CaseInsensitive) )
+            dex.isInChn = true;
+        else if ( parts.at(3).startsWith("do", Qt::CaseInsensitive) )
+            dex.isInChn = false;
+        else
+            return is;
+
+        dex.isDigital = true;
         dex.devID = parts.at(2).toUInt();
         dex.chanID = parts.at(3).mid(2).toUInt();
         dex.isValid = true;
@@ -249,7 +278,8 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&
             (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID)) &&
             a.isAnalog==b.isAnalog &&
-            (!a.isAnalog || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
+            a.isDigital==b.isDigital &&
+            (!(a.isAnalog || a.isDigital) || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
             a.isConductance==b.isConductance &&
             (!a.isConductance || (a.conductanceClass==b.conductanceClass && a.conductanceID==b.conductanceID && a.assignID==b.assignID)) &&
             a.isLegacy == b.isLegacy;

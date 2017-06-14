@@ -44,6 +44,11 @@ void initAP()
     // Performance monitor
     addAP("PerfMonp.active", &PerfMonp, &PerformanceMonitorData::active);
     addAP("PerfMonp.interval", &PerfMonp, &PerformanceMonitorData::interval);
+
+
+    // Trigger
+    addAP("Triggerp.active", &Triggerp, &TriggerData::active);
+    addAP("Triggerp.channel", &Triggerp, &TriggerData::channel);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)

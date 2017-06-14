@@ -14,6 +14,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      ui->setupUi(this);
 
      DSDlg= new DataSavingDlg(this);
+     TrigDlg= new TriggerDlg(this);
 
      QVector<ComponentPrototype *> prototypes;
      for ( ConductanceProxy *proxy : ConductanceManager::Currents() )
@@ -71,10 +72,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
      connect(ui->actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));
      connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
+     connect(ui->actionStart_trigger, SIGNAL(triggered(bool)), TrigDlg, SLOT(open()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
 
      connect(this, &MyMainWindow::channelsChanged, &ChannelListModel::updateChns_static_noargs);
      connect(this, &MyMainWindow::modelRemoved, &ChannelListModel::updateChns_static);
+     connect(this, &MyMainWindow::channelsChanged, TrigDlg, &TriggerDlg::updateChannels);
 
      connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
      connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
@@ -239,6 +242,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
   dataSavingPs.enabled = ui->cbDatasaving->isChecked();
+  TrigDlg->exportData();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
   emit channelsChanged();
@@ -251,6 +255,7 @@ void MyMainWindow::importData()
   ui->currentTable->importData();
   DSDlg->importData();
   ui->cbDatasaving->setChecked(dataSavingPs.enabled);
+  TrigDlg->importData();
   ui->graphtab->importData();
   ui->performancetab->importData();
   updateStartButton();

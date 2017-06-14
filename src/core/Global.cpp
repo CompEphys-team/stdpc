@@ -14,6 +14,8 @@ dataSavingParams dataSavingPs;
 // Attilas Sample-and-Hold
 SampleHoldData SampleHoldp;
 
+TriggerData Triggerp;
+
 // LU tables
 tanhLUtable tanhLU;
 expLUtable expLU;

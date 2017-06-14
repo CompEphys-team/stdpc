@@ -62,7 +62,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
     $$PWD/src/gui/PerformanceMonitor.ui \
     $$PWD/src/gui/GraphWidget.ui \
-    $$PWD/src/gui/SynapticNoiseDlg.ui
+    $$PWD/src/gui/SynapticNoiseDlg.ui \
+    $$PWD/src/gui/TriggerDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -133,7 +134,8 @@ HEADERS += \
     $$PWD/src/include/IonicCurrent.h \
     $$PWD/src/include/GraphWidget.h \
     $$PWD/src/include/SynapticNoise.h \
-    $$PWD/src/include/SynapticNoiseDlg.h
+    $$PWD/src/include/SynapticNoiseDlg.h \
+    $$PWD/src/include/TriggerDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -197,7 +199,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/Component.cpp \
     $$PWD/src/gui/GraphWidget.cpp \
     $$PWD/src/models/SynapticNoise.cpp \
-    $$PWD/src/gui/SynapticNoiseDlg.cpp
+    $$PWD/src/gui/SynapticNoiseDlg.cpp \
+    $$PWD/src/gui/TriggerDlg.cpp
 
 mingw {
     LIBS += $$PWD/staticlib/pt_ioctl_tn.a

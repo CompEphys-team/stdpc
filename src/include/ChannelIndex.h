@@ -41,6 +41,7 @@ public:
     size_t instID;
 
     bool isAnalog;
+    bool isDigital;
     QString daqClass;
     size_t devID;
     bool isInChn;
