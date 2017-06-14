@@ -168,7 +168,7 @@
    <item row="4" column="0" colspan="2">
     <widget class="QCheckBox" name="ignoreNegative">
      <property name="text">
-      <string>Ignore negative conductance values</string>
+      <string>Apply positive conductance values only</string>
      </property>
      <property name="checked">
       <bool>true</bool>
