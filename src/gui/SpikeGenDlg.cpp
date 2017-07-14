@@ -31,6 +31,17 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
     ui->instTable->setColumnWidth(6, 80);
     growInstTable(false);
 
+    ui->STTable->setModel(&model);
+    ui->STTable->setItemDelegate(&delegate);
+    connect(&model, &QStandardItemModel::dataChanged, [this](QModelIndex,QModelIndex index,QVector<int>){
+        if ( !model.data(index).isValid() )
+            return;
+        if ( index.row() == model.rowCount()-1 )
+            model.setRowCount(model.rowCount()+1);
+        if ( index.column() == model.columnCount()-1 )
+            model.setColumnCount(model.columnCount()+1);
+    });
+
     connect(ui->btnLoadST, &QPushButton::clicked, [this](bool){
         QString fname = QFileDialog::getOpenFileName(this, "Select spike time file...");
         if ( fname.isEmpty() )
@@ -65,7 +76,7 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
         }
         std::vector<std::vector<double>> tmp;
         this->exportST(tmp);
-        this->importST(tmp); // Reflect potential changes (sorting, dropped values) in GUI
+        os.precision(10);
         for ( int row = 0; row < (int)tmp.size(); row++ ) {
             os << tmp[row].size() << " ";
             for ( int col = 0; col < (int)tmp[row].size(); col++ ) {
@@ -89,8 +100,6 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
     std::vector<std::vector<double>> defaults(1, {.03,.05,.068,.088,.112,.138,.168,.204,.248,.308});
     importST(defaults);
 }
-
-
 
 SpikeGenDlg::~SpikeGenDlg()
 {
@@ -150,50 +159,13 @@ void SpikeGenDlg::importData()
 
 void SpikeGenDlg::importST(std::vector<std::vector<double>> &vec)
 {
-    int row = 0, col = 0;
-    ui->STTable->clear();
-    ui->STTable->setRowCount(vec.size() + 1);
-    for ( std::vector<double> &tmp : vec )
-        col = qMax(int(tmp.size()), col);
-    ui->STTable->setColumnCount(col + 1);
-
-    QDoubleSpinBox *cell;
-    for ( row = 0; row < ui->STTable->rowCount(); row++ ) {
-        for ( col = 0; col < ui->STTable->columnCount(); col++ ) {
-            cell = makeSTCell(row, col);
-            if ( row < (int)vec.size() && col < (int)vec[row].size() ) {
-                cell->setValue(vec[row][col] * 1e3);
-            }
-        }
+    model.clear();
+    model.setRowCount(vec.size() + 1);
+    for ( size_t row = 0; row < vec.size(); row++ ) {
+        model.setColumnCount(std::max(model.columnCount(), int(vec[row].size()+1)));
+        for ( size_t col = 0; col < vec[row].size(); col++ )
+            model.setData(model.index(row, col), QVariant(vec[row][col] * 1e3));
     }
-}
-
-void SpikeGenDlg::growSTTable(int row, int col)
-{
-    if ( row == ui->STTable->rowCount()-1 ) {
-        ui->STTable->setRowCount(row+2);
-        for ( int i = 0; i < ui->STTable->columnCount(); i++ ) {
-            makeSTCell(row+1, i);
-        }
-    }
-    if ( col == ui->STTable->columnCount()-1 ) {
-        ui->STTable->setColumnCount(col+2);
-        for ( int i = 0; i < ui->STTable->rowCount(); i++ ) {
-            makeSTCell(i, col+1);
-        }
-    }
-}
-
-QDoubleSpinBox *SpikeGenDlg::makeSTCell(int row, int col)
-{
-    QDoubleSpinBox *cell = new QDoubleSpinBox();
-    cell->setRange(0., 6000000.);
-    cell->setSingleStep(10.);
-    connect(cell, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), [=](double){
-        growSTTable(row, col);
-    });
-    ui->STTable->setCellWidget(row, col, cell);
-    return cell;
 }
 
 void SpikeGenDlg::exportData()
@@ -213,10 +185,7 @@ void SpikeGenDlg::exportData()
     SpkGenProxy::p[idx].period = ui->Period->value() / 1e3;
     SpkGenProxy::p[idx].loopBursts = ui->Loop->isChecked();
 
-    if ( ui->STTable->rowCount() && ui->STTable->columnCount() ) // Don't export initially empty table
-        exportST(SpkGenProxy::p[idx].SpikeT);
-    // Ensure any changes (sorting, dropping rows) are reflected in the UI
-    importST(SpkGenProxy::p[idx].SpikeT);
+    exportST(SpkGenProxy::p[idx].SpikeT);
 
     SgInstData inst;
     int nRows = ui->instTable->rowCount() - 1;
@@ -237,36 +206,23 @@ void SpikeGenDlg::exportData()
 
 void SpikeGenDlg::exportST(std::vector<std::vector<double>> &vec)
 {
-    int row, col, emptyRows = 0;
-    std::list<double> tmp;
     vec.clear();
-    vec.resize(ui->STTable->rowCount() - 1);
-    for ( row = 0; row < ui->STTable->rowCount() - 1; row++ ) {
-        // Populate tmp from table
-        tmp.clear();
-        for ( col = 0; col < ui->STTable->columnCount() - 1; col++ ) {
-            tmp.push_back(qobject_cast<QDoubleSpinBox*>(ui->STTable->cellWidget(row, col))->value());
+    for ( int row = 0; row < model.rowCount() - 1; row++ ) {
+        // Populate tmp from model
+        std::vector<double> tmp;
+        for ( int col = 0; col < model.columnCount() - 1; col++ ) {
+            QVariant value = model.data(model.index(row, col));
+            if ( value.isValid() )
+                tmp.push_back(value.toDouble() * 1e-3);
         }
-        // Populate SpikeT row with ascending non-zero elements
-        tmp.sort();
-        bool initial = true;
-        int zeros = 0;
-        col = 0;
-        for ( double &val : tmp ) {
-            if ( val <= 0.0 ) {
-                ++zeros;
-                continue;
-            } else if ( initial ) {
-                vec[row - emptyRows].resize(tmp.size() - zeros);
-                initial = false;
-            }
-            vec[row - emptyRows][col] = val * 1e-3;
-            ++col;
+        if ( !tmp.empty() ) {
+            // Populate SpikeT row with ascending non-zero elements
+            std::sort(tmp.begin(), tmp.end());
+            vec.push_back(tmp);
         }
-        if ( initial )
-            ++emptyRows;
     }
-    vec.resize(row - emptyRows);
+
+    importST(vec); // Ensure changes (sorting, dropped values) are reflected in the model
 }
 
 void SpikeGenDlg::addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias,
@@ -332,4 +288,38 @@ void SpikeGenDlg::growInstTable(bool reactive)
     vBiasc = connect(vBias, SIGNAL(valueChanged(double)), this, SLOT(growInstTable()));
     bdChannelc = connect(bdChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(growInstTable()));
     bdThresholdc = connect(bdThresh, SIGNAL(valueChanged(double)), this, SLOT(growInstTable()));
+}
+
+
+
+QWidget *STDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &, const QModelIndex &) const
+{
+    QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+    editor->setDecimals(6);
+    editor->setMinimum(0);
+    editor->setMaximum(999999.999999);
+    editor->setFrame(false);
+    return editor;
+}
+
+void STDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+    spinBox->setValue(index.model()->data(index, Qt::EditRole).toDouble());
+}
+
+void STDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+    spinBox->interpretText();
+    double value = spinBox->value();
+    if ( value > 0 || index.column() == 0 )
+        model->setData(index, value, Qt::EditRole);
+    else
+        model->setData(index, QVariant(), Qt::EditRole);
+}
+
+void STDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &) const
+{
+    editor->setGeometry(option.rect);
 }
