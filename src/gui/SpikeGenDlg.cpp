@@ -162,7 +162,8 @@ void SpikeGenDlg::importST(std::vector<std::vector<double>> &vec)
     model.clear();
     model.setRowCount(vec.size() + 1);
     for ( size_t row = 0; row < vec.size(); row++ ) {
-        model.setColumnCount(std::max(model.columnCount(), int(vec[row].size()+1)));
+        if ( model.columnCount() < int(vec[row].size()+1) )
+            model.setColumnCount(vec[row].size()+1);
         for ( size_t col = 0; col < vec[row].size(); col++ )
             model.setData(model.index(row, col), QVariant(vec[row][col] * 1e3));
     }

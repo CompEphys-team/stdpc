@@ -660,9 +660,15 @@
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollPerPixel</enum>
+     </property>
      <property name="sortingEnabled">
       <bool>true</bool>
      </property>
+     <attribute name="horizontalHeaderDefaultSectionSize">
+      <number>60</number>
+     </attribute>
     </widget>
    </item>
   </layout>
