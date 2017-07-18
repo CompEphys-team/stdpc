@@ -80,6 +80,9 @@ protected:
     bool initial;
     bool active;
 
+    double spkOffsetCutoff;
+    std::vector<double>::const_iterator spkOffset;
+
     double VSpike(double t);
 };
 

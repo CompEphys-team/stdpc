@@ -99,6 +99,8 @@ void SpkGen::update(double t, double dt)
 
     if (initial) {
         ISI_time = t;
+        spkOffset = p->SpikeT[burstNo].begin();
+        spkOffsetCutoff = 100.0 / p->spkTimeScaling;
         initial = false;
     } else {
         ISI_time += dt;
@@ -157,9 +159,16 @@ void SpkGen::update(double t, double dt)
         // routine that calculates the membrane potential of the CN taking
         // in account all the spikes (superimposing) the voltage due to each spike
         V = 0.0;
-        for ( double const& tSpike : p->SpikeT[burstNo] )
-            if ( tSpike > 0 )
-                V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
+
+        // Advance spike offset iterator to only consider spikes starting after t-spkWidth
+        while ( *spkOffset < t - spkOffsetCutoff && spkOffset < p->SpikeT[burstNo].end() )
+            ++spkOffset;
+
+        // Compute contributory voltage only from spikes in [t-spkWidth, t+spkWidth]
+        for ( auto spkIt = spkOffset; spkIt < p->SpikeT[burstNo].end() && *spkIt < t + spkOffsetCutoff; ++spkIt )
+            if ( *spkIt > 0 )
+                V += VSpike((ISI_time - *spkIt) * p->spkTimeScaling);
+
         V *= p->VSpike;
         V += p->VRest;
 
@@ -178,6 +187,7 @@ void SpkGen::update(double t, double dt)
                     active = false;
                 }
             }
+            spkOffset = p->SpikeT[burstNo].begin();
         }
     } else {
         V = p->VRest;
@@ -216,9 +226,8 @@ double SpkGen::VSpike(double t){
   #undef T0
   #undef A1
   #undef A2
-  #undef NORMALIZE
+#undef NORMALIZE
 }
-
 
 void SpkGenPrototype::init(DCThread *DCT)
 {
