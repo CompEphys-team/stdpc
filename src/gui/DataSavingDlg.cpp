@@ -33,7 +33,7 @@ void DataSavingDlg::exportData()
     double sFreq = 1000 * leSavingFreq->text().toDouble();   // kHz -> Hz
     if ( sFreq <= 0.0 ) sFreq = 1000; // set to 1kHz by default
     dataSavingPs.savingFreq = sFreq;
-    dataSavingPs.isBinary = (cbSavingFormat->currentIndex() > 0);
+    dataSavingPs.isBinary = bgFormat->checkedButton() == rbBinary;
 }
 
 void DataSavingDlg::importData()
@@ -42,5 +42,5 @@ void DataSavingDlg::importData()
     leFileName->setText(dataSavingPs.fileName);
     sFreq.setNum(dataSavingPs.savingFreq / 1000);   // Hz -> kHz
     leSavingFreq->setText(sFreq);
-    cbSavingFormat->setCurrentIndex(dataSavingPs.isBinary);
+    (dataSavingPs.isBinary ? rbBinary : rbAscii)->setChecked(true);
 }
