@@ -37,6 +37,7 @@ void SimulDAQDlg::exportData(bool forceInit)
   getEntry<QString>(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
   getEntry(SimulDAQProxy::p[idx].inTFac, inTFacE->text().toDouble(), change);
   getEntry(SimulDAQProxy::p[idx].outDt, outDtE->text().toDouble()*1e-3, change);
+  getEntry(SimulDAQProxy::p[idx].rewindAfterSettling, cbRewind->isChecked(), change);
 
   DAQDlg::exportData(change || forceInit);
 }
@@ -52,6 +53,7 @@ void SimulDAQDlg::importData()
   inTFacE->setText(num);
   num.setNum(SimulDAQProxy::p[idx].outDt*1e3);
   outDtE->setText(num);
+  cbRewind->setChecked(SimulDAQProxy::p[idx].rewindAfterSettling);
 
   DAQDlg::importData();
 }
