@@ -36,7 +36,7 @@ public:
     ///  - Update intermediate state based on k_n and null state
     ///  - at n=3, update null state based on k_{0..3} (nullstate += (k0 + 2k1 + 2k2 + k3)/6 * dt)
     /// Note, out.I must be reset to the retained value at the end of every step, except for the last one (n=3).
-    virtual void RK4(double t, double dt, size_t n) = 0;
+    virtual void RK4(double t, double dt, size_t n, bool settling) = 0;
 
     vInstData &params() const;
     inline size_t id() const { return instID; }
@@ -86,7 +86,7 @@ public:
     virtual void restoreCurrent(double t);
 
     /// Delegates to Model::RK4(t,dt,n)
-    virtual void RK4(double t, double dt, size_t n);
+    virtual void RK4(double t, double dt, size_t n, bool settling);
 
     QString getStatus() const;
     QPair<QVector<QString>, QVector<const double *>> valuesToSave()const;

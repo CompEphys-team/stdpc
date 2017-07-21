@@ -352,7 +352,7 @@ void DCThread::run()
                          c->RK4(subT, rkDT, rkStep, settling);
 
                      for ( auto const& m : Models.active() )
-                         m->RK4(subT, rkDT, rkStep);
+                         m->RK4(subT, rkDT, rkStep, settling);
                  }
 
                  tLoop = DAQClock.get_RTC_const() - tLoop;

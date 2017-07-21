@@ -59,7 +59,7 @@ public:
     inline void updateOut(double) {}
 
     void update(double t, double dt);
-    void RK4(double,double,size_t);
+    void RK4(double, double, size_t, bool settling);
 
 protected:
     const SGData * const p;

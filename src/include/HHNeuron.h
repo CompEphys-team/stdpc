@@ -41,7 +41,7 @@ class HHNeuron : public Model
 public:
     HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT);
 
-    void RK4(double t, double dt, size_t n);
+    void RK4(double t, double dt, size_t n, bool settling);
 
 protected:
     double V;

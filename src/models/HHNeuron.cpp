@@ -38,7 +38,7 @@ HHNeuron::HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     in.V = V + params().inChn.bias;
 }
 
-void HHNeuron::RK4(double, double dt, size_t n)
+void HHNeuron::RK4(double, double dt, size_t n, bool)
 {
     // instance update
     const HHNeuronData &p = static_cast<HHNeuronData const&>(parent->params());

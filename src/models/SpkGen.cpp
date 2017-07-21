@@ -81,12 +81,12 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     }
 }
 
-void SpkGen::RK4(double t, double dt, size_t n)
+void SpkGen::RK4(double t, double dt, size_t n, bool settling)
 {
     /// Cheapskate RK, because SG isn't really a candidate for it
     /// Note the 2*dt, which is the actual full step length for this RK cycle
     /// Note also that burst detection may be slightly inaccurate if the bd channel is another model
-    if ( n == 0 )
+    if ( n == 0 && !settling )
         update(t, 2*dt);
     // Need neither further changes on `in` (nobody touches its voltage),
     // nor on `out` (it's inactive anyway)

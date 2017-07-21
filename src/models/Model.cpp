@@ -46,12 +46,12 @@ void ModelPrototype::restoreCurrent(double t)
                 m->restoreCurrent(t);
 }
 
-void ModelPrototype::RK4(double t, double dt, size_t n)
+void ModelPrototype::RK4(double t, double dt, size_t n, bool settling)
 {
     if ( params().active )
         for ( std::shared_ptr<Model> &m : inst )
             if ( params().instance(m->id()).active )
-                m->RK4(t, dt, n);
+                m->RK4(t, dt, n, settling);
 }
 
 QString ModelPrototype::getStatus() const
