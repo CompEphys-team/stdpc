@@ -12,6 +12,7 @@ GapJunctionProxy::GapJunctionProxy()
     ConductanceManager::RegisterSynapse(this);
 
     addAP("ESynp[#].active", &p, &GJunctData::active);
+    addAP("ESynp[#].activeSettling", &p, &GJunctData::activeSettling);
     addAP("ESynp[#].type", &p, &GJunctData::type);
     addAP("ESynp[#].gSyn", &p, &GJunctData::gSyn);
     addAP("ESynp[#].assign[#].active", &p, &GJunctData::assign, &GapJunctionAssignment::active);
@@ -93,7 +94,7 @@ GapJunction::GapJunction(size_t condID, size_t assignID, size_t multiID, inChann
 {
 }
 
-void GapJunction::step(double, double)
+void GapJunction::step(double, double, bool settling)
 {
   if ( p->active && a->active && pre->active && post->active && outpre->active && outpost->active ) {
       // calculate synaptic current
@@ -104,8 +105,10 @@ void GapJunction::step(double, double)
       } else {
           m_conductance = p->gSyn;
       }
-      outpost->I+= I;
-      outpre->I-= I;
+      if ( !settling || p->activeSettling ) {
+          outpost->I+= I;
+          outpre->I-= I;
+      }
   } else {
       m_conductance = 0;
   }

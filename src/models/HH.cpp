@@ -15,6 +15,7 @@ HHProxy::HHProxy()
     ConductanceManager::RegisterCurrent(this);
 
     addAP("mhHHp[#].active", &p, &mhHHData::active);
+    addAP("mhHHp[#].activeSettling", &p, &mhHHData::activeSettling);
     addAP("mhHHp[#].LUTables", &p, &mhHHData::LUTables);
     addAP("mhHHp[#].gMax", &p, &mhHHData::gMax);
     addAP("mhHHp[#].Vrev", &p, &mhHHData::Vrev);
@@ -75,7 +76,7 @@ HH::HH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel
     hi = h;
 }
 
-void HH::step(double, double dt)
+void HH::step(double, double dt, bool settling)
 {
   static double powm, powh;
   static double V, tmp;
@@ -129,13 +130,14 @@ void HH::step(double, double dt)
     else powh = 1.0;
 
     m_conductance = p->gMax * powm * powh;
-    out->I += m_conductance * (p->Vrev - V);
+    if ( !settling || p->activeSettling )
+        out->I += m_conductance * (p->Vrev - V);
   } else {
       m_conductance = 0;
   }
 }
 
-void HH::RK4(double, double dt, size_t n)
+void HH::RK4(double, double dt, size_t n, bool settling)
 {
     static double powm, powh;
     static double V, tmp;
@@ -220,7 +222,8 @@ void HH::RK4(double, double dt, size_t n)
       else powh = 1.0;
 
       m_conductance = p->gMax * powm * powh;
-      out->I += m_conductance * (p->Vrev - V);
+      if ( !settling || p->activeSettling )
+          out->I += m_conductance * (p->Vrev - V);
     } else {
         m_conductance = 0;
     }

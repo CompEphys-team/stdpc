@@ -53,6 +53,7 @@ ChemSynProxy::ChemSynProxy()
 
     // main Csynp
     addAP("CSynp[#].active", &p, &CSynData::active);
+    addAP("CSynp[#].activeSettling", &p, &CSynData::activeSettling);
     addAP("CSynp[#].LUTables", &p, &CSynData::LUTables);
     addAP("CSynp[#].MgBlock", &p, &CSynData::MgBlock);
     addAP("CSynp[#].gSyn", &p, &CSynData::gSyn);
@@ -124,7 +125,7 @@ ChemSyn::ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, 
     setupBuffer(DCT);
 }
 
-void ChemSyn::step(double t, double dt)
+void ChemSyn::step(double t, double dt, bool settling)
 {
     if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
         m_conductance = 0;
@@ -163,7 +164,7 @@ void ChemSyn::step(double t, double dt)
 
 
     // if plastic, learn
-    switch (p->Plasticity) {
+    switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
       case 0:
         m_conductance = p->gSyn * gfac * S * h;
         break;
@@ -177,7 +178,8 @@ void ChemSyn::step(double t, double dt)
         break;
     }
 
-    out->I += m_conductance * (p->VSyn - postV);
+    if ( !settling || p->activeSettling )
+        out->I += m_conductance * (p->VSyn - postV);
 }
 
 double ChemSyn::invGFilter(double ing)

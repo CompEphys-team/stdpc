@@ -15,6 +15,7 @@ abHHProxy::abHHProxy()
     ConductanceManager::RegisterCurrent(this);
 
     addAP("abHHp[#].active", &p, &abHHData::active);
+    addAP("abHHp[#].activeSettling", &p, &abHHData::activeSettling);
     addAP("abHHp[#].LUTables", &p, &abHHData::LUTables);
     addAP("abHHp[#].gMax", &p, &abHHData::gMax);
     addAP("abHHp[#].Vrev", &p, &abHHData::Vrev);
@@ -92,7 +93,7 @@ inline double abHH::mhFunc(double x, int thetype)
    return 0.0;
 }
 
-void abHH::step(double, double dt)
+void abHH::step(double, double dt, bool settling)
 {
   static double powm, powh;
   static double V;
@@ -121,13 +122,14 @@ void abHH::step(double, double dt)
     else powh= 1.0;
 
     m_conductance = p->gMax * powm * powh;
-    out->I += m_conductance * (p->Vrev-V);
+    if ( !settling || p->activeSettling )
+        out->I += m_conductance * (p->Vrev-V);
   } else {
       m_conductance = 0;
   }
 }
 
-void abHH::RK4(double, double dt, size_t n)
+void abHH::RK4(double, double dt, size_t n, bool settling)
 {
     static double powm, powh;
     static double V;
@@ -185,7 +187,8 @@ void abHH::RK4(double, double dt, size_t n)
       else powh= 1.0;
 
       m_conductance = p->gMax * powm * powh;
-      out->I += m_conductance * (p->Vrev-V);
+      if ( !settling || p->activeSettling )
+          out->I += m_conductance * (p->Vrev-V);
     } else {
         m_conductance = 0;
     }

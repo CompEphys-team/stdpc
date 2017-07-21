@@ -71,7 +71,7 @@ class abSyn : public Synapse {
   public:
     abSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const abSynData &params() const { return abSynProxy::p[condID]; }
-    void step(double t, double dt);
+    void step(double t, double dt, bool settling);
 
     abSynProxy *proxy() const;
 };

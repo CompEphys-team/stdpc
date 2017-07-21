@@ -55,8 +55,8 @@ class GapJunction : public Conductance {
         
   public:
     GapJunction(size_t condID, size_t assignID, size_t multiID, inChannel *pre, outChannel *outpre, inChannel *post, outChannel *outpost);
-    void step(double t, double dt);
-    inline void RK4(double, double, size_t) {}
+    void step(double t, double dt, bool settling);
+    inline void RK4(double, double, size_t, bool) {}
 
     inline const GapJunctionAssignment &assignment() const { return params().assignment(assignID); }
     inline const GJunctData &params() const { return GapJunctionProxy::p[condID]; }

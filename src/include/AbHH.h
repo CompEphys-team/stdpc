@@ -67,8 +67,8 @@ class abHH : public IonicCurrent
     
   public:
     abHH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
-    void step(double t, double dt);
-    void RK4(double t, double dt, size_t n);
+    void step(double t, double dt, bool settling);
+    void RK4(double t, double dt, size_t n, bool settling);
 
     inline const abHHData &params() const { return abHHProxy::p[condID]; }
     abHHProxy *proxy() const;

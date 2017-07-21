@@ -127,6 +127,14 @@ void ChannelBufferHelper::advance(double t)
     }
 }
 
+void ChannelBufferHelper::rewind()
+// Resets the offset, discarding all buffered data.
+{
+    _absOffset = 0;
+    for ( BufferHandler &h : handler )
+        h.initial = true;
+}
+
 size_t ChannelBufferHelper::getHandle(double duration)
 {
     size_t handle;

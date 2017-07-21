@@ -18,10 +18,10 @@ public:
     ///  - Update intermediate state based on k_n and null state
     ///  - at n=3, update null state based on k_{0..3} (nullstate += (k0 + 2k1 + 2k2 + k3)/6 * dt)
     /// Note, out.I must be reset to the retained value at the end of every step, except for the last one (n=3).
-    virtual void RK4(double t, double dt, size_t n) = 0;
+    virtual void RK4(double t, double dt, size_t n, bool settling) = 0;
 
     /// Compute a forward-integrating time step, updating m_conductance and adding current to the output channel(s)
-    virtual void step(double t, double dt) = 0;
+    virtual void step(double t, double dt, bool settling) = 0;
 
     inline const AssignmentData &assignment() const { return params().assignment(assignID); }
     inline size_t assignmentID() const { return assignID; }

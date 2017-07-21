@@ -53,6 +53,7 @@ DestexheSynProxy::DestexheSynProxy()
 
     // main DxheSynp
     addAP("DxheSynp[#].active", &p, &DestexheSynData::active);
+    addAP("DxheSynp[#].activeSettling", &p, &DestexheSynData::activeSettling);
     addAP("DxheSynp[#].LUTables", &p, &DestexheSynData::LUTables);
     addAP("DxheSynp[#].gSyn", &p, &DestexheSynData::gSyn);
     addAP("DxheSynp[#].Vpre", &p, &DestexheSynData::Vpre);
@@ -139,7 +140,7 @@ double DestexheSyn::gFilter(double ingr)
   return ng;
 }
 
-void DestexheSyn::step(double t, double dt)
+void DestexheSyn::step(double t, double dt, bool settling)
 {
   static double rt, dS;
 
@@ -172,7 +173,7 @@ void DestexheSyn::step(double t, double dt)
   double postV = p->fixVpost ? p->Vpost : post->V;
 
   // if plastic, learn
-  switch (p->Plasticity) {
+  switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
     case 0:
       m_conductance = p->gSyn * S;
       break;
@@ -185,7 +186,9 @@ void DestexheSyn::step(double t, double dt)
       ODElearn(dt);
       break; 
   }
-  out->I += m_conductance * (p->Vrev - postV);
+
+  if ( !settling || p->activeSettling )
+      out->I += m_conductance * (p->Vrev - postV);
 }
 
 void DestexheSyn::STlearn(double t)

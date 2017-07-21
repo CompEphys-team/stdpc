@@ -13,8 +13,8 @@ public:
     inline virtual const CurrentAssignment &assignment() const { return params().assignment(assignID); }
     virtual const CurrentData &params() const = 0;
 
-    virtual void RK4(double t, double dt, size_t n) = 0;
-    virtual void step(double t, double dt) = 0;
+    virtual void RK4(double t, double dt, size_t n, bool settling) = 0;
+    virtual void step(double t, double dt, bool settling) = 0;
 
 protected:
     inChannel *in;

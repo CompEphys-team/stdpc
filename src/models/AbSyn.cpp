@@ -53,6 +53,7 @@ abSynProxy::abSynProxy()
 
     // main abSynp
     addAP("abSynp[#].active", &p, &abSynData::active);
+    addAP("abSynp[#].activeSettling", &p, &abSynData::activeSettling);
     addAP("abSynp[#].LUTables", &p, &abSynData::LUTables);
     addAP("abSynp[#].gSyn", &p, &abSynData::gSyn);
     addAP("abSynp[#].Vrev", &p, &abSynData::Vrev);
@@ -141,7 +142,7 @@ double abSyn::gFilter(double ingr)
   return ng;
 }
 
-void abSyn::step(double t, double dt)
+void abSyn::step(double t, double dt, bool settling)
 {
   static double dS, dR;
 
@@ -164,7 +165,7 @@ void abSyn::step(double t, double dt)
   double postV = p->fixVpost ? p->Vpost : post->V;
 
   // if plastic, learn
-  switch (p->Plasticity) {
+  switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
     case 0:
       m_conductance = p->gSyn * S;
       break;
@@ -178,7 +179,8 @@ void abSyn::step(double t, double dt)
       break; 
   }
 
-  out->I += m_conductance * (p->Vrev - postV);
+  if ( !settling || p->activeSettling )
+      out->I += m_conductance * (p->Vrev - postV);
 }
 
 void abSyn::STlearn(double t)

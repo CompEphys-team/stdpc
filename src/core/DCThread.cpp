@@ -256,6 +256,7 @@ void DCThread::run()
          rateCounter = 0;
          lastRateReport = 0;
          limitWarningEmitted = false;
+         bufferHelper->rewind();
          message("DynClamp: Settled, clamping ...");
          settling = false;
      }
@@ -313,7 +314,7 @@ void DCThread::run()
 
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
          for ( Conductance *c : Conductances.preDigital() )
-             c->step(t, dt);
+             c->step(t, dt, settling);
 
          // Dynamic clamp: models (d2d currents)
          if ( Models.active().size() ) { // Runge-Kutta 4
@@ -348,7 +349,7 @@ void DCThread::run()
                      double rkDT = rkStep < 2 ? subDT/2 : subDT;
 
                      for ( Conductance *c : Conductances.inDigital() )
-                         c->RK4(subT, rkDT, rkStep);
+                         c->RK4(subT, rkDT, rkStep, settling);
 
                      for ( auto const& m : Models.active() )
                          m->RK4(subT, rkDT, rkStep);
@@ -368,7 +369,7 @@ void DCThread::run()
 
          // Dynamic clamp: d2a synapses
          for ( Conductance *c : Conductances.postDigital() )
-             c->step(t, dt);
+             c->step(t, dt, settling);
 
          // copy AEC compensated input values to output channels if desired
          for ( int k=0; k<aecChannels.size(); k++ ){

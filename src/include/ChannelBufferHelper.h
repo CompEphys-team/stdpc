@@ -11,6 +11,7 @@ public:
     ~ChannelBufferHelper();
 
     void advance(double t);
+    void rewind();
 
     inline static size_t requiredSize(double duration)
     {

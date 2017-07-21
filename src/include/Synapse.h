@@ -13,8 +13,8 @@ public:
     virtual const SynapseAssignment &assignment() const { return params().assignment(assignID); }
     virtual const SynapseData &params() const = 0;
 
-    virtual void RK4(double, double, size_t) {}
-    virtual void step(double t, double dt) = 0;
+    virtual void RK4(double, double, size_t, bool) {}
+    virtual void step(double t, double dt, bool settling) = 0;
 
 protected:
     inChannel *pre;

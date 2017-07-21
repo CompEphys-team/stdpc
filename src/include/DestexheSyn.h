@@ -69,7 +69,7 @@ class DestexheSyn : public Synapse {
   public:
     DestexheSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const DestexheSynData &params() const { return DestexheSynProxy::p[condID]; }
-    void step(double t, double dt);
+    void step(double t, double dt, bool settling);
 
     DestexheSynProxy *proxy() const;
 };

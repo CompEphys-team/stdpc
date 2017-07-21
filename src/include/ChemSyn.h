@@ -83,7 +83,7 @@ class ChemSyn : public Synapse
   public:
     ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
     inline const CSynData &params() const { return ChemSynProxy::p[condID]; }
-    void step(double t, double dt);
+    void step(double t, double dt, bool settling);
 
     ChemSynProxy *proxy() const;
 };

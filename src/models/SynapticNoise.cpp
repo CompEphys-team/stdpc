@@ -15,6 +15,7 @@ SynapticNoiseProxy::SynapticNoiseProxy()
     ConductanceManager::RegisterCurrent(this);
 
     addAP("SynapticNoisep[#].active", &p, &SynapticNoiseData::active);
+    addAP("SynapticNoisep[#].activeSettling", &p, &SynapticNoiseData::activeSettling);
     addAP("SynapticNoisep[#].Vrev", &p, &SynapticNoiseData::Vrev);
     addAP("SynapticNoisep[#].tau", &p, &SynapticNoiseData::tau);
     addAP("SynapticNoisep[#].g0", &p, &SynapticNoiseData::g0);
@@ -33,18 +34,18 @@ SynapticNoise::SynapticNoise(size_t condID, size_t assignID, size_t multiID, inC
     m_conductance = params().g0;
 }
 
-void SynapticNoise::step(double, double dt)
+void SynapticNoise::step(double, double dt, bool settling)
 {
     if ( p->active && a->active && in->active && out->active ) {
         m_conductance = next(dt);
-        if ( !p->ignoreNegative || m_conductance > 0 )
+        if ( ( !p->ignoreNegative || m_conductance > 0 ) && ( !settling || p->activeSettling ) )
             out->I += m_conductance * (p->Vrev - in->V);
     } else {
         m_conductance = 0;
     }
 }
 
-void SynapticNoise::RK4(double, double dt, size_t n)
+void SynapticNoise::RK4(double, double dt, size_t n, bool settling)
 {
     if ( p->active && a->active && in->active && out->active ) {
         if ( n == 0 ) // RK0: Estimate gradient at the step's starting point, m_conductance unchanged from previous
@@ -54,7 +55,7 @@ void SynapticNoise::RK4(double, double dt, size_t n)
         else if ( n == 3 ) // RK3: Estimate gradient at endpoint
             m_conductance = gNext;
 
-        if ( !p->ignoreNegative || m_conductance > 0 )
+        if ( ( !p->ignoreNegative || m_conductance > 0 ) && ( !settling || p->activeSettling ) )
             out->I += m_conductance * (p->Vrev - in->V);
     } else {
         m_conductance = 0;
