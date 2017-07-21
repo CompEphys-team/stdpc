@@ -257,6 +257,19 @@ void DCThread::run()
          lastRateReport = 0;
          limitWarningEmitted = false;
          bufferHelper->rewind();
+
+         // Push negative time data points to indicate end of settling
+         if ( perfmon ) {
+             perfData = PerformanceMonitor::DataPoint { -1, 0, perfDt, 0 };
+             perfmon->q.push(perfData);
+             perfData.t = 0;
+         }
+         if ( graph ) {
+             for ( i = 0; i < graphVar.size(); i++ )
+                graph->q[i]->push(GraphWidget::DataPoint {-1.0, 0.0});
+             lastWrite = 0;
+         }
+
          message("DynClamp: Settled, clamping ...");
          settling = false;
      }

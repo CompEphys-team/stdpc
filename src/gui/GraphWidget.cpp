@@ -277,6 +277,9 @@ void GraphWidget::replot()
     bool rangeFound;
     QCPRange range = plots[0]->graph()->getKeyRange(rangeFound);
 
+    bool settlingEnded = false;
+    double settlingOffset;
+
     DataPoint point {0., 0.};
 
     if ( initial && q[0]->pop(point) ) {
@@ -298,6 +301,20 @@ void GraphWidget::replot()
         }
 
         while ( queue->pop(point) ) {
+            if ( point.t < 0 ) { // End of settling: Shift all existing data to end at t=0
+                for ( size_t j = 0; j < graphs.size(); j++ ) {
+                    QSharedPointer<QCPGraphDataContainer> g_container = std::get<0>(graphs[j])->data();
+                    if ( !g_container->isEmpty() ) {
+                        settlingOffset = (g_container->end()-1)->key;
+                        for ( QCPGraphData &g_data : *g_container ) {
+                            g_data.key -= settlingOffset;
+                        }
+                    }
+                }
+                settlingEnded = true;
+                // Ignore unused point.value
+                continue;
+            }
             for ( size_t j = 0; j < graphs.size(); j++ ) {
                 try {
                     std::get<0>(graphs[j])->addData(point.t, point.value * fac[j]);
@@ -320,6 +337,16 @@ void GraphWidget::replot()
         if ( !i )
             tNow = point.t;
         ++i;
+    }
+
+    // Shift x axis along with data after settling
+    if ( settlingEnded ) {
+        for ( QCustomPlot *plot : plots ) {
+            plot->xAxis->blockSignals(true);
+            plot->xAxis->moveRange(-settlingOffset);
+            plot->xAxis->blockSignals(false);
+        }
+        range -= settlingOffset;
     }
 
     // make key axis range scroll with the data:

@@ -120,6 +120,20 @@ void PerformanceMonitor::replot()
         QCPRange range = ui->plot->graph()->getKeyRange(rangeFound);
 
         do {
+            // End of settling: Shift all existing data to end at t=0
+            if ( point.t < 0 ) {
+                if ( !ui->plot->graph(0)->data()->isEmpty() ) {
+                    double offset = (ui->plot->graph(0)->data()->end()-1)->key;
+                    for ( int i = 0; i < 3; i++ ) {
+                        for ( QCPGraphData &g_data : *ui->plot->graph(i)->data() ) {
+                            g_data.key -= offset;
+                        }
+                    }
+                    ui->plot->xAxis->moveRange( -offset - PerfMonp.interval );
+                }
+                continue; // Discard unused point data
+            }
+
             ui->plot->graph(0)->addData(point.t, point.maxDt * 1e3);
             ui->plot->graph(1)->addData(point.t, point.minDt * 1e3);
             ui->plot->graph(2)->addData(point.t, PerfMonp.interval/point.n * 1e3);
