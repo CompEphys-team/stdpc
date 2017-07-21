@@ -46,6 +46,8 @@ private:
      bool stopped;
      bool finished;
      bool scripting;
+     bool settling;
+     bool wakeFromSettling;
 
      outChnData outNoneData;
      outChannel outChnNone;

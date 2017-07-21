@@ -209,16 +209,22 @@ void DCThread::run()
 
    stopped= false;
    finished= false;
+   settling = Settlingp.active;
+   wakeFromSettling = false;
 
-   DAQ *triggerDev;
+   DAQ *triggerDev = nullptr;
    if ( Triggerp.active && (triggerDev = Devices.getDevice(Triggerp.channel)) ) {
        message(QString("DynClamp: Waiting for trigger on %1...").arg(Triggerp.channel.prettyName()));
        triggerDev->armTrigger(Triggerp.channel);
-       while ( !stopped && !triggerDev->triggerFired() ) {
-           // Wait patiently.
+       if ( !settling ) {
+           while ( !stopped && !triggerDev->triggerFired() ) {
+               // Wait patiently.
+           }
+           if ( !stopped )
+               message(QString("DynClamp: Triggered, clamping..."));
        }
-       if ( !stopped )
-           message(QString("DynClamp: Triggered, clamping..."));
+   } else if ( settling ) {
+       message("DynClamp: Settling ...");
    } else {
        message(QString("DynClamp: Clamping ..."));
    }
@@ -242,6 +248,17 @@ void DCThread::run()
    // Dynamic clamp loop begins
    while (!stopped) {
 
+     if ( settling && (
+              (Settlingp.duration > 0 && t > Settlingp.duration) // Timed wake
+              || wakeFromSettling // Manual wake
+              || triggerDev && triggerDev->triggerFired()) ) { // Triggered wake
+         t = 0.0;
+         rateCounter = 0;
+         lastRateReport = 0;
+         limitWarningEmitted = false;
+         message("DynClamp: Settled, clamping ...");
+         settling = false;
+     }
 
      if (!SampleHoldOn) {
        // --- Read --- //
@@ -360,7 +377,7 @@ void DCThread::run()
          }
 
          //--------------- Data saving ------------------------//
-         if ( saving && dataSavingPs.enabled ) {
+         if ( !settling && saving && dataSavingPs.enabled ) {
            if ( t >= lastSave + savingPeriod )
            {
               i = 0;
@@ -404,7 +421,7 @@ void DCThread::run()
          }
 
          // Scripting
-         if (t >= evt) { // event needs doing
+         if ( !settling && t >= evt ) { // event needs doing
            scrIter->second();
            scrIter++;
            if (scrIter == scriptq.end()) evt= 1e10;
