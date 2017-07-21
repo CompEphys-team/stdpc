@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>115</width>
-    <height>91</height>
+    <width>125</width>
+    <height>114</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,6 +92,16 @@
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="activeSettling">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Check to allow this conductance to output currents during settling. If left unchecked, the internal state is settled without applying the resulting currents or synaptic plasticity.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>when settling</string>
         </property>
        </widget>
       </item>

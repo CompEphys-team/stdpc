@@ -41,6 +41,7 @@ public:
     QLabel *&label;
     QPushButton *&params;
     QCheckBox *&active;
+    QCheckBox *&activeSettling;
 };
 
 #endif // COMPONENTFACTORYWIDGET_H

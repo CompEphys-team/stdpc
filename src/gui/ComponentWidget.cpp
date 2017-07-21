@@ -22,9 +22,13 @@ ComponentWidget::ComponentWidget(QWidget *parent) :
     ui(new Ui::ComponentWidget),
     label(ui->label),
     params(ui->params),
-    active(ui->active)
+    active(ui->active),
+    activeSettling(ui->activeSettling)
 {
     ui->setupUi(this);
+    connect(active, &QCheckBox::stateChanged, [=](int){
+        activeSettling->setEnabled(active->isChecked());
+    });
 }
 
 ComponentWidget::~ComponentWidget()

@@ -12,6 +12,7 @@ void Component::importData()
 {
     dlg->importData();
     _widget->active->setChecked(proxy->param(idx).active);
+    _widget->activeSettling->setChecked(proxy->param(idx).activeSettling);
 }
 
 void Component::exportData()
@@ -19,6 +20,7 @@ void Component::exportData()
     if ( idx >= proxy->size() )
         proxy->resize(idx+1);
     proxy->param(idx).active = _widget->active->isChecked();
+    proxy->param(idx).activeSettling = _widget->activeSettling->isChecked();
     dlg->exportData();
 }
 
