@@ -327,9 +327,9 @@ void GraphWidget::replot()
         double xUpper = plots[0]->xAxis->range().upper;
         if ( range.upper <= xUpper && point.t > xUpper) {
             for ( QCustomPlot *plot : plots ) {
-                plot->blockSignals(true);
+                plot->xAxis->blockSignals(true);
                 plot->xAxis->moveRange(point.t - xUpper);
-                plot->blockSignals(false);
+                plot->xAxis->blockSignals(false);
             }
         }
     }
