@@ -19,6 +19,7 @@ SimulDAQProxy::SimulDAQProxy() :
         addAP("SDAQp[#].outFileName", &p, &SDAQData::outFileName),
         addAP("SDAQp[#].inTFac", &p, &SDAQData::inTFac),
         addAP("SDAQp[#].outDt", &p, &SDAQData::outDt),
+        addAP("SDAQp[#].rewindAfterSettling", &p, &SDAQData::rewindAfterSettling),
         addAP("SDAQp[#].inChn[#].active", &p, &SDAQData::inChn, &inChnData::active),
         addAP("SDAQp[#].inChn[#].gain", &p, &SDAQData::inChn, &inChnData::gain),
         addAP("SDAQp[#].inChn[#].gainFac", &p, &SDAQData::inChn, &inChnData::gainFac),
@@ -160,7 +161,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
   }
 }
 
-void SimulDAQ::get_scan()
+void SimulDAQ::get_scan(bool)
 {
   short int i;
   short int idx;
@@ -239,12 +240,10 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns
   lastWrite= 0.0;
 }
 
-void SimulDAQ::write_analog_out()
+void SimulDAQ::write_analog_out(bool settling)
 {
-//  short int idx;
-//  double dt;
-  
-//  dt= get_RTC();
+  if ( settling ) // Can't write during settling without messing up time stamps... so don't write.
+    return;
   if (t > lastWrite + SimulDAQProxy::p[devID].outDt) {
     lastWrite= t;
     outtq.append(t);
@@ -252,6 +251,14 @@ void SimulDAQ::write_analog_out()
       outq[i].append(out[outIdx[i]].I);
     }
   }
+}
+
+void SimulDAQ::settling_complete()
+{
+    if ( SimulDAQProxy::p[devID].rewindAfterSettling ) {
+        rewind();
+        tOff = t;
+    }
 }
 
 

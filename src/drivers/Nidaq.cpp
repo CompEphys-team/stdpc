@@ -261,7 +261,7 @@ void NIDAQ::generate_scan_list(short int chnNo, QVector<short int> Chns)
 }
 
 //---------------------------------------------------------------------------
-void NIDAQ::get_scan()
+void NIDAQ::get_scan(bool)
 {
   // assume device is present if this is called (responsibility of calling code!)
   static int i;
@@ -328,7 +328,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 
 
 //---------------------------------------------------------------------------
-void NIDAQ::write_analog_out()
+void NIDAQ::write_analog_out(bool)
 {
   static int i;
   static int32 spw;

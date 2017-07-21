@@ -29,9 +29,10 @@ class DAQ {
     virtual void start() = 0;
     virtual void generate_scan_list(short int, QVector<short int>)= 0;
     virtual void generate_analog_out_list(short int, QVector<short int> )= 0;
-    virtual void get_scan()= 0;
+    virtual void get_scan(bool settling = false)= 0;
     virtual void get_single_scan(inChannel *)= 0;
-    virtual void write_analog_out()= 0;
+    virtual void write_analog_out(bool settling = false)= 0;
+    virtual void settling_complete() {} //!< Called when DC exits settling loop and enters standard clamp mode.
     virtual void reset_board()= 0;
 
     virtual inline void armTrigger(ChannelIndex) {}

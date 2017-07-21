@@ -270,6 +270,10 @@ void DCThread::run()
              lastWrite = 0;
          }
 
+         // Rewind SimulDAQ
+         for ( auto &b : Devices.active() )
+             b->settling_complete();
+
          message("DynClamp: Settled, clamping ...");
          settling = false;
      }
@@ -277,7 +281,7 @@ void DCThread::run()
      if (!SampleHoldOn) {
        // --- Read --- //
          for ( auto &b : Devices.active() )
-             b->get_scan();
+             b->get_scan(settling);
        // --- Read end --- //
 
        // --- Calculate --- //
@@ -467,7 +471,7 @@ void DCThread::run()
 
      // --- Write --- //
      for ( auto &b : Devices.active() )
-         b->write_analog_out();
+         b->write_analog_out(settling);
      // --- Write end --- //
 
 

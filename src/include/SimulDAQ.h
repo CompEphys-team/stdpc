@@ -12,11 +12,13 @@ class SDAQData : public DAQData {
     QuotedString outFileName;
     double inTFac;
     double outDt;
+    bool rewindAfterSettling;
     SDAQData() : DAQData(),
         inFileName("StdpcIn1.dat"),
         outFileName("StdpcOut1.dat"),
         inTFac(1),
-        outDt(0.001)
+        outDt(0.001),
+        rewindAfterSettling(false)
     {}
 };
 
@@ -48,9 +50,10 @@ class SimulDAQ: public DAQ
     virtual void start();
     virtual void generate_scan_list(short int, QVector<short int>);
     virtual void generate_analog_out_list(short int, QVector<short>);
-    virtual void get_scan();
+    virtual void get_scan(bool settling = false);
     virtual void get_single_scan(inChannel *);
-    virtual void write_analog_out();
+    virtual void write_analog_out(bool settling = false);
+    virtual void settling_complete();
     virtual void reset_board();
 
     ifstream is;

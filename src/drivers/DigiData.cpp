@@ -216,7 +216,7 @@ void DigiData::generate_scan_list(short int chnNo, QVector<short> Chns)
 }
 
 //---------------------------------------------------------------------------
-void DigiData::get_scan()
+void DigiData::get_scan(bool)
 {
    short int i, scan;
 
@@ -261,7 +261,7 @@ void DigiData::generate_analog_out_list(short int chnNo, QVector<short int> Chns
 
 
 //---------------------------------------------------------------------------
-void DigiData::write_analog_out()
+void DigiData::write_analog_out(bool)
 {
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {
