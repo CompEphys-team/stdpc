@@ -180,6 +180,10 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
 
 void MyMainWindow::StartButClicked() 
 {
+  if ( !DCT->stopped && DCT->settling ) {
+      DCT->wakeFromSettling = true;
+      return;
+  }
   ui->actionLoad_Protocol->setEnabled(false);
   ui->actionSave_Protocol->setEnabled(false);
   ui->actionLoad_Script->setEnabled(false);
@@ -190,6 +194,8 @@ void MyMainWindow::StartButClicked()
   ui->menuConfigure->setEnabled(false);
   ui->cbDatasaving->setEnabled(false);
   ui->cbTrigger->setEnabled(false);
+  ui->cbSettle->setEnabled(false);
+  ui->dblSettleDuration->setEnabled(false);
   ui->DAQTable->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -218,6 +224,8 @@ void MyMainWindow::StopButClicked()
   ui->menuConfigure->setEnabled(true);
   ui->cbDatasaving->setEnabled(true);
   ui->cbTrigger->setEnabled(true);
+  ui->cbSettle->setEnabled(true);
+  ui->dblSettleDuration->setEnabled(true);
   ui->DAQTable->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
@@ -246,6 +254,8 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   dataSavingPs.enabled = ui->cbDatasaving->isChecked();
   TrigDlg->exportData();
   Triggerp.active = ui->cbTrigger->isChecked();
+  Settlingp.active = ui->cbSettle->isChecked();
+  Settlingp.duration = ui->dblSettleDuration->value();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
   emit channelsChanged();
@@ -260,6 +270,8 @@ void MyMainWindow::importData()
   ui->cbDatasaving->setChecked(dataSavingPs.enabled);
   TrigDlg->importData();
   ui->cbTrigger->setChecked(Triggerp.active);
+  ui->cbSettle->setChecked(Settlingp.active);
+  ui->dblSettleDuration->setValue(Settlingp.duration);
   ui->graphtab->importData();
   ui->performancetab->importData();
   updateStartButton();
