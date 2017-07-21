@@ -31,6 +31,7 @@ extern PerformanceMonitorData PerfMonp;
 extern SampleHoldData SampleHoldp;
 
 extern TriggerData Triggerp;
+extern SettlingData Settlingp;
 
 // LU tables
 extern tanhLUtable tanhLU;

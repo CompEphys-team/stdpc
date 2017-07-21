@@ -15,6 +15,7 @@ dataSavingParams dataSavingPs;
 SampleHoldData SampleHoldp;
 
 TriggerData Triggerp;
+SettlingData Settlingp;
 
 // LU tables
 tanhLUtable tanhLU;

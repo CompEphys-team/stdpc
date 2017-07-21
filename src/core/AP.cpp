@@ -50,6 +50,10 @@ void initAP()
     // Trigger
     addAP("Triggerp.active", &Triggerp, &TriggerData::active);
     addAP("Triggerp.channel", &Triggerp, &TriggerData::channel);
+
+    // Settling
+    addAP("Settlingp.active", &Settlingp, &SettlingData::active);
+    addAP("Settlingp.duration", &Settlingp, &SettlingData::duration);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)

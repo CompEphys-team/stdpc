@@ -220,4 +220,9 @@ struct TriggerData {
     ChannelIndex channel;
 };
 
+struct SettlingData {
+    bool active = false;
+    double duration = 0.0;
+};
+
 #endif
