@@ -2,6 +2,9 @@
 #include <QDir>
 #include <QDateTime>
 #include <QRegularExpression>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
 
 DataSaver::DataSaver()
 {
@@ -52,6 +55,13 @@ bool DataSaver::init(dataSavingParams p_, QVector<QString> labels)
     return true;
 }
 
+QString getColumnFileName(QString rawlabel)
+{
+    QString label = rawlabel.toLatin1();
+    label.replace(QRegularExpression("[^-_\\.a-zA-Z0-9]"), "_");
+    return QString("%1_%2.dat").arg(i).arg(label);
+}
+
 bool DataSaver::initBinary(QVector<QString> labels)
 {
     QFileInfo fileinfo(p.fileName);
@@ -59,17 +69,36 @@ bool DataSaver::initBinary(QVector<QString> labels)
         if ( !QDir(p.fileName).mkpath(".") )
             return false;
 
-    // TODO: Metadata
+    // Write metadata
+    QJsonArray columns;
+    for ( int i = 0; i < labels.size(); i++ ) {
+        columns.append(QJsonObject {
+                           {"column_name", labels[i]},
+                           {"file_name", getColumnFileName(labels[i])}
+                           // TODO: type and units
+                       });
+    }
+    QJsonObject json
+    {
+        {"generator", "StdpC"},
+        {"record_name", fileinfo.fileName()},
+        {"requested_saving_frequency", p.savingFreq},
+        {"creation_time", QDateTime::currentDateTime().toString(Qt::ISODate)},
+        // TODO: Stream attributes
+        {"data_columns", columns}
+    };
+    QFile json_file(QString("%1/meta.json"));
+    if ( !json_file.open(QFile::WriteOnly) )
+        return false;
+    json_file.write(QJsonDocument(json).toJson());
 
+    // Create separate streams for each data column
     binaryStreams.resize(labels.size());
     binaryFiles.resize(labels.size());
     for ( size_t i = 0; i < binaryStreams.size(); i++ ) {
-        QString label = labels[i].toLatin1();
-        label.replace(QRegularExpression("[^-_\\.a-zA-Z0-9]"), "_");
-        QFile *file(QString("%1/%2_%3.dat")
+        QFile *file(QString("%1/%2")
                    .arg(p.fileName)
-                   .arg(i)
-                   .arg(label));
+                   .arg(getColumnFileName(labels[i])));
         if ( !file->open(QFile::WriteOnly) )
             return false;
 
