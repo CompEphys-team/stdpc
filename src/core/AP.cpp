@@ -12,6 +12,8 @@ void initAP()
     addAP("dataSavingPs.fileName", &(dataSavingPs.fileName));
     addAP("dataSavingPs.savingFreq", &(dataSavingPs.savingFreq));
     addAP("dataSavingPs.isBinary", &(dataSavingPs.isBinary));
+    addAP("dataSavingPs.binaryLittleEndian", &dataSavingPs.binaryLittleEndian);
+    addAP("dataSavingPs.binaryDoublePrecision", &dataSavingPs.binaryDoublePrecision);
 
 
     // Graphs

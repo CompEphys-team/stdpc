@@ -64,6 +64,7 @@ QString getColumnFileName(QString rawlabel)
 
 bool DataSaver::initBinary(QVector<QString> labels)
 {
+    QDataStream::Version streamversion = QDataStream::Qt_DefaultCompiledVersion;
     QFileInfo fileinfo(p.fileName);
     if ( !fileinfo.exists() || !fileinfo.isDir() )
         if ( !QDir(p.fileName).mkpath(".") )
@@ -84,7 +85,9 @@ bool DataSaver::initBinary(QVector<QString> labels)
         {"record_name", fileinfo.fileName()},
         {"requested_saving_frequency", p.savingFreq},
         {"creation_time", QDateTime::currentDateTime().toString(Qt::ISODate)},
-        // TODO: Stream attributes
+        {"QDataStream_version", streamversion},
+        {"byte_order", p.binaryLittleEndian ? "little_endian" : "big_endian"},
+        {"precision", p.binaryDoublePrecision ? "double" : "single"},
         {"data_columns", columns}
     };
     QFile json_file(QString("%1/meta.json"));
@@ -103,7 +106,9 @@ bool DataSaver::initBinary(QVector<QString> labels)
             return false;
 
         QDataStream *stream = new QDataStream(file);
-        // TODO: Stream attributes
+        stream->setVersion(streamversion);
+        stream->setByteOrder(p.binaryLittleEndian ? QDataStream::LittleEndian : QDataStream::BigEndian);
+        stream->setFloatingPointPrecision(p.binaryDoublePrecision ? QDataStream::DoublePrecision : QDataStream::SinglePrecision);
 
         binaryStreams[i].reset(stream);
         binaryFiles[i].reset(file);

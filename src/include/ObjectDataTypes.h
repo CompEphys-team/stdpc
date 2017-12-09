@@ -133,6 +133,9 @@ typedef struct {
   double savingFreq;
   bool isBinary;
 
+  bool binaryLittleEndian;
+  bool binaryDoublePrecision;
+
 } dataSavingParams;
  
 struct inChnData {
