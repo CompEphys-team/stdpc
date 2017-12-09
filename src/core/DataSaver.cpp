@@ -1,96 +1,110 @@
 #include "DataSaver.h"
 #include <QDir>
 #include <QDateTime>
+#include <QRegularExpression>
 
 DataSaver::DataSaver()
 {
 }
 
-// Opens the file
-bool DataSaver::InitDataSaving(QString filename, bool isBnry)
+bool DataSaver::init(dataSavingParams p_, QVector<QString> labels)
 {
-    if( !os.good() || os.is_open() ) {
-        os.close();
-        os.clear();
-    }
+    p = p_;
 
     QDateTime now = QDateTime::currentDateTime();
-    filename.replace("%Y", now.toString("yyyy"))
+    p.fileName.replace("%Y", now.toString("yyyy"))
             .replace("%M", now.toString("MM"))
             .replace("%D", now.toString("dd"))
             .replace("%h", now.toString("HH"))
             .replace("%m", now.toString("mm"))
             .replace("%s", now.toString("ss"));
-    QFileInfo fileinfo(filename);
+    QFileInfo fileinfo(p.fileName);
     QDir dir(fileinfo.path());
     if ( !dir.exists() )
-        dir.mkpath(".");
+        if ( !dir.mkpath(".") )
+            return false;
 
-    isBinary = isBnry;
-    if( isBinary == 0 ) os.open(filename.toLatin1());  // ascii write
-    else                os.open(filename.toLatin1(), std::ios::out | std::ios::binary);    // binary write
+    // TODO: %n numbering
 
-    return os.good() && os.is_open();
+    if ( p.isBinary ) {
+        if ( !initBinary(labels) )
+            return false;
+    } else {
+        if ( !initAscii(labels) )
+            return false;
+    }
+
+    // prepare queues
+    size_t bufsz (p.savingFreq > 1e3 ? p.savingFreq : 1e3);
+    q.resize(labels.size());
+    for ( auto &queue : q )
+        queue.reset(new CircularFifo<double>(bufsz));
+
+    return true;
+}
+
+bool DataSaver::initBinary(QVector<QString> labels)
+{
+    QFileInfo fileinfo(p.fileName);
+    if ( !fileinfo.exists() || !fileinfo.isDir() )
+        if ( !QDir(p.fileName).mkpath(".") )
+            return false;
+
+    // TODO: Metadata
+
+    binaryStreams.resize(labels.size());
+    binaryFiles.resize(labels.size());
+    for ( size_t i = 0; i < binaryStreams.size(); i++ ) {
+        QString label = labels[i].toLatin1();
+        label.replace(QRegularExpression("[^-_\\.a-zA-Z0-9]"), "_");
+        QFile *file(QString("%1/%2_%3.dat")
+                   .arg(p.fileName)
+                   .arg(i)
+                   .arg(label));
+        if ( !file->open(QFile::WriteOnly) )
+            return false;
+
+        QDataStream *stream = new QDataStream(file);
+        // TODO: Stream attributes
+
+        binaryStreams[i].reset(stream);
+        binaryFiles[i].reset(file);
+    }
+
+    return true;
+}
+
+bool DataSaver::initAscii(QVector<QString> labels)
+{
+    os.open(p.fileName.toLatin1());
+    if ( !os.good() || !os.is_open())
+        return false;
+
+    os << "% ";
+    for ( QString &label : labels )
+        os << label.toLatin1().constData() << " ";
+    os << "\n";
+
+    return true;
 }
 
 
 // Consume data pushed to the queues by DCThread on the main thread
 void DataSaver::SaveLine()
 {
-    float data;
-    if ( isBinary ) {
-        for ( auto& queue : q ) {
-            queue->pop(data);
-            os.write(reinterpret_cast<char*>(&data), sizeof data);
+    double data;
+    if ( p.isBinary ) {
+        for ( size_t i = 0; i < q.size(); i++ ) {
+            q[i]->pop(data);
+            *binaryStreams[i] << data;
         }
     } else {
-        for ( auto& queue : q ) {
+        for ( auto &queue : q ) {
             queue->pop(data);
             os << data << " ";
         }
         os << "\n";
     }
-    os.flush();
-}
-
-
-// Saves the header into the file
-void DataSaver::SaveHeader(QVector<QString> header, double savingFreq)
-{
-
-  if( isBinary == 0 ) {     // Ascii write
-
-      os << "% ";
-
-      for ( int i= 0; i < header.size(); i++ ){
-          for ( int j= 0; j<header[i].size(); j++ )
-              os << header[i][j].toLatin1();
-          os << " ";
-
-      }
-      os << "\n";
-
-  }
-  else {                    // Binary write
-
-      float data;
-      for ( int i= 0; i < header.size(); i++ ) {
-          for ( int j= 0; j<header[i].size(); j++ ) {
-              data = (char) header[i][j].toLatin1();
-              os.write( reinterpret_cast<char*>( &data ), sizeof data );
-          }
-      }
-
-  }
-
-  // flush the buffer
-  os.flush();
-
-  // prepare queues
-  size_t bufsz (savingFreq > 1e3 ? savingFreq : 1e3);
-  q.clear();
-  for ( int i = 0; i < header.size(); i++ )
-      q.push_back(std::unique_ptr<CircularFifo<float>>(new CircularFifo<float>(bufsz)));
 }
 
 
@@ -101,4 +115,7 @@ void DataSaver::EndDataSaving()
     // so no call to SaveLine() should remain.
     os.close();
     os.clear();
+    binaryStreams.clear();
+    binaryFiles.clear();
+    q.clear();
 }

@@ -138,11 +138,6 @@ void DCThread::setup_and_go()
    // Init data saving
    saving = false;
    if ( dataSavingPs.enabled ) {
-       saving = dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
-       if ( !saving )
-           dataSaver->EndDataSaving();
-   }
-   if (saving) {
        savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
        valuesToSave.clear();
@@ -171,10 +166,13 @@ void DCThread::setup_and_go()
        }
 #endif
 
-       if ( valuesToSave.empty() )
+       if ( valuesToSave.empty() ) {
            saving = false;
-       else
-           dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
+       } else {
+           saving = dataSaver->init(dataSavingPs, header);
+           if ( !saving )
+               message("Warning: Data saving failed to initialise. Data will not be written to disk!");
+       }
    }
 
    start();
