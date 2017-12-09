@@ -160,7 +160,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directory will be created if it does not exist.&lt;/p&gt;&lt;p&gt;Use %Y, %M, %D, %h, %m, %s for year, month, day, hours, minutes, seconds, respectively.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Directory will be created if it does not exist.&lt;/p&gt;&lt;p&gt;Use %Y, %M, %D, %h, %m, %s for year, month, day, hours, minutes, seconds, respectively, and %n for consecutive file numbering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
   <widget class="QRadioButton" name="rbAscii">

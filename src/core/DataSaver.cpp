@@ -24,7 +24,16 @@ bool DataSaver::init(dataSavingParams p_, QVector<QString> labels)
         if ( !dir.mkpath(".") )
             return false;
 
-    // TODO: %n numbering
+    if ( p.fileName.contains("%n") ) {
+        p.fileName.replace("%n", "%1");
+        for ( size_t i = 0; true; i++ ) {
+            QString name = p.fileName.arg(i, 4, 10, '0');
+            if ( QFileInfo(name).exists() ) {
+                p.fileName = name;
+                break;
+            }
+        }
+    }
 
     if ( p.isBinary ) {
         if ( !initBinary(labels) )
