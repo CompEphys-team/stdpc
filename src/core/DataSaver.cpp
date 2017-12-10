@@ -72,10 +72,16 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
     // Write metadata
     QJsonArray columns;
     for ( int i = 0; i < channels.size(); i++ ) {
-        columns.append(QJsonObject {
-                           {"file_name", getColumnFileName(i, channels[i])}
-                           // TODO: type and units
-                       });
+        QJsonObject obj;
+        if ( channels[i].isNone )
+            obj = QJsonObject {
+                {"type", "Time"},
+                {"units", "s"}
+            };
+        else
+            obj = channels[i].toJson();
+        obj.insert("file_name", getColumnFileName(i, channels[i]));
+        columns.append(obj);
     }
     QJsonObject json
     {

@@ -168,6 +168,51 @@ QString ChannelIndex::toString(QChar sep, bool withDetails) const
     return ret;
 }
 
+QJsonObject ChannelIndex::toJson() const
+{
+    if ( !isValid || isNone ) {
+        return QJsonObject;
+    } else if ( isAnalog || isDigital ) {
+        QJsonObject obj {
+            {"type", "DAQ"},
+            {"class", daqClass},
+            {"class_id", devID},
+            {"channel_id", chanID},
+            {"is_input_channel", isInChn}
+        };
+        if ( isAnalog )
+            obj.insert("units", isInChn ? "V" : "A");
+        else
+            obj.insert("units", "bit");
+        return obj;
+    } else if ( isPrototype ) {
+        return QJsonObject {
+            {"type", "Prototype"},
+            {"class", modelClass},
+            {"class_id", modelID}
+        };
+    } else if ( isVirtual ) {
+        return QJsonObject {
+            {"type", "Virtual"},
+            {"class", modelClass},
+            {"class_id", modelID},
+            {"instance_id", instID},
+            {"is_input_channel", isInChn},
+            {"units", isInChn ? "V" : "A"}
+        };
+    } else if ( isConductance ) {
+        return QJsonObject {
+            {"type", "Conductance"},
+            {"class", conductanceClass},
+            {"class_id", conductanceID},
+            {"assignment_id", assignID},
+            {"multiplex_id", multiplexID},
+            {"units", "S"}
+        };
+    }
+    return QJsonObject;
+}
+
 std::ostream &operator<<(std::ostream &os, const ChannelIndex &dex)
 {
     os << dex.toString().toStdString();

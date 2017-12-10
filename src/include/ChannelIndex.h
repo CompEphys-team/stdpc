@@ -4,6 +4,7 @@
 #include <iostream>
 #include <QString>
 #include <QMetaType>
+#include <QJsonObject>
 
 // Forward
 struct inChnData;
@@ -29,6 +30,7 @@ public:
 
     QString toString(QChar sep = '/', bool withDetails = false) const;
     QString prettyName() const;
+    QJsonObject toJson() const;
 
     bool isValid;
 
