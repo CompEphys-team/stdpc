@@ -89,7 +89,7 @@ public:
     virtual void RK4(double t, double dt, size_t n, bool settling);
 
     QString getStatus() const;
-    QPair<QVector<QString>, QVector<const double *>> valuesToSave()const;
+    QPair<QVector<ChannelIndex>, QVector<const double *>> valuesToSave()const;
 
     inline std::vector<std::shared_ptr<Model>> const& instances() const { return inst; }
 

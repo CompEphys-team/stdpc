@@ -10,7 +10,7 @@ DataSaver::DataSaver()
 {
 }
 
-bool DataSaver::init(dataSavingParams p_, QVector<QString> labels)
+bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
 {
     p = p_;
 
@@ -39,30 +39,29 @@ bool DataSaver::init(dataSavingParams p_, QVector<QString> labels)
     }
 
     if ( p.isBinary ) {
-        if ( !initBinary(labels) )
+        if ( !initBinary(channels) )
             return false;
     } else {
-        if ( !initAscii(labels) )
+        if ( !initAscii(channels) )
             return false;
     }
 
     // prepare queues
     size_t bufsz (p.savingFreq > 1e3 ? p.savingFreq : 1e3);
-    q.resize(labels.size());
+    q.resize(channels.size());
     for ( auto &queue : q )
         queue.reset(new CircularFifo<double>(bufsz));
 
     return true;
 }
 
-QString getColumnFileName(QString rawlabel)
+QString getColumnFileName(int i, ChannelIndex channel)
 {
-    QString label = rawlabel.toLatin1();
-    label.replace(QRegularExpression("[^-_\\.a-zA-Z0-9]"), "_");
-    return QString("%1_%2.dat").arg(i).arg(label);
+    QString label = channel.isNone ? "time" : channel.toString('_', true);
+    return QString("%1_%2.dat").arg(i, 2, 10, '0').arg(label);
 }
 
-bool DataSaver::initBinary(QVector<QString> labels)
+bool DataSaver::initBinary(QVector<ChannelIndex> channels)
 {
     QDataStream::Version streamversion = QDataStream::Qt_DefaultCompiledVersion;
     QFileInfo fileinfo(p.fileName);
@@ -72,10 +71,9 @@ bool DataSaver::initBinary(QVector<QString> labels)
 
     // Write metadata
     QJsonArray columns;
-    for ( int i = 0; i < labels.size(); i++ ) {
+    for ( int i = 0; i < channels.size(); i++ ) {
         columns.append(QJsonObject {
-                           {"column_name", labels[i]},
-                           {"file_name", getColumnFileName(labels[i])}
+                           {"file_name", getColumnFileName(i, channels[i])}
                            // TODO: type and units
                        });
     }
@@ -96,12 +94,12 @@ bool DataSaver::initBinary(QVector<QString> labels)
     json_file.write(QJsonDocument(json).toJson());
 
     // Create separate streams for each data column
-    binaryStreams.resize(labels.size());
-    binaryFiles.resize(labels.size());
+    binaryStreams.resize(channels.size());
+    binaryFiles.resize(channels.size());
     for ( size_t i = 0; i < binaryStreams.size(); i++ ) {
         QFile *file(QString("%1/%2")
                    .arg(p.fileName)
-                   .arg(getColumnFileName(labels[i])));
+                   .arg(getColumnFileName(i, channels[i])));
         if ( !file->open(QFile::WriteOnly) )
             return false;
 
@@ -117,15 +115,17 @@ bool DataSaver::initBinary(QVector<QString> labels)
     return true;
 }
 
-bool DataSaver::initAscii(QVector<QString> labels)
+bool DataSaver::initAscii(QVector<ChannelIndex> channels)
 {
     os.open(p.fileName.toLatin1());
     if ( !os.good() || !os.is_open())
         return false;
 
     os << p.asciiHeaderPrefix;
-    for ( QString &label : labels )
-        os << '"' << label.toLatin1().constData() << '"' << p.asciiSeparator;
+    for ( ChannelIndex channel : channels ) {
+        QString label = channel.isNone ? "Time" : channel.toString('_', true);
+        os << '"' << label << '"' << p.asciiSeparator;
+    }
     os << (p.asciiCRLF ? "\r\n" : "\n");
 
     return true;

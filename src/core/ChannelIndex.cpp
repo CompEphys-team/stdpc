@@ -23,6 +23,7 @@ ChannelIndex::ChannelIndex() :
     isConductance(false),
     conductanceID(0),
     assignID(0),
+    multiplexID(0),
     isLegacy(false)
 {
 
@@ -57,7 +58,7 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
     isLegacy(false)
 {}
 
-ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
+ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID, bool isInChn) :
     isValid(proxy != nullptr),
     isNone(false),
     isPrototype(false),
@@ -67,11 +68,12 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
     instID(instID),
     isAnalog(false),
     isDigital(false),
+    isInChn(isInChn),
     isConductance(false),
     isLegacy(false)
 {}
 
-ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID) :
+ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID, size_t multiplexID) :
     isValid(proxy != nullptr),
     isNone(false),
     isPrototype(false),
@@ -82,6 +84,7 @@ ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t
     conductanceClass(proxy->conductanceClass()),
     conductanceID(conductanceID),
     assignID(assignID),
+    multiplexID(multiplexID),
     isLegacy(false)
 {}
 
@@ -138,7 +141,7 @@ QString ChannelIndex::prettyName() const
     return ret;
 }
 
-QString ChannelIndex::toString(QChar sep) const
+QString ChannelIndex::toString(QChar sep, bool withDetails) const
 {
     QString ret;
     if ( !isValid || isNone ) {
@@ -150,9 +153,15 @@ QString ChannelIndex::toString(QChar sep) const
     } else if ( isPrototype ) {
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
-        ret = QString("Virtual/%1/%2/%3").arg(modelClass).arg(modelID).arg(instID);
+        QString direction = "";
+        if ( withDetails )
+            direction = (isInChn ? "in" : "out");
+        ret = QString("Virtual/%1/%2/%3%4").arg(modelClass).arg(modelID).arg(direction).arg(instID);
     } else if ( isConductance ) {
-        ret = QString("Conductance/%1/%2/%3").arg(conductanceClass).arg(conductanceID).arg(assignID);
+        QString multi = "";
+        if ( withDetails )
+            multi = QString("/multi%1").arg(multiplexID);
+        ret = QString("Conductance/%1/%2/%3%4").arg(conductanceClass).arg(conductanceID).arg(assignID).arg(multi);
     }
     if ( sep != QChar('/') )
         ret.replace('/', sep);
@@ -276,11 +285,11 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             a.isPrototype==b.isPrototype &&
             a.isVirtual==b.isVirtual &&
             (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&
-            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID)) &&
+            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID && a.isInChn==b.isInChn)) &&
             a.isAnalog==b.isAnalog &&
             a.isDigital==b.isDigital &&
             (!(a.isAnalog || a.isDigital) || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
             a.isConductance==b.isConductance &&
-            (!a.isConductance || (a.conductanceClass==b.conductanceClass && a.conductanceID==b.conductanceID && a.assignID==b.assignID)) &&
+            (!a.isConductance || (a.conductanceClass==b.conductanceClass && a.conductanceID==b.conductanceID && a.assignID==b.assignID && a.multiplexID==b.multiplexID)) &&
             a.isLegacy == b.isLegacy;
 }

@@ -96,21 +96,17 @@ QStringList ConductanceManager::getStatus() const
     return statuses;
 }
 
-QPair<QVector<QString>, QVector<const double *>> ConductanceManager::toSave() const
+QPair<QVector<ChannelIndex>, QVector<const double *>> ConductanceManager::toSave() const
 {
-    QVector<QString> labels;
+    QVector<ChannelIndex> indices;
     QVector<const double *> values;
     for ( auto&& any : {preD, inD, postD} ) {
         for ( Conductance *c : any ) {
             if ( c->assignment().save ) {
-                labels.push_back(QString("%1_%2_g%3_multi%4")
-                                 .arg(c->proxy()->conductanceClass())
-                                 .arg(c->conductanceID())
-                                 .arg(c->assignmentID())
-                                 .arg(c->multiplexID()));
+                indices.push_back(ChannelIndex(c->proxy(), c->conductanceID(), c->assignmentID(), c->multiplexID()));
                 values.push_back(&c->conductance());
             }
         }
     }
-    return qMakePair(labels, values);
+    return qMakePair(indices, values);
 }

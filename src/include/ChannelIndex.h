@@ -18,8 +18,8 @@ public:
     ChannelIndex();
     ChannelIndex(DAQProxy *proxy, size_t devID=0, size_t chanID=0, bool isInChn=true);
     ChannelIndex(ModelProxy *proxy, size_t modelID=0);
-    ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID);
-    ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID);
+    ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID, bool isInChn=true);
+    ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID, size_t multiplexID=0);
     static ChannelIndex None() { ChannelIndex i; i.isValid = true; i.isNone = true; return i; }
 
     ChannelIndex toInstance(size_t instID) const;
@@ -27,7 +27,7 @@ public:
     inChnData *getInChnData() const;
     outChnData *getOutChnData() const;
 
-    QString toString(QChar sep = '/') const;
+    QString toString(QChar sep = '/', bool withDetails = false) const;
     QString prettyName() const;
 
     bool isValid;
@@ -51,6 +51,7 @@ public:
     QString conductanceClass;
     size_t conductanceID;
     size_t assignID;
+    size_t multiplexID;
 
     bool isLegacy;
 

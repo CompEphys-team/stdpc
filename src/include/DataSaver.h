@@ -23,12 +23,12 @@ private:
     std::ofstream os;
 
 protected:
-    bool initBinary(QVector<QString> labels);
-    bool initAscii(QVector<QString> labels);
+    bool initBinary(QVector<ChannelIndex> channels);
+    bool initAscii(QVector<ChannelIndex> channels);
 
 public:
     DataSaver();
-    bool init(dataSavingParams p_, QVector<QString> labels);
+    bool init(dataSavingParams p_, QVector<ChannelIndex> channels);
 
     std::vector<std::unique_ptr<CircularFifo<double>>> q;
 

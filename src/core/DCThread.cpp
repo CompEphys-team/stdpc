@@ -141,7 +141,8 @@ void DCThread::setup_and_go()
        savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
        valuesToSave.clear();
-       QVector<QString> header(1, "Time");
+//       QVector<QString> header(1, "Time");
+       QVector<ChannelIndex> header(1, ChannelIndex::None()); // First entry is time, not a channel
 
        for ( auto &b : Devices.active() ) {
            auto toSave = b->valuesToSave();
@@ -159,12 +160,12 @@ void DCThread::setup_and_go()
            valuesToSave += toSave.second;
        }
 
-#ifdef TEST_VERSION
-       for ( AECChannel *aec : aecChannels ) {
-           header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
-           valuesToSave += &(aec->v_e);
-       }
-#endif
+//#ifdef TEST_VERSION
+//       for ( AECChannel *aec : aecChannels ) {
+//           header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
+//           valuesToSave += &(aec->v_e);
+//       }
+//#endif
 
        if ( valuesToSave.empty() ) {
            saving = false;
