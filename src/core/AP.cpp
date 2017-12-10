@@ -14,6 +14,9 @@ void initAP()
     addAP("dataSavingPs.isBinary", &(dataSavingPs.isBinary));
     addAP("dataSavingPs.binaryLittleEndian", &dataSavingPs.binaryLittleEndian);
     addAP("dataSavingPs.binaryDoublePrecision", &dataSavingPs.binaryDoublePrecision);
+    addAP("dataSavingPs.asciiSeparator", &dataSavingPs.asciiSeparator);
+    addAP("dataSavingPs.asciiHeaderPrefix", &dataSavingPs.asciiHeaderPrefix);
+    addAP("dataSavingPs.asciiCRLF", &dataSavingPs.asciiCRLF);
 
 
     // Graphs

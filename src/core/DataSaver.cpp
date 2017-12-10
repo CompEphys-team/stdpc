@@ -123,10 +123,10 @@ bool DataSaver::initAscii(QVector<QString> labels)
     if ( !os.good() || !os.is_open())
         return false;
 
-    os << "% ";
+    os << p.asciiHeaderPrefix;
     for ( QString &label : labels )
-        os << label.toLatin1().constData() << " ";
-    os << "\n";
+        os << '"' << label.toLatin1().constData() << '"' << p.asciiSeparator;
+    os << (p.asciiCRLF ? "\r\n" : "\n");
 
     return true;
 }
@@ -144,9 +144,9 @@ void DataSaver::SaveLine()
     } else {
         for ( auto &queue : q ) {
             queue->pop(data);
-            os << data << " ";
+            os << data << p.asciiSeparator;
         }
-        os << "\n";
+        os << (p.asciiCRLF ? "\r\n" : "\n");
     }
 }
 

@@ -136,6 +136,10 @@ typedef struct {
   bool binaryLittleEndian;
   bool binaryDoublePrecision;
 
+  char asciiSeparator;
+  QuotedString asciiHeaderPrefix;
+  bool asciiCRLF;
+
 } dataSavingParams;
  
 struct inChnData {
