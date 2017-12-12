@@ -36,6 +36,7 @@ struct CurrentAssignment : public AssignmentData {
 struct ConductanceData {
     bool active;
     bool activeSettling = false;
+    QuotedString label;
     virtual const AssignmentData &assignment(size_t i) const = 0;
     virtual size_t numAssignments() const = 0;
     ConductanceData() : active(false) {}

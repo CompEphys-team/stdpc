@@ -54,6 +54,7 @@ ChemSynProxy::ChemSynProxy()
     // main Csynp
     addAP("CSynp[#].active", &p, &CSynData::active);
     addAP("CSynp[#].activeSettling", &p, &CSynData::activeSettling);
+    addAP("CSynp[#].label", &p, &CSynData::label);
     addAP("CSynp[#].LUTables", &p, &CSynData::LUTables);
     addAP("CSynp[#].MgBlock", &p, &CSynData::MgBlock);
     addAP("CSynp[#].gSyn", &p, &CSynData::gSyn);

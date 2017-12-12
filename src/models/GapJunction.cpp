@@ -13,6 +13,7 @@ GapJunctionProxy::GapJunctionProxy()
 
     addAP("ESynp[#].active", &p, &GJunctData::active);
     addAP("ESynp[#].activeSettling", &p, &GJunctData::activeSettling);
+    addAP("ESynp[#].label", &p, &GJunctData::label);
     addAP("ESynp[#].type", &p, &GJunctData::type);
     addAP("ESynp[#].gSyn", &p, &GJunctData::gSyn);
     addAP("ESynp[#].assign[#].active", &p, &GJunctData::assign, &GapJunctionAssignment::active);

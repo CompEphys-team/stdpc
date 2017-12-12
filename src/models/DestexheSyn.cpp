@@ -54,6 +54,7 @@ DestexheSynProxy::DestexheSynProxy()
     // main DxheSynp
     addAP("DxheSynp[#].active", &p, &DestexheSynData::active);
     addAP("DxheSynp[#].activeSettling", &p, &DestexheSynData::activeSettling);
+    addAP("DxheSynp[#].label", &p, &DestexheSynData::label);
     addAP("DxheSynp[#].LUTables", &p, &DestexheSynData::LUTables);
     addAP("DxheSynp[#].gSyn", &p, &DestexheSynData::gSyn);
     addAP("DxheSynp[#].Vpre", &p, &DestexheSynData::Vpre);

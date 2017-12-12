@@ -16,6 +16,7 @@ SynapticNoiseProxy::SynapticNoiseProxy()
 
     addAP("SynapticNoisep[#].active", &p, &SynapticNoiseData::active);
     addAP("SynapticNoisep[#].activeSettling", &p, &SynapticNoiseData::activeSettling);
+    addAP("SynapticNoisep[#].label", &p, &SynapticNoiseData::label);
     addAP("SynapticNoisep[#].Vrev", &p, &SynapticNoiseData::Vrev);
     addAP("SynapticNoisep[#].tau", &p, &SynapticNoiseData::tau);
     addAP("SynapticNoisep[#].g0", &p, &SynapticNoiseData::g0);

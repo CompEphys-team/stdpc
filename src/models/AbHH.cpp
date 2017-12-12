@@ -16,6 +16,7 @@ abHHProxy::abHHProxy()
 
     addAP("abHHp[#].active", &p, &abHHData::active);
     addAP("abHHp[#].activeSettling", &p, &abHHData::activeSettling);
+    addAP("abHHp[#].label", &p, &abHHData::label);
     addAP("abHHp[#].LUTables", &p, &abHHData::LUTables);
     addAP("abHHp[#].gMax", &p, &abHHData::gMax);
     addAP("abHHp[#].Vrev", &p, &abHHData::Vrev);

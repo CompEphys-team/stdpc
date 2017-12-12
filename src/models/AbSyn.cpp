@@ -54,6 +54,7 @@ abSynProxy::abSynProxy()
     // main abSynp
     addAP("abSynp[#].active", &p, &abSynData::active);
     addAP("abSynp[#].activeSettling", &p, &abSynData::activeSettling);
+    addAP("abSynp[#].label", &p, &abSynData::label);
     addAP("abSynp[#].LUTables", &p, &abSynData::LUTables);
     addAP("abSynp[#].gSyn", &p, &abSynData::gSyn);
     addAP("abSynp[#].Vrev", &p, &abSynData::Vrev);

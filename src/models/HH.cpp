@@ -16,6 +16,7 @@ HHProxy::HHProxy()
 
     addAP("mhHHp[#].active", &p, &mhHHData::active);
     addAP("mhHHp[#].activeSettling", &p, &mhHHData::activeSettling);
+    addAP("mhHHp[#].label", &p, &mhHHData::label);
     addAP("mhHHp[#].LUTables", &p, &mhHHData::LUTables);
     addAP("mhHHp[#].gMax", &p, &mhHHData::gMax);
     addAP("mhHHp[#].Vrev", &p, &mhHHData::Vrev);
