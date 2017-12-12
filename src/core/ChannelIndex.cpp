@@ -126,15 +126,28 @@ QString ChannelIndex::prettyName() const
         return ret;
     } else if ( isNone ) {
         ret = "None";
-    } else if ( isAnalog ) {
-        ret = QString("%1 %2 on %3 %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(Devices.Register().value(daqClass)->prettyName()).arg(devID);
-    } else if ( isDigital ) {
-        ret = QString("%1 %2 on %3 %4").arg(isInChn ? "DI" : "DO").arg(chanID).arg(Devices.Register().value(daqClass)->prettyName()).arg(devID);
+    } else if ( isAnalog || isDigital ) {
+        QString label;
+        DAQProxy *proxy = Devices.Register().value(daqClass);
+        if ( proxy->size() > devID )
+            label = proxy->param(devID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(devID);
+        if ( isAnalog )
+            ret = QString("%1 %2 on %3").arg(isInChn ? "AI" : "AO").arg(chanID).arg(label);
+        else if ( isDigital )
+            ret = QString("%1 %2 on %3").arg(isInChn ? "DI" : "DO").arg(chanID).arg(label);
     } else if ( isPrototype || isVirtual ) {
+        QString label;
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID )
+            label = proxy->param(modelID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(modelID);
         if ( isPrototype )
-            ret = QString("%1 %2:all (%5 %2, all instances)").arg(modelClass).arg(modelID).arg(Models.Register().value(modelClass)->prettyName());
+            ret = QString("%1 %2:all (%4, all instances)").arg(modelClass).arg(modelID).arg(label);
         else
-            ret = QString("%1 %2:%3 (%5 %2, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(Models.Register().value(modelClass)->prettyName());
+            ret = QString("%1 %2:%3 (%4, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(label);
     } else if ( isConductance ) {
         QString label;
         ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
@@ -191,6 +204,9 @@ QJsonObject ChannelIndex::toJson() const
             obj.insert("units", isInChn ? "V" : "A");
         else
             obj.insert("units", "bit");
+        DAQProxy *proxy = Devices.Register().value(daqClass);
+        if ( proxy->size() > devID && !proxy->param(devID).label.isEmpty() )
+            obj.insert("label", proxy->param(devID).label);
         return obj;
     } else if ( isPrototype ) {
         obj = QJsonObject {
@@ -198,6 +214,9 @@ QJsonObject ChannelIndex::toJson() const
             {"class", modelClass},
             {"class_id", modelID}
         };
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
+            obj.insert("label", proxy->param(modelID).label);
     } else if ( isVirtual ) {
         obj = QJsonObject {
             {"type", "Virtual"},
@@ -207,6 +226,9 @@ QJsonObject ChannelIndex::toJson() const
             {"is_input_channel", isInChn},
             {"units", isInChn ? "V" : "A"}
         };
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
+            obj.insert("label", proxy->param(modelID).label);
     } else if ( isConductance ) {
         obj = QJsonObject {
             {"type", "Conductance"},
