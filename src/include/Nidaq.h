@@ -15,8 +15,13 @@ public:
 };
 
 class NIDAQProxy : public DAQProxy {
-public:
+private:
     NIDAQProxy();
+public:
+    NIDAQProxy(const NIDAQProxy &) = delete;
+    void operator=(const NIDAQProxy &) = delete;
+    static NIDAQProxy *get() { static NIDAQProxy proxy; return &proxy; }
+
     inline DAQData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

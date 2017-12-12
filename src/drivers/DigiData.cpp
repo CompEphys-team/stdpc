@@ -6,10 +6,10 @@
 // DigiData 1200 device driver
 
 /// Construct a single self-registering proxy
-static DigiDataProxy prox;
+static DigiDataProxy *prox = DigiDataProxy::get();
 std::vector<DigiDataData> DigiDataProxy::p;
-DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, &prox); }
-DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
+DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, prox); }
+DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, prox, parent); }
 
 DigiDataProxy::DigiDataProxy() :
     regAP {
@@ -198,7 +198,7 @@ void DigiData::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
   short int i, Chan_Gain_Code;
   DAQData *p = params();
-  ChannelIndex dex(&prox, devID, 0, true);
+  ChannelIndex dex(prox, devID, 0, true);
 
   actInChnNo= chnNo;  
   WriteWord(ADCDAC_control, ADCSCANLISTENABLE);
@@ -247,7 +247,7 @@ void DigiData::get_single_scan(inChannel *in)
 void DigiData::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
   DAQData *p = params();
-  ChannelIndex dex(&prox, devID, 0, false);
+  ChannelIndex dex(prox, devID, 0, false);
 
   // collect the active out channels
   actOutChnNo= chnNo;

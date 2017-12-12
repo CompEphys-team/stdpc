@@ -30,8 +30,13 @@ struct abHHData : public CurrentData {
 
 class abHHProxy : public IonicCurrentProxy
 {
-public:
+private:
     abHHProxy();
+public:
+    abHHProxy(const abHHProxy &) = delete;
+    void operator=(const abHHProxy &) = delete;
+    static abHHProxy *get() { static abHHProxy proxy; return &proxy; }
+
     inline abHHData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

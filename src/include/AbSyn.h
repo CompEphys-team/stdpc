@@ -22,8 +22,13 @@ struct abSynData : public SynapseData {
 };
 
 class abSynProxy : public SynapseProxy {
-public:
+private:
     abSynProxy();
+public:
+    abSynProxy(const abSynProxy &) = delete;
+    void operator=(const abSynProxy &) = delete;
+    static abSynProxy *get() { static abSynProxy proxy; return &proxy; }
+
     inline abSynData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

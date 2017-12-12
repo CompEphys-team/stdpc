@@ -10,10 +10,10 @@
 // NIDAQmx device driver
 
 /// Construct a single self-registering proxy
-static NIDAQProxy prox;
+static NIDAQProxy *prox = NIDAQProxy::get();
 std::vector<NIDAQData> NIDAQProxy::p;
-DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID, &prox); }
-DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, &prox, parent); }
+DAQ *NIDAQProxy::createDAQ(size_t devID) { return new NIDAQ(devID, prox); }
+DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NIDAQDlg(devID, prox, parent); }
 
 NIDAQProxy::NIDAQProxy() :
     regAP {
@@ -243,7 +243,7 @@ void NIDAQ::generate_scan_list(short int chnNo, QVector<short int> Chns)
     DAQmxCreateTask ("", &inTask);
 
     DAQData *p = params();
-    ChannelIndex dex(&prox, devID, 0, true);
+    ChannelIndex dex(prox, devID, 0, true);
   
     for (int i= 0; i < chnNo; i++) {
       inIdx[i]= Chns[i];
@@ -310,7 +310,7 @@ void NIDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
     DAQmxCreateTask("", &outTask);
 
     DAQData *p = params();
-    ChannelIndex dex(&prox, devID, 0, false);
+    ChannelIndex dex(prox, devID, 0, false);
    
     for (int i= 0; i < chnNo; i++) {
       outIdx[i]= Chns[i];

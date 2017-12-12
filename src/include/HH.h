@@ -31,8 +31,13 @@ struct mhHHData : public CurrentData {
 
 class HHProxy : public IonicCurrentProxy
 {
-public:
+private:
     HHProxy();
+public:
+    HHProxy(const HHProxy &) = delete;
+    void operator=(const HHProxy &) = delete;
+    static HHProxy *get() { static HHProxy proxy; return &proxy; }
+
     inline mhHHData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

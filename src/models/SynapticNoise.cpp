@@ -2,9 +2,9 @@
 #include "SynapticNoiseDlg.h"
 #include "AP.h"
 
-static SynapticNoiseProxy prox;
+static SynapticNoiseProxy *prox = SynapticNoiseProxy::get();
 std::vector<SynapticNoiseData> SynapticNoiseProxy::p;
-SynapticNoiseProxy *SynapticNoise::proxy() const { return &prox; }
+SynapticNoiseProxy *SynapticNoise::proxy() const { return prox; }
 ConductanceDlg *SynapticNoiseProxy::createDialog(size_t condID, QWidget *parent) { return new SynapticNoiseDlg(condID, parent); }
 IonicCurrent *SynapticNoiseProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
     return new SynapticNoise(conductanceID, assignID, multiID, in, out);

@@ -86,8 +86,13 @@ class DigiDataData : public DAQData
 
 
 class DigiDataProxy : public DAQProxy {
-public:
+private:
     DigiDataProxy();
+public:
+    DigiDataProxy(const DigiDataProxy &) = delete;
+    void operator=(const DigiDataProxy &) = delete;
+    static DigiDataProxy *get() { static DigiDataProxy proxy; return &proxy; }
+
     inline DAQData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

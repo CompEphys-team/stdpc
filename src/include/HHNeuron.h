@@ -19,8 +19,13 @@ struct HHNeuronData : public ModelData
 };
 
 class HHNeuronProxy : public ModelProxy {
-public:
+private:
     HHNeuronProxy();
+public:
+    HHNeuronProxy(const HHNeuronProxy &) = delete;
+    void operator=(const HHNeuronProxy &) = delete;
+    static HHNeuronProxy *get() { static HHNeuronProxy proxy; return &proxy; }
+
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

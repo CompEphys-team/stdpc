@@ -3,9 +3,9 @@
 #include "DCThread.h"
 #include "ChemSynDlg.h"
 
-static ChemSynProxy prox;
+static ChemSynProxy *prox = ChemSynProxy::get();
 std::vector<CSynData> ChemSynProxy::p;
-ChemSynProxy *ChemSyn::proxy() const { return &prox; }
+ChemSynProxy *ChemSyn::proxy() const { return prox; }
 ConductanceDlg *ChemSynProxy::createDialog(size_t condID, QWidget *parent) { return new ChemSynDlg(condID, parent); }
 Synapse *ChemSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
                                       inChannel *pre, inChannel *post, outChannel *out) {

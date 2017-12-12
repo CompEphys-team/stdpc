@@ -23,8 +23,13 @@ class SDAQData : public DAQData {
 };
 
 class SimulDAQProxy : public DAQProxy {
-public:
+private:
     SimulDAQProxy();
+public:
+    SimulDAQProxy(const SimulDAQProxy &) = delete;
+    void operator=(const SimulDAQProxy &) = delete;
+    static SimulDAQProxy *get() { static SimulDAQProxy proxy; return &proxy; }
+
     inline DAQData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

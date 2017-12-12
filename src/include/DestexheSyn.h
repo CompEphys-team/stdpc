@@ -20,8 +20,13 @@ struct DestexheSynData : public SynapseData {
 };
 
 class DestexheSynProxy : public SynapseProxy {
-public:
+private:
     DestexheSynProxy();
+public:
+    DestexheSynProxy(const DestexheSynProxy &) = delete;
+    void operator=(const DestexheSynProxy &) = delete;
+    static DestexheSynProxy *get() { static DestexheSynProxy proxy; return &proxy; }
+
     inline DestexheSynData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

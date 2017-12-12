@@ -7,10 +7,10 @@
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 /// Construct a single self-registering proxy
-static SimulDAQProxy prox;
+static SimulDAQProxy *prox = SimulDAQProxy::get();
 std::vector<SDAQData> SimulDAQProxy::p;
-DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, &prox); }
-DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
+DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, prox); }
+DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, prox, parent); }
 
 SimulDAQProxy::SimulDAQProxy() :
     regAP {
@@ -150,7 +150,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
   short int i;
   actInChnNo= chnNo;
 
-  ChannelIndex dex(&prox, devID, 0, true);
+  ChannelIndex dex(prox, devID, 0, true);
 
   for(i= 0; i < actInChnNo; i++)
   {
@@ -225,7 +225,7 @@ void SimulDAQ::get_single_scan(inChannel *in)
 
 void SimulDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
-  ChannelIndex dex(&prox, devID, 0, false);
+  ChannelIndex dex(prox, devID, 0, false);
 
   short int i;
   actOutChnNo= chnNo;

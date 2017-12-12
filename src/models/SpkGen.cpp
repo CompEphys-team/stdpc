@@ -5,9 +5,9 @@
 #include "SpikeGenDlg.h"
 
 /// Construct a single self-registering proxy
-static SpkGenProxy prox;
+static SpkGenProxy *prox = SpkGenProxy::get();
 std::vector<SGData> SpkGenProxy::p;
-ModelProxy *SpkGenPrototype::proxy() const { return &prox; }
+ModelProxy *SpkGenPrototype::proxy() const { return prox; }
 ModelPrototype *SpkGenProxy::createPrototype(size_t modelID) { return new SpkGenPrototype(modelID); }
 ModelDlg *SpkGenProxy::createDialog(size_t modelID, QWidget *parent) { return new SpikeGenDlg(modelID, parent); }
 

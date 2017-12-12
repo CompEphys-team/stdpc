@@ -33,8 +33,13 @@ struct SGData : public ModelData {
 };
 
 class SpkGenProxy : public ModelProxy {
-public:
+private:
     SpkGenProxy();
+public:
+    SpkGenProxy(const SpkGenProxy &) = delete;
+    void operator=(const SpkGenProxy &) = delete;
+    static SpkGenProxy *get() { static SpkGenProxy proxy; return &proxy; }
+
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

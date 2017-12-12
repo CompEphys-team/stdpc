@@ -4,9 +4,9 @@
 #include "HHModelDlg.h"
 
 /// Construct a single self-registering proxy
-static HHNeuronProxy prox;
+static HHNeuronProxy *prox = HHNeuronProxy::get();
 std::vector<HHNeuronData> HHNeuronProxy::p;
-ModelProxy *HHNeuronModel::proxy() const { return &prox; }
+ModelProxy *HHNeuronModel::proxy() const { return prox; }
 ModelPrototype *HHNeuronProxy::createPrototype(size_t modelID) { return new HHNeuronModel(modelID); }
 ModelDlg *HHNeuronProxy::createDialog(size_t modelID, QWidget *parent) { return new HHModelDlg(modelID, parent); }
 

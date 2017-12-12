@@ -2,9 +2,9 @@
 #include "DCThread.h"
 #include "GapJunctionDlg.h"
 
-static GapJunctionProxy prox;
+static GapJunctionProxy *prox = GapJunctionProxy::get();
 std::vector<GJunctData> GapJunctionProxy::p;
-GapJunctionProxy *GapJunction::proxy() const { return &prox; }
+GapJunctionProxy *GapJunction::proxy() const { return prox; }
 ConductanceDlg *GapJunctionProxy::createDialog(size_t condID, QWidget *parent) { return new GapJunctionDlg(condID, parent); }
 
 GapJunctionProxy::GapJunctionProxy()

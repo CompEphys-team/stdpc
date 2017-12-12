@@ -30,8 +30,13 @@ struct CSynData : public SynapseData {
 };
 
 class ChemSynProxy : public SynapseProxy {
-public:
+private:
     ChemSynProxy();
+public:
+    ChemSynProxy(const ChemSynProxy &) = delete;
+    void operator=(const ChemSynProxy &) = delete;
+    static ChemSynProxy *get() { static ChemSynProxy proxy; return &proxy; }
+
     inline CSynData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

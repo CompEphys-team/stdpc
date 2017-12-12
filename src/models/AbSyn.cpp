@@ -3,9 +3,9 @@
 #include "DCThread.h"
 #include "AbSynDlg.h"
 
-static abSynProxy prox;
+static abSynProxy *prox = abSynProxy::get();
 std::vector<abSynData> abSynProxy::p;
-abSynProxy *abSyn::proxy() const { return &prox; }
+abSynProxy *abSyn::proxy() const { return prox; }
 ConductanceDlg *abSynProxy::createDialog(size_t condID, QWidget *parent) { return new abSynDlg(condID, parent); }
 Synapse *abSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
                                     inChannel *pre, inChannel *post, outChannel *out) {

@@ -21,8 +21,13 @@ struct GJunctData : public ConductanceData {
 
 class GapJunctionProxy : public ConductanceProxy
 {
-public:
+private:
     GapJunctionProxy();
+public:
+    GapJunctionProxy(const GapJunctionProxy &) = delete;
+    void operator=(const GapJunctionProxy &) = delete;
+    static GapJunctionProxy *get() { static GapJunctionProxy proxy; return &proxy; }
+
     inline GJunctData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

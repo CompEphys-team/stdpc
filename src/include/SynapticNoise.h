@@ -20,8 +20,13 @@ struct SynapticNoiseData : public CurrentData
 
 class SynapticNoiseProxy : public IonicCurrentProxy
 {
-public:
+private:
     SynapticNoiseProxy();
+public:
+    SynapticNoiseProxy(const SynapticNoiseProxy &) = delete;
+    void operator=(const SynapticNoiseProxy &) = delete;
+    static SynapticNoiseProxy *get() { static SynapticNoiseProxy proxy; return &proxy; }
+
     inline SynapticNoiseData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }

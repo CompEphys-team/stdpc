@@ -2,9 +2,9 @@
 #include "DCThread.h"
 #include "HHDlg.h"
 
-static HHProxy prox;
+static HHProxy *prox = HHProxy::get();
 std::vector<mhHHData> HHProxy::p;
-HHProxy *HH::proxy() const { return &prox; }
+HHProxy *HH::proxy() const { return prox; }
 ConductanceDlg *HHProxy::createDialog(size_t condID, QWidget *parent) { return new HHDlg(condID, parent); }
 IonicCurrent *HHProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
     return new HH(conductanceID, assignID, multiID, in, out);

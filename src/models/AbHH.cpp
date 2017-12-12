@@ -2,9 +2,9 @@
 #include "DCThread.h"
 #include "AlphaBetaHHDlg.h"
 
-static abHHProxy prox;
+static abHHProxy *prox = abHHProxy::get();
 std::vector<abHHData> abHHProxy::p;
-abHHProxy *abHH::proxy() const { return &prox; }
+abHHProxy *abHH::proxy() const { return prox; }
 ConductanceDlg *abHHProxy::createDialog(size_t condID, QWidget *parent) { return new AlphaBetaHHDlg(condID, parent); }
 IonicCurrent *abHHProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
     return new abHH(conductanceID, assignID, multiID, in, out);
