@@ -18,7 +18,6 @@ class abSynDlg : public ConductanceDlg, private Ui::abSynDlg
      void importData();
      void setIndex(int);
 
-     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
      

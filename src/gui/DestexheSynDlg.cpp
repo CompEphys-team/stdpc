@@ -11,7 +11,6 @@ DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
      STDP= new STDPDlg(this);
      ODESTDP= new ODESTDPDlg(this);
 
-     label = DestexheSynDlgLabel->text();
      setIndex(no);
 
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
@@ -37,7 +36,8 @@ DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
 
 void DestexheSynDlg::setIndex(int no)
 {
-    QString lb = label.arg(no);
+    ConductanceDlg::setIndex(no);
+    QString lb = QString("%1 %2").arg(DestexheSynProxy::get()->prettyName()).arg(no);
     DestexheSynDlgLabel->setText(lb);
     STDP->setLabel(lb);
     ODESTDP->setLabel(lb);
@@ -78,6 +78,7 @@ void DestexheSynDlg::PlastMethodChange()
 void DestexheSynDlg::exportData()
 {
   DestexheSynData &p = DestexheSynProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vpre= VpreE->text().toDouble()*1e-3;
@@ -100,6 +101,7 @@ void DestexheSynDlg::importData()
 {
   DestexheSynData &p = DestexheSynProxy::p[idx];
   QString num;
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);

@@ -7,7 +7,6 @@ HHDlg::HHDlg(int no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
-     label = HHDlgLabel->text();
      setIndex(no);
 
      QVector<AssignmentCellBase<CurrentAssignment>*> vec;
@@ -22,12 +21,14 @@ HHDlg::HHDlg(int no, QWidget *parent)
 
 void HHDlg::setIndex(int no)
 {
-    HHDlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    HHDlgLabel->setText(QString("%1 %2").arg(HHProxy::get()->prettyName()).arg(no));
 }
 
 void HHDlg::exportData()
 {
   mhHHData &p = HHProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -58,7 +59,7 @@ void HHDlg::importData()
 {
   mhHHData &p = HHProxy::p[idx];
   QString num;
-  
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gMax*1e9);

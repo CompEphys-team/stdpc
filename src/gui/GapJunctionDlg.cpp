@@ -6,7 +6,6 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
  {
      setupUi(this);
      
-     label = gapJunctDlgLabel->text();
      setIndex(no);
 
      ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
@@ -25,6 +24,7 @@ GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
 void GapJunctionDlg::exportData()
 {
   GJunctData &p = GapJunctionProxy::p[idx];
+  p.label = leLabel->text();
   p.type= typeCombo->currentIndex();
   p.gSyn= gSynE->text().toDouble()*1e-9;
   assignments->exportData(p.assign);
@@ -34,6 +34,7 @@ void GapJunctionDlg::importData()
 {
   GJunctData &p = GapJunctionProxy::p[idx];
   QString num;
+  leLabel->setText(p.label);
   typeCombo->setCurrentIndex(p.type);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
@@ -42,5 +43,6 @@ void GapJunctionDlg::importData()
 
 void GapJunctionDlg::setIndex(int no)
 {
-    gapJunctDlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    gapJunctDlgLabel->setText(QString("%1 %2").arg(GapJunctionProxy::get()->prettyName()).arg(no));
 }

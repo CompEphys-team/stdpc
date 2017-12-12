@@ -7,7 +7,6 @@ SynapticNoiseDlg::SynapticNoiseDlg(int idx, QWidget *parent) :
     ui(new Ui::SynapticNoiseDlg)
 {
     ui->setupUi(this);
-    label = ui->DlgLabel->text();
     setIndex(idx);
     
     QVector<AssignmentCellBase<CurrentAssignment>*> vec;
@@ -27,12 +26,14 @@ SynapticNoiseDlg::~SynapticNoiseDlg()
 
 void SynapticNoiseDlg::setIndex(int no)
 {
-    ui->DlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    ui->DlgLabel->setText(QString("%1 %2").arg(SynapticNoiseProxy::get()->prettyName()).arg(no));
 }
 
 void SynapticNoiseDlg::importData()
 {
     SynapticNoiseData &p = SynapticNoiseProxy::p[idx];
+    ui->leLabel->setText(p.label);
     ui->assignments->importData(p.assign);
     ui->Vrev->setValue(p.Vrev * 1e3);
     ui->tau->setValue(p.tau * 1e3);
@@ -44,6 +45,7 @@ void SynapticNoiseDlg::importData()
 void SynapticNoiseDlg::exportData()
 {
     SynapticNoiseData &p = SynapticNoiseProxy::p[idx];
+    p.label = ui->leLabel->text();
     ui->assignments->exportData(p.assign);
     p.Vrev = ui->Vrev->value() * 1e-3;
     p.tau = ui->tau->value() * 1e-3;

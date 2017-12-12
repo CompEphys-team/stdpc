@@ -18,7 +18,6 @@ class ChemSynDlg : public ConductanceDlg, private Ui::ChemSynDlg
      void importData();
      void setIndex(int);
 
-     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
      

@@ -11,7 +11,6 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
      STDP= new STDPDlg(this);
      ODESTDP= new ODESTDPDlg(this);
 
-     label = abSynDlgLabel->text();
      setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
@@ -37,7 +36,8 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
 
 void abSynDlg::setIndex(int no)
 {
-    QString lb = label.arg(no);
+    ConductanceDlg::setIndex(no);
+    QString lb = QString("%1 %2").arg(abSynProxy::get()->prettyName()).arg(no);
     abSynDlgLabel->setText(lb);
     STDP->setLabel(lb);
     ODESTDP->setLabel(lb);
@@ -78,6 +78,7 @@ void abSynDlg::PlastMethodChange()
 void abSynDlg::exportData()
 {
   abSynData &p = abSynProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -102,6 +103,7 @@ void abSynDlg::importData()
 {
   abSynData &p = abSynProxy::p[idx];
   QString num;   
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);

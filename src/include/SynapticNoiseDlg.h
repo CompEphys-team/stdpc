@@ -21,8 +21,6 @@ public:
 
 private:
     Ui::SynapticNoiseDlg *ui;
-    
-    QString label;
 };
 
 #endif // SYNAPTICNOISEDLG_H

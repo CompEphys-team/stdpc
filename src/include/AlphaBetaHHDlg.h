@@ -14,8 +14,6 @@ class AlphaBetaHHDlg : public ConductanceDlg, private Ui::AlphaBetaHHDlg
      void exportData();
      void importData();
      void setIndex(int);
-
-     QString label;
 }; 
 
 #endif

@@ -7,7 +7,6 @@ AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
  {
   setupUi(this);
 
-  label = HHDlgLabel->text();
   setIndex(no);
 
   QVector<AssignmentCellBase<CurrentAssignment>*> vec;
@@ -22,12 +21,14 @@ AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
 
 void AlphaBetaHHDlg::setIndex(int no)
 {
-    HHDlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    HHDlgLabel->setText(QString("%1 %2").arg(abHHProxy::get()->prettyName()).arg(no));
 }
 
 void AlphaBetaHHDlg::exportData()
 {
   abHHData &p = abHHProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -58,7 +59,7 @@ void AlphaBetaHHDlg::importData()
 {
   abHHData &p = abHHProxy::p[idx];
   QString num;
-     
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gMax*1e9);

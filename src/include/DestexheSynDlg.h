@@ -18,7 +18,6 @@ class DestexheSynDlg : public ConductanceDlg, private Ui::DestexheSynDlg
      void importData();
      void setIndex(int);
 
-     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
 

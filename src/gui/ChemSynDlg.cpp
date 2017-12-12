@@ -11,7 +11,6 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      STDP= new STDPDlg(this);
      ODESTDP= new ODESTDPDlg(this);
 
-     label = ChemSynDlgLabel->text();
      setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
@@ -38,7 +37,8 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
 
 void ChemSynDlg::setIndex(int no)
 {
-    QString lb = label.arg(no);
+    ConductanceDlg::setIndex(no);
+    QString lb = QString("%1 %2").arg(ChemSynProxy::get()->prettyName()).arg(no);
     ChemSynDlgLabel->setText(lb);
     STDP->setLabel(lb);
     ODESTDP->setLabel(lb);
@@ -108,6 +108,7 @@ void ChemSynDlg::STDComboChange()
 void ChemSynDlg::exportData()
 {
   CSynData &p = ChemSynProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.MgBlock= (MgBlockCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
@@ -139,7 +140,8 @@ void ChemSynDlg::exportData()
 void ChemSynDlg::importData()
 {
   CSynData &p = ChemSynProxy::p[idx];
-  QString num;   
+  QString num;
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   if (p.MgBlock) MgBlockCombo->setCurrentIndex(1);

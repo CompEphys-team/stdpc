@@ -14,8 +14,6 @@ class HHDlg : public ConductanceDlg, private Ui::HHDlg
      void exportData();
      void importData();
      void setIndex(int);
-
-     QString label;
 }; 
 
 #endif

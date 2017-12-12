@@ -14,8 +14,6 @@ class GapJunctionDlg : public ConductanceDlg, private Ui::GapJunctionDlg
      void exportData();
      void importData();
      void setIndex(int);
-     
-     QString label;
 }; 
 
 #endif

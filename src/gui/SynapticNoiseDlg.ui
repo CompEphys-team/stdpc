@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>473</width>
+    <width>509</width>
     <height>260</height>
    </rect>
   </property>
@@ -14,7 +14,17 @@
    <string>Synaptic background noise</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
+   <item row="2" column="0" colspan="4">
+    <widget class="AssignmentWidget&lt;CurrentAssignment&gt;" name="assignments">
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="label_40">
      <property name="font">
       <font>
@@ -24,6 +34,113 @@
      </property>
      <property name="text">
       <string>Channel assignments</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Reversal potential</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QDoubleSpinBox" name="Vrev">
+     <property name="suffix">
+      <string> mV</string>
+     </property>
+     <property name="minimum">
+      <double>-999.990000000000009</double>
+     </property>
+     <property name="maximum">
+      <double>999.990000000000009</double>
+     </property>
+     <property name="value">
+      <double>-75.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Average conductance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3">
+    <widget class="QDoubleSpinBox" name="g0">
+     <property name="suffix">
+      <string> nS</string>
+     </property>
+     <property name="maximum">
+      <double>999999.989999999990687</double>
+     </property>
+     <property name="value">
+      <double>58.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Time constant</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QDoubleSpinBox" name="tau">
+     <property name="suffix">
+      <string> ms</string>
+     </property>
+     <property name="maximum">
+      <double>999.990000000000009</double>
+     </property>
+     <property name="value">
+      <double>11.000000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Standard deviation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3">
+    <widget class="QDoubleSpinBox" name="stddev">
+     <property name="suffix">
+      <string> nS</string>
+     </property>
+     <property name="maximum">
+      <double>999999.989999999990687</double>
+     </property>
+     <property name="value">
+      <double>6.600000000000000</double>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QCheckBox" name="ignoreNegative">
+     <property name="text">
+      <string>Apply positive conductance values only</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLineEdit" name="leLabel">
+     <property name="placeholderText">
+      <string>Label...</string>
      </property>
     </widget>
    </item>
@@ -58,120 +175,10 @@
       <number>0</number>
      </property>
      <property name="text">
-      <string>Synaptic background noise %1</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="AssignmentWidget&lt;CurrentAssignment&gt;" name="assignments">
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>25</number>
-     </attribute>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Reversal potential</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QDoubleSpinBox" name="Vrev">
-     <property name="suffix">
-      <string> mV</string>
-     </property>
-     <property name="minimum">
-      <double>-999.990000000000009</double>
-     </property>
-     <property name="maximum">
-      <double>999.990000000000009</double>
-     </property>
-     <property name="value">
-      <double>-75.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Average conductance</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QDoubleSpinBox" name="g0">
-     <property name="suffix">
-      <string> nS</string>
-     </property>
-     <property name="maximum">
-      <double>999999.989999999990687</double>
-     </property>
-     <property name="value">
-      <double>58.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Time constant</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QDoubleSpinBox" name="tau">
-     <property name="suffix">
-      <string> ms</string>
-     </property>
-     <property name="maximum">
-      <double>999.990000000000009</double>
-     </property>
-     <property name="value">
-      <double>11.000000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Standard deviation</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QDoubleSpinBox" name="stddev">
-     <property name="suffix">
-      <string> nS</string>
-     </property>
-     <property name="maximum">
-      <double>999999.989999999990687</double>
-     </property>
-     <property name="value">
-      <double>6.600000000000000</double>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2" colspan="2">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QCheckBox" name="ignoreNegative">
-     <property name="text">
-      <string>Apply positive conductance values only</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
      </property>
     </widget>
    </item>
