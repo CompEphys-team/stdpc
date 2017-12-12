@@ -9,8 +9,7 @@ HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
     ui(new Ui::HHModelDlg)
 {
     ui->setupUi(this);
-    label = ui->titleLabel->text();
-    ui->titleLabel->setText(label.arg(idx));
+    setIndex(idx);
     ui->table->setHorizontalHeaderLabels({"Active",
                                           "",
                                           "VChan\nSave",
@@ -41,7 +40,7 @@ HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
 
 void HHModelDlg::setIndex(size_t no)
 {
-    ui->titleLabel->setText(label.arg(no));
+    ui->titleLabel->setText(QString("%1 %2").arg(HHNeuronProxy::get()->prettyName()).arg(no));
     ModelDlg::setIndex(no);
 }
 
@@ -84,6 +83,7 @@ void HHModelDlg::importData()
     }
     growTable(false);
 
+    ui->leLabel->setText(HHNeuronProxy::p[idx].label);
     ui->C->setValue(HHNeuronProxy::p[idx].C * 1e9);
     ui->gLeak->setValue(HHNeuronProxy::p[idx].gLeak * 1e9);
     ui->ELeak->setValue(HHNeuronProxy::p[idx].ELeak * 1e3);
@@ -108,6 +108,7 @@ void HHModelDlg::exportData()
         HHNeuronProxy::p[idx].inst.push_back(inst);
     }
 
+    HHNeuronProxy::p[idx].label = ui->leLabel->text();
     HHNeuronProxy::p[idx].C = ui->C->value() * 1e-9;
     HHNeuronProxy::p[idx].gLeak = ui->gLeak->value() * 1e-9;
     HHNeuronProxy::p[idx].ELeak = ui->ELeak->value() * 1e-3;

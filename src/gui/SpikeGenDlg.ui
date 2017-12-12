@@ -143,7 +143,7 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>180</x>
         <y>10</y>
         <width>151</width>
         <height>18</height>
@@ -175,7 +175,7 @@
        <number>0</number>
       </property>
       <property name="text">
-       <string>Spike generator %1</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
@@ -501,6 +501,19 @@
        </property>
       </widget>
      </widget>
+     <widget class="QLineEdit" name="leLabel">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>151</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Label...</string>
+      </property>
+     </widget>
      <zorder>bdGroupW</zorder>
      <zorder>SpikesL</zorder>
      <zorder>VRestL</zorder>
@@ -517,6 +530,7 @@
      <zorder>VSpike</zorder>
      <zorder>Width</zorder>
      <zorder>VRest</zorder>
+     <zorder>leLabel</zorder>
     </widget>
    </item>
    <item row="0" column="5">

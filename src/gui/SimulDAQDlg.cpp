@@ -9,13 +9,12 @@ SimulDAQDlg::SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
   setupUi(this);
   connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
   connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
-  label = DAQLabel->text();
   setIndex(idx);
 }
 
 void SimulDAQDlg::setIndex(size_t no)
 {
-    DAQLabel->setText(label.arg(no));
+    DAQLabel->setText(QString("%1 %2").arg(SimulDAQProxy::get()->prettyName()).arg(no));
     DAQDlg::setIndex(no);
 }
 
@@ -33,6 +32,7 @@ void SimulDAQDlg::exportData(bool forceInit)
       for ( outChnData &i : SimulDAQProxy::p[idx].outChn )
           i.active = true;
   }
+  getEntry<QString>(SimulDAQProxy::p[idx].label, leLabel->text(), change);
   getEntry<QString>(SimulDAQProxy::p[idx].inFileName, InputFileE->text(), change);
   getEntry<QString>(SimulDAQProxy::p[idx].outFileName, OutputFileE->text(), change);
   getEntry(SimulDAQProxy::p[idx].inTFac, inTFacE->text().toDouble(), change);
@@ -45,6 +45,7 @@ void SimulDAQDlg::exportData(bool forceInit)
 void SimulDAQDlg::importData()
 {
   QString num;
+  leLabel->setText(SimulDAQProxy::p[idx].label);
   InputFileE->setText(SimulDAQProxy::p[idx].inFileName);
   OutputFileE->setText(SimulDAQProxy::p[idx].outFileName);
   inChannelE->setText(QString::number(SimulDAQProxy::p[idx].inChn.size()));

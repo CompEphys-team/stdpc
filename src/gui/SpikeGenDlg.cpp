@@ -12,8 +12,7 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
     clm(ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::None))
 {
     ui->setupUi(this);
-    label = ui->titleLabel->text();
-    ui->titleLabel->setText(label.arg(idx));
+    setIndex(idx);
     ui->instTable->setHorizontalHeaderLabels({"Active",
                                               "",
                                               "Save",
@@ -108,12 +107,14 @@ SpikeGenDlg::~SpikeGenDlg()
 
 void SpikeGenDlg::setIndex(size_t no)
 {
-    ui->titleLabel->setText(label.arg(no));
+    ui->titleLabel->setText(QString("%1 %2").arg(SpkGenProxy::get()->prettyName()).arg(no));
     ModelDlg::setIndex(no);
 }
 
 void SpikeGenDlg::importData()
 {
+    ui->leLabel->setText(SpkGenProxy::p[idx].label);
+
     ui->SGLUTableCombo->setCurrentIndex(SpkGenProxy::p[idx].LUTables);
     ui->VSpike->setValue(SpkGenProxy::p[idx].VSpike * 1e3);
     ui->Width->setValue(5e3 / SpkGenProxy::p[idx].spkTimeScaling);
@@ -171,6 +172,8 @@ void SpikeGenDlg::importST(std::vector<std::vector<double>> &vec)
 
 void SpikeGenDlg::exportData()
 {
+    SpkGenProxy::p[idx].label = ui->leLabel->text();
+
     SpkGenProxy::p[idx].LUTables = ui->SGLUTableCombo->currentIndex();
     SpkGenProxy::p[idx].VSpike = ui->VSpike->value() / 1e3;
     SpkGenProxy::p[idx].spkTimeScaling = 5e3 / ui->Width->value();

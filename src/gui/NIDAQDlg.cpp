@@ -8,25 +8,26 @@ NIDAQDlg::NIDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
     setupUi(this);
     connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
     connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
-    label = DAQLabel->text();
     setIndex(idx);
 }
 
 void NIDAQDlg::setIndex(size_t no)
 {
-    DAQLabel->setText(label.arg(no));
+    DAQLabel->setText(QString("%1 %2").arg(NIDAQProxy::get()->prettyName()).arg(no));
     DAQDlg::setIndex(no);
 }
 
 void NIDAQDlg::exportData(bool forceInit)
 {
     bool change= false;
+    getEntry<QString>(NIDAQProxy::p[idx].label, leLabel->text(), change);
     getEntry(NIDAQProxy::p[idx].deviceName, DeviceNameE->text(), change);
     DAQDlg::exportData(change || forceInit);
 }
 
 void NIDAQDlg::importData()
 {
+    leLabel->setText(NIDAQProxy::p[idx].label);
     DeviceNameE->setText(NIDAQProxy::p[idx].deviceName);
     DAQDlg::importData();
 }

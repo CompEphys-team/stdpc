@@ -47,7 +47,6 @@ public:
 
 private:
     Ui::SpikeGenDlg *ui;
-    QString label;
 
     ChannelListModel *clm;
 

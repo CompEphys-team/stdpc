@@ -18,7 +18,6 @@ protected:
     void restoreBackup();
 
     DigiDataData bak;
-    QString label;
 };
 
 #endif

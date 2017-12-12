@@ -27,8 +27,6 @@ private:
     QVector<QDoubleSpinBox*> vBiases, spkThrs, iBiases;
     QMetaObject::Connection activec, vSavec, vBiasc, spkDc, spkThrc, iSavec, iBiasc;
 
-    QString label;
-
     void addRow(int row, QCheckBox *active,
                 QCheckBox *vSave, QDoubleSpinBox *vBias, QCheckBox *spkD, QDoubleSpinBox *spkThr,
                 QCheckBox *iSave, QDoubleSpinBox *iBias);

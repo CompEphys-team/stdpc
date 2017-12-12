@@ -217,9 +217,9 @@
    </property>
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>260</x>
      <y>10</y>
-     <width>201</width>
+     <width>131</width>
      <height>20</height>
     </rect>
    </property>
@@ -249,7 +249,7 @@
     <number>0</number>
    </property>
    <property name="text">
-    <string>Simulated DAQ, device %1</string>
+    <string/>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -318,6 +318,19 @@
    </property>
    <property name="text">
     <string>Rewind at end of settling period</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>231</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="placeholderText">
+    <string>Label...</string>
    </property>
   </widget>
  </widget>

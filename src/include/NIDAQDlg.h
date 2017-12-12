@@ -18,7 +18,6 @@ protected:
     void restoreBackup();
 
     NIDAQData bak;
-    QString label;
 };
 
 #endif

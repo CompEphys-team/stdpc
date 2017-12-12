@@ -75,7 +75,7 @@
       <number>0</number>
      </property>
      <property name="text">
-      <string>Hodgkin-Huxley model %1</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -265,6 +265,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="0" column="0" colspan="6">
+    <widget class="QLineEdit" name="leLabel">
+     <property name="placeholderText">
+      <string>Label...</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -24,7 +24,6 @@ protected:
      void restoreBackup();
 
      SDAQData bak;
-     QString label;
 };
 
 #endif
