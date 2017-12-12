@@ -136,7 +136,13 @@ QString ChannelIndex::prettyName() const
         else
             ret = QString("%1 %2:%3 (%5 %2, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(Models.Register().value(modelClass)->prettyName());
     } else if ( isConductance ) {
-        ret = QString("%1 %2, assignment %3").arg(Conductances.Register().value(conductanceClass)->prettyName()).arg(conductanceID).arg(assignID);
+        QString label;
+        ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
+        if ( proxy->size() > conductanceID )
+            label = proxy->param(conductanceID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(conductanceID);
+        ret = QString("%1, assignment %2").arg(label).arg(assignID);
     } else ret = "Oops: Invalid channel index";
     return ret;
 }
@@ -170,10 +176,11 @@ QString ChannelIndex::toString(QChar sep, bool withDetails) const
 
 QJsonObject ChannelIndex::toJson() const
 {
+    QJsonObject obj;
     if ( !isValid || isNone ) {
-        return QJsonObject;
+        return obj;
     } else if ( isAnalog || isDigital ) {
-        QJsonObject obj {
+        obj = QJsonObject {
             {"type", "DAQ"},
             {"class", daqClass},
             {"class_id", devID},
@@ -186,13 +193,13 @@ QJsonObject ChannelIndex::toJson() const
             obj.insert("units", "bit");
         return obj;
     } else if ( isPrototype ) {
-        return QJsonObject {
+        obj = QJsonObject {
             {"type", "Prototype"},
             {"class", modelClass},
             {"class_id", modelID}
         };
     } else if ( isVirtual ) {
-        return QJsonObject {
+        obj = QJsonObject {
             {"type", "Virtual"},
             {"class", modelClass},
             {"class_id", modelID},
@@ -201,7 +208,7 @@ QJsonObject ChannelIndex::toJson() const
             {"units", isInChn ? "V" : "A"}
         };
     } else if ( isConductance ) {
-        return QJsonObject {
+        obj = QJsonObject {
             {"type", "Conductance"},
             {"class", conductanceClass},
             {"class_id", conductanceID},
@@ -209,8 +216,11 @@ QJsonObject ChannelIndex::toJson() const
             {"multiplex_id", multiplexID},
             {"units", "S"}
         };
+        ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
+        if ( proxy->size() > conductanceID && !proxy->param(conductanceID).label.isEmpty() )
+            obj.insert("label", proxy->param(conductanceID).label);
     }
-    return QJsonObject;
+    return obj;
 }
 
 std::ostream &operator<<(std::ostream &os, const ChannelIndex &dex)
