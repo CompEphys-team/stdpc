@@ -15,6 +15,7 @@ DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new 
 SimulDAQProxy::SimulDAQProxy() :
     regAP {
         addAP("SDAQp[#].active", &p, &SDAQData::active),
+        addAP("SDAQp[#].label", &p, &SDAQData::label),
         addAP("SDAQp[#].inFileName", &p, &SDAQData::inFileName),
         addAP("SDAQp[#].outFileName", &p, &SDAQData::outFileName),
         addAP("SDAQp[#].inTFac", &p, &SDAQData::inTFac),

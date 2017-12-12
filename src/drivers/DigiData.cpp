@@ -14,6 +14,7 @@ DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new 
 DigiDataProxy::DigiDataProxy() :
     regAP {
         addAP("DigiDatap[#].active", &p, &DigiDataData::active),
+        addAP("DigiDatap[#].label", &p, &DigiDataData::label),
         addAP("DigiDatap[#].baseAddress", &p, &DigiDataData::baseAddress),
         addAP("DigiDatap[#].syncIOMask", &p, &DigiDataData::syncIOMask),
         addAP("DigiDatap[#].inChn[#].active", &p, &DigiDataData::inChn, &inChnData::active),

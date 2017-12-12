@@ -15,6 +15,7 @@ SpkGenProxy::SpkGenProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);
     AP *sgAc = addAP("SGp[#].active", &SpkGenProxy::p, &SGData::active);
+               addAP("SGp[#].label", &SpkGenProxy::p, &SGData::label);
     AP *sgLU = addAP("SGp[#].LUTables", &SpkGenProxy::p, &SGData::LUTables);
     AP *sgVS = addAP("SGp[#].VSpike", &SpkGenProxy::p, &SGData::VSpike);
     AP *sgTS = addAP("SGp[#].spkTimeScaling", &SpkGenProxy::p, &SGData::spkTimeScaling);

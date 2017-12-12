@@ -18,6 +18,7 @@ DAQDlg *NIDAQProxy::createDialog(size_t devID, QWidget *parent) { return new NID
 NIDAQProxy::NIDAQProxy() :
     regAP {
         addAP("NIDAQp[#].active", &p, &NIDAQData::active),
+        addAP("NIDAQp[#].label", &p, &NIDAQData::label),
         addAP("NIDAQp[#].deviceName", &p, &NIDAQData::deviceName),
         addAP("NIDAQp[#].inChn[#].active", &p, &NIDAQData::inChn, &inChnData::active),
         addAP("NIDAQp[#].inChn[#].gain", &p, &NIDAQData::inChn, &inChnData::gain),

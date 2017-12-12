@@ -169,6 +169,7 @@ struct outChnData {
 class DAQData {
 public:
     bool active;
+    QuotedString label;
     std::vector<inChnData> inChn;
     std::vector<outChnData> outChn;
     DAQData() : active(false) {}
@@ -219,6 +220,7 @@ struct vInstData {
 
 struct ModelData {
     bool active;
+    QuotedString label;
     virtual vInstData &instance(size_t i) = 0;
     virtual size_t numInst() const = 0;
     ModelData() : active(false) {}

@@ -14,6 +14,7 @@ HHNeuronProxy::HHNeuronProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);
     addAP("HHNeuronp[#].active", &HHNeuronProxy::p, &HHNeuronData::active);
+    addAP("HHNeuronp[#].label", &HHNeuronProxy::p, &HHNeuronData::label);
     addAP("HHNeuronp[#].C", &HHNeuronProxy::p, &HHNeuronData::C);
     addAP("HHNeuronp[#].gLeak", &HHNeuronProxy::p, &HHNeuronData::gLeak);
     addAP("HHNeuronp[#].ELeak", &HHNeuronProxy::p, &HHNeuronData::ELeak);
