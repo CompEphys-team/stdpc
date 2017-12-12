@@ -22,6 +22,9 @@ protected:
     size_t idx;
     ComponentWidget *_widget;
     ConductanceDlg *dlg;
+
+protected slots:
+    void setLabel();
 };
 
 class ComponentPrototype

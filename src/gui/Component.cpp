@@ -5,7 +5,8 @@ Component::Component(ConductanceProxy *proxy, size_t idx) :
     proxy(proxy), idx(idx), dlg(proxy->createDialog(idx))
 {
     regenerateWidget();
-    _widget->label->setText(proxy->prettyName() + " " + QString::number(idx));
+    setIndex(idx);
+    connect(dlg, &ConductanceDlg::accepted, this, &Component::setLabel);
 }
 
 void Component::importData()
@@ -27,8 +28,16 @@ void Component::exportData()
 void Component::setIndex(int i)
 {
     idx = i;
-    _widget->label->setText(proxy->prettyName() + " " + QString::number(idx));
+    setLabel();
     dlg->setIndex(idx);
+}
+
+void Component::setLabel()
+{
+    QString label = proxy->param(idx).label;
+    if ( label.isEmpty() )
+        label = QString("%1 %2").arg(proxy->prettyName()).arg(idx);
+    _widget->label->setText(label);
 }
 
 void Component::regenerateWidget()
