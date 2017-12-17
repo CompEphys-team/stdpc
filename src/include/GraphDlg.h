@@ -7,6 +7,7 @@
 #include <QCheckBox>
 #include <QToolButton>
 #include <QColorDialog>
+#include <QLabel>
 
 namespace Ui {
 class GraphDlg;
@@ -50,13 +51,15 @@ private:
     QVector<QCheckBox*> actives;
     QVector<ColorButton*> colors;
     QVector<QComboBox*> types;
+    QVector<QComboBox*> unitMods;
+    QVector<QLabel*> unitTypes;
     QVector<WideComboBox*> channels;
-    QMetaObject::Connection activec, typec, channelc;
+    QMetaObject::Connection activec, typec, unitc, channelc;
 
     int m_plot;
     bool interactive;
 
-    void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel);
+    void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, QComboBox *unitMod, QLabel *unitType, WideComboBox *channel);
 
 private slots:
     void growTable(bool reactive = true);
@@ -76,6 +79,8 @@ public:
      inline int plot() const { return m_plot; }
 
      inline void setInteractive(bool maybe) { interactive = maybe; }
+
+     static QStringList unitModifiers;
 
 public slots:
      void open();

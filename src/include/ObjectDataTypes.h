@@ -179,6 +179,7 @@ struct GraphData {
     bool active;
     ChannelIndex chan;
     bool isVoltage;
+    int unitMod;
     QColor color;
 
     GraphData() : active(true) {}

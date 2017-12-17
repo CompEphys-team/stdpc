@@ -31,6 +31,7 @@ void initAP()
     AP *graphChan =   addAP("Plotp.plot[#].graph[#].chan", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::chan);
     AP *graphVolt =   addAP("Plotp.plot[#].graph[#].isVoltage", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::isVoltage);
     AP *graphColor =  addAP("Plotp.plot[#].graph[#].color", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::color);
+    addAP("Plotp.plot[#].graph[#].unitMod", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::unitMod);
 
     addDeprecatedAP("Plotp.graphs[#].active", graphActive, 1);
     addDeprecatedAP("Plotp.graphs[#].color", graphColor, 1);

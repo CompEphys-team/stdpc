@@ -110,13 +110,14 @@ void GraphWidget::updatePlot(int row)
 
 void GraphWidget::setupGraph(GraphData &p, QCPGraph *graph)
 {
-    QString name = QString("%1 [%2]").arg(p.chan.prettyName());
+    QString name = QString("%1 [%2%3]").arg(p.chan.prettyName()).arg(GraphDlg::unitModifiers[p.unitMod]);
+
     if ( p.chan.isConductance )
-        name = name.arg("nS");
+        name = name.arg("S");
     else if ( p.chan.isAnalog )
-        name = name.arg(p.chan.isInChn ? "mV" : "nA");
+        name = name.arg(p.chan.isInChn ? "V" : "A");
     else if ( p.chan.isVirtual )
-        name = name.arg((p.chan.isInChn = p.isVoltage) ? "mV" : "nA");
+        name = name.arg((p.chan.isInChn = p.isVoltage) ? "V" : "A");
     graph->setName(name);
     graph->setPen(QPen(p.color));
 
@@ -296,7 +297,7 @@ void GraphWidget::replot()
             if ( qIndex[j] == i ) {
                 graphs.push_back(activeGraphs[j]);
                 const GraphData &p = std::get<1>(activeGraphs[j]);
-                fac.push_back(((p.chan.isVirtual && p.isVoltage) || (p.chan.isAnalog && p.chan.isInChn)) ? 1e3 : 1e9);
+                fac.push_back(std::pow(10, p.unitMod*3));
             }
         }
 
