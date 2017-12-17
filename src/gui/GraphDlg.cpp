@@ -176,9 +176,17 @@ void GraphDlg::on_TraceDeactivate_clicked()
 
 void GraphDlg::on_TraceClear_clicked()
 {
-    for ( int i = ui->table->rowCount() - 2; i >= 0; i-- )
-        if ( !actives[i]->isChecked() )
+    for ( int i = ui->table->rowCount() - 2; i >= 0; i-- ) {
+        if ( !actives[i]->isChecked() ) {
             ui->table->removeRow(i);
+            actives.remove(i);
+            colors.remove(i);
+            types.remove(i);
+            unitMods.remove(i);
+            unitTypes.remove(i);
+            channels.remove(i);
+        }
+    }
     checkChannelTypes();
 }
 
