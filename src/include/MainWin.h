@@ -23,7 +23,6 @@ class MyMainWindow : public QMainWindow
 
   protected:
     void closeEvent(QCloseEvent *event);
-    void doExportLog(QString &);
 
   public:
      MyMainWindow(QWidget *parent= 0);
@@ -61,18 +60,8 @@ class MyMainWindow : public QMainWindow
      void UnLoadScript();
           
  private:
-    QFileDialog *ExportLogFileDlg;
-    QFileDialog *LoadProtocolFileDlg;
-    QFileDialog *SaveProtocolFileDlg;
-    QFileDialog *LoadScriptFileDlg;    
-    
     QLabel *loadedProtocolStatus;
     QLabel *rateIndicator;
-
-    // adjustable parameter stuff
-
-    void doLoadProtocol(QString &);
-    void doSaveProtocol(QString &);
 
     Ui::MainWindow *ui;
 

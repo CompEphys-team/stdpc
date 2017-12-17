@@ -32,20 +32,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      for ( ModelProxy *proxy : ModelManager::Register() )
          dprot.push_back(new ModelOptsPrototype(proxy));
      ui->DAQTable->init(dprot, this);
-     
-     ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
-               QString("*.log"));
-     ExportLogFileDlg->setAcceptMode(QFileDialog::AcceptSave);
-     
-     LoadProtocolFileDlg= new QFileDialog(this, QString("Load Protocol File Dialog"), QString("."), 
-               QString("*.cpr"));
-     LoadProtocolFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
-     SaveProtocolFileDlg= new QFileDialog(this, QString("Save Protocol File Dialog"), QString("."), 
-               QString("*.cpr"));
-     SaveProtocolFileDlg->setAcceptMode(QFileDialog::AcceptSave);
-     LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
-               QString("*.scr"));
-     LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
 
      rateIndicator = new QLabel("Ready");
      ui->statusbar->addPermanentWidget(rateIndicator);
@@ -60,15 +46,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
      connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
-     connect(ui->actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
-     connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
+     connect(ui->actionExport_Log, SIGNAL(triggered()), this, SLOT(ExportLog()));
      connect(ui->actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
-     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
-     connect(LoadProtocolFileDlg, SIGNAL(accepted()), SLOT(LoadProtocol()));
-     connect(ui->actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
-     connect(SaveProtocolFileDlg, SIGNAL(accepted()), SLOT(SaveProtocol()));
-     connect(ui->actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
-     connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
+     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), this, SLOT(LoadProtocol()));
+     connect(ui->actionSave_Protocol, SIGNAL(triggered()), this, SLOT(SaveProtocol()));
+     connect(ui->actionLoad_Script, SIGNAL(triggered()), this, SLOT(LoadScript()));
      connect(ui->actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));
      connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
      connect(ui->actionStart_trigger, SIGNAL(triggered(bool)), TrigDlg, SLOT(open()));
@@ -110,10 +92,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
 MyMainWindow::~MyMainWindow()
 {
-  delete ExportLogFileDlg;
-  delete LoadProtocolFileDlg;
-  delete SaveProtocolFileDlg;
-
   delete ui;
 
   ChannelListModel::destruct();
@@ -305,8 +283,14 @@ void MyMainWindow::LoadConfig()
     SampleHoldp.threshV= 0.0;
 }
 
-void MyMainWindow::doSaveProtocol(QString &fname)
+void MyMainWindow::SaveProtocol()
 {
+  QString fname = QFileDialog::getSaveFileName(this, "Save protocol to file", "", "StdpC protocols (*.cpr);;All files(*)");
+  if ( fname.isEmpty() )
+      return;
+  if ( !fname.endsWith(".cpr") && !QFileInfo(fname).exists() && !QFileInfo(QString("%1.cpr").arg(fname)).exists() )
+      fname.append(".cpr");
+
   ofstream os(fname.toLatin1());
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
@@ -320,8 +304,12 @@ void MyMainWindow::doSaveProtocol(QString &fname)
 }
 
 
-void MyMainWindow::doLoadProtocol(QString &fname)
+void MyMainWindow::LoadProtocol()
 {
+  QString fname = QFileDialog::getOpenFileName(this, "Load protocol file", "", "StdpC protocols (*.cpr);;All files(*)");
+  if ( fname.isEmpty() )
+    return;
+
   ifstream is(fname.toLatin1());
   if (!is.good()) {
     DisplayMessage(QString("Error opening Protocol file"));
@@ -349,12 +337,12 @@ void MyMainWindow::doLoadProtocol(QString &fname)
 
 void MyMainWindow::ExportLog()
 {
-  QStringList fnlist= ExportLogFileDlg->selectedFiles();
-  doExportLog(*fnlist.begin());
-}
+  QString fname = QFileDialog::getSaveFileName(this, "Export log to file", "", "Log files (*.log);;All files (*)");
+  if ( fname.isEmpty() )
+      return;
+  if ( !fname.endsWith(".log") && !QFileInfo(fname).exists() && !QFileInfo(QString("%1.log").arg(fname)).exists() )
+      fname.append(".log");
 
-void MyMainWindow::doExportLog(QString &fname)
-{
   ofstream os(fname.toLatin1());
   int i= 0, done= 0;
   QListWidgetItem *it;
@@ -375,22 +363,10 @@ void MyMainWindow::ClearLog()
   ui->MessageWindow->clear();
 }
 
-void MyMainWindow::LoadProtocol()
-{
-  QStringList fnlist= LoadProtocolFileDlg->selectedFiles();
-  doLoadProtocol(*fnlist.begin());
-}
-
-void MyMainWindow::SaveProtocol()
-{
-  QStringList fnlist= SaveProtocolFileDlg->selectedFiles();
-  doSaveProtocol(*fnlist.begin());
-}
-
 void MyMainWindow::LoadScript()
 {
-  QStringList fnlist= LoadScriptFileDlg->selectedFiles();
-  if (DCT->LoadScript(*fnlist.begin())) {
+  QString fname = QFileDialog::getOpenFileName(this, "Load script file", "", "StdpC scripts(*.scr);;All files(*)");
+  if ( !fname.isEmpty() && DCT->LoadScript(fname) ) {
     ui->actionLoad_Script->setEnabled(false);
     ui->actionUnload_Script->setEnabled(true);
   }
