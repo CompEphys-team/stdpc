@@ -93,6 +93,9 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 MyMainWindow::~MyMainWindow()
 {
   delete ui;
+  delete DSDlg;
+  delete TrigDlg;
+  delete DCT;
 
   ChannelListModel::destruct();
 }
