@@ -30,7 +30,7 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
     if ( p.fileName.contains("%n") ) {
         p.fileName.replace("%n", "%1");
         for ( size_t i = 0; true; i++ ) {
-            QString name = p.fileName.arg(i, 4, 10, '0');
+            QString name = p.fileName.arg(i, 4, 10, QChar('0'));
             if ( QFileInfo(name).exists() ) {
                 p.fileName = name;
                 break;
@@ -58,7 +58,7 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
 QString getColumnFileName(int i, ChannelIndex channel)
 {
     QString label = channel.isNone ? "time" : channel.toString('_', true);
-    return QString("%1_%2.dat").arg(i, 2, 10, '0').arg(label);
+    return QString("%1_%2.dat").arg(i, 2, 10, QChar('0')).arg(label);
 }
 
 bool DataSaver::initBinary(QVector<ChannelIndex> channels)
@@ -94,7 +94,7 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
         {"precision", p.binaryDoublePrecision ? "double" : "single"},
         {"data_columns", columns}
     };
-    QFile json_file(QString("%1/meta.json"));
+    QFile json_file(QString("%1/meta.json").arg(p.fileName));
     if ( !json_file.open(QFile::WriteOnly) )
         return false;
     json_file.write(QJsonDocument(json).toJson());
@@ -103,9 +103,9 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
     binaryStreams.resize(channels.size());
     binaryFiles.resize(channels.size());
     for ( size_t i = 0; i < binaryStreams.size(); i++ ) {
-        QFile *file(QString("%1/%2")
-                   .arg(p.fileName)
-                   .arg(getColumnFileName(i, channels[i])));
+        QFile *file = new QFile(QString("%1/%2")
+                                .arg(p.fileName)
+                                .arg(getColumnFileName(i, channels[i])));
         if ( !file->open(QFile::WriteOnly) )
             return false;
 
@@ -127,7 +127,7 @@ bool DataSaver::initAscii(QVector<ChannelIndex> channels)
     if ( !os.good() || !os.is_open())
         return false;
 
-    os << p.asciiHeaderPrefix;
+    os << p.asciiHeaderPrefix.toStdString();
     for ( ChannelIndex channel : channels ) {
         QString label = channel.isNone ? "Time" : channel.toString('_', true);
         os << '"' << label << '"' << p.asciiSeparator;
