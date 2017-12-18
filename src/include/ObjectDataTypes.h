@@ -136,7 +136,7 @@ typedef struct {
   bool binaryLittleEndian;
   bool binaryDoublePrecision;
 
-  char asciiSeparator;
+  QuotedString asciiSeparator;
   QuotedString asciiHeaderPrefix;
   bool asciiCRLF;
 

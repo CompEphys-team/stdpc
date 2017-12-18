@@ -123,16 +123,22 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
 
 bool DataSaver::initAscii(QVector<ChannelIndex> channels)
 {
-    os.open(p.fileName.toLatin1());
+    os.open(p.fileName.toLatin1(), ios_base::out | ios_base::binary); // text mode auto-converts \n into \r\n...
     if ( !os.good() || !os.is_open())
         return false;
 
+    lineEnding = (p.asciiCRLF ? "\r\n" : "\n");
+    p.asciiHeaderPrefix.replace(QRegularExpression("\\r?\\n"), lineEnding.data());
+    p.asciiSeparator.replace(QRegularExpression("\\r?\\n"), lineEnding.data());
+
     os << p.asciiHeaderPrefix.toStdString();
-    for ( ChannelIndex channel : channels ) {
-        QString label = channel.isNone ? "Time" : channel.toString('_', true);
-        os << '"' << label << '"' << p.asciiSeparator;
+    for ( int i = 0, last = channels.size() - 1; i <= last; i++ ) {
+        QString label = channels[i].isNone ? "Time" : channels[i].toString('_', true);
+        os << '"' << label << '"';
+        if ( i < last )
+            os << p.asciiSeparator.toStdString();
     }
-    os << (p.asciiCRLF ? "\r\n" : "\n");
+    os << lineEnding;
 
     return true;
 }
@@ -148,11 +154,13 @@ void DataSaver::SaveLine()
             *binaryStreams[i] << data;
         }
     } else {
-        for ( auto &queue : q ) {
-            queue->pop(data);
-            os << data << p.asciiSeparator;
+        for ( int i = 0, last = q.size()-1; i <= last; i++ ) {
+            q[i]->pop(data);
+            os << data;
+            if ( i < last )
+                os << p.asciiSeparator.toStdString();
         }
-        os << (p.asciiCRLF ? "\r\n" : "\n");
+        os << lineEnding;
     }
 }
 
