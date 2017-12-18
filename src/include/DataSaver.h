@@ -22,6 +22,8 @@ private:
     std::vector<std::unique_ptr<QFile>> binaryFiles;
     std::ofstream os;
 
+    std::string lineEnding;
+
 protected:
     bool initBinary(QVector<ChannelIndex> channels);
     bool initAscii(QVector<ChannelIndex> channels);

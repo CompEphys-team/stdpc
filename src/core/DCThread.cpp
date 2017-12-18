@@ -487,10 +487,6 @@ void DCThread::run()
    for ( auto const& m : Models.active() )
        m->reset();
 
-   if ( saving ) {
-       dataSaver->EndDataSaving();
-   }
-
    finished= true;
    emit done();
 }
