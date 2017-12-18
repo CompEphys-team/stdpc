@@ -53,3 +53,10 @@ void SynapticNoiseDlg::exportData()
     p.D = 2e-18 * ui->stddev->value()*ui->stddev->value() / p.tau; // nS^2 / s = 10^-18 S^2/s (variance = D*tau/2)
     p.ignoreNegative = ui->ignoreNegative->isChecked();
 }
+
+void SynapticNoiseDlg::on_buttonBox_clicked(QAbstractButton *button)
+{
+    if ( button->text() == "Close" )
+        hide();
+    emit labelChanged(ui->leLabel->text());
+}

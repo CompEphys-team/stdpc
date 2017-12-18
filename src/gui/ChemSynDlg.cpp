@@ -52,6 +52,7 @@ void ChemSynDlg::ResCloseClicked(QAbstractButton *but)
   if (but->text() == QString("Reset")) {
 //    reset();
   }
+  emit labelChanged(leLabel->text());
 }
 
 void ChemSynDlg::PlastMethodChange()

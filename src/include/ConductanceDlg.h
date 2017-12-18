@@ -15,6 +15,9 @@ public:
     virtual void exportData() = 0;
     virtual void setIndex(size_t i) { idx = i; }
 
+signals:
+    void labelChanged(QString);
+
 protected:
     size_t idx;
 };

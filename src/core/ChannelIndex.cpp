@@ -196,8 +196,8 @@ QJsonObject ChannelIndex::toJson() const
         obj = QJsonObject {
             {"type", "DAQ"},
             {"class", daqClass},
-            {"class_id", devID},
-            {"channel_id", chanID},
+            {"class_id", int(devID)},
+            {"channel_id", int(chanID)},
             {"is_input_channel", isInChn}
         };
         if ( isAnalog )
@@ -212,7 +212,7 @@ QJsonObject ChannelIndex::toJson() const
         obj = QJsonObject {
             {"type", "Prototype"},
             {"class", modelClass},
-            {"class_id", modelID}
+            {"class_id", int(modelID)}
         };
         ModelProxy *proxy = Models.Register().value(modelClass);
         if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
@@ -221,8 +221,8 @@ QJsonObject ChannelIndex::toJson() const
         obj = QJsonObject {
             {"type", "Virtual"},
             {"class", modelClass},
-            {"class_id", modelID},
-            {"instance_id", instID},
+            {"class_id", int(modelID)},
+            {"instance_id", int(instID)},
             {"is_input_channel", isInChn},
             {"units", isInChn ? "V" : "A"}
         };
@@ -233,9 +233,9 @@ QJsonObject ChannelIndex::toJson() const
         obj = QJsonObject {
             {"type", "Conductance"},
             {"class", conductanceClass},
-            {"class_id", conductanceID},
-            {"assignment_id", assignID},
-            {"multiplex_id", multiplexID},
+            {"class_id", int(conductanceID)},
+            {"assignment_id", int(assignID)},
+            {"multiplex_id", int(multiplexID)},
             {"units", "S"}
         };
         ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);

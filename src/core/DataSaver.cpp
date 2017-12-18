@@ -30,8 +30,8 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
     if ( p.fileName.contains("%n") ) {
         p.fileName.replace("%n", "%1");
         for ( size_t i = 0; true; i++ ) {
-            QString name = p.fileName.arg(i, 4, 10, '0');
-            if ( QFileInfo(name).exists() ) {
+            QString name = p.fileName.arg(i, 4, 10, QChar('0'));
+            if ( !QFileInfo(name).exists() ) {
                 p.fileName = name;
                 break;
             }
@@ -58,7 +58,7 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
 QString getColumnFileName(int i, ChannelIndex channel)
 {
     QString label = channel.isNone ? "time" : channel.toString('_', true);
-    return QString("%1_%2.dat").arg(i, 2, 10, '0').arg(label);
+    return QString("%1_%2.dat").arg(i, 2, 10, QChar('0')).arg(label);
 }
 
 bool DataSaver::initBinary(QVector<ChannelIndex> channels)
@@ -94,7 +94,7 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
         {"precision", p.binaryDoublePrecision ? "double" : "single"},
         {"data_columns", columns}
     };
-    QFile json_file(QString("%1/meta.json"));
+    QFile json_file(QString("%1/meta.json").arg(p.fileName));
     if ( !json_file.open(QFile::WriteOnly) )
         return false;
     json_file.write(QJsonDocument(json).toJson());
@@ -103,9 +103,9 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
     binaryStreams.resize(channels.size());
     binaryFiles.resize(channels.size());
     for ( size_t i = 0; i < binaryStreams.size(); i++ ) {
-        QFile *file(QString("%1/%2")
-                   .arg(p.fileName)
-                   .arg(getColumnFileName(i, channels[i])));
+        QFile *file = new QFile(QString("%1/%2")
+                                .arg(p.fileName)
+                                .arg(getColumnFileName(i, channels[i])));
         if ( !file->open(QFile::WriteOnly) )
             return false;
 
@@ -123,16 +123,22 @@ bool DataSaver::initBinary(QVector<ChannelIndex> channels)
 
 bool DataSaver::initAscii(QVector<ChannelIndex> channels)
 {
-    os.open(p.fileName.toLatin1());
+    os.open(p.fileName.toLatin1(), ios_base::out | ios_base::binary); // text mode auto-converts \n into \r\n...
     if ( !os.good() || !os.is_open())
         return false;
 
-    os << p.asciiHeaderPrefix;
-    for ( ChannelIndex channel : channels ) {
-        QString label = channel.isNone ? "Time" : channel.toString('_', true);
-        os << '"' << label << '"' << p.asciiSeparator;
+    lineEnding = (p.asciiCRLF ? "\r\n" : "\n");
+    p.asciiHeaderPrefix.replace(QRegularExpression("\\r?\\n"), lineEnding.data());
+    p.asciiSeparator.replace(QRegularExpression("\\r?\\n"), lineEnding.data());
+
+    os << p.asciiHeaderPrefix.toStdString();
+    for ( int i = 0, last = channels.size() - 1; i <= last; i++ ) {
+        QString label = channels[i].isNone ? "Time" : channels[i].toString('_', true);
+        os << '"' << label << '"';
+        if ( i < last )
+            os << p.asciiSeparator.toStdString();
     }
-    os << (p.asciiCRLF ? "\r\n" : "\n");
+    os << lineEnding;
 
     return true;
 }
@@ -148,11 +154,13 @@ void DataSaver::SaveLine()
             *binaryStreams[i] << data;
         }
     } else {
-        for ( auto &queue : q ) {
-            queue->pop(data);
-            os << data << p.asciiSeparator;
+        for ( int i = 0, last = q.size()-1; i <= last; i++ ) {
+            q[i]->pop(data);
+            os << data;
+            if ( i < last )
+                os << p.asciiSeparator.toStdString();
         }
-        os << (p.asciiCRLF ? "\r\n" : "\n");
+        os << lineEnding;
     }
 }
 

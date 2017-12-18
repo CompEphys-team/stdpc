@@ -2,6 +2,7 @@
 #define SYNAPTICNOISEDLG_H
 
 #include "ConductanceDlg.h"
+#include <QAbstractButton>
 
 namespace Ui {
 class SynapticNoiseDlg;
@@ -18,6 +19,9 @@ public:
     void importData();
     void exportData();
     void setIndex(int);
+
+private slots:
+    void on_buttonBox_clicked(QAbstractButton *button);
 
 private:
     Ui::SynapticNoiseDlg *ui;
