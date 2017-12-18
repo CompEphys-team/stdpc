@@ -31,7 +31,7 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
         p.fileName.replace("%n", "%1");
         for ( size_t i = 0; true; i++ ) {
             QString name = p.fileName.arg(i, 4, 10, QChar('0'));
-            if ( QFileInfo(name).exists() ) {
+            if ( !QFileInfo(name).exists() ) {
                 p.fileName = name;
                 break;
             }
