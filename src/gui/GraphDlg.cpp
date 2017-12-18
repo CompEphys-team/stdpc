@@ -80,6 +80,13 @@ void GraphDlg::accept()
     QDialog::accept();
 }
 
+void GraphDlg::reject()
+{
+    if ( m_delete )
+        emit removePlot(m_plot);
+    QDialog::reject();
+}
+
 void GraphDlg::growTable(bool reactive)
 {
     disconnect(activec);
@@ -192,6 +199,6 @@ void GraphDlg::on_TraceClear_clicked()
 
 void GraphDlg::on_removePlot_clicked()
 {
-    emit removePlot(m_plot);
+    m_delete = true;
     reject();
 }

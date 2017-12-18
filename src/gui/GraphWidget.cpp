@@ -38,7 +38,7 @@ void GraphWidget::addPlot(bool import)
     plot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend);
     plot->legend->setSelectableParts(QCPLegend::spItems);
     connect(plot, &QCustomPlot::mouseDoubleClick, [=](){
-        dialog->setPlot(row);
+        dialog->setPlot(row, false);
         dialog->open();
     });
 
@@ -67,14 +67,20 @@ void GraphWidget::addPlot(bool import)
     if ( import ) {
         ui->table->setRowHeight(row, Plotp.plot[row].height);
         plot->xAxis->setRange(0, Plotp.xRange);
+        plot->yAxis->setRange(Plotp.plot[row].yLower, Plotp.plot[row].yUpper);
     } else {
         Plotp.plot.resize(row+1);
         plot->xAxis->setRange(plots[0]->xAxis->range());
-        dialog->setPlot(row);
+        if ( row > 0 ) {
+            plot->yAxis->setRange(plots[row-1]->yAxis->range());
+            ui->table->setRowHeight(row, ui->table->rowHeight(row-1));
+        } else {
+            plot->yAxis->setRange(Plotp.plot[row].yLower, Plotp.plot[row].yUpper);
+        }
+        dialog->setPlot(row, true);
         dialog->open();
     }
 
-    plot->yAxis->setRange(Plotp.plot[row].yLower, Plotp.plot[row].yUpper);
     connect(plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(rangeChanged(QCPRange)));
 
     updatePlot(row);
@@ -90,7 +96,7 @@ void GraphWidget::removePlot(int row)
 void GraphWidget::updatePlot(int row)
 {
     QCustomPlot *plot = plots[row];
-    bool hasGraphs;
+    bool hasGraphs = false;
     for ( auto tup : activeGraphs ) {
         if ( std::get<0>(tup)->parentPlot() == plot ) {
             hasGraphs = true;

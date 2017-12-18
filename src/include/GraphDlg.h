@@ -58,6 +58,7 @@ private:
 
     int m_plot;
     bool interactive;
+    bool m_delete;
 
     void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, QComboBox *unitMod, QLabel *unitType, WideComboBox *channel);
 
@@ -75,7 +76,7 @@ public:
      GraphDlg(QWidget *parent = 0);
      ~GraphDlg();
 
-     inline void setPlot(int g) { m_plot = g; }
+     inline void setPlot(int g, bool deleteOnClose) { m_plot = g; m_delete = deleteOnClose; }
      inline int plot() const { return m_plot; }
 
      inline void setInteractive(bool maybe) { interactive = maybe; }
@@ -85,6 +86,7 @@ public:
 public slots:
      void open();
      void accept();
+     void reject();
 
 signals:
      void updatePlot(int row);
