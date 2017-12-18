@@ -53,6 +53,7 @@ class MyMainWindow : public QMainWindow
      void SaveConfig();
      void LoadConfig();
      void ExportLog();
+     void doExportLog(QString);
      void ClearLog();
      void SaveProtocol();
      void LoadProtocol();

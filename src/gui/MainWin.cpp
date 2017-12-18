@@ -151,7 +151,6 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
     while (!DCT->finished) Sleep(100);
-    delete DCT;
   }
   SaveConfig();
   fname= QString("StdpC_last.log");
@@ -345,7 +344,11 @@ void MyMainWindow::ExportLog()
       return;
   if ( !fname.endsWith(".log") && !QFileInfo(fname).exists() && !QFileInfo(QString("%1.log").arg(fname)).exists() )
       fname.append(".log");
+  doExportLog(fname);
+}
 
+void MyMainWindow::doExportLog(QString fname)
+{
   ofstream os(fname.toLatin1());
   int i= 0, done= 0;
   QListWidgetItem *it;

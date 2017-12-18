@@ -73,7 +73,7 @@ void GraphDlg::accept()
         p.color = colors[i]->color;
         p.chan = channels[i]->currentData().value<ChannelIndex>();
         p.isVoltage = types[i]->currentIndex() == 0;
-        p.unitMod = std::max(0, unitMods[i]->currentIndex());
+        p.unitMod = max(0, unitMods[i]->currentIndex());
         Plotp.plot[m_plot].graph.push_back(p);
     }
     emit updatePlot(m_plot);
@@ -112,7 +112,7 @@ void GraphDlg::checkChannelTypes()
         types[i]->setEnabled(dex.isVirtual);
         if ( dex.isConductance )
             unitTypes[i]->setText("S");
-        else if ( (dex.isVirtual && types[i]->currentIndex() == 0) || dex.isInChn )
+        else if ( (dex.isVirtual && types[i]->currentIndex() == 0) || (dex.isAnalog && dex.isInChn) )
             unitTypes[i]->setText("V");
         else
             unitTypes[i]->setText("A");
