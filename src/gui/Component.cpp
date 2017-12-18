@@ -6,7 +6,7 @@ Component::Component(ConductanceProxy *proxy, size_t idx) :
 {
     regenerateWidget();
     setIndex(idx);
-    connect(dlg, &ConductanceDlg::accepted, this, &Component::setLabel);
+    connect(dlg, &ConductanceDlg::labelChanged, this, &Component::setExplicitLabel);
 }
 
 void Component::importData()
@@ -34,7 +34,14 @@ void Component::setIndex(int i)
 
 void Component::setLabel()
 {
-    QString label = proxy->param(idx).label;
+    QString label;
+    if ( proxy->size() > idx )
+        label = proxy->param(idx).label;
+    setExplicitLabel(label);
+}
+
+void Component::setExplicitLabel(QString label)
+{
     if ( label.isEmpty() )
         label = QString("%1 %2").arg(proxy->prettyName()).arg(idx);
     _widget->label->setText(label);

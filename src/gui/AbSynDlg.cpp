@@ -51,6 +51,7 @@ void abSynDlg::ResCloseClicked(QAbstractButton *but)
   if (but->text() == QString("Reset")) {
 //    reset();
   }
+  emit labelChanged(leLabel->text());
 }
 
 void abSynDlg::PlastMethodChange()

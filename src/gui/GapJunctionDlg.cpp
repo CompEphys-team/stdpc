@@ -46,3 +46,10 @@ void GapJunctionDlg::setIndex(int no)
     ConductanceDlg::setIndex(no);
     gapJunctDlgLabel->setText(QString("%1 %2").arg(GapJunctionProxy::get()->prettyName()).arg(no));
 }
+
+void GapJunctionDlg::on_buttonBox_clicked(QAbstractButton *button)
+{
+    if ( button->text() == "Close" )
+        hide();
+    emit labelChanged(leLabel->text());
+}

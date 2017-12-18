@@ -14,6 +14,8 @@ class HHDlg : public ConductanceDlg, private Ui::HHDlg
      void exportData();
      void importData();
      void setIndex(int);
-}; 
+private slots:
+     void on_buttonBox_clicked(QAbstractButton *button);
+};
 
 #endif

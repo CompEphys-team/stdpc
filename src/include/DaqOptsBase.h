@@ -25,6 +25,7 @@ signals:
 
 protected slots:
     virtual void activeChanged() = 0;
+    virtual void setLabel() = 0;
 
 protected:
     size_t idx;

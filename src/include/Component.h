@@ -4,8 +4,9 @@
 #include "ComponentWidget.h"
 #include "ChannelListModel.h"
 
-class Component
+class Component : public QObject
 {
+    Q_OBJECT
 public:
     Component(ConductanceProxy *proxy, size_t idx);
 
@@ -25,6 +26,7 @@ protected:
 
 protected slots:
     void setLabel();
+    void setExplicitLabel(QString label);
 };
 
 class ComponentPrototype

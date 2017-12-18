@@ -102,3 +102,10 @@ void AlphaBetaHHDlg::importData()
 
   assignments->importData(p.assign);
 }
+
+void AlphaBetaHHDlg::on_buttonBox_clicked(QAbstractButton *button)
+{
+    if ( button->text() == "Close" )
+        hide();
+    emit labelChanged(leLabel->text());
+}
