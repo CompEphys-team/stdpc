@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Gap Junction</string>
+   <string>Voltage Clamp</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <item row="0" column="0">
