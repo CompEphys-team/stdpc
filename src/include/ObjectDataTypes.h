@@ -1,13 +1,14 @@
 #ifndef OBJECTDATATYPES_H
 #define OBJECTDATATYPES_H
 
-using namespace std;
 
 #include <QString>
 #include <iostream>
 #include <QColor>
 #include "ChannelIndex.h"
 #include "Util.h"
+
+using namespace std;
 
 struct SynapseAssignment {
     bool active;
@@ -29,6 +30,13 @@ struct CurrentAssignment {
     bool active;
     ChannelIndex VChannel;
     ChannelIndex IChannel;
+};
+
+struct VoltageClampAssignment {
+    bool active;
+    ChannelIndex PreSynChannel;
+    ChannelIndex PostSynChannel;
+    ChannelIndex OutSynChannel;
 };
 
 typedef struct {
@@ -151,6 +159,16 @@ typedef struct {
   int legacy_PreOut = -1;
   int legacy_PostOut = -1;
 } GJunctData;
+
+typedef struct {
+  bool active;
+  std::vector<VoltageClampAssignment> assign;
+  double gP;
+  double gI;
+  double gD;
+  double decayI;
+  int tstepD;
+} VoltageClampData;
 
 typedef struct {
   bool active;

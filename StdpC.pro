@@ -1,8 +1,11 @@
 # StdpC project file #
 
+# To enable DigiData support, uncoment the following line (requires compilation kit that can handle pt_iocntl_tn.a static library
+#CONFIG += digidata
+
 # To enable NI support, uncomment the following line (requires NIDAQmx 15.5.1 or newer)
 # If NIDAQmx is detected, this has no effect.
-#CONFIG += nidaqmx
+CONFIG += nidaqmx
 
 # To disable NI support (despite NIDAQmx being present in the system), uncomment the following line:
 #CONFIG += nonidaqmx
@@ -32,7 +35,7 @@ CONFIG += qt \
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
 
-QMAKE_CXXFLAGS += -std=c++11
+# QMAKE_CXXFLAGS += -std=c++11 -Wa,-mbig-obj
 
 static {
     QMAKE_LFLAGS += -static
@@ -56,7 +59,6 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/AlphaBetaHHDlg.ui \
     $$PWD/src/gui/OutputChannelDlg.ui \
     $$PWD/src/gui/SimulDAQDlg.ui \
-    $$PWD/src/gui/DigiDataDlg.ui \
     $$PWD/src/gui/ElectrodeCompDlg.ui \
     $$PWD/src/gui/AbSynDlg.ui \
     $$PWD/src/gui/DataSavingDlg.ui \
@@ -67,7 +69,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqWidget.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
-    $$PWD/src/gui/PerformanceMonitor.ui
+    $$PWD/src/gui/PerformanceMonitor.ui \
+    $$PWD/src/gui/VoltageClampDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -81,12 +84,8 @@ HEADERS += \
     $$PWD/src/include/LUtables.h \
     $$PWD/src/include/InputChannelDlg.h \
     $$PWD/src/include/OutputChannelDlg.h \
-    $$PWD/src/include/DigiData.h \
     $$PWD/src/include/Channels.h \
-    $$PWD/src/include/Pt_ioctl_tn.h \
-    $$PWD/src/include/PortTalkX_IOCTL.h \
     $$PWD/src/include/SimulDAQDlg.h \
-    $$PWD/src/include/DigiDataDlg.h \
     $$PWD/src/include/ChemSyn.h \
     $$PWD/src/include/GapJunction.h \
     $$PWD/src/include/HH.h \
@@ -135,7 +134,9 @@ HEADERS += \
     $$PWD/src/include/ModelOpts.h \
     $$PWD/src/include/ModelDlg.h \
     $$PWD/src/include/Util.h \
-    $$PWD/src/include/PerformanceMonitor.h
+    $$PWD/src/include/PerformanceMonitor.h \
+    $$PWD/src/include/VoltageClampDlg.h \
+    $$PWD/src/include/VoltageClamp.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -151,10 +152,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Global.cpp \
     $$PWD/src/core/Global_func.cpp \
     $$PWD/src/gui/OutputChannelDlg.cpp \
-    $$PWD/src/drivers/DigiData.cpp \
     $$PWD/src/core/Channels.cpp \
     $$PWD/src/gui/SimulDAQDlg.cpp \
-    $$PWD/src/gui/DigiDataDlg.cpp \
     $$PWD/src/models/ChemSyn.cpp \
     $$PWD/src/models/GapJunction.cpp \
     $$PWD/src/models/HH.cpp \
@@ -194,9 +193,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/ModelOpts.cpp \
     $$PWD/src/gui/DaqOpts.cpp \
     $$PWD/src/core/Util.cpp \
-    $$PWD/src/gui/PerformanceMonitor.cpp
-
-LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+    $$PWD/src/gui/PerformanceMonitor.cpp \
+    $$PWD/src/gui/VoltageClampDlg.cpp \
+    $$PWD/src/models/VoltageClamp.cpp
 
 NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
 isEmpty(NIDAQPATH) {
@@ -204,6 +203,18 @@ isEmpty(NIDAQPATH) {
     message("To force enable, add CONFIG+=nidaqmx to the qmake call.")
 } else {
     !CONFIG(nonidaqmx): CONFIG += nidaqmx
+}
+
+digidata {
+    FORMS +=  $$PWD/src/gui/DigiDataDlg.ui
+    HEADERS += $$PWD/src/include/DigiData.h \
+            $$PWD/src/include/Pt_ioctl_tn.h \
+            $$PWD/src/include/PortTalkX_IOCTL.h \
+            $$PWD/src/include/DigiDataDlg.h
+    SOURCES += $$PWD/src/gui/DigiDataDlg.cpp \
+            $$PWD/src/drivers/DigiData.cpp
+    LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+    DEFINES += DIGIDATA
 }
 
 nidaqmx {

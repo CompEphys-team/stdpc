@@ -7,6 +7,7 @@
 #include "ChemSyn.h"
 #include "AbSyn.h"
 #include "GapJunction.h"
+#include "VoltageClamp.h"
 #include "DestexheSyn.h"
 #include "HH.h"
 #include "AbHH.h"
@@ -51,6 +52,8 @@ private:
      template <typename T>
      void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, SynapseAssignment &);
      template <typename T>
+     void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, VoltageClampAssignment &);
+     template <typename T>
      void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
 
      QVector<inChannel *> inChnsToSave;
@@ -68,6 +71,9 @@ private:
 
      std::vector<DestexheSyn> dsynPre;
      std::vector<DestexheSyn> dsynPost;
+
+     std::vector<VoltageClamp> vclampPre;
+     std::vector<VoltageClamp> vclampPost;
 
      std::vector<HH> hhPre;
      std::vector<HH> hhIn;

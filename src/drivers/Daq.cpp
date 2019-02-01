@@ -24,8 +24,8 @@ DAQData *DAQ::params()
 void DAQ::init_chans()
 {
     DAQData *p = params();
-    short int No = 0;
-    short int Chns[p->inChn.size()];
+    size_t No = 0;
+    short *Chns= new short[p->inChn.size()];
     in.resize(p->inChn.size());
     vHiLim.resize(p->inChn.size());
     vLoLim.resize(p->inChn.size());
@@ -60,6 +60,7 @@ void DAQ::init_chans()
         }
     }
     generate_analog_out_list(No, Chns);
+    delete[] Chns;
 }
 
 

@@ -8,6 +8,7 @@
 #include "AbSynDlg.h"
 #include "GapJunctionDlg.h"
 #include "DestexheSynDlg.h"
+#include "VoltageClampDlg.h"
 #include "AlphaBetaHHDlg.h"
 #include "HHDlg.h"
 

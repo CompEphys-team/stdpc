@@ -127,6 +127,15 @@ void DCThread::setup_and_go()
                    instantiate(esyn, p, a);
        }
    }
+   vclampPre.clear();
+   vclampPost.clear();
+   for (VoltageClampData &p : VClampp ) {
+       if ( p.active ) {
+           for ( VoltageClampAssignment &a : p.assign )
+               if ( a.active )
+                   instantiate(vclampPre, vclampPost, p, a);
+       }
+   }
    hhPre.clear();
    hhIn.clear();
    for ( mhHHData &p : mhHHp ) {
@@ -149,11 +158,13 @@ void DCThread::setup_and_go()
    }
    if (csynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(csynPre.size()));
    if (csynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(csynPost.size()));
-   if (absynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
-   if (absynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(absynPost.size()));
+   if (absynPre.size() > 0) message(QString("DynClamp: %1 alpha/beta synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
+   if (absynPost.size() > 0) message(QString("DynClamp: %1 alpha/beta synapse(s) (d2a) ").arg(absynPost.size()));
    if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
-   if (dsynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(dsynPre.size()));
-   if (dsynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(dsynPost.size()));
+   if (dsynPre.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) (a2a/a2d/d2d) ").arg(dsynPre.size()));
+   if (dsynPost.size() > 0) message(QString("DynClamp: %1 Destexhe synapse(s) (d2a) ").arg(dsynPost.size()));
+   if (vclampPre.size() > 0) message(QString("DynClamp: %1 voltage clamp(s) (a2a/a2d/d2d) ").arg(vclampPre.size()));
+   if (vclampPost.size() > 0) message(QString("DynClamp: %1 voltage clamp(s) (d2a) ").arg(vclampPost.size()));
    if (hhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(hhPre.size()));
    if (hhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(hhIn.size()));
    if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
@@ -350,6 +361,10 @@ void DCThread::run()
          for ( DestexheSyn &obj : dsynPre )
              obj.currentUpdate(t, dt);
          for ( GapJunction &obj : esyn )
+             obj.currentUpdate(t, dt);
+         for ( VoltageClamp &obj : vclampPre )
+             obj.currentUpdate(t, dt);
+         for ( VoltageClamp &obj : vclampPost )
              obj.currentUpdate(t, dt);
 
          for ( HH &obj : hhPre )
@@ -639,6 +654,46 @@ void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
         }
     }
 }
+
+template <typename T>
+void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
+                           typename T::param_type &p, VoltageClampAssignment &a)
+{
+    std::vector<ChannelIndex> preSynInst = getChanIndices(a.PreSynChannel);
+    std::vector<ChannelIndex> postSynInst = getChanIndices(a.PostSynChannel);
+    std::vector<ChannelIndex> outSynInst = getChanIndices(a.OutSynChannel);
+    inChannel *preC, *postC;
+    outChannel *outC;
+
+    if ( a.PostSynChannel == a.OutSynChannel ) {
+        for ( ChannelIndex post : postSynInst ) {
+            for ( ChannelIndex pre : preSynInst ) {
+                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) ) {
+                    T tmp(&p, this, &a, preC, postC, outC);
+                    if ( pre.isVirtual && post.isAnalog )
+                        postModel.push_back(tmp);
+                    else
+                        preModel.push_back(tmp);
+                }
+            }
+        }
+    } else {
+        for ( ChannelIndex post : postSynInst ) {
+            for ( ChannelIndex out : outSynInst ) {
+                for ( ChannelIndex pre : preSynInst ) {
+                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) ) {
+                        T tmp(&p, this, &a, preC, postC, outC);
+                        if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
+                            postModel.push_back(tmp);
+                        else
+                            preModel.push_back(tmp);
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 template <typename T>
 void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJunctionAssignment &a)

@@ -330,7 +330,9 @@ std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
 }
 
 #include "SimulDAQ.h"
+#ifdef DIGIDATA
 #include "DigiData.h"
+#endif
 #ifdef NATIONAL_INSTRUMENTS
 #include "Nidaq.h"
 #endif
@@ -341,7 +343,9 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     int pos = is.tellg();
     std::vector<std::unique_ptr<AP>> deprec;
     SDAQData sdaq;
+#ifdef DIGIDATA
     DigiDataData dd;
+#endif
 #ifdef NATIONAL_INSTRUMENTS
     NIDAQData nidaq;
 #endif
@@ -380,14 +384,22 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         is >> sdaq.inFileName >> sdaq.outFileName >> sdaqInChnNo >> sdaqOutChnNo >> sdaq.inTFac >> sdaq.outDt;
         sdaq.inChn.resize(sdaqInChnNo);
         sdaq.outChn.resize(sdaqOutChnNo);
+#ifdef DIGIDATA
         is >> dd.baseAddress;
+#else
+        short int itmp;
+        is >> itmp;
+#endif
         if ( selection == 0 ) {
             sdaq.active = true;
             deprec = deprecateChannelsTo("SDAQp[#]");
-        } else if ( selection == 1 ) {
+        }
+#ifdef DIGIDATA
+        if ( selection == 1 ) {
             dd.active = true;
             deprec = deprecateChannelsTo("DigiDatap[#]");
         }
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( selection == 2 ) {
             is >> nidaq.deviceName;
@@ -397,17 +409,19 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 #endif
         if ( !is.good() )
             return false;
-
+#ifdef DIGIDATA
         AP *syncio = AP::find("DigiDatap[#].syncIOMask");
         if ( syncio )
             deprec.push_back(std::unique_ptr<AP>(new APDeprec("DigiDatap.syncIOMask", syncio, 1)));
-
+#endif
         SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
         if ( sdaq.active )
             LEGACY_DAQ_CLASS = "SimulDAQ";
+#ifdef DIGIDATA
         DigiDataProxy::p.insert(DigiDataProxy::p.begin(), dd);
         if ( dd.active )
             LEGACY_DAQ_CLASS = "DigiData1200";
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( nidaq.active ) {
             NIDAQProxy::p.insert(NIDAQProxy::p.begin(), nidaq);

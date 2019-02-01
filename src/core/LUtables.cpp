@@ -118,17 +118,17 @@ int expSigmoidLUtable::generate()
 }
 
 
-inline double tanhFunction::operator()(double x)
+double tanhFunction::operator()(double x)
 {
   return tanh(x); 
 }
 
-inline double expFunction::operator()(double x)
+double expFunction::operator()(double x)
 {
   return exp(x); 
 }
 
-inline double expSigmoidFunction::operator()(double x)
+double expSigmoidFunction::operator()(double x)
 {
   return 1.0/(1.0+exp(x)); 
 }

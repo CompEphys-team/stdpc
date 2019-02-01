@@ -30,6 +30,7 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
      prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
      prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
+     prototypes.push_back(new ComponentPrototype<VoltageClampDlg>("VoltageClamp", &VClampp));
      ui->synapseTable->init(prototypes, inChnModel, outChnModel);
 
      QVector<DaqOptsPrototypeBase*> dprot;
@@ -308,6 +309,7 @@ void MyMainWindow::doLoadProtocol(QString &fname)
   abSynp.clear();
   ESynp.clear();
   DxheSynp.clear();
+  VClampp.clear();
   mhHHp.clear();
   abHHp.clear();
   Models.clear();

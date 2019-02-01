@@ -9,6 +9,7 @@ std::vector<CSynData> CSynp;
 std::vector<abSynData> abSynp;
 std::vector<GJunctData> ESynp;
 std::vector<DestexheSynData> DxheSynp;
+std::vector<VoltageClampData> VClampp;
 
 std::vector<mhHHData> mhHHp;
 std::vector<abHHData> abHHp;

@@ -25,6 +25,7 @@ extern std::vector<CSynData> CSynp;
 extern std::vector<abSynData> abSynp;
 extern std::vector<GJunctData> ESynp;
 extern std::vector<DestexheSynData> DxheSynp;
+extern std::vector<VoltageClampData> VClampp;
 
 extern std::vector<mhHHData> mhHHp;
 extern std::vector<abHHData> abHHp;
