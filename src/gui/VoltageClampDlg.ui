@@ -129,7 +129,7 @@
      <item row="1" column="1">
       <widget class="QLineEdit" name="gPE">
        <property name="text">
-        <string>10.0</string>
+        <string>1.0</string>
        </property>
        <property name="maxLength">
         <number>8</number>
@@ -156,7 +156,7 @@
      <item row="1" column="4">
       <widget class="QLineEdit" name="gIE">
        <property name="text">
-        <string>10.0</string>
+        <string>1.0</string>
        </property>
        <property name="maxLength">
         <number>8</number>
@@ -183,7 +183,7 @@
      <item row="1" column="7">
       <widget class="QLineEdit" name="gDE">
        <property name="text">
-        <string>10.0</string>
+        <string>1.0</string>
        </property>
        <property name="maxLength">
         <number>8</number>
@@ -196,7 +196,7 @@
      <item row="1" column="8">
       <widget class="QLabel" name="label_7">
        <property name="text">
-        <string>nA/mV</string>
+        <string>nA*s/mV</string>
        </property>
       </widget>
      </item>

@@ -10,8 +10,8 @@ class VoltageClamp {
   protected:
     double I;
     double IP, II, ID;
-    double cmdAvg, postAvg;
-    double *VBuf, *tBuf;
+    double cmdAvg, postAvg, denom;
+    vector<double> VBuf, tBuf;
     size_t Bufptr, BufSz, BufMax;
     inChannel *cmd;
     inChannel *post;

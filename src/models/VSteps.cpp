@@ -16,7 +16,6 @@ VStepsProxy::VStepsProxy()
     ModelManager::RegisterModel(modelClass(), this);
 }
 
-
 VSteps::VSteps(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     Model(parent, instID, DCT),
     p(static_cast<const VStepsData *>(&(parent->params()))),
@@ -28,6 +27,7 @@ VSteps::VSteps(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     cmdT.clear();
     cmdV.clear();
     int stepNo= static_cast<int>(floor((p->endV-p->startV+1e-6)/p->deltaV));
+    cmdV.push_back(p->holdV);
     for (int i= 0; i < stepNo; i++) {
         cmdT.push_back(p->t0+i*(p->tStep+p->tHold));
         cmdV.push_back(p->startV+i*p->deltaV);
@@ -58,6 +58,7 @@ void VSteps::update(double t, double dt)
         cmdVI++;
     }
     V= *cmdVI;
+    in.V= V;
 }
 
 void VStepsPrototype::init(DCThread *DCT)

@@ -60,7 +60,7 @@ protected:
 class VStepsPrototype : public ModelPrototype
 {
 public:
-    VStepsPrototype(size_t modelID) : ModelPrototype(modelID) {}
+    VStepsPrototype(size_t modelID) : ModelPrototype (modelID) {}
     ~VStepsPrototype() {}
 
     void init(DCThread *);

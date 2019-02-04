@@ -37,7 +37,7 @@ void VoltageClampDlg::exportData(VoltageClampData &p)
 {
   p.gP= gPE->text().toDouble()*1e-6;
   p.gI= gIE->text().toDouble()*1e-6;
-  p.gP= gPE->text().toDouble()+1e-6;
+  p.gD= gDE->text().toDouble()*1e-6;
   p.decayI= decayE->text().toDouble();
   p.tstepD= tDE->text().toInt();
 

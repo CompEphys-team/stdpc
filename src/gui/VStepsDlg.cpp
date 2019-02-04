@@ -49,6 +49,7 @@ void VStepsDlg::importData()
 
 void VStepsDlg::exportData()
 {
+        cerr << "exportData start" << endl;
     VStepsProxy::p[idx].holdV= ui->holdVE->text().toDouble()*1e-3;
     VStepsProxy::p[idx].startV= ui->startVE->text().toDouble()*1e-3;
     VStepsProxy::p[idx].endV= ui->endVE->text().toDouble()*1e-3;
@@ -56,6 +57,15 @@ void VStepsDlg::exportData()
     VStepsProxy::p[idx].t0= ui->t0E->text().toDouble()*1e-3;
     VStepsProxy::p[idx].tStep= ui->tStepE->text().toDouble()*1e-3;
     VStepsProxy::p[idx].tHold= ui->tHoldE->text().toDouble()*1e-3;
+    // automatically create one instance
+    vInstData inst;
+    VStepsProxy::p[idx].inst.clear();
+    VStepsProxy::p[idx].inst.reserve(1);
+    inst.active = 1;
+    // thre is no inChn, so these are not relevant
+    inst.inChn.chnlSaving = false;
+    inst.inChn.bias = 0.0;
+    VStepsProxy::p[idx].inst.push_back(inst);
 
     emit channelsChanged();
     emit modelStatusChanged();
