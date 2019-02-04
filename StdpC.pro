@@ -70,7 +70,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
     $$PWD/src/gui/PerformanceMonitor.ui \
-    $$PWD/src/gui/VoltageClampDlg.ui
+    $$PWD/src/gui/VoltageClampDlg.ui \
+    $$PWD/src/gui/VStepsDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -136,7 +137,9 @@ HEADERS += \
     $$PWD/src/include/Util.h \
     $$PWD/src/include/PerformanceMonitor.h \
     $$PWD/src/include/VoltageClampDlg.h \
-    $$PWD/src/include/VoltageClamp.h
+    $$PWD/src/include/VoltageClamp.h \
+    $$PWD/src/include/VStepsDlg.h \
+    $$PWD/src/include/VSteps.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -195,7 +198,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Util.cpp \
     $$PWD/src/gui/PerformanceMonitor.cpp \
     $$PWD/src/gui/VoltageClampDlg.cpp \
-    $$PWD/src/models/VoltageClamp.cpp
+    $$PWD/src/models/VoltageClamp.cpp \
+    $$PWD/src/gui/VStepsDlg.cpp \
+    $$PWD/src/models/VSteps.cpp
 
 NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
 isEmpty(NIDAQPATH) {

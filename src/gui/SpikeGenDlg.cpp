@@ -41,11 +41,11 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
             return;
         }
         std::vector<std::vector<double>> vec;
-        int sn;
+        size_t sn;
         is >> sn;
         while ( is.good() ) {
             std::vector<double> tmp(sn);
-            for (int i = 0; i < sn && is.good(); i++) {
+            for (size_t i = 0; i < sn && is.good(); i++) {
                 is >> tmp[i];
             }
             vec.push_back(tmp);

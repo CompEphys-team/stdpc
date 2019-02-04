@@ -1,5 +1,4 @@
-#ifndef SPIKEGENDLG_H
-#define SPIKEGENDLG_H
+#pragma once
 
 #include "ModelDlg.h"
 #include <QCheckBox>
@@ -47,4 +46,3 @@ private slots:
     void growSTTable(int row, int col);
 };
 
-#endif // SPIKEGENDLG_H
