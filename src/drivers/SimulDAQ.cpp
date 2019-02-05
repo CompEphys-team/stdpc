@@ -165,13 +165,7 @@ void SimulDAQ::get_scan()
   short int i;
   short int idx;
   static double V;
-  // do this to slow down the churning simulated DAQ
-  Sleep(1);
- // double tmp=0;
-  //for (int j=0; j < 10000; j++) {
-  //    tmp+= sqrt(j);
- // }
-  //cerr << t << endl;
+
   if (t >= inT + tOff) {
     intIter++;
     for (i= 0; i < inChnNo; i++) {

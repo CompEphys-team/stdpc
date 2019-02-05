@@ -19,6 +19,7 @@ VoltageClamp::VoltageClamp(VoltageClampData *inp, DCThread *t, VoltageClampAssig
     BufMax(p->tstepD)
 {
     VBuf.resize(BufMax);
+    cmdBuf.resize(BufMax);
     tBuf.resize(BufMax);
 }
 
@@ -35,6 +36,7 @@ void VoltageClamp::currentUpdate(double t, double)
       postAvg= postAvg*p->decayI+post->V;
       denom= denom*p->decayI+1.0;
       VBuf[(Bufptr+BufSz)%BufMax]= post->V;
+      cmdBuf[(Bufptr+BufSz)%BufMax]= cmd->V;
       tBuf[(Bufptr+BufSz)%BufMax]= t;
       if (BufSz < BufMax-1) {
           BufSz++;
@@ -44,8 +46,8 @@ void VoltageClamp::currentUpdate(double t, double)
           out->I+= IP;
           II= p->gI * (cmdAvg - postAvg)/denom;
           out->I+= II;
-          ID= p->gD * (post->V - VBuf[Bufptr])/(t-tBuf[Bufptr]);
-          //cerr << post->V - VBuf[Bufptr] << " " << t-tBuf[Bufptr] << " " << ID << endl;
+          ID= p->gD * ( cmd->V - cmdBuf[Bufptr] - post->V + VBuf[Bufptr] )/(t-tBuf[Bufptr]);
+          cerr << cmd->V - cmdBuf[Bufptr] << " " << post->V-VBuf[Bufptr] << " " << ID << endl;
           out->I+= ID;
           Bufptr++;
           if (Bufptr >= BufMax) Bufptr= 0;
