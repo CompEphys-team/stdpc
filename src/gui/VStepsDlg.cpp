@@ -62,9 +62,15 @@ void VStepsDlg::exportData()
     VStepsProxy::p[idx].inst.clear();
     VStepsProxy::p[idx].inst.reserve(1);
     inst.active = 1;
-    // thre is no inChn, so these are not relevant
-    inst.inChn.chnlSaving = false;
-    inst.inChn.bias = 0.0;
+
+    // outChn is the input to the model - this is not used.
+    inst.outChn.active = false;
+
+    // inChn is the output from the model; save by default
+    // Other channel properties are not used by the model.
+    inst.inChn.active = true;
+    inst.inChn.chnlSaving = true;
+
     VStepsProxy::p[idx].inst.push_back(inst);
 
     emit channelsChanged();
