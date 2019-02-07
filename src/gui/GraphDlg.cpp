@@ -91,6 +91,7 @@ void GraphDlg::growTable(bool reactive)
 {
     disconnect(activec);
     disconnect(typec);
+    disconnect(unitc);
     disconnect(channelc);
 
     if ( reactive && !actives.empty() )
