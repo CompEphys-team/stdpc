@@ -45,7 +45,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MyMainWindow::TabChanged);
      
      connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
      connect(ui->actionExport_Log, SIGNAL(triggered()), this, SLOT(ExportLog()));
      connect(ui->actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
      connect(ui->actionLoad_Protocol, SIGNAL(triggered()), this, SLOT(LoadProtocol()));
@@ -259,30 +258,17 @@ void MyMainWindow::importData()
 
 void MyMainWindow::SaveConfig()
 {
-  ui->DAQTable->exportData();
-
   ofstream os("StdpC.conf");
-  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
-
-  for ( DAQProxy *proxy : DeviceManager::Register() )
-      for ( AP *ap : proxy->coreAPs() )
-          ap->write(os);
-
+  DoSaveProtocol(os);
   os.close();
 }
 
 void MyMainWindow::LoadConfig()
 {
     ifstream is("StdpC.conf");
-    if ( readProtocol(is) )
-        ui->DAQTable->importData();
-    else
-        DisplayMessage(QString("No valid config file found; reverting to standard settings"));
+    if ( !DoLoadProtocol(is) )
+        DisplayMessage(QString("No valid config file found; reverting to default settings"));
     is.close();
-
-    // special Sample-and-Hold for Attila
-    SampleHoldp.active= false;
-    SampleHoldp.threshV= 0.0;
 }
 
 void MyMainWindow::SaveProtocol()
@@ -294,6 +280,12 @@ void MyMainWindow::SaveProtocol()
       fname.append(".cpr");
 
   ofstream os(fname.toLatin1());
+  DoSaveProtocol(os);
+  os.close();
+}
+
+void MyMainWindow::DoSaveProtocol(ofstream &os)
+{
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
   exportData();
@@ -301,8 +293,6 @@ void MyMainWindow::SaveProtocol()
   for ( auto const& ap : AP::params() ) {
       ap->write(os);
   }
-
-  os.close();
 }
 
 
@@ -314,10 +304,21 @@ void MyMainWindow::LoadProtocol()
 
   ifstream is(fname.toLatin1());
   if (!is.good()) {
-    DisplayMessage(QString("Error opening Protocol file"));
+    DisplayMessage(QString("Error opening protocol file"));
     return;
   }
 
+  bool ret = DoLoadProtocol(is);
+  is.close();
+
+  if ( ret )
+      loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
+  else
+      DisplayMessage(QString("Error reading protocol file"));
+}
+
+bool MyMainWindow::DoLoadProtocol(ifstream &is)
+{
   // Clear params before loading
   Models.clear();
   Devices.clear();
@@ -328,12 +329,11 @@ void MyMainWindow::LoadProtocol()
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
       return false;
   };
-  readProtocol(is, &callback);
-  is.close();
+  bool ret = readProtocol(is, &callback);
 
   importData();
 
-  loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
+  return ret;
 }
 
 

@@ -66,6 +66,8 @@ class MyMainWindow : public QMainWindow
 
     Ui::MainWindow *ui;
 
+    void DoSaveProtocol(ofstream&);
+    bool DoLoadProtocol(ifstream&);
 }; 
 
 #endif
