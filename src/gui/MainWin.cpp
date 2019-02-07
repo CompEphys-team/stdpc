@@ -182,6 +182,11 @@ void MyMainWindow::StartButClicked()
   while (!DCT->finished) Sleep(100);
   exportData();
 
+  QPalette pal = palette();
+  pal.setColor(QPalette::Background, QColor(255,140,0));
+  ui->controlPanel->setAutoFillBackground(true);
+  ui->controlPanel->setPalette(pal);
+
   if ( !ui->graphtab->startPlotting(DCT) )
       ui->tabWidget->setTabEnabled(1, false);
   if ( !ui->performancetab->startPlotting(DCT) )
@@ -212,6 +217,7 @@ void MyMainWindow::StopButClicked()
   ui->performancetab->stopPlotting();
   ui->tabWidget->setTabEnabled(1, true);
   ui->tabWidget->setTabEnabled(2, true);
+  ui->controlPanel->setPalette(palette());
 }
 
 void MyMainWindow::TabChanged(int idx)
