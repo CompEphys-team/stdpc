@@ -66,7 +66,9 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/PerformanceMonitor.ui \
     $$PWD/src/gui/GraphWidget.ui \
     $$PWD/src/gui/SynapticNoiseDlg.ui \
-    $$PWD/src/gui/TriggerDlg.ui
+    $$PWD/src/gui/TriggerDlg.ui \
+    $$PWD/src/gui/VoltageClampDlg.ui \
+    $$PWD/src/gui/VStepsDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -138,7 +140,11 @@ HEADERS += \
     $$PWD/src/include/GraphWidget.h \
     $$PWD/src/include/SynapticNoise.h \
     $$PWD/src/include/SynapticNoiseDlg.h \
-    $$PWD/src/include/TriggerDlg.h
+    $$PWD/src/include/TriggerDlg.h \
+    $$PWD/src/include/VoltageClampDlg.h \
+    $$PWD/src/include/VoltageClamp.h \
+    $$PWD/src/include/VStepsDlg.h \
+    $$PWD/src/include/VSteps.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -203,7 +209,11 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/GraphWidget.cpp \
     $$PWD/src/models/SynapticNoise.cpp \
     $$PWD/src/gui/SynapticNoiseDlg.cpp \
-    $$PWD/src/gui/TriggerDlg.cpp
+    $$PWD/src/gui/TriggerDlg.cpp \
+    $$PWD/src/gui/VoltageClampDlg.cpp \
+    $$PWD/src/models/VoltageClamp.cpp \
+    $$PWD/src/gui/VStepsDlg.cpp \
+    $$PWD/src/models/VSteps.cpp
 
 digidata {
     mingw {
