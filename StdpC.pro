@@ -1,5 +1,8 @@
 # StdpC project file #
 
+# To enable DigiData support, uncoment the following line (requires mingw)
+#CONFIG += digidata
+
 # To enable NI support, uncomment the following line (requires NIDAQmx 15.5.1 or newer)
 # If NIDAQmx is detected, this has no effect.
 #CONFIG += nidaqmx
@@ -202,16 +205,20 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/SynapticNoiseDlg.cpp \
     $$PWD/src/gui/TriggerDlg.cpp
 
-mingw {
-    LIBS += $$PWD/staticlib/pt_ioctl_tn.a
-    FORMS += $$PWD/src/gui/DigiDataDlg.ui
-    HEADERS += $$PWD/src/include/DigiData.h \
-        $$PWD/src/include/DigiDataDlg.h \
-        $$PWD/src/include/Pt_ioctl_tn.h \
-        $$PWD/src/include/PortTalkX_IOCTL.h
-    SOURCES += $$PWD/src/drivers/DigiData.cpp \
-        $$PWD/src/gui/DigiDataDlg.cpp
-    DEFINES += DIGIDATA_PT
+digidata {
+    mingw {
+        LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+        FORMS += $$PWD/src/gui/DigiDataDlg.ui
+        HEADERS += $$PWD/src/include/DigiData.h \
+            $$PWD/src/include/DigiDataDlg.h \
+            $$PWD/src/include/Pt_ioctl_tn.h \
+            $$PWD/src/include/PortTalkX_IOCTL.h
+        SOURCES += $$PWD/src/drivers/DigiData.cpp \
+            $$PWD/src/gui/DigiDataDlg.cpp
+        DEFINES += DIGIDATA_PT
+    } else {
+        message("Digidata is not supported in msvc build.")
+    }
 }
 
 NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
