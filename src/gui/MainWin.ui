@@ -449,11 +449,6 @@
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionConfig">
-   <property name="text">
-    <string>Config</string>
-   </property>
-  </action>
   <action name="actionLoad_Protocol">
    <property name="text">
     <string>Load Protocol</string>
@@ -479,29 +474,9 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionDAQ">
-   <property name="text">
-    <string>DAQ</string>
-   </property>
-  </action>
   <action name="actionAbout">
    <property name="text">
     <string>About StdpC</string>
-   </property>
-  </action>
-  <action name="actionInput_channels">
-   <property name="text">
-    <string>Input channels</string>
-   </property>
-  </action>
-  <action name="actionOutput_channels">
-   <property name="text">
-    <string>Output channels</string>
-   </property>
-  </action>
-  <action name="actionSave_config">
-   <property name="text">
-    <string>Save config</string>
    </property>
   </action>
   <action name="actionExport_Log">
@@ -514,30 +489,9 @@
     <string>Clear Log</string>
    </property>
   </action>
-  <action name="actionElectrode_setup">
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Electrode setup</string>
-   </property>
-  </action>
   <action name="actionData_saving">
    <property name="text">
     <string>Data saving</string>
-   </property>
-  </action>
-  <action name="actionHH_models">
-   <property name="text">
-    <string>Hodgkin-Huxley models</string>
-   </property>
-  </action>
-  <action name="actionData_display">
-   <property name="text">
-    <string>Data display</string>
    </property>
   </action>
   <action name="actionStart_trigger">

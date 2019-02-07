@@ -169,7 +169,6 @@ void MyMainWindow::StartButClicked()
   ui->actionUnload_Script->setEnabled(false);
   ui->actionExport_Log->setEnabled(false);
   ui->actionExit->setEnabled(false);
-  ui->actionSave_config->setEnabled(false);
   ui->menuConfigure->setEnabled(false);
   ui->cbDatasaving->setEnabled(false);
   ui->cbTrigger->setEnabled(false);
@@ -199,7 +198,6 @@ void MyMainWindow::StopButClicked()
   ui->actionUnload_Script->setEnabled(DCT->scripting);
   ui->actionExport_Log->setEnabled(true);
   ui->actionExit->setEnabled(true);
-  ui->actionSave_config->setEnabled(true);
   ui->menuConfigure->setEnabled(true);
   ui->cbDatasaving->setEnabled(true);
   ui->cbTrigger->setEnabled(true);
