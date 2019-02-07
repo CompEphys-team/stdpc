@@ -11,6 +11,14 @@ ModelProxy *VStepsPrototype::proxy() const { return prox; }
 ModelPrototype *VStepsProxy::createPrototype(size_t modelID) { return new VStepsPrototype(modelID); }
 ModelDlg *VStepsProxy::createDialog(size_t modelID, QWidget *parent) { return new VStepsDlg(modelID, parent); }
 
+VStepsData::VStepsData()
+{
+    // Ensure the single instance is correctly set up. None of these values have any reason to change at runtime.
+    inst.active = true;
+    inst.inChn.active = true;
+    inst.outChn.active = false;
+}
+
 VStepsProxy::VStepsProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);

@@ -43,6 +43,7 @@ void VStepsDlg::importData()
     ui->tStepE->setText(num);
     num.setNum(VStepsProxy::p[idx].tHold*1e3);
     ui->tHoldE->setText(num);
+    ui->cbSave->setChecked(VStepsProxy::p[idx].inst.inChn.chnlSaving);
 }
 
 
@@ -56,21 +57,7 @@ void VStepsDlg::exportData()
     VStepsProxy::p[idx].t0= ui->t0E->text().toDouble()*1e-3;
     VStepsProxy::p[idx].tStep= ui->tStepE->text().toDouble()*1e-3;
     VStepsProxy::p[idx].tHold= ui->tHoldE->text().toDouble()*1e-3;
-    // automatically create one instance
-    vInstData inst;
-    VStepsProxy::p[idx].inst.clear();
-    VStepsProxy::p[idx].inst.reserve(1);
-    inst.active = 1;
-
-    // outChn is the input to the model - this is not used.
-    inst.outChn.active = false;
-
-    // inChn is the output from the model; save by default
-    // Other channel properties are not used by the model.
-    inst.inChn.active = true;
-    inst.inChn.chnlSaving = true;
-
-    VStepsProxy::p[idx].inst.push_back(inst);
+    VStepsProxy::p[idx].inst.inChn.chnlSaving = ui->cbSave->isChecked();
 
     emit channelsChanged();
     emit modelStatusChanged();

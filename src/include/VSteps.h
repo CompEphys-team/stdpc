@@ -13,10 +13,12 @@ struct VStepsData : public ModelData {
   double t0;
   double tStep;
   double tHold;
-  std::vector<vInstData> inst;
+  vInstData inst;
 
-  inline vInstData &instance(size_t i) { return inst[i]; }
-  inline size_t numInst() const { return inst.size(); }
+  inline vInstData &instance(size_t) { return inst; }
+  inline size_t numInst() const { return 1; }
+
+  VStepsData();
 };
 
 class VStepsProxy : public ModelProxy {
