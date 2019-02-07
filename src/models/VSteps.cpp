@@ -17,6 +17,7 @@ VStepsData::VStepsData()
     inst.active = true;
     inst.inChn.active = true;
     inst.outChn.active = false;
+    inst.outChn.chnlSaving = false;
 }
 
 VStepsProxy::VStepsProxy()
