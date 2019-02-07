@@ -24,7 +24,11 @@ VoltageClampProxy::VoltageClampProxy()
     addAP("VoltageClamp[#].assign[#].OutSynChannel", &p, &VoltageClampData::assign, &SynapseAssignment::OutSynChannel);
     addAP("VoltageClamp[#].assign[#].save", &p, &VoltageClampData::assign, &SynapseAssignment::save);
 
-    // TODO
+    addAP("VoltageClamp[#].gP", &p, &VoltageClampData::gP);
+    addAP("VoltageClamp[#].gI", &p, &VoltageClampData::gI);
+    addAP("VoltageClamp[#].gD", &p, &VoltageClampData::gD);
+    addAP("VoltageClamp[#].decayI", &p, &VoltageClampData::decayI);
+    addAP("VoltageClamp[#].tstepD", &p, &VoltageClampData::tstepD);
 }
 
 

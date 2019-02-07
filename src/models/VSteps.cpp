@@ -22,8 +22,16 @@ VStepsData::VStepsData()
 VStepsProxy::VStepsProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);
-
-    // TODO: APs
+    addAP("VSteps[#].active", &VStepsProxy::p, &VStepsData::active);
+    addAP("VSteps[#].label", &VStepsProxy::p, &VStepsData::label);
+    addAP("VSteps[#].holdV", &VStepsProxy::p, &VStepsData::holdV);
+    addAP("VSteps[#].startV", &VStepsProxy::p, &VStepsData::startV);
+    addAP("VSteps[#].endV", &VStepsProxy::p, &VStepsData::endV);
+    addAP("VSteps[#].deltaV", &VStepsProxy::p, &VStepsData::deltaV);
+    addAP("VSteps[#].t0", &VStepsProxy::p, &VStepsData::t0);
+    addAP("VSteps[#].tStep", &VStepsProxy::p, &VStepsData::tStep);
+    addAP("VSteps[#].tHold", &VStepsProxy::p, &VStepsData::tHold);
+    addAP("VSteps[#].inst.inChn.save", &VStepsProxy::p, &VStepsData::inst, &vInstData::inChn, &inChnData::chnlSaving);
 }
 
 VSteps::VSteps(ModelPrototype *parent, size_t instID, DCThread *DCT) :
