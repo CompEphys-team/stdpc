@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>212</width>
-    <height>293</height>
+    <width>218</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>NIDAQ Setup</string>
+   <string>Voltage stepper</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="1">
