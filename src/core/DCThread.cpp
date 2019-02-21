@@ -176,7 +176,8 @@ void DCThread::setup_and_go()
        }
    }
 
-   start();
+   Priority prio[] = {NormalPriority, HighPriority, HighestPriority, TimeCriticalPriority};
+   start(prio[ClampThreadPriority]);
 }
 
 void DCThread::run()

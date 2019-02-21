@@ -243,6 +243,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   Triggerp.active = ui->cbTrigger->isChecked();
   Settlingp.active = ui->cbSettle->isChecked();
   Settlingp.duration = ui->dblSettleDuration->value();
+  ClampThreadPriority = ui->threadPriority->currentIndex();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
   emit channelsChanged();
@@ -259,6 +260,7 @@ void MyMainWindow::importData()
   ui->cbTrigger->setChecked(Triggerp.active);
   ui->cbSettle->setChecked(Settlingp.active);
   ui->dblSettleDuration->setValue(Settlingp.duration);
+  ui->threadPriority->setCurrentIndex(ClampThreadPriority);
   ui->graphtab->importData();
   ui->performancetab->importData();
   updateStartButton();

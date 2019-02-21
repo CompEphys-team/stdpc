@@ -60,6 +60,9 @@ void initAP()
     // Settling
     addAP("Settlingp.active", &Settlingp, &SettlingData::active);
     addAP("Settlingp.duration", &Settlingp, &SettlingData::duration);
+
+    // Thread priority
+    addAP("ClampThreadPriority", &ClampThreadPriority);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)

@@ -24,8 +24,6 @@ class DCThread : public QThread
 private:
      DataSaver *dataSaver;
 
-     inline void start(Priority pr = TimeCriticalPriority) { QThread::start(pr); }
-
  public:
      DCThread();
      virtual ~DCThread();

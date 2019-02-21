@@ -43,26 +43,6 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="0" column="0">
-            <widget class="QPushButton" name="StartBut">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Start</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="QPushButton" name="StopBut">
              <property name="minimumSize">
@@ -83,13 +63,6 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="cbTrigger">
-             <property name="text">
-              <string>Triggered start</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="1">
             <widget class="QCheckBox" name="cbDatasaving">
              <property name="text">
@@ -97,10 +70,37 @@
              </property>
             </widget>
            </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="cbTrigger">
+             <property name="text">
+              <string>Triggered start</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="0">
             <widget class="QCheckBox" name="cbSettle">
              <property name="text">
               <string>Settle for/until</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="StartBut">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Start</string>
              </property>
             </widget>
            </item>
@@ -118,6 +118,40 @@
              <property name="maximum">
               <double>99.998999999999995</double>
              </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Clamp thread priority</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="threadPriority">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>Normal</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>High</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Highest</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Time-critical</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

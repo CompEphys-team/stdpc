@@ -16,6 +16,7 @@ SampleHoldData SampleHoldp;
 
 TriggerData Triggerp;
 SettlingData Settlingp;
+int ClampThreadPriority = 1;
 
 // LU tables
 tanhLUtable tanhLU;
