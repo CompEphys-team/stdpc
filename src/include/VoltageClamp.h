@@ -9,6 +9,8 @@ struct VoltageClampData : public SynapseData {
     double gD;
     double decayI;
     int tstepD;
+    double easeIn = 0;
+    double easeInAmpLimit = 0;
 };
 
 class VoltageClampProxy : public SynapseProxy {
@@ -39,9 +41,11 @@ class VoltageClamp : public Synapse {
   private:
     const VoltageClampData *p;
     const SynapseAssignment *a;
+    DCThread *DCT;
     
   protected:
-    double I;
+    bool active;
+    double I, Imin, Imax;
     double IP, II, ID;
     double cmdAvg, postAvg, denom;
     vector<double> VBuf, cmdBuf, tBuf;

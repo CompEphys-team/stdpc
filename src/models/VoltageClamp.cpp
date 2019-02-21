@@ -29,13 +29,20 @@ VoltageClampProxy::VoltageClampProxy()
     addAP("VoltageClamp[#].gD", &p, &VoltageClampData::gD);
     addAP("VoltageClamp[#].decayI", &p, &VoltageClampData::decayI);
     addAP("VoltageClamp[#].tstepD", &p, &VoltageClampData::tstepD);
+    addAP("VoltageClamp[#].easeIn", &p, &VoltageClampData::easeIn);
+    addAP("VoltageClamp[#].easeInAmpLimit", &p, &VoltageClampData::easeInAmpLimit);
 }
 
 
-VoltageClamp::VoltageClamp(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out) :
+VoltageClamp::VoltageClamp(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
     Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
+    DCT(DCT),
+    active(true),
+    I(0.),
+    Imin(0.),
+    Imax(0.),
     IP(0.),
     II(0.),
     ID(0.),
@@ -53,7 +60,7 @@ VoltageClamp::VoltageClamp(size_t condID, size_t assignID, size_t multiID, DCThr
 
 void VoltageClamp::step(double t, double, bool settling)
 {
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active ) {
+  if ( !active || !p->active || !a->active || !pre->active || !post->active || !out->active ) {
       m_conductance = 0;
       return;
   }
@@ -71,13 +78,27 @@ void VoltageClamp::step(double t, double, bool settling)
       }
       else {
           IP= p->gP * (pre->V - post->V);
-          out->I+= IP;
           II= p->gI * (cmdAvg - postAvg)/denom;
-          out->I+= II;
           ID= p->gD * ( pre->V - cmdBuf[Bufptr] - post->V + VBuf[Bufptr] )/(t-tBuf[Bufptr]);
-          out->I+= ID;
           Bufptr++;
           if (Bufptr >= BufMax) Bufptr= 0;
+          I = IP + II + ID;
+
+          if ( t < p->easeIn ) {
+              I *= t/p->easeIn;
+              if ( p->easeInAmpLimit > 0 ) {
+                  if ( I < Imin )
+                      Imin = I;
+                  if ( I > Imax )
+                      Imax = I;
+                  if ( Imax - Imin > p->easeInAmpLimit ) {
+                      DCT->message("Voltage clamp disabled due to excess current amplitude.");
+                      active = false;
+                      I = 0;
+                  }
+              }
+          }
+          out->I += I;
       }
   }
 }

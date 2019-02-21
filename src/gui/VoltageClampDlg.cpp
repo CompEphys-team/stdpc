@@ -48,6 +48,9 @@ void VoltageClampDlg::exportData()
   p.decayI= decayE->text().toDouble();
   p.tstepD= tDE->text().toInt();
 
+  p.easeIn = easeIn->text().toDouble();
+  p.easeInAmpLimit = easeInAmpLimit->text().toDouble() * 1e-9;
+
   assignments->exportData(p.assign);
 }
 
@@ -66,6 +69,11 @@ void VoltageClampDlg::importData()
   decayE->setText(num);
   num.setNum(p.tstepD);
   tDE->setText(num);
+
+  num.setNum(p.easeIn);
+  easeIn->setText(num);
+  num.setNum(p.easeInAmpLimit*1e9);
+  easeInAmpLimit->setText(num);
 
   assignments->importData(p.assign);
 }
