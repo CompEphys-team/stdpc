@@ -487,8 +487,8 @@ void DCThread::run()
    for ( auto const& m : Models.active() )
        m->reset();
 
-   finished= true;
    emit done();
+   finished= true;
 }
 
 

@@ -179,7 +179,11 @@ void MyMainWindow::StartButClicked()
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
-  while (!DCT->finished) Sleep(100);
+  if (!DCT->finished) {
+      Sleep(10);
+      emit ui->StartBut->clicked();
+      return;
+  }
   exportData();
 
   QPalette pal = palette();
