@@ -68,7 +68,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/SynapticNoiseDlg.ui \
     $$PWD/src/gui/TriggerDlg.ui \
     $$PWD/src/gui/VoltageClampDlg.ui \
-    $$PWD/src/gui/VStepsDlg.ui
+    $$PWD/src/gui/VStepsDlg.ui \
+    $$PWD/src/gui/WireDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -144,7 +145,9 @@ HEADERS += \
     $$PWD/src/include/VoltageClampDlg.h \
     $$PWD/src/include/VoltageClamp.h \
     $$PWD/src/include/VStepsDlg.h \
-    $$PWD/src/include/VSteps.h
+    $$PWD/src/include/VSteps.h \
+    $$PWD/src/include/Wire.h \
+    $$PWD/src/include/WireDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -213,7 +216,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/VoltageClampDlg.cpp \
     $$PWD/src/models/VoltageClamp.cpp \
     $$PWD/src/gui/VStepsDlg.cpp \
-    $$PWD/src/models/VSteps.cpp
+    $$PWD/src/models/VSteps.cpp \
+    $$PWD/src/models/Wire.cpp \
+    src/gui/WireDlg.cpp
 
 digidata {
     mingw {
