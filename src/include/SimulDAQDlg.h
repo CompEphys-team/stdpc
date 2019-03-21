@@ -20,6 +20,7 @@ private slots:
      void on_OutputFileB_clicked();
 
 protected:
+     bool change;
      void backup();
      void restoreBackup();
 

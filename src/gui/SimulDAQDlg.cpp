@@ -10,6 +10,7 @@ SimulDAQDlg::SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
   connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
   connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
   setIndex(idx);
+  change= false;
 }
 
 void SimulDAQDlg::setIndex(size_t no)
@@ -20,7 +21,6 @@ void SimulDAQDlg::setIndex(size_t no)
 
 void SimulDAQDlg::exportData(bool forceInit)
 {
-  bool change= false;
   uint inChnNo = SimulDAQProxy::p[idx].inChn.size(), outChnNo = SimulDAQProxy::p[idx].outChn.size();
   getEntry(inChnNo, inChannelE->text().toUInt(), change);
   getEntry(outChnNo, outChannelE->text().toUInt(), change);
@@ -40,6 +40,7 @@ void SimulDAQDlg::exportData(bool forceInit)
   getEntry(SimulDAQProxy::p[idx].rewindAfterSettling, cbRewind->isChecked(), change);
 
   DAQDlg::exportData(change || forceInit);
+  change= false;
 }
 
 void SimulDAQDlg::importData()
@@ -72,13 +73,17 @@ void SimulDAQDlg::restoreBackup()
 void SimulDAQDlg::on_InputFileB_clicked()
 {
     QString file = QFileDialog::getOpenFileName(this, "Select input file...", InputFileE->text());
-    if ( !file.isEmpty() )
+    if ( !file.isEmpty() ) {
         InputFileE->setText(file);
+        change= true;
+    }
 }
 
 void SimulDAQDlg::on_OutputFileB_clicked()
 {
     QString file = QFileDialog::getSaveFileName(this, "Select input file...", OutputFileE->text());
-    if ( !file.isEmpty() )
+    if ( !file.isEmpty() ) {
         OutputFileE->setText(file);
+        change= true;
+    }
 }
