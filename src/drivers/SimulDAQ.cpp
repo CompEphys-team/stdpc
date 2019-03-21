@@ -291,6 +291,7 @@ void SimulDAQ::rewind()
     for (int i= 0; i < inChnNo; i++) {
       inIter[i]= inq[i].begin();
     }
+    intIter++;   // the t iterator needs to be one step ahead so that channel values of the current step are applied
     inT= *intIter;
   }
 }
