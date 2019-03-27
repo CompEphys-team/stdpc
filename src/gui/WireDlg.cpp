@@ -15,11 +15,10 @@ WireDlg::WireDlg(int no, QWidget *parent)
      ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
      ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
-     QVector<AssignmentCellBase<SynapseAssignment>*> vec;
-     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PreSynChannel, "Input channel", 95, in));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PostSynChannel, "\"post\" channel", 95, in));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::OutSynChannel, "Output channel", 95, out));
+     QVector<AssignmentCellBase<CurrentAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "Input channel", 200, in));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "Output channel", 200, out));
      assignments->init(vec);
 }
 
@@ -42,6 +41,7 @@ void WireDlg::exportData()
 {
   WireData &p = WireProxy::p[idx];
   p.label = leLabel->text();
+  p.factor = leFactor->text().toDouble() * 1e-6;
 
   assignments->exportData(p.assign);
 }
@@ -50,7 +50,9 @@ void WireDlg::importData()
 {
   WireData &p = WireProxy::p[idx];
   leLabel->setText(p.label);
-  QString num;   
+  QString num;
+  num.setNum(p.factor * 1e6);
+  leFactor->setText(num);
 
   assignments->importData(p.assign);
 }

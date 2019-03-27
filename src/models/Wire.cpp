@@ -7,9 +7,8 @@ static WireProxy *prox = WireProxy::get();
 std::vector<WireData> WireProxy::p;
 WireProxy *Wire::proxy() const { return prox; }
 ConductanceDlg *WireProxy::createDialog(size_t condID, QWidget *parent) { return new WireDlg(condID, parent); }
-Synapse *WireProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
-                                    inChannel *pre, inChannel *post, outChannel *out) {
-    return new Wire(conductanceID, assignID, multiID, DCT, pre, post, out);
+IonicCurrent *WireProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
+    return new Wire(conductanceID, assignID, multiID, in, out);
 }
 
 WireProxy::WireProxy()
@@ -18,27 +17,23 @@ WireProxy::WireProxy()
     addAP("Wire[#].active", &p, &WireData::active);
     addAP("Wire[#].activeSettling", &p, &WireData::activeSettling);
     addAP("Wire[#].label", &p, &WireData::label);
-    addAP("Wire[#].assign[#].active", &p, &WireData::assign, &SynapseAssignment::active);
-    addAP("Wire[#].assign[#].PreSynChannel", &p, &WireData::assign, &SynapseAssignment::PreSynChannel);
-    addAP("Wire[#].assign[#].PostSynChannel", &p, &WireData::assign, &SynapseAssignment::PostSynChannel);
-    addAP("Wire[#].assign[#].OutSynChannel", &p, &WireData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("Wire[#].assign[#].active", &p, &WireData::assign, &CurrentAssignment::active);
+    addAP("Wire[#].assign[#].VChannel", &p, &WireData::assign, &CurrentAssignment::VChannel);
+    addAP("Wire[#].assign[#].IChannel", &p, &WireData::assign, &CurrentAssignment::IChannel);
+    addAP("Wire[#].factor", &p, &WireData::factor);
 }
 
 
-Wire::Wire(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
-    Synapse(condID, assignID, multiID, pre, nullptr, out),
+Wire::Wire(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
+    IonicCurrent(condID, assignID, multiID, in, out),
     p(&params()),
-    a(&assignment()),
-    DCT(DCT),
-    active(true)
+    a(&assignment())
 {
 }
 
-void Wire::step(double, double, bool)
+void Wire::step(double, double, bool settling)
 {
- // if ( !active || !p->active || !a->active || !pre->active || !out->active ) {
- //     m_conductance = 0;
- //     return;
- // }
-  out->I += pre->V*1e-6;
+    if ( p->active && a->active && in->active && out->active && (!settling || p->activeSettling) ) {
+        out->I += in->V * p->factor;
+    }
 }

@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Global_func.h"
-#include "Synapse.h"
+#include "IonicCurrent.h"
 
-struct WireData : public SynapseData {
+struct WireData : public CurrentData {
+    double factor = 1e-6;
 };
 
-class WireProxy : public SynapseProxy {
+class WireProxy : public IonicCurrentProxy {
 private:
     WireProxy();
 public:
@@ -22,26 +23,24 @@ public:
     inline QString conductanceClass() { return "Wire"; }
     inline QString prettyName() { return "Pass Wire"; }
 
-    Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
-                            inChannel *pre, inChannel *post, outChannel *out);
+    IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
+                                 inChannel *in, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
 
     static std::vector<WireData> p;
 };
 
-class Wire : public Synapse {
+class Wire : public IonicCurrent {
   private:
     const WireData *p;
-    const SynapseAssignment *a;
-    DCThread *DCT;
-    
-  protected:
-    bool active;
+    const CurrentAssignment *a;
         
   public:
-    Wire(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
+    Wire(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
     inline const WireData &params() const { return WireProxy::p[condID]; }
+
+    virtual void RK4(double, double, size_t, bool) {}
     void step(double t, double dt, bool settling);
 
     WireProxy *proxy() const;
