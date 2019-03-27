@@ -8,7 +8,7 @@ IonicCurrent::IonicCurrent(size_t condID, size_t assignID, size_t multiID, inCha
 {
 }
 
-void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, std::vector<Conductance *> &preD, std::vector<Conductance *> &inD, std::vector<Conductance *> &)
+void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, std::vector<Conductance *> &preD, std::vector<Conductance *> &inD, std::vector<Conductance *> &postD)
 {
     const CurrentAssignment &a = param(condID).assignment(assignID);
     size_t multi = 0;
@@ -21,13 +21,16 @@ void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DC
                 inD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
             }
         }
-    } else { // NOTE: These channels are assumed to be analog only, although technically, a/d combos are permitted
+    } else {
         for ( ChannelIndex VChan : DCT->getChanIndices(a.VChannel) ) {
             for ( ChannelIndex IChan : DCT->getChanIndices(a.IChannel) ) {
                 inChannel *inC = DCT->getInChan(VChan);
                 outChannel *outC = DCT->getOutChan(IChan);
                 if ( inC && outC ) {
-                    preD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
+                    if ( VChan.isVirtual && IChan.isAnalog )
+                        postD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
+                    else
+                        preD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
                 }
             }
         }
