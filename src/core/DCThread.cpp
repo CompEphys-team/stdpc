@@ -332,7 +332,6 @@ void DCThread::run()
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
          for ( Conductance *c : Conductances.preDigital() )
              c->step(t, dt, settling);
-
          // Dynamic clamp: models (d2d currents)
          if ( Models.active().size() ) { // Runge-Kutta 4
              for ( auto const& m : Models.active() )
