@@ -67,8 +67,10 @@ public:
     static QMap<QString, ConductanceProxy*> &Register() { static QMap<QString, ConductanceProxy*> r; return r; } //!< All conductances
     static QMap<QString, ConductanceProxy*> &Synapses() { static QMap<QString, ConductanceProxy*> r; return r; } //!< Synapse subset
     static QMap<QString, ConductanceProxy*> &Currents() { static QMap<QString, ConductanceProxy*> r; return r; } //!< Current subset
+    static QMap<QString, ConductanceProxy*> &Tools() { static QMap<QString, ConductanceProxy*> r; return r; } //!< Tool subset
     static inline void RegisterSynapse(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Synapses()[proxy->conductanceClass()] = proxy; }
     static inline void RegisterCurrent(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Currents()[proxy->conductanceClass()] = proxy; }
+    static inline void RegisterTool(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Tools()[proxy->conductanceClass()] = proxy; }
 
 private:
     std::vector<Conductance *> preD, inD, postD;

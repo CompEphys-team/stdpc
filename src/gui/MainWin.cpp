@@ -26,6 +26,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
          prototypes.push_back(new ComponentPrototype(proxy));
      ui->synapseTable->init(prototypes);
 
+     prototypes.clear();
+     for ( ConductanceProxy *proxy : ConductanceManager::Tools() )
+         prototypes.push_back(new ComponentPrototype(proxy));
+     ui->toolsTable->init(prototypes);
+
      QVector<DaqOptsPrototypeBase*> dprot;
      for ( DAQProxy *proxy : DeviceManager::Register() )
          dprot.push_back(new DaqOptsPrototype(proxy));
@@ -69,6 +74,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
      connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
      connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
+
+     connect(ui->ToolsActivate, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(activateAll()));
+     connect(ui->ToolsDeactivate, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(deactivateAll()));
+     connect(ui->ToolsClear, &QPushButton::clicked, [=](){ui->toolsTable->importData(true);});
+     connect(ui->ToolsReset, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(importData()));
 
      connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
    
@@ -236,6 +246,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
 {
   ui->synapseTable->exportData();
   ui->currentTable->exportData();
+  ui->toolsTable->exportData();
   ui->DAQTable->exportData(ignoreDAQ);
   DSDlg->exportData();
   dataSavingPs.enabled = ui->cbDatasaving->isChecked();
@@ -254,6 +265,7 @@ void MyMainWindow::importData()
   ui->DAQTable->importData();
   ui->synapseTable->importData();
   ui->currentTable->importData();
+  ui->toolsTable->importData();
   DSDlg->importData();
   ui->cbDatasaving->setChecked(dataSavingPs.enabled);
   TrigDlg->importData();

@@ -14,7 +14,7 @@ Synapse *VoltageClampProxy::createAssigned(size_t conductanceID, size_t assignID
 
 VoltageClampProxy::VoltageClampProxy()
 {
-    ConductanceManager::RegisterSynapse(this);
+    ConductanceManager::RegisterTool(this);
     addAP("VoltageClamp[#].active", &p, &VoltageClampData::active);
     addAP("VoltageClamp[#].activeSettling", &p, &VoltageClampData::activeSettling);
     addAP("VoltageClamp[#].label", &p, &VoltageClampData::label);

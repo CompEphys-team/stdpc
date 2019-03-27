@@ -12,7 +12,7 @@ IonicCurrent *SynapticNoiseProxy::createAssigned(size_t conductanceID, size_t as
 
 SynapticNoiseProxy::SynapticNoiseProxy()
 {
-    ConductanceManager::RegisterCurrent(this);
+    ConductanceManager::RegisterTool(this);
 
     addAP("SynapticNoisep[#].active", &p, &SynapticNoiseData::active);
     addAP("SynapticNoisep[#].activeSettling", &p, &SynapticNoiseData::activeSettling);

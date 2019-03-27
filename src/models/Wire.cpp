@@ -13,7 +13,7 @@ IonicCurrent *WireProxy::createAssigned(size_t conductanceID, size_t assignID, s
 
 WireProxy::WireProxy()
 {
-    ConductanceManager::RegisterSynapse(this);
+    ConductanceManager::RegisterTool(this);
     addAP("Wire[#].active", &p, &WireData::active);
     addAP("Wire[#].activeSettling", &p, &WireData::activeSettling);
     addAP("Wire[#].label", &p, &WireData::label);
