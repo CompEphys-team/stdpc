@@ -14,7 +14,7 @@ class DataSavingDlg : public QDialog, private Ui::DataSavingDlg
     Q_OBJECT
 
 public:
-    DataSavingDlg(QWidget *parent = 0);
+    DataSavingDlg(QWidget *parent = nullptr);
     ~DataSavingDlg();
     void exportData();
     void importData();

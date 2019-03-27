@@ -15,7 +15,7 @@ class ChannelListModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    explicit ChannelListModel(int displayFlags, QObject *parent = 0);
+    explicit ChannelListModel(int displayFlags, QObject *parent = nullptr);
 
     enum ChannelType {
         Blank =      1,
@@ -38,6 +38,7 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
+    using QAbstractListModel::index; // squelch -Woverloaded-virtual
     int index(const ChannelIndex &dex) const;
     QModelIndex index(const ChannelIndex &dex, ChannelType type) const;
 

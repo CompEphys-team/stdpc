@@ -9,7 +9,7 @@ class ComponentTable : public QTableWidget
     Q_OBJECT
 
 public:
-    ComponentTable(QWidget *parent = 0);
+    ComponentTable(QWidget *parent = nullptr);
     ~ComponentTable();
 
     void init(QVector<ComponentPrototype *> prototypes);

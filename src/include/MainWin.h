@@ -25,7 +25,7 @@ class MyMainWindow : public QMainWindow
     void closeEvent(QCloseEvent *event);
 
   public:
-     MyMainWindow(QWidget *parent= 0);
+     MyMainWindow(QWidget *parent= nullptr);
      virtual ~MyMainWindow();
      void exportData(bool ignoreDAQ = false);
      void importData();

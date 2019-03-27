@@ -285,7 +285,7 @@ void GraphWidget::replot()
     QCPRange range = plots[0]->graph()->getKeyRange(rangeFound);
 
     bool settlingEnded = false;
-    double settlingOffset;
+    double settlingOffset = 0;
 
     DataPoint point {0., 0.};
 

@@ -13,12 +13,12 @@ class SynapticNoiseDlg : public ConductanceDlg
     Q_OBJECT
 
 public:
-    explicit SynapticNoiseDlg(int idx, QWidget *parent = 0);
+    explicit SynapticNoiseDlg(size_t idx, QWidget *parent = nullptr);
     ~SynapticNoiseDlg();
 
     void importData();
     void exportData();
-    void setIndex(int);
+    void setIndex(size_t);
 
 private slots:
     void on_buttonBox_clicked(QAbstractButton *button);

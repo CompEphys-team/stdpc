@@ -12,7 +12,7 @@ class AssignmentWidgetQ : public QTableWidget
 {
     Q_OBJECT
 public:
-    explicit AssignmentWidgetQ(QWidget *parent = 0) : QTableWidget(parent) {}
+    explicit AssignmentWidgetQ(QWidget *parent = nullptr) : QTableWidget(parent) {}
     ~AssignmentWidgetQ() {}
 
 protected slots:
@@ -24,7 +24,7 @@ template <class Assignment>
 class AssignmentWidget : public AssignmentWidgetQ
 {
 public:
-    AssignmentWidget(QWidget *parent = 0) : AssignmentWidgetQ(parent) {}
+    AssignmentWidget(QWidget *parent = nullptr) : AssignmentWidgetQ(parent) {}
     ~AssignmentWidget()
     {
         for ( AssignmentCellBase<Assignment> *d : cell )

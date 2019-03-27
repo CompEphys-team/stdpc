@@ -10,10 +10,10 @@ class HHDlg : public ConductanceDlg, private Ui::HHDlg
      Q_OBJECT
 
   public:
-     HHDlg(int, QWidget *parent= 0);
+     HHDlg(size_t, QWidget *parent= nullptr);
      void exportData();
      void importData();
-     void setIndex(int);
+     void setIndex(size_t);
 private slots:
      void on_buttonBox_clicked(QAbstractButton *button);
 };

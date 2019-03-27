@@ -13,10 +13,10 @@ class ChemSynDlg : public ConductanceDlg, private Ui::ChemSynDlg
      Q_OBJECT
 
   public:
-     ChemSynDlg(int, QWidget *parent= 0);
+     ChemSynDlg(size_t, QWidget *parent= nullptr);
      void exportData();
      void importData();
-     void setIndex(int);
+     void setIndex(size_t);
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;

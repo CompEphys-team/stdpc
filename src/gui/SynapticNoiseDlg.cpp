@@ -2,7 +2,7 @@
 #include "ui_SynapticNoiseDlg.h"
 #include "SynapticNoise.h"
 
-SynapticNoiseDlg::SynapticNoiseDlg(int idx, QWidget *parent) :
+SynapticNoiseDlg::SynapticNoiseDlg(size_t idx, QWidget *parent) :
     ConductanceDlg(idx, parent),
     ui(new Ui::SynapticNoiseDlg)
 {
@@ -24,7 +24,7 @@ SynapticNoiseDlg::~SynapticNoiseDlg()
     delete ui;
 }
 
-void SynapticNoiseDlg::setIndex(int no)
+void SynapticNoiseDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     ui->DlgLabel->setText(QString("%1 %2").arg(SynapticNoiseProxy::get()->prettyName()).arg(no));

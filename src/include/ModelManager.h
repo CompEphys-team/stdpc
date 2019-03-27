@@ -33,6 +33,8 @@ public:
 
     /// Create a new model dialog
     virtual ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr) = 0;
+
+    virtual ~ModelProxy() = default;
 };
 
 

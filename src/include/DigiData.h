@@ -131,7 +131,6 @@ class DigiData: public DAQ
    short int ADCDAC_status; 
    short int reset_control;     
    bool portsOpen;
-   double t;
             
   public:
     DigiData(size_t devID, DAQProxy *proxy);

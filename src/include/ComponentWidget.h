@@ -20,7 +20,7 @@ private:
     Ui::ComponentFactoryWidget *ui;
 
 public:
-    explicit ComponentFactoryWidget(QWidget *parent = 0);
+    explicit ComponentFactoryWidget(QWidget *parent = nullptr);
     ~ComponentFactoryWidget();
 
     QComboBox *&combo;
@@ -35,7 +35,7 @@ private:
     Ui::ComponentWidget *ui;
 
 public:
-    explicit ComponentWidget(QWidget *parent = 0);
+    explicit ComponentWidget(QWidget *parent = nullptr);
     ~ComponentWidget();
 
     QLabel *&label;

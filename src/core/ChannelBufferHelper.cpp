@@ -137,7 +137,7 @@ void ChannelBufferHelper::rewind()
 
 size_t ChannelBufferHelper::getHandle(double duration)
 {
-    size_t handle;
+    size_t handle = 0;
 
     // Expand t buffer
     size_t reqSize = requiredSize(duration);

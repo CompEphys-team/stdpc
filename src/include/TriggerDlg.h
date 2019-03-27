@@ -12,7 +12,7 @@ class TriggerDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit TriggerDlg(QWidget *parent = 0);
+    explicit TriggerDlg(QWidget *parent = nullptr);
     ~TriggerDlg();
     void exportData();
     void importData();

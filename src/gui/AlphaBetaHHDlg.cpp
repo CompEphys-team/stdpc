@@ -2,7 +2,7 @@
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
-AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
+AlphaBetaHHDlg::AlphaBetaHHDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
   setupUi(this);
@@ -19,7 +19,7 @@ AlphaBetaHHDlg::AlphaBetaHHDlg(int no, QWidget *parent)
   assignments->init(vec);
 }
 
-void AlphaBetaHHDlg::setIndex(int no)
+void AlphaBetaHHDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     HHDlgLabel->setText(QString("%1 %2").arg(abHHProxy::get()->prettyName()).arg(no));

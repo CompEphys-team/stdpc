@@ -77,7 +77,7 @@ public:
     inline void restoreCurrent(double) {}
 
     inline ModelData &params() const { return VStepsProxy::p[modelID]; }
-    inline ModelProxy *proxy() const;
+    ModelProxy *proxy() const;
     inline QString prefix() const { return "VStep"; }
 };
 

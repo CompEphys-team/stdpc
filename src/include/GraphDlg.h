@@ -73,7 +73,7 @@ private slots:
     void on_removePlot_clicked();
 
 public:
-     GraphDlg(QWidget *parent = 0);
+     GraphDlg(QWidget *parent = nullptr);
      ~GraphDlg();
 
      inline void setPlot(int g, bool deleteOnClose) { m_plot = g; m_delete = deleteOnClose; }

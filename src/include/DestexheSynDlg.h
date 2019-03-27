@@ -13,10 +13,10 @@ class DestexheSynDlg : public ConductanceDlg, private Ui::DestexheSynDlg
      Q_OBJECT
 
   public:
-     DestexheSynDlg(int, QWidget *parent= 0);
+     DestexheSynDlg(size_t, QWidget *parent= nullptr);
      void exportData();
      void importData();
-     void setIndex(int);
+     void setIndex(size_t);
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;

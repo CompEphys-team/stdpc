@@ -351,7 +351,7 @@ void Calibrator::Calibration(double injCalLen, double sampRate, int fullKLen, in
     // Create current input
     int sample;
     double rnd;
-    srand((unsigned) time(NULL));
+    srand((unsigned) time(nullptr));
     currents[0] = 0.0;  // To be able to neglect the first high jitter in the sampling times
     for (sample=1; sample<numberOfSamples-fullKerLen; sample++){
         rnd = 2*(((double) rand())/RAND_MAX-0.5);     // Random number in [-1, 1]

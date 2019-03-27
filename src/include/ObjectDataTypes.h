@@ -1,13 +1,13 @@
 #ifndef OBJECTDATATYPES_H
 #define OBJECTDATATYPES_H
 
-using namespace std;
-
 #include <QString>
 #include <iostream>
 #include <QColor>
 #include "ChannelIndex.h"
 #include "Util.h"
+
+using namespace std;
 
 struct AssignmentData {
     bool active;
@@ -40,6 +40,7 @@ struct ConductanceData {
     virtual const AssignmentData &assignment(size_t i) const = 0;
     virtual size_t numAssignments() const = 0;
     ConductanceData() : active(false) {}
+    virtual ~ConductanceData() = default;
 };
 
 struct SynapseData : public ConductanceData {
@@ -225,6 +226,7 @@ struct ModelData {
     virtual vInstData &instance(size_t i) = 0;
     virtual size_t numInst() const = 0;
     ModelData() : active(false) {}
+    virtual ~ModelData() = default;
 };
 
 struct TriggerData {

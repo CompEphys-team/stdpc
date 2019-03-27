@@ -10,7 +10,7 @@ class SimulDAQDlg : public DAQDlg, private Ui::SimulDAQDlg
     Q_OBJECT
 
 public:
-     SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     SimulDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent= nullptr);
      void exportData(bool forceInit = false);
      void importData();
      void setIndex(size_t);

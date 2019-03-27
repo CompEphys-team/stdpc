@@ -83,13 +83,10 @@ inline double abHH::mhFunc(double x, int thetype)
    switch (thetype) {
     case 0:
          return x/((*theExp)(x)-1.0);
-         break;
     case 1:
          return (*theExp)(x);
-         break;
     case 2:
          return (*theExpSigmoid)(x);
-         break;
    }
    return 0.0;
 }

@@ -197,7 +197,7 @@ void DCThread::run()
    double tFull[tDepth] = {}, tComp[tDepth] = {};
    double sumTFull = 0., sumTComp = 0.;
    int tFullOff = 0, tCompOff = 0;
-   double meanTComp, meanDT;
+   double meanTComp=0, meanDT=1;
    double subDT, subT, tLoop;
    int nSubsteps;
 
@@ -251,7 +251,7 @@ void DCThread::run()
      if ( settling && (
               (Settlingp.duration > 0 && t > Settlingp.duration) // Timed wake
               || wakeFromSettling // Manual wake
-              || triggerDev && triggerDev->triggerFired()) ) { // Triggered wake
+              || (triggerDev && triggerDev->triggerFired())) ) { // Triggered wake
          t = 0.0;
          rateCounter = 0;
          lastRateReport = 0;
@@ -602,5 +602,3 @@ void DCThread::UnloadScript()
   scripting= false;
   message(QString("script unloaded"));
 }
-
-

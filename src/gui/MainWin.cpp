@@ -2,7 +2,7 @@
 #include "ui_MainWin.h"
 #include "LUtables.h"
 #include "AP.h"
-#include <windows.h>
+#include <Windows.h>
 #include <QScrollBar>
 #include "ModelOpts.h"
 #include "DaqOpts.h"
@@ -138,7 +138,6 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
         DisplayMessage(QString("Bad news: %1 not found or not opened successfully!").arg(name));
         break;
     case DeviceStatus::Inactive :
-    default:
         break;
     }
 
@@ -377,7 +376,7 @@ void MyMainWindow::doExportLog(QString fname)
   
   while (!done) {
     it= ui->MessageWindow->item(i);
-    if (it != NULL) {
+    if (it != nullptr) {
       os << it->text().toStdString() << endl;
     }
     else done= 1;

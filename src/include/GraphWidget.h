@@ -18,7 +18,7 @@ class GraphWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit GraphWidget(QWidget *parent = 0);
+    explicit GraphWidget(QWidget *parent = nullptr);
     ~GraphWidget();
 
     struct DataPoint { double t; double value; };

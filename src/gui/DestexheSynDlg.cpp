@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "DestexheSyn.h"
 
-DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
+DestexheSynDlg::DestexheSynDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
@@ -34,7 +34,7 @@ DestexheSynDlg::DestexheSynDlg(int no, QWidget *parent)
      assignments->init(vec);
 }
 
-void DestexheSynDlg::setIndex(int no)
+void DestexheSynDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     QString lb = QString("%1 %2").arg(DestexheSynProxy::get()->prettyName()).arg(no);

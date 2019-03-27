@@ -18,7 +18,7 @@ class STDelegate : public QStyledItemDelegate
     Q_OBJECT
 
 public:
-    STDelegate(QObject *parent = 0) : QStyledItemDelegate(parent) {}
+    STDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
     ~STDelegate() {}
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,
@@ -38,7 +38,7 @@ class SpikeGenDlg : public ModelDlg
     Q_OBJECT
 
 public:
-    explicit SpikeGenDlg(size_t idx, QWidget *parent = 0);
+    explicit SpikeGenDlg(size_t idx, QWidget *parent = nullptr);
     ~SpikeGenDlg();
 
     void importData();

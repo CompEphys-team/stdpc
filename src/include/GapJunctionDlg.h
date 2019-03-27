@@ -10,10 +10,10 @@ class GapJunctionDlg : public ConductanceDlg, private Ui::GapJunctionDlg
      Q_OBJECT
 
   public:
-     GapJunctionDlg(int, QWidget *parent= 0);
+     GapJunctionDlg(size_t, QWidget *parent= nullptr);
      void exportData();
      void importData();
-     void setIndex(int);
+     void setIndex(size_t);
 private slots:
      void on_buttonBox_clicked(QAbstractButton *button);
 };

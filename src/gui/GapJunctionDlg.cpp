@@ -1,7 +1,7 @@
 #include "GapJunction.h"
 #include "GapJunctionDlg.h"
 
-GapJunctionDlg::GapJunctionDlg(int no, QWidget *parent)
+GapJunctionDlg::GapJunctionDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
@@ -41,7 +41,7 @@ void GapJunctionDlg::importData()
   assignments->importData(p.assign);
 }
 
-void GapJunctionDlg::setIndex(int no)
+void GapJunctionDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     gapJunctDlgLabel->setText(QString("%1 %2").arg(GapJunctionProxy::get()->prettyName()).arg(no));

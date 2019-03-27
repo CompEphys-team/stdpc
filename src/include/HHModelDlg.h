@@ -14,7 +14,7 @@ class HHModelDlg : public ModelDlg
     Q_OBJECT
 
 public:
-    explicit HHModelDlg(size_t idx, QWidget *parent = 0);
+    explicit HHModelDlg(size_t idx, QWidget *parent = nullptr);
     ~HHModelDlg();
 
     void importData();

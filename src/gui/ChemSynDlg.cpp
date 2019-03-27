@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "ChemSyn.h"
 
-ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
+ChemSynDlg::ChemSynDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
@@ -35,7 +35,7 @@ ChemSynDlg::ChemSynDlg(int no, QWidget *parent)
      assignments->init(vec);
 }
 
-void ChemSynDlg::setIndex(int no)
+void ChemSynDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     QString lb = QString("%1 %2").arg(ChemSynProxy::get()->prettyName()).arg(no);

@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "AbSyn.h"
 
-abSynDlg::abSynDlg(int no, QWidget *parent)
+abSynDlg::abSynDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
@@ -34,7 +34,7 @@ abSynDlg::abSynDlg(int no, QWidget *parent)
      assignments->init(vec);
 }
 
-void abSynDlg::setIndex(int no)
+void abSynDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     QString lb = QString("%1 %2").arg(abSynProxy::get()->prettyName()).arg(no);

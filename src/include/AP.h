@@ -99,6 +99,8 @@ public:
 
     static inline std::vector<std::unique_ptr<AP>> &params() { static std::vector<std::unique_ptr<AP>> p; return p; }
 
+    virtual ~AP() = default;
+
 protected:
     AP(QString &name) : _name(name) {}
     QString _name;
@@ -322,7 +324,7 @@ public:
         // Replace existing indices in order
         QString tName(target->name());
         QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
-        int offset, i = 0;
+        int offset = 0, i = 0;
         while ( it.hasNext() && (offset = tName.indexOf('#')) > 0 ) {
             if ( i++ < nIgnore )
                 tName.replace(offset, 1, '0');

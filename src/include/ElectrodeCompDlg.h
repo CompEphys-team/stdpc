@@ -32,7 +32,7 @@ class ElectrodeCompDlg : public QDialog
     public:                
         Calibrator calibrator;
 
-        ElectrodeCompDlg(elecCalibParams &p, ChannelIndex dex, QWidget *parent = 0);
+        ElectrodeCompDlg(elecCalibParams &p, ChannelIndex dex, QWidget *parent = nullptr);
         ~ElectrodeCompDlg();
         void exportData();
         void importData();

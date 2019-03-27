@@ -34,8 +34,8 @@ public:
     inline QString modelClass() { return "HH"; }
     inline QString prettyName() { return "HH Model"; }
 
-    inline ModelPrototype *createPrototype(size_t modelID);
-    inline ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
+    ModelPrototype *createPrototype(size_t modelID);
+    ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
 
     static std::vector<HHNeuronData> p;
 };

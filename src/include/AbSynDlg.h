@@ -13,10 +13,10 @@ class abSynDlg : public ConductanceDlg, private Ui::abSynDlg
      Q_OBJECT
 
   public:
-     abSynDlg(int, QWidget *parent= 0);
+     abSynDlg(size_t, QWidget *parent= nullptr);
      void exportData();
      void importData();
-     void setIndex(int);
+     void setIndex(size_t);
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;

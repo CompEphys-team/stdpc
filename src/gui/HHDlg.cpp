@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include "HH.h"
 
-HHDlg::HHDlg(int no, QWidget *parent)
+HHDlg::HHDlg(size_t no, QWidget *parent)
      : ConductanceDlg(no, parent)
  {
      setupUi(this);
@@ -19,7 +19,7 @@ HHDlg::HHDlg(int no, QWidget *parent)
      assignments->init(vec);
 }
 
-void HHDlg::setIndex(int no)
+void HHDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
     HHDlgLabel->setText(QString("%1 %2").arg(HHProxy::get()->prettyName()).arg(no));

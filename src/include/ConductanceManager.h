@@ -34,6 +34,8 @@ public:
 
     /// Create a new conductance dialog
     virtual ConductanceDlg *createDialog(size_t conductanceID, QWidget *parent=nullptr) = 0;
+
+    virtual ~ConductanceProxy() = default;
 };
 
 

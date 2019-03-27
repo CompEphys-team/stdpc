@@ -16,7 +16,7 @@ class PerformanceMonitor : public QWidget
     Q_OBJECT
 
 public:
-    explicit PerformanceMonitor(QWidget *parent = 0);
+    explicit PerformanceMonitor(QWidget *parent = nullptr);
     ~PerformanceMonitor();
 
     struct DataPoint {
