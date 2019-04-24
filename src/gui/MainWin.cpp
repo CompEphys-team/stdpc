@@ -16,28 +16,6 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      DSDlg= new DataSavingDlg(this);
      TrigDlg= new TriggerDlg(this);
 
-     QVector<ComponentPrototype *> prototypes;
-     for ( ConductanceProxy *proxy : ConductanceManager::Currents() )
-         prototypes.push_back(new ComponentPrototype(proxy));
-     ui->currentTable->init(prototypes);
-
-     prototypes.clear();
-     for ( ConductanceProxy *proxy : ConductanceManager::Synapses() )
-         prototypes.push_back(new ComponentPrototype(proxy));
-     ui->synapseTable->init(prototypes);
-
-     prototypes.clear();
-     for ( ConductanceProxy *proxy : ConductanceManager::Tools() )
-         prototypes.push_back(new ComponentPrototype(proxy));
-     ui->toolsTable->init(prototypes);
-
-     QVector<DaqOptsPrototypeBase*> dprot;
-     for ( DAQProxy *proxy : DeviceManager::Register() )
-         dprot.push_back(new DaqOptsPrototype(proxy));
-     for ( ModelProxy *proxy : ModelManager::Register() )
-         dprot.push_back(new ModelOptsPrototype(proxy));
-     ui->DAQTable->init(dprot, this);
-
      rateIndicator = new QLabel("Ready");
      ui->statusbar->addPermanentWidget(rateIndicator);
      loadedProtocolStatus = new QLabel("");
@@ -65,22 +43,32 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      connect(this, &MyMainWindow::modelRemoved, &ChannelListModel::updateChns_static);
      connect(this, &MyMainWindow::channelsChanged, TrigDlg, &TriggerDlg::updateChannels);
 
-     connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
-     connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
-     connect(ui->HHClear, &QPushButton::clicked, [=](){ui->currentTable->importData(true);});
-     connect(ui->HHReset, SIGNAL(clicked(bool)), ui->currentTable, SLOT(importData()));
+     QTreeWidgetItem *hDAQ = new QTreeWidgetItem(ui->treeWidget);
+     hDAQ->setText(0, "Data sources");
+     QTreeWidgetItem *bDAQ = new QTreeWidgetItem(hDAQ);
+     DAQ_tree_item = new TreeWidgetItem_DataSources(this);
+     ui->treeWidget->setItemWidget(bDAQ, 0, DAQ_tree_item);
 
-     connect(ui->SynActivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(activateAll()));
-     connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
-     connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
-     connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
+     QTreeWidgetItem *hTools = new QTreeWidgetItem(ui->treeWidget, hDAQ);
+     hTools->setText(0, "Tools");
+     QTreeWidgetItem *bTools = new QTreeWidgetItem(hTools);
+     TreeWidgetItem_Models *box = new TreeWidgetItem_Models(ConductanceManager::Tools());
+     ui->treeWidget->setItemWidget(bTools, 0, box);
+     model_tree_items.push_back(box);
 
-     connect(ui->ToolsActivate, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(activateAll()));
-     connect(ui->ToolsDeactivate, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(deactivateAll()));
-     connect(ui->ToolsClear, &QPushButton::clicked, [=](){ui->toolsTable->importData(true);});
-     connect(ui->ToolsReset, SIGNAL(clicked(bool)), ui->toolsTable, SLOT(importData()));
+     QTreeWidgetItem *hSynapses = new QTreeWidgetItem(ui->treeWidget, hTools);
+     hSynapses->setText(0, "Synapses");
+     QTreeWidgetItem *bSynapses = new QTreeWidgetItem(hSynapses);
+     box = new TreeWidgetItem_Models(ConductanceManager::Synapses());
+     ui->treeWidget->setItemWidget(bSynapses, 0, box);
+     model_tree_items.push_back(box);
 
-     connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
+     QTreeWidgetItem *hCurrents = new QTreeWidgetItem(ui->treeWidget, hSynapses);
+     hCurrents->setText(0, "Ionic conductances");
+     QTreeWidgetItem *bCurrents = new QTreeWidgetItem(hCurrents);
+     box = new TreeWidgetItem_Models(ConductanceManager::Currents());
+     ui->treeWidget->setItemWidget(bCurrents, 0, box);
+     model_tree_items.push_back(box);
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(DCT, &DCThread::updateRate, [this](int rate){
@@ -183,7 +171,7 @@ void MyMainWindow::StartButClicked()
   ui->cbTrigger->setEnabled(false);
   ui->cbSettle->setEnabled(false);
   ui->dblSettleDuration->setEnabled(false);
-  ui->DAQTable->setEnabled(false);
+  DAQ_tree_item->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
@@ -221,7 +209,7 @@ void MyMainWindow::StopButClicked()
   ui->cbTrigger->setEnabled(true);
   ui->cbSettle->setEnabled(true);
   ui->dblSettleDuration->setEnabled(true);
-  ui->DAQTable->setEnabled(true);
+  DAQ_tree_item->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
@@ -243,10 +231,9 @@ void MyMainWindow::TabChanged(int idx)
 
 void MyMainWindow::exportData(bool ignoreDAQ)
 {
-  ui->synapseTable->exportData();
-  ui->currentTable->exportData();
-  ui->toolsTable->exportData();
-  ui->DAQTable->exportData(ignoreDAQ);
+  DAQ_tree_item->exportData(ignoreDAQ);
+  for ( TreeWidgetItem_Models *box : model_tree_items )
+      box->exportData();
   DSDlg->exportData();
   dataSavingPs.enabled = ui->cbDatasaving->isChecked();
   TrigDlg->exportData();
@@ -261,10 +248,9 @@ void MyMainWindow::exportData(bool ignoreDAQ)
  
 void MyMainWindow::importData()
 {
-  ui->DAQTable->importData();
-  ui->synapseTable->importData();
-  ui->currentTable->importData();
-  ui->toolsTable->importData();
+  DAQ_tree_item->importData();
+  for ( TreeWidgetItem_Models *box : model_tree_items )
+      box->importData();
   DSDlg->importData();
   ui->cbDatasaving->setChecked(dataSavingPs.enabled);
   TrigDlg->importData();

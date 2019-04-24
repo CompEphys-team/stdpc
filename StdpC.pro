@@ -69,7 +69,9 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/TriggerDlg.ui \
     $$PWD/src/gui/VoltageClampDlg.ui \
     $$PWD/src/gui/VStepsDlg.ui \
-    $$PWD/src/gui/WireDlg.ui
+    $$PWD/src/gui/WireDlg.ui \
+    src/gui/treewidgetitem_datasources.ui \
+    src/gui/treewidgetitem_models.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -147,7 +149,9 @@ HEADERS += \
     $$PWD/src/include/VStepsDlg.h \
     $$PWD/src/include/VSteps.h \
     $$PWD/src/include/Wire.h \
-    $$PWD/src/include/WireDlg.h
+    $$PWD/src/include/WireDlg.h \
+    src/include/treewidgetitem_datasources.h \
+    src/include/treewidgetitem_models.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -218,7 +222,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/VStepsDlg.cpp \
     $$PWD/src/models/VSteps.cpp \
     $$PWD/src/models/Wire.cpp \
-    src/gui/WireDlg.cpp
+    src/gui/WireDlg.cpp \
+    src/gui/treewidgetitem_datasources.cpp \
+    src/gui/treewidgetitem_models.cpp
 
 digidata {
     mingw {

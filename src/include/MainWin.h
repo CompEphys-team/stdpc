@@ -12,6 +12,8 @@
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
 #include "DCThread.h"
+#include "treewidgetitem_datasources.h"
+#include "treewidgetitem_models.h"
 
 namespace Ui {
 class MainWindow;
@@ -65,6 +67,9 @@ class MyMainWindow : public QMainWindow
     QLabel *rateIndicator;
 
     Ui::MainWindow *ui;
+
+    TreeWidgetItem_DataSources *DAQ_tree_item;
+    std::vector<TreeWidgetItem_Models*> model_tree_items;
 
     void DoSaveProtocol(ofstream&);
     bool DoLoadProtocol(ifstream&);
