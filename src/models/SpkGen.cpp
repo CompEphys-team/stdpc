@@ -57,7 +57,7 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     p(static_cast<const SGData *>(&(parent->params()))),
     instp(static_cast<const SgInstData *>(&params())),
     V(p->VRest),
-    bdChn(DCT->getInChan(instp->bdChannel)),
+    bdChn(nullptr),
     SGactive(p->bdType == 0),
     burstDetected(false),
     tOverThresh(0.),
@@ -80,6 +80,11 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
         theExp= &expFunc;
         theTanh= &tanhFunc;
     }
+}
+
+void SpkGen::setBdChn(DCThread *DCT)
+{
+    bdChn = DCT->getInChan(instp->bdChannel);
 }
 
 void SpkGen::RK4(double t, double dt, size_t n, bool settling)
@@ -234,4 +239,11 @@ void SpkGenPrototype::init(DCThread *DCT)
     for ( size_t i = 0; i < params().numInst(); i++ )
         if ( params().instance(i).active )
             inst.emplace_back(new SpkGen(this, i, DCT));
+}
+
+void SpkGenPrototype::post_init(DCThread *DCT)
+{
+    for ( auto ptr : inst ) {
+        static_cast<SpkGen*>(ptr.get())->setBdChn(DCT);
+    }
 }

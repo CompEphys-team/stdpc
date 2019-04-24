@@ -66,6 +66,8 @@ public:
     void update(double t, double dt);
     void RK4(double, double, size_t, bool settling);
 
+    void setBdChn(DCThread *DCT);
+
 protected:
     const SGData * const p;
     const SgInstData * const instp;
@@ -98,6 +100,7 @@ public:
     ~SpkGenPrototype() {}
 
     void init(DCThread *);
+    void post_init(DCThread *);
 
     // Override processing on unused Model::out
     inline void retainCurrent(double) {}

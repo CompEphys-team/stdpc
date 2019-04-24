@@ -64,6 +64,9 @@ public:
     /// Prepare for action: Populate inst with newly constructed Models
     virtual void init(DCThread *) = 0;
 
+    /// Post-init call for any additional setup that requires other models to be present
+    virtual void post_init(DCThread *) {}
+
     /// Return a reference to the specific parameter set used for this model
     virtual ModelData &params() const = 0;
 

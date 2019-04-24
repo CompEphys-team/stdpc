@@ -4,6 +4,8 @@ void ModelManager::initActive(DCThread *DCT)
 {
     for ( std::shared_ptr<ModelPrototype> &m : activeModels )
         m->init(DCT);
+    for ( std::shared_ptr<ModelPrototype> &m : activeModels )
+        m->post_init(DCT);
 }
 
 void ModelManager::clear()
