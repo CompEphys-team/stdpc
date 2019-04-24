@@ -56,12 +56,13 @@ ChemSynProxy::ChemSynProxy()
     addAP("CSynp[#].activeSettling", &p, &CSynData::activeSettling);
     addAP("CSynp[#].label", &p, &CSynData::label);
     addAP("CSynp[#].LUTables", &p, &CSynData::LUTables);
-    addAP("CSynp[#].MgBlock", &p, &CSynData::MgBlock);
+
     addAP("CSynp[#].gSyn", &p, &CSynData::gSyn);
     addAP("CSynp[#].VSyn", &p, &CSynData::VSyn);
     addAP("CSynp[#].tauSyn", &p, &CSynData::tauSyn);
     addAP("CSynp[#].VThresh", &p, &CSynData::VThresh);
     addAP("CSynp[#].VSlope", &p, &CSynData::VSlope);
+
     addAP("CSynp[#].STD", &p, &CSynData::STD);
     addAP("CSynp[#].STDAmpl", &p, &CSynData::STDAmpl);
     addAP("CSynp[#].STDVThresh", &p, &CSynData::STDVThresh);
@@ -70,10 +71,19 @@ ChemSynProxy::ChemSynProxy()
     addAP("CSynp[#].STDtau0", &p, &CSynData::STDtau0);
     addAP("CSynp[#].STDtauVThresh", &p, &CSynData::STDtauVThresh);
     addAP("CSynp[#].STDtauVSlope", &p, &CSynData::STDtauVSlope);
+
     addAP("CSynp[#].fixVpost", &p, &CSynData::fixVpost);
     addAP("CSynp[#].Vpost", &p, &CSynData::Vpost);
+
+    addAP("CSynp[#].MgBlock", &p, &CSynData::MgBlock);
     addAP("CSynp[#].Mgfac", &p, &CSynData::Mgfac);
     addAP("CSynp[#].Mgexpo", &p, &CSynData::Mgexpo);
+
+    addAP("CSynp[#].stochastic", &p, &CSynData::stochastic);
+    addAP("CSynp[#].stoch_nRel", &p, &CSynData::stoch_nRel);
+    addAP("CSynp[#].stoch_pRel", &p, &CSynData::stoch_pRel);
+    addAP("CSynp[#].stoch_variance", &p, &CSynData::stoch_variance);
+
     addAP("CSynp[#].Plasticity", &p, &CSynData::Plasticity);
     addAP("CSynp[#].assign[#].active", &p, &CSynData::assign, &SynapseAssignment::active);
     addAP("CSynp[#].assign[#].PreSynChannel", &p, &CSynData::assign, &SynapseAssignment::PreSynChannel);
@@ -143,9 +153,24 @@ void ChemSyn::step(double t, double dt, bool settling)
 
     double preV = buffered ? pre->getBufferedV(bufferHandle) : pre->V;
 
-    if (preV > p->VThresh)
-      Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
-    else Sinf= 0.0;
+    if (preV > p->VThresh) {
+        Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
+        if ( p->stochastic && !spike ) {
+            spike = true;
+            int nRel = RNG.variate<int, std::binomial_distribution>(p->stoch_nRel, p->stoch_pRel);
+            if ( nRel > 0 ) {
+                stochastic_factor = RNG.variate<double>(nRel, nRel * std::sqrt(p->stoch_variance)) / (p->stoch_nRel * p->stoch_pRel);
+                if ( stochastic_factor < 0 )
+                    stochastic_factor = 0;
+            } else {
+                stochastic_factor = 0;
+            }
+        }
+    } else {
+        Sinf= 0.0;
+        if ( spike )
+            spike = false;
+    }
 
     if(p->STD){
       // Linear Euler:
@@ -178,6 +203,9 @@ void ChemSyn::step(double t, double dt, bool settling)
         ODElearn(dt);
         break;
     }
+
+    if ( p->stochastic )
+        m_conductance *= stochastic_factor;
 
     if ( !settling || p->activeSettling )
         out->I += m_conductance * (p->VSyn - postV);

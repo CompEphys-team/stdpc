@@ -23,7 +23,6 @@ class ChemSynDlg : public ConductanceDlg, private Ui::ChemSynDlg
      
   public slots:
      void PlastMethodChange();
-     void STDComboChange();
      void ResCloseClicked(QAbstractButton *);
 }; 
 

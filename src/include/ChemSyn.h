@@ -27,6 +27,11 @@ struct CSynData : public SynapseData {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
+
+  bool stochastic = false;
+  int stoch_nRel = 5;
+  double stoch_pRel = 0.6;
+  double stoch_variance = 0.05;
 };
 
 class ChemSynProxy : public SynapseProxy {
@@ -84,6 +89,9 @@ class ChemSyn : public Synapse
     double D;  // "depression var" in ODE STDP
     double Pslope; // slope of the sigmoid for P
     double Dslope; // slope of the sigmoid for D
+
+    bool spike = false;
+    double stochastic_factor = 1.0;
 
   public:
     ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
