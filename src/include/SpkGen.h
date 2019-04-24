@@ -80,13 +80,13 @@ protected:
     double tUnderThresh;
     bool onThreshold;
     int burstNo;
-    double ISI_time;
     double period;
+    double epoch;
     bool initial;
     bool active;
 
     double spkOffsetCutoff;
-    std::vector<double>::const_iterator spkOffset;
+    std::vector<double>::const_iterator spkIterator;
 
     double VSpike(double t);
 };

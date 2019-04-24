@@ -64,8 +64,8 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     tUnderThresh(0.),
     onThreshold(false),
     burstNo(0),
-    ISI_time(0.),
     period(p->period),
+    epoch(0.),
     initial(true),
     active(true)
 {
@@ -99,12 +99,10 @@ void SpkGen::update(double t, double dt)
         return;
 
     if (initial) {
-        ISI_time = t;
-        spkOffset = p->SpikeT[burstNo].begin();
+        epoch = t;
+        spkIterator = p->SpikeT[burstNo].begin();
         spkOffsetCutoff = 100.0 / p->spkTimeScaling;
         initial = false;
-    } else {
-        ISI_time += dt;
     }
 
     if (p->bdType > 0 && !SGactive && bdChn ) { // taking care of the burst detection options
@@ -117,8 +115,8 @@ void SpkGen::update(double t, double dt)
                     SGactive = true;
                     tUnderThresh = 0.;
                     burstDetected = false;
-                    ISI_time = 0.0;
                     period = p->SpikeT[burstNo].back() + (20.0/p->spkTimeScaling);
+                    epoch = t;
                 }
             } else if ( p->bdtOverCont ) {
                 if ( !onThreshold &&
@@ -161,23 +159,23 @@ void SpkGen::update(double t, double dt)
         // in account all the spikes (superimposing) the voltage due to each spike
         V = 0.0;
 
-        // Advance spike offset iterator to only consider spikes starting after t-spkWidth
-        while ( *spkOffset < t - spkOffsetCutoff && spkOffset < p->SpikeT[burstNo].end() )
-            ++spkOffset;
+        // Advance spike iterator to only consider spikes starting after t-spkWidth
+        while ( epoch + *spkIterator < t - spkOffsetCutoff && spkIterator != p->SpikeT[burstNo].end() )
+            ++spkIterator;
 
         // Compute contributory voltage only from spikes in [t-spkWidth, t+spkWidth]
-        for ( auto spkIt = spkOffset; spkIt < p->SpikeT[burstNo].end() && *spkIt < t + spkOffsetCutoff; ++spkIt )
+        for ( auto spkIt = spkIterator; spkIt != p->SpikeT[burstNo].end() && *spkIt < t + spkOffsetCutoff; ++spkIt )
             if ( *spkIt > 0 )
-                V += VSpike((ISI_time - *spkIt) * p->spkTimeScaling);
+                V += VSpike((t - epoch - *spkIt) * p->spkTimeScaling);
 
         V *= p->VSpike;
         V += p->VRest;
 
-        if (ISI_time > period) {
+        if (t > epoch + period) {
             if (p->bdType > 0) {
                 SGactive = false;
             } else {
-                ISI_time -= (period = p->period);
+                epoch = t;
             }
             if ( ++burstNo == (int)p->SpikeT.size() ) {
                 if ( p->loopBursts ) {
@@ -188,7 +186,7 @@ void SpkGen::update(double t, double dt)
                     active = false;
                 }
             }
-            spkOffset = p->SpikeT[burstNo].begin();
+            spkIterator = p->SpikeT[burstNo].begin();
         }
     } else {
         V = p->VRest;
