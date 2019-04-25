@@ -154,18 +154,26 @@ void ChemSyn::step(double t, double dt, bool settling)
 
     // calculate synaptic current
     if ( p->stochastic ) {
-        S = 0.0;
-        for ( int i = stoch_S.size()-1; i >= 0; i-- ) {
-            tmp = (stoch_Smax[i] - stoch_Sinf[i]) * p->tauSyn;
-            stoch_S[i] += (stoch_Sinf[i] - stoch_S[i]) / tmp * dt;
-            clip(stoch_S[i], stoch_Smax[i]);
-            S += stoch_S[i];
+        if ( stoch_S.empty() ) {
+            S = 0.0;
+        } else {
+            // Last active PSP
+            tmp = (1.0 - Sinf) * p->tauSyn;
+            stoch_S.back() += (Sinf - stoch_S.back()) / tmp * dt;
+            clip(stoch_S.back(), 1.0);
+            S = stoch_S.back() * stoch_amplitude.back();
 
-            // Prune decayed
-            if ( !spike && stoch_S[i] < 1e-6 ) {
-                stoch_S.erase(stoch_S.begin() + i);
-                stoch_Sinf.erase(stoch_Sinf.begin() + i);
-                stoch_Smax.erase(stoch_Smax.begin() + i);
+            // Older decaying PSPs (note, Sinf==0 for these)
+            for ( int i = stoch_S.size()-2; i >= 0; i-- ) {
+                stoch_S[i] +=  -stoch_S[i] / p->tauSyn * dt;
+                clip(stoch_S[i], 1.0);
+                S += stoch_S[i] * stoch_amplitude[i];
+
+                // Prune decayed
+                if ( stoch_S[i] < 1e-6 ) {
+                    stoch_S.erase(stoch_S.begin() + i);
+                    stoch_amplitude.erase(stoch_amplitude.begin() + i);
+                }
             }
         }
     } else {
@@ -186,22 +194,15 @@ void ChemSyn::step(double t, double dt, bool settling)
                     double Smax = RNG.variate<double>(nRel, nRel * std::sqrt(p->stoch_variance)) / (p->stoch_nRel * p->stoch_pRel);
                     if ( Smax > 0 ) {
                         stoch_S.push_back(0.0);
-                        stoch_Sinf.push_back(0.0);
-                        stoch_Smax.push_back(Smax);
+                        stoch_amplitude.push_back(Smax);
                     }
                 }
             }
-            stoch_Sinf.back() = (*theTanh)((preV - p->VThresh)/p->VSlope) * stoch_Smax.back();
-        } else {
-            Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
         }
+        Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
         spike = true;
     } else if ( spike ) {
-        if ( p->stochastic ) {
-            stoch_Sinf.back() = 0.0;
-        } else {
-            Sinf= 0.0;
-        }
+        Sinf= 0.0;
         spike = false;
     }
 
