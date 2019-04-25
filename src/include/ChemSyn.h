@@ -91,7 +91,7 @@ class ChemSyn : public Synapse
     double Dslope; // slope of the sigmoid for D
 
     bool spike = false;
-    double stochastic_factor = 1.0;
+    std::vector<double> stoch_S, stoch_Smax, stoch_Sinf;
 
   public:
     ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);

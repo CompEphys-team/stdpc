@@ -136,40 +136,73 @@ ChemSyn::ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, 
     setupBuffer(DCT);
 }
 
+void clip(double &value, double maxval)
+{
+    if ( value > maxval )
+        value = maxval;
+    else if ( value < 0.0 || std::isnan(value) )
+        value = 0.0;
+}
+
 void ChemSyn::step(double t, double dt, bool settling)
 {
     if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
         m_conductance = 0;
         return;
     }
+    double tmp;
 
     // calculate synaptic current
-    double tmp = (1.0 - Sinf)*p->tauSyn;
-    //  if (tmp < 1e-8) tmp= 1e-8;
-    // Linear Euler:
-    S+= (Sinf - S)/tmp*dt;   /// use previous values of Sinf, S
-    if (S > 1.0) S= 1.0;
-    else if (S < 0.0 || std::isnan(S)) S= 0.0;
+    if ( p->stochastic ) {
+        S = 0.0;
+        for ( int i = stoch_S.size()-1; i >= 0; i-- ) {
+            tmp = (stoch_Smax[i] - stoch_Sinf[i]) * p->tauSyn;
+            stoch_S[i] += (stoch_Sinf[i] - stoch_S[i]) / tmp * dt;
+            clip(stoch_S[i], stoch_Smax[i]);
+            S += stoch_S[i];
+
+            // Prune decayed
+            if ( !spike && stoch_S[i] < 1e-6 ) {
+                stoch_S.erase(stoch_S.begin() + i);
+                stoch_Sinf.erase(stoch_Sinf.begin() + i);
+                stoch_Smax.erase(stoch_Smax.begin() + i);
+            }
+        }
+    } else {
+        tmp = (1.0 - Sinf)*p->tauSyn;
+        //  if (tmp < 1e-8) tmp= 1e-8;
+        // Linear Euler:
+        S+= (Sinf - S)/tmp*dt;   /// use previous values of Sinf, S
+        clip(S, 1.0);
+    }
 
     double preV = buffered ? pre->getBufferedV(bufferHandle) : pre->V;
 
     if (preV > p->VThresh) {
-        Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
-        if ( p->stochastic && !spike ) {
-            spike = true;
-            int nRel = RNG.variate<int, std::binomial_distribution>(p->stoch_nRel, p->stoch_pRel);
-            if ( nRel > 0 ) {
-                stochastic_factor = RNG.variate<double>(nRel, nRel * std::sqrt(p->stoch_variance)) / (p->stoch_nRel * p->stoch_pRel);
-                if ( stochastic_factor < 0 )
-                    stochastic_factor = 0;
-            } else {
-                stochastic_factor = 0;
+        if ( p->stochastic ) {
+            if ( !spike ) {
+                int nRel = RNG.variate<int, std::binomial_distribution>(p->stoch_nRel, p->stoch_pRel);
+                if ( nRel > 0 ) {
+                    double Smax = RNG.variate<double>(nRel, nRel * std::sqrt(p->stoch_variance)) / (p->stoch_nRel * p->stoch_pRel);
+                    if ( Smax > 0 ) {
+                        stoch_S.push_back(0.0);
+                        stoch_Sinf.push_back(0.0);
+                        stoch_Smax.push_back(Smax);
+                    }
+                }
             }
+            stoch_Sinf.back() = (*theTanh)((preV - p->VThresh)/p->VSlope) * stoch_Smax.back();
+        } else {
+            Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
         }
-    } else {
-        Sinf= 0.0;
-        if ( spike )
-            spike = false;
+        spike = true;
+    } else if ( spike ) {
+        if ( p->stochastic ) {
+            stoch_Sinf.back() = 0.0;
+        } else {
+            Sinf= 0.0;
+        }
+        spike = false;
     }
 
     if(p->STD){
@@ -203,9 +236,6 @@ void ChemSyn::step(double t, double dt, bool settling)
         ODElearn(dt);
         break;
     }
-
-    if ( p->stochastic )
-        m_conductance *= stochastic_factor;
 
     if ( !settling || p->activeSettling )
         out->I += m_conductance * (p->VSyn - postV);
