@@ -239,4 +239,11 @@ struct SettlingData {
     double duration = 0.0;
 };
 
+struct GuiData {
+    bool openDAQ = true;
+    bool openTools = false;
+    bool openSynapses = false;
+    bool openCurrents = false;
+};
+
 #endif

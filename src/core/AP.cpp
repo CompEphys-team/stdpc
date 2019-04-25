@@ -63,6 +63,12 @@ void initAP()
 
     // Thread priority
     addAP("ClampThreadPriority", &ClampThreadPriority);
+
+    // GUI
+    addAP("GUIp.openDAQ", &GUIp, &GuiData::openDAQ);
+    addAP("GUIp.openTools", &GUIp, &GuiData::openTools);
+    addAP("GUIp.openSynapses", &GUIp, &GuiData::openSynapses);
+    addAP("GUIp.openCurrents", &GUIp, &GuiData::openCurrents);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)

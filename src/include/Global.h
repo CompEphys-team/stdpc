@@ -33,6 +33,7 @@ extern SampleHoldData SampleHoldp;
 extern TriggerData Triggerp;
 extern SettlingData Settlingp;
 extern int ClampThreadPriority;
+extern GuiData GUIp;
 
 // LU tables
 extern tanhLUtable tanhLU;

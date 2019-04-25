@@ -82,6 +82,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      initAP();
      LoadConfig();
 
+     hDAQ->setExpanded(GUIp.openDAQ);
+     hTools->setExpanded(GUIp.openTools);
+     hSynapses->setExpanded(GUIp.openSynapses);
+     hCurrents->setExpanded(GUIp.openCurrents);
+
      DisplayMessage(QString("Main: Dynamic Clamp starting ..."));
      exportData(true);
      updateDeviceStatus();
@@ -244,6 +249,12 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   ui->graphtab->exportData();
   ui->performancetab->exportData();
   emit channelsChanged();
+
+  QTreeWidgetItemIterator it(ui->treeWidget, QTreeWidgetItemIterator::HasChildren);
+  GUIp.openDAQ = (*it++)->isExpanded();
+  GUIp.openTools = (*it++)->isExpanded();
+  GUIp.openSynapses = (*it++)->isExpanded();
+  GUIp.openCurrents = (*it)->isExpanded();
 }
  
 void MyMainWindow::importData()
