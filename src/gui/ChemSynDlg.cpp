@@ -51,6 +51,9 @@ ChemSynDlg::ChemSynDlg(size_t no, QWidget *parent)
      vec.push_back(tmp);
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
+
+     gSyn_clm = ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::Blank);
+     gSyn_channel->setModel(gSyn_clm);
 }
 
 void ChemSynDlg::setIndex(size_t no)
@@ -106,6 +109,7 @@ void ChemSynDlg::exportData()
   p.tauSyn= tauSynE->text().toDouble()*1e-3;
   p.VThresh= VThreshE->text().toDouble()*1e-3;
   p.VSlope= VSlopeE->text().toDouble()*1e-3;
+  p.gSyn_channel = gSyn_channel->currentData().value<ChannelIndex>();
 
   p.STD= STD->isChecked();
   p.STDAmpl= STDAmplE->text().toDouble();
@@ -155,6 +159,7 @@ void ChemSynDlg::importData()
   VThreshE->setText(num);
   num.setNum(p.VSlope*1e3);
   VSlopeE->setText(num);
+  gSyn_channel->setCurrentIndex(gSyn_clm->index(p.gSyn_channel));
 
   STD->setChecked(p.STD);
   num.setNum(p.STDAmpl);
