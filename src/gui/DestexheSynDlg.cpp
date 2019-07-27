@@ -51,6 +51,9 @@ DestexheSynDlg::DestexheSynDlg(size_t no, QWidget *parent)
      vec.push_back(tmp);
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
+
+     gSyn_clm = ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::Blank);
+     gSyn_channel->setModel(gSyn_clm);
 }
 
 void DestexheSynDlg::setIndex(size_t no)
@@ -101,6 +104,7 @@ void DestexheSynDlg::exportData()
   p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
+  p.gSyn_channel = gSyn_channel->currentData().value<ChannelIndex>();
   p.Vpre= VpreE->text().toDouble()*1e-3;
   p.Vrev= VrevE->text().toDouble()*1e-3;
   p.trelease= treleaseE->text().toDouble()*1e-3;
@@ -126,6 +130,7 @@ void DestexheSynDlg::importData()
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
+  gSyn_channel->setCurrentIndex(gSyn_clm->index(p.gSyn_channel));
   num.setNum(p.Vpre*1e3);
   VpreE->setText(num);
   num.setNum(p.Vrev*1e3);

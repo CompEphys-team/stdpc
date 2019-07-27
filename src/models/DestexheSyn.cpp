@@ -94,6 +94,8 @@ DestexheSynProxy::DestexheSynProxy()
     addAP("DxheSynp[#].PreSynChannel", &p, &DestexheSynData::legacy_PreSyn);
     addAP("DxheSynp[#].PostSynChannel", &p, &DestexheSynData::legacy_PostSyn);
     addAP("DxheSynp[#].OutSynChannel", &p, &DestexheSynData::legacy_OutSyn);
+
+    addAP("DxheSynp[#].gSyn_channel", &p, &DestexheSynData::gSyn_channel);
 }
 
     
@@ -101,6 +103,7 @@ DestexheSyn::DestexheSyn(size_t condID, size_t assignID, size_t multiID, DCThrea
     Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
+    gSyn_dynamic(DCT->getInChan(p->gSyn_channel)),
     S(0.0),
     tlast(-1.0e10),
     g(p->gSyn)
@@ -206,6 +209,9 @@ void DestexheSyn::step(double t, double dt, bool settling)
       ODElearn(dt);
       break; 
   }
+
+  if ( gSyn_dynamic )
+      m_conductance *= gSyn_dynamic->V;
 
   if ( !settling || p->activeSettling )
       out->I += m_conductance * (p->Vrev - postV);
