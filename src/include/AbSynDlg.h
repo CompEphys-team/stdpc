@@ -39,6 +39,7 @@ class abSynDlg : public ConductanceDlg, private Ui::abSynDlg
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
+     ChannelListModel *gSyn_clm;
      
   public slots:
      void PlastMethodChange();

@@ -96,6 +96,8 @@ abSynProxy::abSynProxy()
     addAP("abSynp[#].PreSynChannel", &p, &abSynData::legacy_PreSyn);
     addAP("abSynp[#].PostSynChannel", &p, &abSynData::legacy_PostSyn);
     addAP("abSynp[#].OutSynChannel", &p, &abSynData::legacy_OutSyn);
+
+    addAP("abSynp[#].gSyn_channel", &p, &abSynData::gSyn_channel);
 }
 
     
@@ -103,6 +105,7 @@ abSyn::abSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inCh
     Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
+    gSyn_dynamic(DCT->getInChan(p->gSyn_channel)),
     S(0.0),
     R(0.0),
     g(p->gSyn)
@@ -198,6 +201,9 @@ void abSyn::step(double t, double dt, bool settling)
       ODElearn(dt);
       break; 
   }
+
+  if ( gSyn_dynamic )
+      m_conductance *= gSyn_dynamic->V;
 
   if ( !settling || p->activeSettling )
       out->I += m_conductance * (p->Vrev - postV);
