@@ -110,7 +110,7 @@ void DestexheSynDlg::exportData()
   p.trelease= treleaseE->text().toDouble()*1e-3;
   p.alpha= alphaE->text().toDouble()*1e3;
   p.beta= betaE->text().toDouble()*1e3;
-  p.fixVpost= fixVpostCombo->currentIndex();
+  p.fixVpost= fixVpost->isChecked();
   p.Vpost= VpostE->text().toDouble()*1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
@@ -141,7 +141,7 @@ void DestexheSynDlg::importData()
   alphaE->setText(num);
   num.setNum(p.beta*1e-3);
   betaE->setText(num);
-  fixVpostCombo->setCurrentIndex(p.fixVpost);
+  fixVpost->setChecked(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
