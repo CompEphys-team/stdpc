@@ -18,8 +18,8 @@
 */
 
 #include "InputConductance.h"
-#include "DCThread.h"
 #include "InputConductanceDlg.h"
+#include "AP.h"
 
 static InputConductanceProxy *prox = InputConductanceProxy::get();
 std::vector<InputConductanceData> InputConductanceProxy::p;

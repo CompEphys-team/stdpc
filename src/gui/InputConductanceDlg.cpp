@@ -66,7 +66,7 @@ void InputConductanceDlg::exportData()
     p.label = ui->leLabel->text();
     ui->assignments->exportData(p.assign);
     p.Vrev = ui->Vrev->value() * 1e-3;
-    p.gStatic = ui->g0->value() * 1e-9;
+    p.gStatic = ui->gStatic->value() * 1e-9;
     p.rectify = ui->rectify->isChecked();
 }
 
