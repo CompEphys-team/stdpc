@@ -39,7 +39,6 @@ class DestexheSynDlg : public ConductanceDlg, private Ui::DestexheSynDlg
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
-     ChannelListModel *gSyn_clm;
 
   public slots:
      void PlastMethodChange();

@@ -51,8 +51,6 @@ struct CSynData : public SynapseData {
   int stoch_nRel = 5;
   double stoch_pRel = 0.6;
   double stoch_variance = 0.05;
-
-  ChannelIndex gSyn_channel;
 };
 
 class ChemSynProxy : public SynapseProxy {
@@ -84,7 +82,6 @@ class ChemSyn : public Synapse
   private:
     const CSynData *p;
     const SynapseAssignment *a;
-    const inChannel *gSyn_dynamic;
 
     stdpc::function *theExp;
     stdpc::function *theTanh;

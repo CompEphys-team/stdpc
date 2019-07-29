@@ -6,22 +6,379 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>503</width>
-    <height>392</height>
+    <width>521</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Destexhe Synapse</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
+  <layout class="QGridLayout" name="gridLayout">
+   <property name="spacing">
+    <number>10</number>
+   </property>
+   <item row="1" column="0" colspan="2">
+    <widget class="QLabel" name="label_15">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Channel assignments</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="VpreE">
+     <property name="text">
+      <string>-20</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QLabel" name="VpreU">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="4">
+    <widget class="QLabel" name="treleaseL">
+     <property name="text">
+      <string>trelease</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="label_14">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Activation</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QLabel" name="gSynU">
+     <property name="text">
+      <string>nS</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="7">
+    <widget class="QLabel" name="alphaU">
+     <property name="text">
+      <string>1/ms</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="VrevE">
+     <property name="text">
+      <string>0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="QLabel" name="VrevU">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QLabel" name="alphaL">
+     <property name="text">
+      <string>alpha</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="4" colspan="4">
+    <widget class="QComboBox" name="PlasticityCombo">
+     <item>
+      <property name="text">
+       <string>None</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Spike STDP</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>ODE STDP</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="7" column="4" colspan="2">
+    <widget class="QLabel" name="label_31">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Plasticity</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="3" rowspan="6">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="5" colspan="2">
+    <widget class="QLineEdit" name="betaE">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>0.02</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2">
+    <widget class="QLabel" name="label_30">
+     <property name="text">
+      <string>mV</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_29">
+     <property name="text">
+      <string>Vpost</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="gSynL">
+     <property name="text">
+      <string>gSyn</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0" colspan="2">
+    <widget class="QComboBox" name="LUCombo">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <item>
+      <property name="text">
+       <string>Direct Functions</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>LookupTables</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="2">
+    <widget class="QComboBox" name="fixVpostCombo">
+     <item>
+      <property name="text">
+       <string>Off</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Fixed</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="7" column="0" colspan="2">
+    <widget class="QLabel" name="label_18">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>fix Vpost</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="gSynE">
+     <property name="text">
+      <string>10.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="VpreL">
+     <property name="text">
+      <string>Vpre</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
+    <widget class="QLabel" name="MethodL">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Method</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="4" colspan="4">
+    <widget class="QPushButton" name="PlastParaBut">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Parameters</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="5" colspan="2">
+    <widget class="QLineEdit" name="treleaseE">
+     <property name="text">
+      <string>2</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="5" colspan="2">
+    <widget class="QLineEdit" name="alphaE">
+     <property name="text">
+      <string>0.1</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="8">
+    <widget class="AssignmentWidget&lt;SynapseAssignment&gt;" name="assignments">
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderDefaultSectionSize">
+      <number>25</number>
+     </attribute>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="VrevL">
+     <property name="text">
+      <string>Vrev</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="6" colspan="2">
+    <widget class="QDialogButtonBox" name="ResCloseBox">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QLineEdit" name="VpostE">
+     <property name="text">
+      <string>0.0</string>
+     </property>
+     <property name="maxLength">
+      <number>8</number>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="7">
+    <widget class="QLabel" name="betaU">
+     <property name="text">
+      <string>1/ms</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="4">
+    <widget class="QLabel" name="betaL">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>beta</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="7">
+    <widget class="QLabel" name="treleaseU">
+     <property name="text">
+      <string>ms</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="4">
     <widget class="QLineEdit" name="leLabel">
      <property name="placeholderText">
       <string>Label...</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
+   <item row="0" column="4" colspan="4">
     <widget class="QLabel" name="DestexheSynDlgLabel">
      <property name="enabled">
       <bool>true</bool>
@@ -59,355 +416,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_15">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Channel assignments</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="AssignmentWidget&lt;SynapseAssignment&gt;" name="assignments">
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="verticalHeaderDefaultSectionSize">
-      <number>25</number>
-     </attribute>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QGroupBox" name="fixVpost">
-     <property name="title">
-      <string>Fix Vpost</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>false</bool>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_32">
-        <property name="text">
-         <string>Vpost</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="VpostE">
-        <property name="text">
-         <string>0.0</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_33">
-        <property name="text">
-         <string>mV</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <layout class="QGridLayout" name="gridLayout_7">
-     <item row="0" column="0">
-      <widget class="QLabel" name="MethodL">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Method</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QComboBox" name="LUCombo">
-       <property name="font">
-        <font>
-         <pointsize>8</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <item>
-        <property name="text">
-         <string>Direct Functions</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>LookupTables</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="1">
-    <layout class="QGridLayout" name="gridLayout_6">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_31">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Plasticity</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QComboBox" name="PlasticityCombo">
-       <item>
-        <property name="text">
-         <string>None</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Spike STDP</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ODE STDP</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QPushButton" name="PlastParaBut">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Parameters</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="6" column="1">
-    <widget class="QDialogButtonBox" name="ResCloseBox">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" rowspan="4">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>General</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="gSynL">
-        <property name="text">
-         <string>gSyn</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="gSynE">
-        <property name="text">
-         <string>10.0</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="gSynU">
-        <property name="text">
-         <string>nS</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>g gain</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="WideComboBox" name="gSyn_channel"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="VpreL">
-        <property name="text">
-         <string>Vpre</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="VpreE">
-        <property name="text">
-         <string>-20</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="VpreU">
-        <property name="text">
-         <string>mV</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="VrevL">
-        <property name="text">
-         <string>Vrev</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="VrevE">
-        <property name="text">
-         <string>0</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="2">
-       <widget class="QLabel" name="VrevU">
-        <property name="text">
-         <string>mV</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="treleaseL">
-        <property name="text">
-         <string>trelease</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="treleaseE">
-        <property name="text">
-         <string>2</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="treleaseU">
-        <property name="text">
-         <string>ms</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="alphaL">
-        <property name="text">
-         <string>alpha</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="alphaE">
-        <property name="text">
-         <string>0.1</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QLabel" name="alphaU">
-        <property name="text">
-         <string>1/ms</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="betaL">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>beta</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="betaE">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="text">
-         <string>0.02</string>
-        </property>
-        <property name="maxLength">
-         <number>8</number>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2">
-       <widget class="QLabel" name="betaU">
-        <property name="text">
-         <string>1/ms</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -416,17 +424,20 @@
    <extends>QTableWidget</extends>
    <header location="global">AssignmentWidget.h</header>
   </customwidget>
-  <customwidget>
-   <class>WideComboBox</class>
-   <extends>QComboBox</extends>
-   <header>WideComboBox.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>assignments</tabstop>
+  <tabstop>gSynE</tabstop>
+  <tabstop>VpreE</tabstop>
+  <tabstop>VrevE</tabstop>
+  <tabstop>fixVpostCombo</tabstop>
+  <tabstop>VpostE</tabstop>
+  <tabstop>LUCombo</tabstop>
   <tabstop>treleaseE</tabstop>
   <tabstop>alphaE</tabstop>
   <tabstop>betaE</tabstop>
+  <tabstop>PlasticityCombo</tabstop>
+  <tabstop>PlastParaBut</tabstop>
  </tabstops>
  <resources/>
  <connections/>

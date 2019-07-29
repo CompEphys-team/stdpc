@@ -38,8 +38,6 @@ struct abSynData : public SynapseData {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
-
-  ChannelIndex gSyn_channel;
 };
 
 class abSynProxy : public SynapseProxy {
@@ -70,7 +68,6 @@ class abSyn : public Synapse {
   private:
     const abSynData *p;
     const SynapseAssignment *a;
-    const inChannel *gSyn_dynamic;
 
     stdpc::function *theExp;
     stdpc::function *theTanh;

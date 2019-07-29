@@ -51,9 +51,6 @@ abSynDlg::abSynDlg(size_t no, QWidget *parent)
      vec.push_back(tmp);
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
-
-     gSyn_clm = ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Virtual | ChannelListModel::Blank);
-     gSyn_channel->setModel(gSyn_clm);
 }
 
 void abSynDlg::setIndex(size_t no)
@@ -104,7 +101,6 @@ void abSynDlg::exportData()
   p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
-  p.gSyn_channel = gSyn_channel->currentData().value<ChannelIndex>();
   p.Vrev= VrevE->text().toDouble()*1e-3;
   p.aS= aSE->text().toDouble()*1e3;
   p.bS= bSE->text().toDouble()*1e3;
@@ -112,7 +108,7 @@ void abSynDlg::exportData()
   p.VaR= VaRE->text().toDouble()*1e-3;
   p.saR= saRE->text().toDouble()*1e-3;
   p.bR= bRE->text().toDouble()*1e3;
-  p.fixVpost= fixVpost->isChecked();
+  p.fixVpost= fixVpostCombo->currentIndex();
   p.Vpost= VpostE->text().toDouble()*1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
@@ -132,7 +128,6 @@ void abSynDlg::importData()
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);
   gSynE->setText(num);
-  gSyn_channel->setCurrentIndex(gSyn_clm->index(p.gSyn_channel));
   num.setNum(p.Vrev*1e3);
   VrevE->setText(num);
   num.setNum(p.aS*1e-3);
@@ -147,7 +142,7 @@ void abSynDlg::importData()
   saRE->setText(num);
   num.setNum(p.bR*1e-3);
   bRE->setText(num);
-  fixVpost->setChecked(p.fixVpost);
+  fixVpostCombo->setCurrentIndex(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
   PlasticityCombo->setCurrentIndex(p.Plasticity);

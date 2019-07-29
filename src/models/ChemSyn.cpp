@@ -114,8 +114,6 @@ ChemSynProxy::ChemSynProxy()
     addAP("CSynp[#].PreSynChannel", &p, &CSynData::legacy_PreSyn);
     addAP("CSynp[#].PostSynChannel", &p, &CSynData::legacy_PostSyn);
     addAP("CSynp[#].OutSynChannel", &p, &CSynData::legacy_OutSyn);
-
-    addAP("CSynp[#].gSyn_channel", &p, &CSynData::gSyn_channel);
 }
 
 
@@ -124,7 +122,6 @@ ChemSyn::ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, 
     Synapse(condID, assignID, multiID, pre, post, out),
     p(&params()),
     a(&assignment()),
-    gSyn_dynamic(DCT->getInChan(p->gSyn_channel)),
     Sinf(0.0),
     S(0.0),
     hinf(1.0),
@@ -259,9 +256,6 @@ void ChemSyn::step(double t, double dt, bool settling)
         ODElearn(dt);
         break;
     }
-
-    if ( gSyn_dynamic )
-        m_conductance *= gSyn_dynamic->V;
 
     if ( !settling || p->activeSettling )
         out->I += m_conductance * (p->VSyn - postV);

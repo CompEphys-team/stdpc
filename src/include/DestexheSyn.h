@@ -36,8 +36,6 @@ struct DestexheSynData : public SynapseData {
   int Plasticity;
   STPlast ST;
   ODEPlast ODE;
-
-  ChannelIndex gSyn_channel;
 };
 
 class DestexheSynProxy : public SynapseProxy {
@@ -68,7 +66,6 @@ class DestexheSyn : public Synapse {
   private:
     const DestexheSynData *p;
     const SynapseAssignment *a;
-    const inChannel *gSyn_dynamic;
 
     stdpc::function *theExp;
     stdpc::function *theTanh;

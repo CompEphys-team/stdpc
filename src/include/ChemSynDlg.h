@@ -39,7 +39,6 @@ class ChemSynDlg : public ConductanceDlg, private Ui::ChemSynDlg
 
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
-     ChannelListModel *gSyn_clm;
      
   public slots:
      void PlastMethodChange();
