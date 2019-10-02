@@ -40,7 +40,7 @@ public:
     inline void remove(size_t i) { p.erase(p.begin() + i); }
 
     inline QString conductanceClass() { return "Wire"; }
-    inline QString prettyName() { return "Pass Wire"; }
+    inline QString prettyName() { return "Wire"; }
 
     IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
                                  inChannel *in, outChannel *out);

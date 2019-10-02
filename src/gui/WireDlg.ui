@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Pass Wire</string>
+   <string>Wire</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="4" column="1">
