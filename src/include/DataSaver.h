@@ -43,6 +43,9 @@ private:
 
     std::string lineEnding;
 
+    int runningIndex = -1;
+    QuotedString indexedFilename;
+
 protected:
     bool initBinary(QVector<ChannelIndex> channels);
     bool initAscii(QVector<ChannelIndex> channels);
@@ -50,6 +53,7 @@ protected:
 public:
     DataSaver();
     bool init(dataSavingParams p_, QVector<ChannelIndex> channels);
+    inline QuotedString filename() const { return p.fileName; }
 
     std::vector<std::unique_ptr<CircularFifo<double>>> q;
 

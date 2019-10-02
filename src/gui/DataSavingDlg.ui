@@ -241,7 +241,7 @@ p, li { white-space: pre-wrap; }
    <item row="2" column="0" colspan="4">
     <widget class="QLabel" name="label_5">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File(s) or directory will be created if they do not exist. To protect against overwriting, use the following formatting options:&lt;/p&gt;&lt;p&gt;- %Y, %M, %D, %h, %m, %s for year, month, day, hours, minutes, seconds, respectively;&lt;/p&gt;&lt;p&gt;-%n for consecutive file numbering.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File(s) or directory will be created if they do not exist. To protect against overwriting, use the following formatting options:&lt;/p&gt;&lt;p&gt;- %Y, %M, %D, %h, %m, %s for year, month, day, hours, minutes, seconds, respectively;&lt;/p&gt;&lt;p&gt;- %n for consecutive file numbering. Note, %n must only be used once, and only in the file name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

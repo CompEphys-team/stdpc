@@ -46,15 +46,29 @@ bool DataSaver::init(dataSavingParams p_, QVector<ChannelIndex> channels)
         if ( !dir.mkpath(".") )
             return false;
 
-    if ( p.fileName.contains("%n") ) {
-        p.fileName.replace("%n", "%1");
-        for ( size_t i = 0; true; i++ ) {
-            QString name = p.fileName.arg(i, 4, 10, QChar('0'));
-            if ( !QFileInfo(name).exists() ) {
-                p.fileName = name;
-                break;
+    if ( fileinfo.fileName().contains("%n") ) { // Ignore %n in path
+        while ( p.fileName.count("%n") != 1 ) // I'm not dealing with *multiple* running indices!
+            p.fileName.remove(p.fileName.indexOf("%n"), 1);
+        if ( runningIndex == -1 || p.fileName != indexedFilename ) {
+            int pos = fileinfo.fileName().indexOf("%n");
+            dir.setNameFilters(QStringList(fileinfo.fileName().replace(pos, 2, "????")));
+            dir.setSorting(QDir::Name);
+            QStringList existing = dir.entryList();
+            int n = 0;
+            if ( !existing.isEmpty() ) {
+                bool ok = false;
+                for ( auto it = existing.rbegin(); !ok && it != existing.rend(); it++ ) {
+                    n = it->mid(pos, 4).toInt(&ok) + 1;
+                }
+                if ( !ok )
+                    n = 0;
             }
+            indexedFilename = p.fileName;
+            runningIndex = n;
+        } else {
+            runningIndex++;
         }
+        p.fileName = p.fileName.replace("%n", "%1").arg(runningIndex, 4, 10, QChar('0'));
     }
 
     if ( p.isBinary ) {

@@ -190,7 +190,9 @@ void DCThread::setup_and_go()
            saving = false;
        } else {
            saving = dataSaver->init(dataSavingPs, header);
-           if ( !saving )
+           if ( saving )
+               message(QString("Saving data to %1").arg(dataSaver->filename()));
+           else
                message("Warning: Data saving failed to initialise. Data will not be written to disk!");
        }
    }
