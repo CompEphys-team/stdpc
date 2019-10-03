@@ -429,6 +429,6 @@ tr(R"EOF(
 StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation.
 It is distributed under the GPL v2 license.
 For more information, visit https://github.com/tnowotny/stdpc/ .
-You are running StdpC version 7.1.
+You are running StdpC version 6.1.
 )EOF"));
 }
