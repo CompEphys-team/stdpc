@@ -33,7 +33,8 @@ struct SynapticNoiseData : public CurrentData
     double Vrev; //!< Reversal potential
     double tau; //!< Time constant
     double g0; //!< Average conductance
-    double D; //!< Noise diffusion coefficient
+    double D__deprecated = -1; //!< Noise diffusion coefficient; deprecated in favour of std
+    double std; //!< Standard deviation \sigma
     bool ignoreNegative;
 };
 

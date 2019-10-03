@@ -57,7 +57,7 @@ void SynapticNoiseDlg::importData()
     ui->Vrev->setValue(p.Vrev * 1e3);
     ui->tau->setValue(p.tau * 1e3);
     ui->g0->setValue(p.g0 * 1e9);
-    ui->stddev->setValue(std::sqrt(p.D * p.tau / 2e-18));
+    ui->stddev->setValue(p.std * 1e9);
     ui->ignoreNegative->setChecked(p.ignoreNegative);
 }
 
@@ -69,7 +69,7 @@ void SynapticNoiseDlg::exportData()
     p.Vrev = ui->Vrev->value() * 1e-3;
     p.tau = ui->tau->value() * 1e-3;
     p.g0 = ui->g0->value() * 1e-9;
-    p.D = 2e-18 * ui->stddev->value()*ui->stddev->value() / p.tau; // nS^2 / s = 10^-18 S^2/s (variance = D*tau/2)
+    p.std = ui->stddev->value() * 1e-9;
     p.ignoreNegative = ui->ignoreNegative->isChecked();
 }
 

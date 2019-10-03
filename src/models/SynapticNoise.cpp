@@ -39,11 +39,23 @@ SynapticNoiseProxy::SynapticNoiseProxy()
     addAP("SynapticNoisep[#].Vrev", &p, &SynapticNoiseData::Vrev);
     addAP("SynapticNoisep[#].tau", &p, &SynapticNoiseData::tau);
     addAP("SynapticNoisep[#].g0", &p, &SynapticNoiseData::g0);
-    addAP("SynapticNoisep[#].D", &p, &SynapticNoiseData::D);
+    addAP("SynapticNoisep[#].D", &p, &SynapticNoiseData::D__deprecated)->setReadOnly();
+    addAP("SynapticNoisep[#].std", &p, &SynapticNoiseData::std);
     addAP("SynapticNoisep[#].assign[#].active", &p, &SynapticNoiseData::assign, &CurrentAssignment::active);
     addAP("SynapticNoisep[#].assign[#].VChannel", &p, &SynapticNoiseData::assign, &CurrentAssignment::VChannel);
     addAP("SynapticNoisep[#].assign[#].IChannel", &p, &SynapticNoiseData::assign, &CurrentAssignment::IChannel);
     addAP("SynapticNoisep[#].assign[#].save", &p, &SynapticNoiseData::assign, &CurrentAssignment::save);
+
+    AP::hooks_post_load().push_back([](){
+        for ( SynapticNoiseData &data : p ) {
+            if ( data.D__deprecated >= 0 ) {
+                // D was deprecated on 2019-10-03.
+                // D = 2 std^2 / tau
+                // => std = sqrt(D*tau/2)
+                data.std = std::sqrt(data.D__deprecated * data.tau / 2);
+            }
+        }
+    });
 }
 
 SynapticNoise::SynapticNoise(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
@@ -85,6 +97,5 @@ void SynapticNoise::RK4(double, double dt, size_t n, bool settling)
 double SynapticNoise::next(double dt)
 {
     double tmp = std::exp(-dt/p->tau);
-    double A = std::sqrt(p->D * p->tau / 2 * (1 - tmp*tmp));
-    return p->g0 + (m_conductance - p->g0) * tmp + A * RNG.variate<double>(0, 1);
+    return p->g0 + (m_conductance - p->g0) * tmp + p->std * std::sqrt(1 - tmp*tmp) * RNG.variate<double>(0, 1);
 }
