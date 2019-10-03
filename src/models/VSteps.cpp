@@ -46,7 +46,7 @@ VStepsProxy::VStepsProxy()
     addAP("VSteps[#].label", &VStepsProxy::p, &VStepsData::label);
     addAP("VSteps[#].holdV", &VStepsProxy::p, &VStepsData::holdV);
     addAP("VSteps[#].startV", &VStepsProxy::p, &VStepsData::startV);
-    addAP("VSteps[#].endV", &VStepsProxy::p, &VStepsData::endV);
+    addAP("VSteps[#].nSteps", &VStepsProxy::p, &VStepsData::nSteps);
     addAP("VSteps[#].deltaV", &VStepsProxy::p, &VStepsData::deltaV);
     addAP("VSteps[#].t0", &VStepsProxy::p, &VStepsData::t0);
     addAP("VSteps[#].tStep", &VStepsProxy::p, &VStepsData::tStep);
@@ -64,9 +64,8 @@ VSteps::VSteps(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     // intitialize vector of step times and step voltages
     cmdT.clear();
     cmdV.clear();
-    int stepNo= static_cast<int>(floor((p->endV-p->startV+1e-6)/p->deltaV));
     cmdV.push_back(p->holdV);
-    for (int i= 0; i < stepNo; i++) {
+    for (int i= 0; i < p->nSteps; i++) {
         cmdT.push_back(p->t0+i*(p->tStep+p->tHold));
         cmdV.push_back(p->startV+i*p->deltaV);
         cmdT.push_back(p->t0+i*(p->tStep+p->tHold)+p->tStep);

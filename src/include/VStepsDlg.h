@@ -39,6 +39,8 @@ public:
 private:
     Ui::VStepsDlg *ui;
     QString label;
+
+    void updateEndV();
 };
 
 

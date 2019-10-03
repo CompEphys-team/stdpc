@@ -27,7 +27,7 @@
 struct VStepsData : public ModelData {
   double holdV;
   double startV;
-  double endV;
+  int nSteps;
   double deltaV;
   double t0;
   double tStep;
