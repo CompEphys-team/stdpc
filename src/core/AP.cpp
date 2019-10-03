@@ -410,5 +410,8 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         }
     }
 
+    for ( auto hook : AP::hooks_post_load() )
+        hook();
+
     return true;
 }
