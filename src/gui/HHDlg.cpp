@@ -20,28 +20,34 @@
 #include <QString>
 #include "HHDlg.h"
 #include <QMessageBox>
+#include "HH.h"
 
-HHDlg::HHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
-     : QDialog(parent)
+HHDlg::HHDlg(size_t no, QWidget *parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
-     label = HHDlgLabel->text();
      setIndex(no);
 
      QVector<AssignmentCellBase<CurrentAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
-     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 180, in));
-     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 180, out));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 165,
+        ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Prototype | ChannelListModel::Blank)));
+     vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 165,
+        ChannelListModel::getModel(ChannelListModel::AnalogOut | ChannelListModel::Prototype | ChannelListModel::Blank)));
+     vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::save, "Save", 30));
      assignments->init(vec);
 }
 
-void HHDlg::setIndex(int no)
+void HHDlg::setIndex(size_t no)
 {
-    HHDlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    HHDlgLabel->setText(QString("%1 %2").arg(HHProxy::get()->prettyName()).arg(no));
 }
 
-void HHDlg::exportData(mhHHData &p)
+void HHDlg::exportData()
 {
+  mhHHData &p = HHProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -68,10 +74,11 @@ void HHDlg::exportData(mhHHData &p)
   assignments->exportData(p.assign);
 }
 
-void HHDlg::importData(mhHHData p)
+void HHDlg::importData()
 {
+  mhHHData &p = HHProxy::p[idx];
   QString num;
-  
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gMax*1e9);
@@ -115,4 +122,11 @@ void HHDlg::importData(mhHHData p)
   stauhE->setText(num);
 
   assignments->importData(p.assign);
+}
+
+void HHDlg::on_buttonBox_clicked(QAbstractButton *button)
+{
+    if ( button->text() == "Close" )
+        hide();
+    emit labelChanged(leLabel->text());
 }

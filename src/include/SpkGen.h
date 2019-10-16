@@ -52,8 +52,13 @@ struct SGData : public ModelData {
 };
 
 class SpkGenProxy : public ModelProxy {
-public:
+private:
     SpkGenProxy();
+public:
+    SpkGenProxy(const SpkGenProxy &) = delete;
+    void operator=(const SpkGenProxy &) = delete;
+    static SpkGenProxy *get() { static SpkGenProxy proxy; return &proxy; }
+
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
@@ -78,7 +83,9 @@ public:
     inline void updateOut(double) {}
 
     void update(double t, double dt);
-    void RK4(double,double,size_t);
+    void RK4(double, double, size_t, bool settling);
+
+    void setBdChn(DCThread *DCT);
 
 protected:
     const SGData * const p;
@@ -94,10 +101,13 @@ protected:
     double tUnderThresh;
     bool onThreshold;
     int burstNo;
-    double ISI_time;
     double period;
+    double epoch;
     bool initial;
     bool active;
+
+    double spkOffsetCutoff;
+    std::vector<double>::const_iterator spkIterator;
 
     double VSpike(double t);
 };
@@ -109,6 +119,7 @@ public:
     ~SpkGenPrototype() {}
 
     void init(DCThread *);
+    void post_init(DCThread *);
 
     // Override processing on unused Model::out
     inline void retainCurrent(double) {}

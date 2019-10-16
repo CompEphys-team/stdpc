@@ -23,6 +23,8 @@ void ModelManager::initActive(DCThread *DCT)
 {
     for ( std::shared_ptr<ModelPrototype> &m : activeModels )
         m->init(DCT);
+    for ( std::shared_ptr<ModelPrototype> &m : activeModels )
+        m->post_init(DCT);
 }
 
 void ModelManager::clear()
@@ -31,7 +33,7 @@ void ModelManager::clear()
     allModels.clear();
     for ( ModelProxy *proxy : Register() )
         while ( proxy->size() )
-            proxy->remove(proxy->size());
+            proxy->remove(proxy->size()-1);
 }
 
 void ModelManager::initSingle(ModelProxy *proxy, size_t idx)

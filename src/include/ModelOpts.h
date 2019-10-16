@@ -42,6 +42,9 @@ protected:
     ModelProxy *proxy;
     ModelDlg *dlg;
     DaqWidget *_widget;
+
+protected slots:
+    void setLabel();
 };
 
 class ModelOptsPrototype : public DaqOptsPrototypeBase

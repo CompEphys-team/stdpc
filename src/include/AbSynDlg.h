@@ -20,28 +20,25 @@
 #ifndef ABSYNDLG_H
 #define ABSYNDLG_H
 
-
+#include "ConductanceDlg.h"
 #include <QAbstractButton>
 #include "ui_AbSynDlg.h"
 #include "STDPDlg.h"
 #include "ODESTDPDlg.h"
 #include "ObjectDataTypes.h"
 
-class abSynDlg : public QDialog, private Ui::abSynDlg
+class abSynDlg : public ConductanceDlg, private Ui::abSynDlg
 {
      Q_OBJECT
 
   public:
-     abSynDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
-     void exportData(abSynData &);
-     void importData(abSynData);
-     void setIndex(int);
+     abSynDlg(size_t, QWidget *parent= nullptr);
+     void exportData();
+     void importData();
+     void setIndex(size_t);
 
-     QString label;
      STDPDlg *STDP;
      ODESTDPDlg *ODESTDP;
-
-     typedef abSynData param_type;
      
   public slots:
      void PlastMethodChange();

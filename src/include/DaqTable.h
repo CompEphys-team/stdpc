@@ -28,7 +28,7 @@ class DaqTable : public QTableWidget
     Q_OBJECT
 
 public:
-    DaqTable(QWidget *parent = 0);
+    DaqTable(QWidget *parent = nullptr);
     ~DaqTable();
 
     void init(QVector<DaqOptsPrototypeBase *> prototypes, QWidget *parent);

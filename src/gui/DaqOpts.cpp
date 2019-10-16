@@ -48,8 +48,9 @@ DaqOpts::DaqOpts(QWidget *parent, DAQProxy *proxy, size_t idx) :
     dlg = proxy->createDialog(idx, parent);
 
     regenerateWidget();
-    _widget->setLabel(proxy->prettyName() + " " + QString::number(idx));
+    setIndex(idx);
 
+    connect(dlg, SIGNAL(accepted()), this, SLOT(setLabel()));
     connect(dlg, SIGNAL(channelsChanged()), parent, SIGNAL(channelsChanged()));
     connect(dlg, SIGNAL(message(QString)), parent, SLOT(DisplayMessage(QString)));
     connect(dlg, SIGNAL(deviceStatusChanged(DeviceStatus, const QString&)), parent, SLOT(updateDeviceStatus(DeviceStatus, const QString&)));
@@ -87,8 +88,16 @@ void DaqOpts::exportData()
 void DaqOpts::setIndex(size_t i)
 {
     idx = i;
-    _widget->setLabel(proxy->prettyName() + " " + QString::number(idx));
+    setLabel();
     dlg->setIndex(idx);
+}
+
+void DaqOpts::setLabel()
+{
+    QString label = proxy->param(idx).label;
+    if ( label.isEmpty() )
+        label = QString("%1 %2").arg(proxy->prettyName()).arg(idx);
+    _widget->setLabel(label);
 }
 
 void DaqOpts::regenerateWidget()

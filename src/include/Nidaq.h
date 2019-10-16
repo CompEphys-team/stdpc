@@ -34,8 +34,13 @@ public:
 };
 
 class NIDAQProxy : public DAQProxy {
-public:
+private:
     NIDAQProxy();
+public:
+    NIDAQProxy(const NIDAQProxy &) = delete;
+    void operator=(const NIDAQProxy &) = delete;
+    static NIDAQProxy *get() { static NIDAQProxy proxy; return &proxy; }
+
     inline DAQData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
@@ -59,13 +64,19 @@ class NIDAQ: public DAQ
    char *devName;
    char *iChnNm[MAXCHANNELS];
    char *oChnNm[MAXCHANNELS];
+   char *diChnNm[MAXCHANNELS];
           
    TaskHandle inTask;
    int inTaskActive;
    float64 *inBuf;
+
    TaskHandle outTask;
    int outTaskActive;
    float64 *outBuf;
+
+   TaskHandle digInTask;
+   int digInTaskActive;
+
    int DevicePresent;
              
   public:
@@ -75,12 +86,15 @@ class NIDAQ: public DAQ
     virtual bool initialize_board(QString &);
     virtual void start();
     virtual void digital_out(unsigned char outbyte);
-    virtual void generate_scan_list(short int, short int *);
-    virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan();
+    virtual void generate_scan_list(short int, QVector<short>);
+    virtual void generate_analog_out_list(short int, QVector<short>);
+    virtual void get_scan(bool settling = false);
     virtual void get_single_scan(inChannel *);
-    virtual void write_analog_out();
+    virtual void write_analog_out(bool settling = false);
     virtual void reset_board();
+
+    virtual void armTrigger(ChannelIndex trigChn);
+    virtual bool triggerFired();
 };
 
 #endif

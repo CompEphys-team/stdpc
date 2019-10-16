@@ -27,10 +27,12 @@
 #include <QFileDialog>
 #include "Global.h"
 #include "DataSavingDlg.h"
+#include "TriggerDlg.h"
 #include "ObjectDataTypes.h"
 #include "DeviceManager.h"
 #include "DCThread.h"
-#include "ChannelListModel.h"
+#include "treewidgetitem_datasources.h"
+#include "treewidgetitem_models.h"
 
 namespace Ui {
 class MainWindow;
@@ -42,18 +44,16 @@ class MyMainWindow : public QMainWindow
 
   protected:
     void closeEvent(QCloseEvent *event);
-    void doExportLog(QString &);
 
   public:
-     MyMainWindow(QWidget *parent= 0);
+     MyMainWindow(QWidget *parent= nullptr);
      virtual ~MyMainWindow();
      void exportData(bool ignoreDAQ = false);
      void importData();
 
      DataSavingDlg *DSDlg;
+     TriggerDlg *TrigDlg;
      DCThread *DCT;
-
-     ChannelListModel *inChnModel, *outChnModel;
      
   public slots:
      void CloseToLimitWarning(QString, QString, double, double, double);
@@ -69,10 +69,12 @@ class MyMainWindow : public QMainWindow
   private slots:
      void StartButClicked();
      void StopButClicked();
+     void TabChanged(int idx);
      
      void SaveConfig();
      void LoadConfig();
      void ExportLog();
+     void doExportLog(QString);
      void ClearLog();
      void SaveProtocol();
      void LoadProtocol();
@@ -80,21 +82,16 @@ class MyMainWindow : public QMainWindow
      void UnLoadScript();
           
  private:
-    QFileDialog *ExportLogFileDlg;
-    QFileDialog *LoadProtocolFileDlg;
-    QFileDialog *SaveProtocolFileDlg;
-    QFileDialog *LoadScriptFileDlg;    
-    
     QLabel *loadedProtocolStatus;
     QLabel *rateIndicator;
 
-    // adjustable parameter stuff
-
-    void doLoadProtocol(QString &);
-    void doSaveProtocol(QString &);
-
     Ui::MainWindow *ui;
 
+    TreeWidgetItem_DataSources *DAQ_tree_item;
+    std::vector<TreeWidgetItem_Models*> model_tree_items;
+
+    void DoSaveProtocol(ofstream&);
+    bool DoLoadProtocol(ifstream&);
 }; 
 
 #endif

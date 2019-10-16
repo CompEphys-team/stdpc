@@ -26,18 +26,20 @@
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
 /// Construct a single self-registering proxy
-static SimulDAQProxy prox;
+static SimulDAQProxy *prox = SimulDAQProxy::get();
 std::vector<SDAQData> SimulDAQProxy::p;
-DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, &prox); }
-DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, &prox, parent); }
+DAQ *SimulDAQProxy::createDAQ(size_t devID) { return new SimulDAQ(devID, prox); }
+DAQDlg *SimulDAQProxy::createDialog(size_t devID, QWidget *parent) { return new SimulDAQDlg(devID, prox, parent); }
 
 SimulDAQProxy::SimulDAQProxy() :
     regAP {
         addAP("SDAQp[#].active", &p, &SDAQData::active),
+        addAP("SDAQp[#].label", &p, &SDAQData::label),
         addAP("SDAQp[#].inFileName", &p, &SDAQData::inFileName),
         addAP("SDAQp[#].outFileName", &p, &SDAQData::outFileName),
         addAP("SDAQp[#].inTFac", &p, &SDAQData::inTFac),
         addAP("SDAQp[#].outDt", &p, &SDAQData::outDt),
+        addAP("SDAQp[#].rewindAfterSettling", &p, &SDAQData::rewindAfterSettling),
         addAP("SDAQp[#].inChn[#].active", &p, &SDAQData::inChn, &inChnData::active),
         addAP("SDAQp[#].inChn[#].gain", &p, &SDAQData::inChn, &inChnData::gain),
         addAP("SDAQp[#].inChn[#].gainFac", &p, &SDAQData::inChn, &inChnData::gainFac),
@@ -163,12 +165,12 @@ bool SimulDAQ::initialize_board(QString &name)
   return success;
 }
 
-void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
+void SimulDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
   short int i;
   actInChnNo= chnNo;
 
-  ChannelIndex dex(&prox, devID, 0, true);
+  ChannelIndex dex(prox, devID, 0, true);
 
   for(i= 0; i < actInChnNo; i++)
   {
@@ -179,7 +181,7 @@ void SimulDAQ::generate_scan_list(short int chnNo, short int *Chns)
   }
 }
 
-void SimulDAQ::get_scan()
+void SimulDAQ::get_scan(bool)
 {
   short int i;
   short int idx;
@@ -241,9 +243,9 @@ void SimulDAQ::get_single_scan(inChannel *in)
  }
 
 
-void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns) 
+void SimulDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
-  ChannelIndex dex(&prox, devID, 0, false);
+  ChannelIndex dex(prox, devID, 0, false);
 
   short int i;
   actOutChnNo= chnNo;
@@ -258,12 +260,10 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, short int *Chns)
   lastWrite= 0.0;
 }
 
-void SimulDAQ::write_analog_out()
+void SimulDAQ::write_analog_out(bool settling)
 {
-//  short int idx;
-//  double dt;
-  
-//  dt= get_RTC();
+  if ( settling ) // Can't write during settling without messing up time stamps... so don't write.
+    return;
   if (t > lastWrite + SimulDAQProxy::p[devID].outDt) {
     lastWrite= t;
     outtq.append(t);
@@ -271,6 +271,14 @@ void SimulDAQ::write_analog_out()
       outq[i].append(out[outIdx[i]].I);
     }
   }
+}
+
+void SimulDAQ::settling_complete()
+{
+    if ( SimulDAQProxy::p[devID].rewindAfterSettling ) {
+        rewind();
+        tOff = t;
+    }
 }
 
 
@@ -302,6 +310,7 @@ void SimulDAQ::rewind()
     for (int i= 0; i < inChnNo; i++) {
       inIter[i]= inq[i].begin();
     }
+    intIter++;   // the t iterator needs to be one step ahead so that channel values of the current step are applied
     inT= *intIter;
   }
 }

@@ -40,7 +40,7 @@ private:
     Ui::DaqFactoryWidget *ui;
 
 public:
-    explicit DaqFactoryWidget(QWidget *parent = 0);
+    explicit DaqFactoryWidget(QWidget *parent = nullptr);
     ~DaqFactoryWidget();
 
     QComboBox *&combo;
@@ -56,7 +56,7 @@ private:
     QString label;
 
 public:
-    explicit DaqWidget(QWidget *parent = 0);
+    explicit DaqWidget(QWidget *parent = nullptr);
     ~DaqWidget();
 
     QPushButton *&params;

@@ -19,12 +19,58 @@
 
 #include "AbHH.h"
 #include "DCThread.h"
+#include "AlphaBetaHHDlg.h"
 
-abHH::abHH(abHHData *inp, CurrentAssignment *a, inChannel *pre, outChannel *out) :
-    p(inp),
-    pre(pre),
-    out(out),
-    a(a),
+static abHHProxy *prox = abHHProxy::get();
+std::vector<abHHData> abHHProxy::p;
+abHHProxy *abHH::proxy() const { return prox; }
+ConductanceDlg *abHHProxy::createDialog(size_t condID, QWidget *parent) { return new AlphaBetaHHDlg(condID, parent); }
+IonicCurrent *abHHProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
+    return new abHH(conductanceID, assignID, multiID, in, out);
+}
+
+abHHProxy::abHHProxy()
+{
+    ConductanceManager::RegisterCurrent(this);
+
+    addAP("abHHp[#].active", &p, &abHHData::active);
+    addAP("abHHp[#].activeSettling", &p, &abHHData::activeSettling);
+    addAP("abHHp[#].label", &p, &abHHData::label);
+    addAP("abHHp[#].LUTables", &p, &abHHData::LUTables);
+    addAP("abHHp[#].gMax", &p, &abHHData::gMax);
+    addAP("abHHp[#].Vrev", &p, &abHHData::Vrev);
+    addAP("abHHp[#].mExpo", &p, &abHHData::mExpo);
+    addAP("abHHp[#].hExpo", &p, &abHHData::hExpo);
+    addAP("abHHp[#].maFunc", &p, &abHHData::maFunc);
+    addAP("abHHp[#].mka", &p, &abHHData::mka);
+    addAP("abHHp[#].mVa", &p, &abHHData::mVa);
+    addAP("abHHp[#].msa", &p, &abHHData::msa);
+    addAP("abHHp[#].mbFunc", &p, &abHHData::mbFunc);
+    addAP("abHHp[#].mkb", &p, &abHHData::mkb);
+    addAP("abHHp[#].mVb", &p, &abHHData::mVb);
+    addAP("abHHp[#].msb", &p, &abHHData::msb);
+    addAP("abHHp[#].haFunc", &p, &abHHData::haFunc);
+    addAP("abHHp[#].hka", &p, &abHHData::hka);
+    addAP("abHHp[#].hVa", &p, &abHHData::hVa);
+    addAP("abHHp[#].hsa", &p, &abHHData::hsa);
+    addAP("abHHp[#].hbFunc", &p, &abHHData::hbFunc);
+    addAP("abHHp[#].hkb", &p, &abHHData::hkb);
+    addAP("abHHp[#].hVb", &p, &abHHData::hVb);
+    addAP("abHHp[#].hsb", &p, &abHHData::hsb);
+    addAP("abHHp[#].assign[#].active", &p, &abHHData::assign, &CurrentAssignment::active);
+    addAP("abHHp[#].assign[#].VChannel", &p, &abHHData::assign, &CurrentAssignment::VChannel);
+    addAP("abHHp[#].assign[#].IChannel", &p, &abHHData::assign, &CurrentAssignment::IChannel);
+    addAP("abHHp[#].assign[#].save", &p, &abHHData::assign, &CurrentAssignment::save);
+
+    addAP("abHHp[#].VChannel", &p, &abHHData::legacy_V);
+    addAP("abHHp[#].IChannel", &p, &abHHData::legacy_I);
+}
+
+
+abHH::abHH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
+    IonicCurrent(condID, assignID, multiID, in, out),
+    p(&params()),
+    a(&assignment()),
     m(0.0),
     h(1.0),
     ma(0.0),
@@ -56,25 +102,22 @@ inline double abHH::mhFunc(double x, int thetype)
    switch (thetype) {
     case 0:
          return x/((*theExp)(x)-1.0);
-         break;
     case 1:
          return (*theExp)(x);
-         break;
     case 2:
          return (*theExpSigmoid)(x);
-         break;
    }
    return 0.0;
 }
 
-void abHH::currentUpdate(double, double dt)
+void abHH::step(double, double dt, bool settling)
 {
   static double powm, powh;
   static double V;
   static int i;
   
-  if (p->active && a->active && pre->active && out->active) {
-    V= pre->V;
+  if (p->active && a->active && in->active && out->active) {
+    V= in->V;
     if (p->mExpo > 0) {
       // Linear Euler:
       m+= (ma*(1.0-m)-mb*m)*dt;    // calculate m with previous values of ma, m, mb
@@ -94,19 +137,23 @@ void abHH::currentUpdate(double, double dt)
       for (i= 0; i < p->hExpo-1; i++) powh*= h;
     }
     else powh= 1.0;
-    I= p->gMax*powm*powh*(p->Vrev-V);
-    out->I+= I;
+
+    m_conductance = p->gMax * powm * powh;
+    if ( !settling || p->activeSettling )
+        out->I += m_conductance * (p->Vrev-V);
+  } else {
+      m_conductance = 0;
   }
 }
 
-void abHH::RK4(double, double dt, size_t n)
+void abHH::RK4(double, double dt, size_t n, bool settling)
 {
     static double powm, powh;
     static double V;
     static int i;
 
-    if (p->active && a->active && pre->active && out->active) {
-      V = pre->V;
+    if (p->active && a->active && in->active && out->active) {
+      V = in->V;
       if (p->mExpo > 0) {
           /// Calculate km[n]=dm/dt based on the previous intermediates (Vi, mi)
           ma= p->mka*mhFunc((V-p->mVa)/p->msa, p->maFunc);
@@ -123,8 +170,10 @@ void abHH::RK4(double, double dt, size_t n)
           } else {
               mi = m + (km[0] + 2*km[1] + 2*km[2] + km[3]) * dt / 6;
           }
-          if ( mi < 0.0 ) mi = 0.0;
+
           if ( mi > 1.0 ) mi = 1.0;
+          else if ( mi < 0.0 || std::isnan(mi) ) mi = 0.0;
+
           if ( n == 3 ) {
               m = mi;
           }
@@ -144,14 +193,20 @@ void abHH::RK4(double, double dt, size_t n)
           } else {
               hi = h + (kh[0] + 2*kh[1] + 2*kh[2] + kh[3]) * dt / 6;
           }
-          if ( hi < 0.0 ) hi = 0.0;
+
           if ( hi > 1.0 ) hi = 1.0;
+          else if ( hi < 0.0 || std::isnan(hi) ) hi = 0.0;
+
           if ( n == 3 ) {
               h = hi;
           }
       }
       else powh= 1.0;
-      I= p->gMax*powm*powh*(p->Vrev-V);
-      out->I+= I;
+
+      m_conductance = p->gMax * powm * powh;
+      if ( !settling || p->activeSettling )
+          out->I += m_conductance * (p->Vrev-V);
+    } else {
+        m_conductance = 0;
     }
 }

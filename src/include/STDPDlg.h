@@ -29,7 +29,7 @@ class STDPDlg : public QDialog, private Ui::STDPDlg
      Q_OBJECT
 
   public:
-     STDPDlg(QWidget *parent= 0);
+     STDPDlg(QWidget *parent= nullptr);
      void exportData(STPlast &);
      void importData(STPlast);
      void setLabel(const QString&);

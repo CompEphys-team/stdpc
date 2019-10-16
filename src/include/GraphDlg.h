@@ -22,10 +22,11 @@
 
 #include <QWidget>
 #include "ChannelListModel.h"
-#include "QCustomPlot.h"
-#include "CircularFifo.h"
-#include <memory>
 #include "WideComboBox.h"
+#include <QCheckBox>
+#include <QToolButton>
+#include <QColorDialog>
+#include <QLabel>
 
 namespace Ui {
 class GraphDlg;
@@ -59,55 +60,56 @@ public slots:
 };
 
 
-class GraphDlg : public QWidget
+class GraphDlg : public QDialog
 {
      Q_OBJECT
 private:
     Ui::GraphDlg *ui;
-    ChannelListModel clm;
-
-    QTimer dataTimer;
-
-    bool initial;
-    long long nPoints;
-    double t0;
-
-    std::vector<GraphData> activeGraphs;
+    ChannelListModel *clm;
 
     QVector<QCheckBox*> actives;
     QVector<ColorButton*> colors;
     QVector<QComboBox*> types;
+    QVector<QComboBox*> unitMods;
+    QVector<QLabel*> unitTypes;
     QVector<WideComboBox*> channels;
-    QMetaObject::Connection activec, typec, channelc;
+    QMetaObject::Connection activec, typec, unitc, channelc;
 
-    void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, WideComboBox *channel);
+    int m_plot;
+    bool interactive;
+    bool m_delete;
 
-    void setInteractive(bool maybe);
+    void addRow(int row, QCheckBox *active, ColorButton *colBtn, QComboBox *type, QComboBox *unitMod, QLabel *unitType, WideComboBox *channel);
 
 private slots:
-    void replot();
     void growTable(bool reactive = true);
     void checkChannelTypes();
 
     void on_TraceActivate_clicked();
     void on_TraceDeactivate_clicked();
     void on_TraceClear_clicked();
-    void on_TraceReset_clicked();
+
+    void on_removePlot_clicked();
 
 public:
-     GraphDlg(QWidget *parent = 0);
-     void link(QWidget *mainwin);
+     GraphDlg(QWidget *parent = nullptr);
      ~GraphDlg();
 
-     struct DataPoint { double t; double value; };
-     std::vector<std::unique_ptr<CircularFifo<DataPoint>>> q;
+     inline void setPlot(int g, bool deleteOnClose) { m_plot = g; m_delete = deleteOnClose; }
+     inline int plot() const { return m_plot; }
+
+     inline void setInteractive(bool maybe) { interactive = maybe; }
+
+     static QStringList unitModifiers;
 
 public slots:
-     bool startPlotting(DCThread *);
-     void stopPlotting();
-     void reloadGraphs();
-     void importData();
-     void exportData();
+     void open();
+     void accept();
+     void reject();
+
+signals:
+     void updatePlot(int row);
+     void removePlot(int row);
 }; 
 
 #endif

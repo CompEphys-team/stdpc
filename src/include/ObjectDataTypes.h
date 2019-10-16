@@ -20,34 +20,63 @@
 #ifndef OBJECTDATATYPES_H
 #define OBJECTDATATYPES_H
 
-using namespace std;
-
 #include <QString>
 #include <iostream>
 #include <QColor>
 #include "ChannelIndex.h"
 #include "Util.h"
 
-struct SynapseAssignment {
+using namespace std;
+
+struct AssignmentData {
     bool active;
+    bool save = false;
+};
+
+struct SynapseAssignment : public AssignmentData {
     ChannelIndex PreSynChannel;
     ChannelIndex PostSynChannel;
     ChannelIndex OutSynChannel;
     double delay;
 };
 
-struct GapJunctionAssignment {
-    bool active;
+struct GapJunctionAssignment : public AssignmentData {
     ChannelIndex preInChannel;
     ChannelIndex postInChannel;
     ChannelIndex preOutChannel;
     ChannelIndex postOutChannel;
 };
 
-struct CurrentAssignment {
-    bool active;
+struct CurrentAssignment : public AssignmentData {
     ChannelIndex VChannel;
     ChannelIndex IChannel;
+};
+
+struct ConductanceData {
+    bool active;
+    bool activeSettling = false;
+    QuotedString label;
+    virtual const AssignmentData &assignment(size_t i) const = 0;
+    virtual size_t numAssignments() const = 0;
+    ConductanceData() : active(false) {}
+    virtual ~ConductanceData() = default;
+};
+
+struct SynapseData : public ConductanceData {
+    inline const SynapseAssignment &assignment(size_t i) const { return assign[i]; }
+    inline size_t numAssignments() const { return assign.size(); }
+    std::vector<SynapseAssignment> assign;
+    int legacy_PreSyn = -1;
+    int legacy_PostSyn = -1;
+    int legacy_OutSyn = -1;
+};
+
+struct CurrentData : public ConductanceData {
+    inline const CurrentAssignment &assignment(size_t i) const { return assign[i]; }
+    inline size_t numAssignments() const { return assign.size(); }
+    std::vector<CurrentAssignment> assign;
+    int legacy_V = -1;
+    int legacy_I = -1;
 };
 
 typedef struct {
@@ -88,145 +117,6 @@ typedef struct {
   double sigmoidTableMaxEntry;
 } ODEPlast;
 
-typedef struct {
-  bool active;
-  bool LUTables;
-  bool MgBlock;
-  double gSyn;
-  double VSyn;
-  double tauSyn;
-  double VThresh;
-  double VSlope;
-  int STD;
-  double STDAmpl;
-  double STDVThresh;
-  double STDVSlope;
-  double STDtauAmpl;
-  double STDtau0;
-  double STDtauVThresh;
-  double STDtauVSlope;
-  int fixVpost;
-  double Vpost;
-  double Mgfac;
-  double Mgexpo;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-  std::vector<SynapseAssignment> assign;
-  int legacy_PreSyn = -1;
-  int legacy_PostSyn = -1;
-  int legacy_OutSyn = -1;
-} CSynData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gSyn;
-  double Vrev;
-  double aS;
-  double bS;
-  double aR;
-  double VaR;
-  double saR;
-  double bR;
-  int fixVpost;
-  double Vpost;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-  std::vector<SynapseAssignment> assign;
-  int legacy_PreSyn = -1;
-  int legacy_PostSyn = -1;
-  int legacy_OutSyn = -1;
-} abSynData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gSyn;
-  double Vpre;
-  double Vrev;
-  double trelease;
-  double alpha;
-  double beta;
-  int fixVpost;
-  double Vpost;
-  int Plasticity;
-  STPlast ST;
-  ODEPlast ODE;
-  std::vector<SynapseAssignment> assign;
-  int legacy_PreSyn = -1;
-  int legacy_PostSyn = -1;
-  int legacy_OutSyn = -1;
-} DestexheSynData;
-
-typedef struct {
-  bool active;
-  int type;
-  double gSyn;
-  std::vector<GapJunctionAssignment> assign;
-  int legacy_PreIn = -1;
-  int legacy_PostIn= -1;
-  int legacy_PreOut = -1;
-  int legacy_PostOut = -1;
-} GJunctData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gMax;
-  double Vrev;
-  int mExpo;
-  int hExpo;
-  double Vm;
-  double sm;
-  double Cm;
-  int taumType;
-  double taum;
-  double taumAmpl;
-  double Vtaum;
-  double staum;
-  double Vh;
-  double sh;
-  double Ch;
-  int tauhType;
-  double tauh;
-  double tauhAmpl;
-  double Vtauh;
-  double stauh;
-  std::vector<CurrentAssignment> assign;
-  int legacy_V = -1;
-  int legacy_I = -1;
-} mhHHData;
-
-typedef struct {
-  bool active;
-  bool LUTables;
-  double gMax;
-  double Vrev;
-  int mExpo;
-  int hExpo;
-  int maFunc;
-  double mka;
-  double mVa;
-  double msa;
-  int mbFunc;
-  double mkb;
-  double mVb;
-  double msb;
-  int haFunc;
-  double hka;
-  double hVa;
-  double hsa;
-  int hbFunc;
-  double hkb;
-  double hVb;
-  double hsb;
-  std::vector<CurrentAssignment> assign;
-  int legacy_V = -1;
-  int legacy_I = -1;
-} abHHData;
-
 struct elecCalibParams {
   // channel copy parameters
   bool copyChnOn;
@@ -264,6 +154,13 @@ typedef struct {
   double savingFreq;
   bool isBinary;
 
+  bool binaryLittleEndian;
+  bool binaryDoublePrecision;
+
+  QuotedString asciiSeparator;
+  QuotedString asciiHeaderPrefix;
+  bool asciiCRLF;
+
 } dataSavingParams;
  
 struct inChnData {
@@ -292,6 +189,7 @@ struct outChnData {
 class DAQData {
 public:
     bool active;
+    QuotedString label;
     std::vector<inChnData> inChn;
     std::vector<outChnData> outChn;
     DAQData() : active(false) {}
@@ -301,16 +199,26 @@ struct GraphData {
     bool active;
     ChannelIndex chan;
     bool isVoltage;
+    int unitMod = 1;
     QColor color;
 
     GraphData() : active(true) {}
 };
 
 struct PlotData {
+    std::vector<GraphData> graph;
+    int height = 400;
+    double yLower = -100;
+    double yUpper = 100;
+};
+
+struct BasePlotData {
+    bool active;
     double interval;
     int bufferExp;
-    std::vector<GraphData> graphs;
-    PlotData() : interval(1e-3), bufferExp(4) {}
+    double xRange = 10;
+    std::vector<PlotData> plot;
+    BasePlotData() : interval(1e-3), bufferExp(4) {}
 };
 
 struct PerformanceMonitorData {
@@ -333,9 +241,28 @@ struct vInstData {
 
 struct ModelData {
     bool active;
+    QuotedString label;
     virtual vInstData &instance(size_t i) = 0;
     virtual size_t numInst() const = 0;
     ModelData() : active(false) {}
+    virtual ~ModelData() = default;
+};
+
+struct TriggerData {
+    bool active;
+    ChannelIndex channel;
+};
+
+struct SettlingData {
+    bool active = false;
+    double duration = 0.0;
+};
+
+struct GuiData {
+    bool openDAQ = true;
+    bool openTools = false;
+    bool openSynapses = false;
+    bool openCurrents = false;
 };
 
 #endif

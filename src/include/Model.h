@@ -55,7 +55,7 @@ public:
     ///  - Update intermediate state based on k_n and null state
     ///  - at n=3, update null state based on k_{0..3} (nullstate += (k0 + 2k1 + 2k2 + k3)/6 * dt)
     /// Note, out.I must be reset to the retained value at the end of every step, except for the last one (n=3).
-    virtual void RK4(double t, double dt, size_t n) = 0;
+    virtual void RK4(double t, double dt, size_t n, bool settling) = 0;
 
     vInstData &params() const;
     inline size_t id() const { return instID; }
@@ -83,6 +83,9 @@ public:
     /// Prepare for action: Populate inst with newly constructed Models
     virtual void init(DCThread *) = 0;
 
+    /// Post-init call for any additional setup that requires other models to be present
+    virtual void post_init(DCThread *) {}
+
     /// Return a reference to the specific parameter set used for this model
     virtual ModelData &params() const = 0;
 
@@ -105,11 +108,10 @@ public:
     virtual void restoreCurrent(double t);
 
     /// Delegates to Model::RK4(t,dt,n)
-    virtual void RK4(double t, double dt, size_t n);
+    virtual void RK4(double t, double dt, size_t n, bool settling);
 
     QString getStatus() const;
-    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save() const;
-    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save()const;
+    QPair<QVector<ChannelIndex>, QVector<const double *>> valuesToSave()const;
 
     inline std::vector<std::shared_ptr<Model>> const& instances() const { return inst; }
 

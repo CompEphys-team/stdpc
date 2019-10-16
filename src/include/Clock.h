@@ -20,7 +20,7 @@
 #ifndef CLOCK_H
 #define CLOCK_H
 
-#include <windows.h>
+#include <Windows.h>
 #include <QVector>
 
 // Forward

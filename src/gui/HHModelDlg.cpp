@@ -28,8 +28,7 @@ HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
     ui(new Ui::HHModelDlg)
 {
     ui->setupUi(this);
-    label = ui->titleLabel->text();
-    ui->titleLabel->setText(label.arg(idx));
+    setIndex(idx);
     ui->table->setHorizontalHeaderLabels({"Active",
                                           "",
                                           "VChan\nSave",
@@ -51,11 +50,16 @@ HHModelDlg::HHModelDlg(size_t idx, QWidget *parent) :
     growTable(false);
 
     connect(ui->addButton, SIGNAL(clicked(bool)), this, SLOT(addMultiple()));
+
+    connect(ui->Vlimit, &QCheckBox::toggled, [=](bool y){
+        ui->Vmax->setEnabled(y);
+        ui->Vmin->setEnabled(y);
+    });
 }
 
 void HHModelDlg::setIndex(size_t no)
 {
-    ui->titleLabel->setText(label.arg(no));
+    ui->titleLabel->setText(QString("%1 %2").arg(HHNeuronProxy::get()->prettyName()).arg(no));
     ModelDlg::setIndex(no);
 }
 
@@ -98,9 +102,13 @@ void HHModelDlg::importData()
     }
     growTable(false);
 
+    ui->leLabel->setText(HHNeuronProxy::p[idx].label);
     ui->C->setValue(HHNeuronProxy::p[idx].C * 1e9);
     ui->gLeak->setValue(HHNeuronProxy::p[idx].gLeak * 1e9);
     ui->ELeak->setValue(HHNeuronProxy::p[idx].ELeak * 1e3);
+    ui->Vlimit->setChecked(HHNeuronProxy::p[idx].Vlimit);
+    ui->Vmin->setValue(HHNeuronProxy::p[idx].Vmin * 1e3);
+    ui->Vmax->setValue(HHNeuronProxy::p[idx].Vmax * 1e3);
 }
 
 void HHModelDlg::exportData()
@@ -119,9 +127,13 @@ void HHModelDlg::exportData()
         HHNeuronProxy::p[idx].inst.push_back(inst);
     }
 
+    HHNeuronProxy::p[idx].label = ui->leLabel->text();
     HHNeuronProxy::p[idx].C = ui->C->value() * 1e-9;
     HHNeuronProxy::p[idx].gLeak = ui->gLeak->value() * 1e-9;
     HHNeuronProxy::p[idx].ELeak = ui->ELeak->value() * 1e-3;
+    HHNeuronProxy::p[idx].Vlimit = ui->Vlimit->isChecked();
+    HHNeuronProxy::p[idx].Vmin = ui->Vmin->value() * 1e-3;
+    HHNeuronProxy::p[idx].Vmax = ui->Vmax->value() * 1e-3;
     emit channelsChanged();
     emit modelStatusChanged();
 }

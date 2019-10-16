@@ -17,6 +17,33 @@
    <property name="verticalSpacing">
     <number>10</number>
    </property>
+   <item row="4" column="0">
+    <widget class="QSpinBox" name="addNumber">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="value">
+      <number>10</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="QPushButton" name="addButton">
+     <property name="text">
+      <string>Add instances</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="6" colspan="3">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="6" colspan="3">
     <widget class="QLabel" name="titleLabel">
      <property name="enabled">
@@ -48,7 +75,7 @@
       <number>0</number>
      </property>
      <property name="text">
-      <string>Hodgkin-Huxley model %1</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -120,27 +147,39 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="6">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+   <item row="3" column="0" colspan="9">
+    <widget class="QTableWidget" name="table">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
      </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
+     <property name="columnCount">
+      <number>9</number>
      </property>
-    </spacer>
+     <attribute name="horizontalHeaderHighlightSections">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+     <column/>
+    </widget>
    </item>
-   <item row="1" column="7">
+   <item row="2" column="4">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>E Leak (mV)</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="8">
+   <item row="2" column="5">
     <widget class="QDoubleSpinBox" name="ELeak">
      <property name="minimumSize">
       <size>
@@ -168,55 +207,69 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="9">
-    <widget class="QTableWidget" name="table">
-     <property name="alternatingRowColors">
-      <bool>true</bool>
+   <item row="2" column="7">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Max voltage (mV)</string>
      </property>
-     <property name="columnCount">
-      <number>9</number>
-     </property>
-     <attribute name="horizontalHeaderHighlightSections">
-      <bool>false</bool>
-     </attribute>
-     <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-     </attribute>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
-     <column/>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QSpinBox" name="addNumber">
+   <item row="2" column="8">
+    <widget class="QSpinBox" name="Vmax">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="minimum">
-      <number>1</number>
+      <number>-9999</number>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
      </property>
      <property name="value">
-      <number>10</number>
+      <number>200</number>
      </property>
     </widget>
    </item>
-   <item row="3" column="1" colspan="2">
-    <widget class="QPushButton" name="addButton">
+   <item row="1" column="8">
+    <widget class="QSpinBox" name="Vmin">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="minimum">
+      <number>-9999</number>
+     </property>
+     <property name="maximum">
+      <number>9999</number>
+     </property>
+     <property name="value">
+      <number>-200</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="7">
+    <widget class="QCheckBox" name="Vlimit">
      <property name="text">
-      <string>Add instances</string>
+      <string>Min voltage (mV)</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="6" colspan="3">
-    <widget class="QDialogButtonBox" name="buttonBox">
+   <item row="1" column="6">
+    <spacer name="horizontalSpacer_2">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="0" colspan="6">
+    <widget class="QLineEdit" name="leLabel">
+     <property name="placeholderText">
+      <string>Label...</string>
      </property>
     </widget>
    </item>

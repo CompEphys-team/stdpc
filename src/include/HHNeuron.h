@@ -27,16 +27,24 @@ struct HHNeuronData : public ModelData
     double C;
     double gLeak;
     double ELeak;
+    bool Vlimit;
+    double Vmin;
+    double Vmax;
     std::vector<vInstData> inst;
 
     inline vInstData &instance(size_t i) { return inst[i]; }
     inline size_t numInst() const { return inst.size(); }
-    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3) {}
+    HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3), Vlimit(false), Vmin(-0.2), Vmax(0.2) {}
 };
 
 class HHNeuronProxy : public ModelProxy {
-public:
+private:
     HHNeuronProxy();
+public:
+    HHNeuronProxy(const HHNeuronProxy &) = delete;
+    void operator=(const HHNeuronProxy &) = delete;
+    static HHNeuronProxy *get() { static HHNeuronProxy proxy; return &proxy; }
+
     inline ModelData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
@@ -45,8 +53,8 @@ public:
     inline QString modelClass() { return "HH"; }
     inline QString prettyName() { return "HH Model"; }
 
-    inline ModelPrototype *createPrototype(size_t modelID);
-    inline ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
+    ModelPrototype *createPrototype(size_t modelID);
+    ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
 
     static std::vector<HHNeuronData> p;
 };
@@ -57,7 +65,7 @@ class HHNeuron : public Model
 public:
     HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT);
 
-    void RK4(double t, double dt, size_t n);
+    void RK4(double t, double dt, size_t n, bool settling);
 
 protected:
     double V;

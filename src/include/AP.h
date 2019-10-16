@@ -115,12 +115,18 @@ public:
 
     inline QString const& name() { return _name; }
     virtual QString const& canonicalName() { return name(); }
+    inline void setReadOnly(bool ro = true) { _readOnly = ro; }
 
     static inline std::vector<std::unique_ptr<AP>> &params() { static std::vector<std::unique_ptr<AP>> p; return p; }
+    static inline std::vector<std::function<void(void)>> &hooks_post_load()
+        { static std::vector<std::function<void(void)>> hooks; return hooks; }
+
+    virtual ~AP() = default;
 
 protected:
     AP(QString &name) : _name(name) {}
     QString _name;
+    bool _readOnly = false;
 };
 
 
@@ -307,7 +313,8 @@ public:
 
     virtual void write(std::ostream &os)
     {
-        write(os, APFunc::gen_seq<sizeof...(Tail)>{});
+        if ( !_readOnly )
+            write(os, APFunc::gen_seq<sizeof...(Tail)>{});
     }
 
 private:
@@ -341,7 +348,7 @@ public:
         // Replace existing indices in order
         QString tName(target->name());
         QRegularExpressionMatchIterator it = QRegularExpression("\\[(\\d+)\\]").globalMatch(rawName);
-        int offset, i = 0;
+        int offset = 0, i = 0;
         while ( it.hasNext() && (offset = tName.indexOf('#')) > 0 ) {
             if ( i++ < nIgnore )
                 tName.replace(offset, 1, '0');

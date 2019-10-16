@@ -33,6 +33,7 @@ class function {
   public:
     function() { }
     virtual double operator()(double)= 0;
+    virtual ~function() = default;
 };  
 
 }

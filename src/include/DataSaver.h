@@ -23,25 +23,39 @@
 #include <QObject>
 #include <QString>
 #include <QVector>
+#include <QDataStream>
+#include <QFile>
 #include <fstream>
 #include <memory>
 #include "CircularFifo.h"
+#include "ObjectDataTypes.h"
 
 class DataSaver : public QObject
 {
     Q_OBJECT
 
 private:
-    QString filename;
-    bool isBinary;
+    dataSavingParams p;
+
+    std::vector<std::unique_ptr<QDataStream>> binaryStreams;
+    std::vector<std::unique_ptr<QFile>> binaryFiles;
     std::ofstream os;
+
+    std::string lineEnding;
+
+    int runningIndex = -1;
+    QuotedString indexedFilename;
+
+protected:
+    bool initBinary(QVector<ChannelIndex> channels);
+    bool initAscii(QVector<ChannelIndex> channels);
 
 public:
     DataSaver();
-    bool InitDataSaving(const QString &, bool);
-    void SaveHeader(QVector<QString>, double savingFreq);
+    bool init(dataSavingParams p_, QVector<ChannelIndex> channels);
+    inline QuotedString filename() const { return p.fileName; }
 
-    std::vector<std::unique_ptr<CircularFifo<float>>> q;
+    std::vector<std::unique_ptr<CircularFifo<double>>> q;
 
 public slots:
     void SaveLine();

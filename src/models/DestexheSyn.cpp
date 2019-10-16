@@ -17,18 +17,90 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-
 #include "DestexheSyn.h"
 #include <cmath>
 #include "DCThread.h"
+#include "DestexheSynDlg.h"
+
+static DestexheSynProxy *prox = DestexheSynProxy::get();
+std::vector<DestexheSynData> DestexheSynProxy::p;
+DestexheSynProxy *DestexheSyn::proxy() const { return prox; }
+ConductanceDlg *DestexheSynProxy::createDialog(size_t condID, QWidget *parent) { return new DestexheSynDlg(condID, parent); }
+Synapse *DestexheSynProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *DCT,
+                                          inChannel *pre, inChannel *post, outChannel *out) {
+    return new DestexheSyn(conductanceID, assignID, multiID, DCT, pre, post, out);
+}
+
+DestexheSynProxy::DestexheSynProxy()
+{
+    ConductanceManager::RegisterSynapse(this);
+    // DxheSynp STPlast
+    addAP("DxheSynp[#].ST.AMinus", &p, &DestexheSynData::ST, &STPlast::AMinus);
+    addAP("DxheSynp[#].ST.tauMinus", &p, &DestexheSynData::ST, &STPlast::tauMinus);
+    addAP("DxheSynp[#].ST.APlus", &p, &DestexheSynData::ST, &STPlast::APlus);
+    addAP("DxheSynp[#].ST.tauPlus", &p, &DestexheSynData::ST, &STPlast::tauPlus);
+    addAP("DxheSynp[#].ST.Exponent", &p, &DestexheSynData::ST, &STPlast::Exponent);
+    addAP("DxheSynp[#].ST.Shift", &p, &DestexheSynData::ST, &STPlast::Shift);
+    addAP("DxheSynp[#].ST.History", &p, &DestexheSynData::ST, &STPlast::History);
+    addAP("DxheSynp[#].ST.Table", &p, &DestexheSynData::ST, &STPlast::Table);
+    addAP("DxheSynp[#].ST.tableDt", &p, &DestexheSynData::ST, &STPlast::tableDt);
+    addAP("DxheSynp[#].ST.tableDgMin", &p, &DestexheSynData::ST, &STPlast::tableDgMin);
+    addAP("DxheSynp[#].ST.gMax", &p, &DestexheSynData::ST, &STPlast::gMax);
+    addAP("DxheSynp[#].ST.gMid", &p, &DestexheSynData::ST, &STPlast::gMid);
+    addAP("DxheSynp[#].ST.gSlope", &p, &DestexheSynData::ST, &STPlast::gSlope);
+    addAP("DxheSynp[#].ST.sigmoidTable", &p, &DestexheSynData::ST, &STPlast::sigmoidTable);
+    addAP("DxheSynp[#].ST.sigmoidTableDg", &p, &DestexheSynData::ST, &STPlast::sigmoidTableDg);
+    addAP("DxheSynp[#].ST.sigmoidTableMaxEntry", &p, &DestexheSynData::ST, &STPlast::sigmoidTableMaxEntry);
+
+    // DxheSynp ODEPlast
+    addAP("DxheSynp[#].ODE.InitialP", &p, &DestexheSynData::ODE, &ODEPlast::InitialP);
+    addAP("DxheSynp[#].ODE.InitialD", &p, &DestexheSynData::ODE, &ODEPlast::InitialD);
+    addAP("DxheSynp[#].ODE.betaP", &p, &DestexheSynData::ODE, &ODEPlast::betaP);
+    addAP("DxheSynp[#].ODE.betaD", &p, &DestexheSynData::ODE, &ODEPlast::betaD);
+    addAP("DxheSynp[#].ODE.gamma", &p, &DestexheSynData::ODE, &ODEPlast::gamma);
+    addAP("DxheSynp[#].ODE.eta", &p, &DestexheSynData::ODE, &ODEPlast::eta);
+    addAP("DxheSynp[#].ODE.highP", &p, &DestexheSynData::ODE, &ODEPlast::highP);
+    addAP("DxheSynp[#].ODE.lowP", &p, &DestexheSynData::ODE, &ODEPlast::lowP);
+    addAP("DxheSynp[#].ODE.highD", &p, &DestexheSynData::ODE, &ODEPlast::highD);
+    addAP("DxheSynp[#].ODE.lowD", &p, &DestexheSynData::ODE, &ODEPlast::lowD);
+    addAP("DxheSynp[#].ODE.gMax", &p, &DestexheSynData::ODE, &ODEPlast::gMax);
+    addAP("DxheSynp[#].ODE.gMid", &p, &DestexheSynData::ODE, &ODEPlast::gMid);
+    addAP("DxheSynp[#].ODE.gSlope", &p, &DestexheSynData::ODE, &ODEPlast::gSlope);
+    addAP("DxheSynp[#].ODE.sigmoidTable", &p, &DestexheSynData::ODE, &ODEPlast::sigmoidTable);
+    addAP("DxheSynp[#].ODE.sigmoidTableDg", &p, &DestexheSynData::ODE, &ODEPlast::sigmoidTableDg);
+    addAP("DxheSynp[#].ODE.sigmoidTableMaxEntry", &p, &DestexheSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
+
+    // main DxheSynp
+    addAP("DxheSynp[#].active", &p, &DestexheSynData::active);
+    addAP("DxheSynp[#].activeSettling", &p, &DestexheSynData::activeSettling);
+    addAP("DxheSynp[#].label", &p, &DestexheSynData::label);
+    addAP("DxheSynp[#].LUTables", &p, &DestexheSynData::LUTables);
+    addAP("DxheSynp[#].gSyn", &p, &DestexheSynData::gSyn);
+    addAP("DxheSynp[#].Vpre", &p, &DestexheSynData::Vpre);
+    addAP("DxheSynp[#].Vrev", &p, &DestexheSynData::Vrev);
+    addAP("DxheSynp[#].trelease", &p, &DestexheSynData::trelease);
+    addAP("DxheSynp[#].alpha", &p, &DestexheSynData::alpha);
+    addAP("DxheSynp[#].beta", &p, &DestexheSynData::beta);
+    addAP("DxheSynp[#].fixVpost", &p, &DestexheSynData::fixVpost);
+    addAP("DxheSynp[#].Vpost", &p, &DestexheSynData::Vpost);
+    addAP("DxheSynp[#].Plasticity", &p, &DestexheSynData::Plasticity);
+    addAP("DxheSynp[#].assign[#].active", &p, &DestexheSynData::assign, &SynapseAssignment::active);
+    addAP("DxheSynp[#].assign[#].PreSynChannel", &p, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
+    addAP("DxheSynp[#].assign[#].PostSynChannel", &p, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
+    addAP("DxheSynp[#].assign[#].OutSynChannel", &p, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
+    addAP("DxheSynp[#].assign[#].delay", &p, &DestexheSynData::assign, &SynapseAssignment::delay);
+    addAP("DxheSynp[#].assign[#].save", &p, &DestexheSynData::assign, &SynapseAssignment::save);
+
+    addAP("DxheSynp[#].PreSynChannel", &p, &DestexheSynData::legacy_PreSyn);
+    addAP("DxheSynp[#].PostSynChannel", &p, &DestexheSynData::legacy_PostSyn);
+    addAP("DxheSynp[#].OutSynChannel", &p, &DestexheSynData::legacy_OutSyn);
+}
+
     
-DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *a, inChannel *pre, inChannel *post, outChannel *out) :
-    p(inp),
-    pre(pre),
-    post(post),
-    out(out),
-    a(a),
-    buffered(false),
+DestexheSyn::DestexheSyn(size_t condID, size_t assignID, size_t multiID, DCThread *DCT, inChannel *pre, inChannel *post, outChannel *out) :
+    Synapse(condID, assignID, multiID, pre, post, out),
+    p(&params()),
+    a(&assignment()),
     S(0.0),
     tlast(-1.0e10),
     g(p->gSyn)
@@ -55,10 +127,7 @@ DestexheSyn::DestexheSyn(DestexheSynData *inp, DCThread *t, SynapseAssignment *a
         Dslope= 1.0/(p->ODE.highD - p->ODE.lowD);
     }
 
-    if ( a->delay > 0. ) {
-        bufferHandle = pre->getBufferHandle(a->delay, t->bufferHelper);
-        buffered = true;
-    }
+    setupBuffer(DCT);
 }
 
 double DestexheSyn::invGFilter(double ing)
@@ -91,12 +160,14 @@ double DestexheSyn::gFilter(double ingr)
   return ng;
 }
 
-void DestexheSyn::currentUpdate(double t, double dt)
+void DestexheSyn::step(double t, double dt, bool settling)
 {
   static double rt, dS;
 
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay )
+  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+      m_conductance = 0;
       return;
+  }
   
   // calculate synaptic current
   rt= t - tlast;
@@ -117,26 +188,27 @@ void DestexheSyn::currentUpdate(double t, double dt)
   // Linear Euler:
   S+= dS*dt;
   if (S > 1.0) S= 1.0;
-  if (S < 0.0) S= 0.0;
+  else if (S < 0.0 || std::isnan(S)) S= 0.0;
+
+  double postV = p->fixVpost ? p->Vpost : post->V;
 
   // if plastic, learn
-  switch (p->Plasticity) {
+  switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
     case 0:
-      if (p->fixVpost) I= p->gSyn * S * (p->Vrev - p->Vpost);
-      else I= p->gSyn * S * (p->Vrev - post->V);
+      m_conductance = p->gSyn * S;
       break;
     case 1:
-      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-      else I= g * S * (p->Vrev - post->V);
+      m_conductance = g * S;
       STlearn(t);   
       break; 
     case 2:
-      if (p->fixVpost) I= g * S * (p->Vrev - p->Vpost);
-      else I= g * S * (p->Vrev - post->V);
+      m_conductance = g * S;
       ODElearn(dt);
       break; 
   }
-  out->I+= I;
+
+  if ( !settling || p->activeSettling )
+      out->I += m_conductance * (p->Vrev - postV);
 }
 
 void DestexheSyn::STlearn(double t)

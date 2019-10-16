@@ -25,7 +25,7 @@
 #include "ChannelIndex.h"
 #include "DeviceManager.h"
 #include "ModelManager.h"
-#include "GraphDlg.h"
+#include "GraphWidget.h"
 #include "PerformanceMonitor.h"
 
 DCThread::DCThread() :
@@ -54,7 +54,7 @@ DCThread::~DCThread()
 {
 }
 
-void DCThread::setGraph(GraphDlg *g, double dt)
+void DCThread::setGraph(GraphWidget *g, double dt)
 {
     if ( stopped ) {
         graph = g;
@@ -82,101 +82,40 @@ void DCThread::setup_and_go()
            Models.initSingle(proxy, j);
    Models.initActive(this);
 
+   // Prepare the buffer helper for delayed synapses
+   bufferHelper.reset(new ChannelBufferHelper);
+
+   // Populate synapses and currents
+   Conductances.init(this);
+
    // set up the graphic display channels
    graphDummy = 0.0;
    if ( graph ) {
        inChannel *itmp;
        outChannel *otmp;
        graphVar.clear();
-       graphVar.reserve(Plotp.graphs.size());
-       for ( GraphData &p : Plotp.graphs ) {
-           if ( !p.active ) {
-               continue;
-           } else if ( !p.chan.isValid || p.chan.isNone ) {
+       graphVar.reserve(graph->q.size());
+       for ( ChannelIndex &chan : graph->plottedChannels ) {
+           if ( !chan.isValid || chan.isNone ) {
                graphVar.push_back(&graphDummy);
-           } else if ( p.chan.isVirtual ) {
-               graphVar.push_back(p.isVoltage
-                       ? &((itmp = getInChan(p.chan)) ? itmp->V : graphDummy)
-                       : &((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
-           } else if ( p.chan.isInChn ) {
-               graphVar.push_back(&((itmp = getInChan(p.chan)) ? itmp->V : graphDummy));
+           } else if ( chan.isConductance ) {
+               const double *ret = Conductances.conductance(chan);
+               graphVar.push_back(ret ? ret : &graphDummy);
+           } else if ( chan.isVirtual ) {
+               graphVar.push_back(chan.isInChn
+                       ? &((itmp = getInChan(chan)) ? itmp->V : graphDummy)
+                       : &((otmp = getOutChan(chan)) ? otmp->I : graphDummy));
+           } else if ( chan.isInChn ) {
+               graphVar.push_back(&((itmp = getInChan(chan)) ? itmp->V : graphDummy));
            } else {
-               graphVar.push_back(&((otmp = getOutChan(p.chan)) ? otmp->I : graphDummy));
+               graphVar.push_back(&((otmp = getOutChan(chan)) ? otmp->I : graphDummy));
            }
        }
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
-   // Prepare the buffer helper for delayed synapses
-   bufferHelper.reset(new ChannelBufferHelper);
-
-   // Populate synapses and currents
-   csynPre.clear();
-   csynPost.clear();
-   for ( CSynData &p : CSynp ) {
-       if ( p.active ) {
-           for ( SynapseAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(csynPre, csynPost, p, a);
-       }
-   }
-   absynPre.clear();
-   absynPost.clear();
-   for ( abSynData &p : abSynp ) {
-       if ( p.active ) {
-           for ( SynapseAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(absynPre, absynPost, p, a);
-       }
-   }
-   dsynPre.clear();
-   dsynPost.clear();
-   for ( DestexheSynData &p : DxheSynp ) {
-       if ( p.active ) {
-           for ( SynapseAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(dsynPre, dsynPost, p, a);
-       }
-   }
-   esyn.clear();
-   for ( GJunctData &p : ESynp ) {
-       if ( p.active ) {
-           for ( GapJunctionAssignment &a : p.assign )
-               if ( a.active )
-                   instantiate(esyn, p, a);
-       }
-   }
-   hhPre.clear();
-   hhIn.clear();
-   for ( mhHHData &p : mhHHp ) {
-       if ( p.active ) {
-           for ( CurrentAssignment &a : p.assign ) {
-               if ( a.active )
-                   instantiate(hhPre, hhIn, p, a);
-           }
-       }
-   }
-   abhhPre.clear();
-   abhhIn.clear();
-   for ( abHHData &p : abHHp ) {
-       if ( p.active ) {
-           for ( CurrentAssignment &a : p.assign ) {
-               if ( a.active )
-                   instantiate(abhhPre, abhhIn, p, a);
-           }
-       }
-   }
-   if (csynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(csynPre.size()));
-   if (csynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(csynPost.size()));
-   if (absynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(absynPre.size()));
-   if (absynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(absynPost.size()));
-   if (esyn.size() > 0) message(QString("DynClamp: %1 gap junction(s) ").arg(esyn.size()));
-   if (dsynPre.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (a2a/a2d/d2d) ").arg(dsynPre.size()));
-   if (dsynPost.size() > 0) message(QString("DynClamp: %1 chemical synapse(s) (d2a) ").arg(dsynPost.size()));
-   if (hhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(hhPre.size()));
-   if (hhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(hhIn.size()));
-   if (abhhPre.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (a) ").arg(abhhPre.size()));
-   if (abhhIn.size() > 0) message(QString("DynClamp: %1 HH conductance(s) (d) ").arg(abhhIn.size()));
+   for ( const QString &status : Conductances.getStatus() )
+       message(status);
    for ( auto const& m : Models.active() )
        message(m->getStatus());
 
@@ -218,46 +157,48 @@ void DCThread::setup_and_go()
    // Init data saving
    saving = false;
    if ( dataSavingPs.enabled ) {
-       saving = dataSaver->InitDataSaving(dataSavingPs.fileName, dataSavingPs.isBinary);
-       if ( !saving )
-           dataSaver->EndDataSaving();
-   }
-   if (saving) {
        savingPeriod = 1.0 / dataSavingPs.savingFreq;
 
-       inChnsToSave.clear();
-       outChnsToSave.clear();
-       QVector<QString> headerIn, headerOut;
+       valuesToSave.clear();
+//       QVector<QString> header(1, "Time");
+       QVector<ChannelIndex> header(1, ChannelIndex::None()); // First entry is time, not a channel
 
        for ( auto &b : Devices.active() ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = b->inChans_to_save();
-           QPair<QVector<QString>, QVector<outChannel*>> ots = b->outChans_to_save();
-           headerIn += its.first;
-           headerOut += ots.first;
-           inChnsToSave += its.second;
-           outChnsToSave += ots.second;
+           auto toSave = b->valuesToSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
        }
        for ( auto const& m : Models.active() ) {
-           QPair<QVector<QString>, QVector<inChannel*>> its = m->inChans_to_save();
-           QPair<QVector<QString>, QVector<outChannel*>> ots = m->outChans_to_save();
-           headerIn += its.first;
-           headerOut += ots.first;
-           inChnsToSave += its.second;
-           outChnsToSave += ots.second;
+           auto toSave = m->valuesToSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
+       }
+       {
+           auto toSave = Conductances.toSave();
+           header += toSave.first;
+           valuesToSave += toSave.second;
        }
 
-       QVector<QString> header(1, "Time");
-       header += headerIn;
-       header += headerOut;
-#ifdef TEST_VERSION
-       for ( AECChannel *aec : aecChannels ) {
-           header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
+//#ifdef TEST_VERSION
+//       for ( AECChannel *aec : aecChannels ) {
+//           header += QString("VAEC_%1").arg(aec->inChnNum.toString('_'));
+//           valuesToSave += &(aec->v_e);
+//       }
+//#endif
+
+       if ( valuesToSave.empty() ) {
+           saving = false;
+       } else {
+           saving = dataSaver->init(dataSavingPs, header);
+           if ( saving )
+               message(QString("Saving data to %1").arg(dataSaver->filename()));
+           else
+               message("Warning: Data saving failed to initialise. Data will not be written to disk!");
        }
-#endif
-       dataSaver->SaveHeader(header, dataSavingPs.savingFreq);
    }
 
-   start();
+   Priority prio[] = {NormalPriority, HighPriority, HighestPriority, TimeCriticalPriority};
+   start(prio[ClampThreadPriority]);
 }
 
 void DCThread::run()
@@ -277,7 +218,7 @@ void DCThread::run()
    double tFull[tDepth] = {}, tComp[tDepth] = {};
    double sumTFull = 0., sumTComp = 0.;
    int tFullOff = 0, tCompOff = 0;
-   double meanTComp, meanDT;
+   double meanTComp=0, meanDT=1;
    double subDT, subT, tLoop;
    int nSubsteps;
 
@@ -287,9 +228,28 @@ void DCThread::run()
    bool limitWarningEmitted = false;
    bool processAnalogs = false;
 
-   message(QString("DynClamp: Clamping ..."));
    stopped= false;
    finished= false;
+   settling = Settlingp.active;
+   wakeFromSettling = false;
+
+   DAQ *triggerDev = nullptr;
+   if ( Triggerp.active && (triggerDev = Devices.getDevice(Triggerp.channel)) ) {
+       message(QString("DynClamp: Waiting for trigger on %1...").arg(Triggerp.channel.prettyName()));
+       triggerDev->armTrigger(Triggerp.channel);
+       if ( !settling ) {
+           while ( !stopped && !triggerDev->triggerFired() ) {
+               // Wait patiently.
+           }
+           if ( !stopped )
+               message(QString("DynClamp: Triggered, clamping..."));
+       }
+   } else if ( settling ) {
+       message("DynClamp: Settling ...");
+   } else {
+       message(QString("DynClamp: Clamping ..."));
+   }
+
    t= 0.0;
    double lastSave = t;
    lastWrite = t;
@@ -309,11 +269,40 @@ void DCThread::run()
    // Dynamic clamp loop begins
    while (!stopped) {
 
+     if ( settling && (
+              (Settlingp.duration > 0 && t > Settlingp.duration) // Timed wake
+              || wakeFromSettling // Manual wake
+              || (triggerDev && triggerDev->triggerFired())) ) { // Triggered wake
+         t = 0.0;
+         rateCounter = 0;
+         lastRateReport = 0;
+         limitWarningEmitted = false;
+         bufferHelper->rewind();
+
+         // Push negative time data points to indicate end of settling
+         if ( perfmon ) {
+             perfData = PerformanceMonitor::DataPoint { -1, 0, perfDt, 0 };
+             perfmon->q.push(perfData);
+             perfData.t = 0;
+         }
+         if ( graph ) {
+             for ( i = 0; i < graphVar.size(); i++ )
+                graph->q[i]->push(GraphWidget::DataPoint {-1.0, 0.0});
+             lastWrite = 0;
+         }
+
+         // Rewind SimulDAQ
+         for ( auto &b : Devices.active() )
+             b->settling_complete();
+
+         message("DynClamp: Settled, clamping ...");
+         settling = false;
+     }
 
      if (!SampleHoldOn) {
        // --- Read --- //
          for ( auto &b : Devices.active() )
-             b->get_scan();
+             b->get_scan(settling);
        // --- Read end --- //
 
        // --- Calculate --- //
@@ -362,20 +351,8 @@ void DCThread::run()
              m->updateChannels(t);
 
          // Dynamic clamp: a2a/mixed currents, a2a/a2d/d2d synapses, all gap junctions
-         for ( ChemSyn &obj : csynPre )
-             obj.currentUpdate(t, dt);
-         for ( abSyn &obj : absynPre )
-             obj.currentUpdate(t, dt);
-         for ( DestexheSyn &obj : dsynPre )
-             obj.currentUpdate(t, dt);
-         for ( GapJunction &obj : esyn )
-             obj.currentUpdate(t, dt);
-
-         for ( HH &obj : hhPre )
-             obj.currentUpdate(t, dt);
-         for ( abHH &obj : abhhPre )
-             obj.currentUpdate(t, dt);
-
+         for ( Conductance *c : Conductances.preDigital() )
+             c->step(t, dt, settling);
          // Dynamic clamp: models (d2d currents)
          if ( Models.active().size() ) { // Runge-Kutta 4
              for ( auto const& m : Models.active() )
@@ -408,13 +385,11 @@ void DCThread::run()
                  for ( size_t rkStep = 0; rkStep < 4; rkStep++ ) {
                      double rkDT = rkStep < 2 ? subDT/2 : subDT;
 
-                     for ( HH &obj : hhIn )
-                         obj.RK4(subT, rkDT, rkStep);
-                     for ( abHH &obj : abhhIn )
-                         obj.RK4(subT, rkDT, rkStep);
+                     for ( Conductance *c : Conductances.inDigital() )
+                         c->RK4(subT, rkDT, rkStep, settling);
 
                      for ( auto const& m : Models.active() )
-                         m->RK4(subT, rkDT, rkStep);
+                         m->RK4(subT, rkDT, rkStep, settling);
                  }
 
                  tLoop = DAQClock.get_RTC_const() - tLoop;
@@ -430,12 +405,8 @@ void DCThread::run()
          } // end RK4
 
          // Dynamic clamp: d2a synapses
-         for ( ChemSyn &obj : csynPost )
-             obj.currentUpdate(t, dt);
-         for ( abSyn &obj : absynPost )
-             obj.currentUpdate(t, dt);
-         for ( DestexheSyn &obj : dsynPost )
-             obj.currentUpdate(t, dt);
+         for ( Conductance *c : Conductances.postDigital() )
+             c->step(t, dt, settling);
 
          // copy AEC compensated input values to output channels if desired
          for ( int k=0; k<aecChannels.size(); k++ ){
@@ -444,7 +415,7 @@ void DCThread::run()
          }
 
          //--------------- Data saving ------------------------//
-         if ( saving && dataSavingPs.enabled ) {
+         if ( !settling && saving && dataSavingPs.enabled ) {
            if ( t >= lastSave + savingPeriod )
            {
               i = 0;
@@ -454,15 +425,8 @@ void DCThread::run()
                                    // DataSaver::SaveLine before this call returns
                   dataSaver->q[i-1]->push(t);
               }
-              for ( inChannel *in : inChnsToSave )
-                  dataSaver->q[i++]->push(in->V);
-              for ( outChannel *out : outChnsToSave )
-                  dataSaver->q[i++]->push(out->I);
-            #ifdef TEST_VERSION
-              for ( AECChannel *aec : aecChannels )
-                  dataSaver->q[i++]->push(aec->v_e);
-            #endif
-
+              for ( const double *value : valuesToSave )
+                  dataSaver->q[i++]->push(*value);
               if ( space )
                   emit saveData();
               lastSave = t;
@@ -495,7 +459,7 @@ void DCThread::run()
          }
 
          // Scripting
-         if (t >= evt) { // event needs doing
+         if ( !settling && t >= evt ) { // event needs doing
            scrIter->second();
            scrIter++;
            if (scrIter == scriptq.end()) evt= 1e10;
@@ -518,8 +482,8 @@ void DCThread::run()
              if ( t - lastWrite > graphDt ) {
                  lastWrite = t;
                  i = 0;
-                 for ( double *val : graphVar )
-                    graph->q[i++]->push(GraphDlg::DataPoint {t, *val});
+                 for ( const double *val : graphVar )
+                    graph->q[i++]->push(GraphWidget::DataPoint {t, *val});
              }
          }
 
@@ -527,7 +491,7 @@ void DCThread::run()
 
      // --- Write --- //
      for ( auto &b : Devices.active() )
-         b->write_analog_out();
+         b->write_analog_out(settling);
      // --- Write end --- //
 
 
@@ -544,12 +508,8 @@ void DCThread::run()
    for ( auto const& m : Models.active() )
        m->reset();
 
-   if ( saving ) {
-       dataSaver->EndDataSaving();
-   }
-
-   finished= true;
    emit done();
+   finished= true;
 }
 
 
@@ -593,126 +553,6 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
     }
     return ret;
 }
-
-template <class T>
-void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &inModel,
-                           typename T::param_type &p, CurrentAssignment &a)
-{
-    if ( a.VChannel == a.IChannel ) {
-        // Input/Output on the same model => connect instances 1-to-1 rather than all-to-all
-        for ( ChannelIndex VIChan : getChanIndices(a.VChannel) ) {
-            inChannel *inC = getInChan(VIChan);
-            outChannel *outC = getOutChan(VIChan);
-            if ( inC && outC ) {
-                inModel.push_back(T(&p, &a, inC, outC));
-            }
-        }
-    } else { // NOTE: These channels are assumed to be analog only, although technically, a/d combos are permitted
-        for ( ChannelIndex VChan : getChanIndices(a.VChannel) ) {
-            for ( ChannelIndex IChan : getChanIndices(a.IChannel) ) {
-                inChannel *inC = getInChan(VChan);
-                outChannel *outC = getOutChan(IChan);
-                if ( inC && outC ) {
-                    preModel.push_back(T(&p, &a, inC, outC));
-                }
-            }
-        }
-    }
-}
-
-template <typename T>
-void DCThread::instantiate(std::vector<T> &preModel, std::vector<T> &postModel,
-                           typename T::param_type &p, SynapseAssignment &a)
-{
-    std::vector<ChannelIndex> preSynInst = getChanIndices(a.PreSynChannel);
-    std::vector<ChannelIndex> postSynInst = getChanIndices(a.PostSynChannel);
-    std::vector<ChannelIndex> outSynInst = getChanIndices(a.OutSynChannel);
-    inChannel *preC, *postC;
-    outChannel *outC;
-
-    if ( a.PostSynChannel == a.OutSynChannel ) {
-        for ( ChannelIndex post : postSynInst ) {
-            for ( ChannelIndex pre : preSynInst ) {
-                if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(post)) ) {
-                    T tmp(&p, this, &a, preC, postC, outC);
-                    if ( pre.isVirtual && post.isAnalog )
-                        postModel.push_back(tmp);
-                    else
-                        preModel.push_back(tmp);
-                }
-            }
-        }
-    } else {
-        for ( ChannelIndex post : postSynInst ) {
-            for ( ChannelIndex out : outSynInst ) {
-                for ( ChannelIndex pre : preSynInst ) {
-                    if ( (preC=getInChan(pre)) && (postC=getInChan(post)) && (outC=getOutChan(out)) ) {
-                        T tmp(&p, this, &a, preC, postC, outC);
-                        if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
-                            postModel.push_back(tmp);
-                        else
-                            preModel.push_back(tmp);
-                    }
-                }
-            }
-        }
-    }
-}
-
-template <typename T>
-void DCThread::instantiate(std::vector<T> &inst, typename T::param_type &p, GapJunctionAssignment &a)
-{
-    struct postChanPointers {
-        inChannel *inC;
-        outChannel *outC;
-    };
-    std::vector<postChanPointers> postChans;
-
-    if ( a.postInChannel == a.postOutChannel ) {
-        for ( ChannelIndex post : getChanIndices(a.postInChannel) ) {
-            inChannel *inC = getInChan(post);
-            outChannel *outC = getOutChan(post);
-            if ( inC && outC ) {
-                postChans.push_back({inC, outC});
-            }
-        }
-    } else {
-        for ( ChannelIndex in : getChanIndices(a.postInChannel) ) {
-            for ( ChannelIndex out : getChanIndices(a.postOutChannel) ) {
-                inChannel *inC = getInChan(in);
-                outChannel *outC = getOutChan(out);
-                if ( inC && outC ) {
-                    postChans.push_back({inC, outC});
-                }
-            }
-        }
-    }
-
-    if ( a.preInChannel == a.preOutChannel ) {
-        for ( ChannelIndex pre : getChanIndices(a.preInChannel) ) {
-            inChannel *inC = getInChan(pre);
-            outChannel *outC = getOutChan(pre);
-            if ( inC && outC ) {
-                for ( postChanPointers &post : postChans ) {
-                    inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
-                }
-            }
-        }
-    } else {
-        for ( ChannelIndex in : getChanIndices(a.preInChannel) ) {
-            for ( ChannelIndex out : getChanIndices(a.preOutChannel) ) {
-                inChannel *inC = getInChan(in);
-                outChannel *outC = getOutChan(out);
-                if ( inC && outC ) {
-                    for ( postChanPointers &post : postChans ) {
-                        inst.push_back(T(&p, &a, inC, outC, post.inC, post.outC));
-                    }
-                }
-            }
-        }
-    }
-}
-
 
 // Scripting support
 
@@ -783,5 +623,3 @@ void DCThread::UnloadScript()
   scripting= false;
   message(QString("script unloaded"));
 }
-
-

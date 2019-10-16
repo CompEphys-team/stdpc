@@ -23,9 +23,9 @@
 #include "HHModelDlg.h"
 
 /// Construct a single self-registering proxy
-static HHNeuronProxy prox;
+static HHNeuronProxy *prox = HHNeuronProxy::get();
 std::vector<HHNeuronData> HHNeuronProxy::p;
-ModelProxy *HHNeuronModel::proxy() const { return &prox; }
+ModelProxy *HHNeuronModel::proxy() const { return prox; }
 ModelPrototype *HHNeuronProxy::createPrototype(size_t modelID) { return new HHNeuronModel(modelID); }
 ModelDlg *HHNeuronProxy::createDialog(size_t modelID, QWidget *parent) { return new HHModelDlg(modelID, parent); }
 
@@ -33,9 +33,13 @@ HHNeuronProxy::HHNeuronProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);
     addAP("HHNeuronp[#].active", &HHNeuronProxy::p, &HHNeuronData::active);
+    addAP("HHNeuronp[#].label", &HHNeuronProxy::p, &HHNeuronData::label);
     addAP("HHNeuronp[#].C", &HHNeuronProxy::p, &HHNeuronData::C);
     addAP("HHNeuronp[#].gLeak", &HHNeuronProxy::p, &HHNeuronData::gLeak);
     addAP("HHNeuronp[#].ELeak", &HHNeuronProxy::p, &HHNeuronData::ELeak);
+    addAP("HHNeuronp[#].Vlimit", &HHNeuronProxy::p, &HHNeuronData::Vlimit);
+    addAP("HHNeuronp[#].Vmin", &HHNeuronProxy::p, &HHNeuronData::Vmin);
+    addAP("HHNeuronp[#].Vmax", &HHNeuronProxy::p, &HHNeuronData::Vmax);
     addAP("HHNeuronp[#].inst[#].active", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::active);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
@@ -54,7 +58,7 @@ HHNeuron::HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     in.V = V + params().inChn.bias;
 }
 
-void HHNeuron::RK4(double, double dt, size_t n)
+void HHNeuron::RK4(double, double dt, size_t n, bool)
 {
     // instance update
     const HHNeuronData &p = static_cast<HHNeuronData const&>(parent->params());
@@ -62,8 +66,17 @@ void HHNeuron::RK4(double, double dt, size_t n)
     if ( n < 3 ) {
         Vi = V + kV[n]*dt;
     } else {
-        Vi = V = V + (kV[0] + 2*kV[1] + 2*kV[2] + kV[3]) * dt / 6;
+        Vi = V + (kV[0] + 2*kV[1] + 2*kV[2] + kV[3]) * dt / 6;
     }
+
+    if ( p.Vlimit ) {
+        if ( Vi < p.Vmin ) Vi = p.Vmin;
+        else if ( Vi > p.Vmax ) Vi = p.Vmax;
+    }
+
+    if ( n == 3 )
+        V = Vi;
+
     in.V = Vi + params().inChn.bias;
 
     // restore current (except on last step, where it's better to keep the final value for output/graphing)

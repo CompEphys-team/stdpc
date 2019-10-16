@@ -105,8 +105,13 @@ class DigiDataData : public DAQData
 
 
 class DigiDataProxy : public DAQProxy {
-public:
+private:
     DigiDataProxy();
+public:
+    DigiDataProxy(const DigiDataProxy &) = delete;
+    void operator=(const DigiDataProxy &) = delete;
+    static DigiDataProxy *get() { static DigiDataProxy proxy; return &proxy; }
+
     inline DAQData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
@@ -145,7 +150,6 @@ class DigiData: public DAQ
    short int ADCDAC_status; 
    short int reset_control;     
    bool portsOpen;
-   double t;
             
   public:
     DigiData(size_t devID, DAQProxy *proxy);
@@ -154,11 +158,11 @@ class DigiData: public DAQ
     virtual bool initialize_board(QString &);
     virtual void start() {}
     virtual void digital_out(unsigned char);
-    virtual void generate_scan_list(short int, short int *);
-    virtual void generate_analog_out_list(short int, short int *);
-    virtual void get_scan();
+    virtual void generate_scan_list(short int, QVector<short int>);
+    virtual void generate_analog_out_list(short int, QVector<short int>);
+    virtual void get_scan(bool settling = false);
     virtual void get_single_scan(inChannel *);
-    virtual void write_analog_out();
+    virtual void write_analog_out(bool settling = false);
     virtual void reset_board();
     short int* inChnGain;
     short int* DACEnable;

@@ -20,20 +20,23 @@
 #include <QDoubleSpinBox>
 #include "AbSynDlg.h"
 #include <QMessageBox>
+#include "AbSyn.h"
 
-abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
-     : QDialog(parent)
+abSynDlg::abSynDlg(size_t no, QWidget *parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
      
      STDP= new STDPDlg(this);
      ODESTDP= new ODESTDPDlg(this);
 
-     label = abSynDlgLabel->text();
      setIndex(no);
      
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
+
+     ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
+     ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
      QVector<AssignmentCellBase<SynapseAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
@@ -46,12 +49,14 @@ abSynDlg::abSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget 
      tmp->setDecimals(3);
      tmp->setFactor(1e-3);
      vec.push_back(tmp);
+     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
 }
 
-void abSynDlg::setIndex(int no)
+void abSynDlg::setIndex(size_t no)
 {
-    QString lb = label.arg(no);
+    ConductanceDlg::setIndex(no);
+    QString lb = QString("%1 %2").arg(abSynProxy::get()->prettyName()).arg(no);
     abSynDlgLabel->setText(lb);
     STDP->setLabel(lb);
     ODESTDP->setLabel(lb);
@@ -65,6 +70,7 @@ void abSynDlg::ResCloseClicked(QAbstractButton *but)
   if (but->text() == QString("Reset")) {
 //    reset();
   }
+  emit labelChanged(leLabel->text());
 }
 
 void abSynDlg::PlastMethodChange()
@@ -89,8 +95,10 @@ void abSynDlg::PlastMethodChange()
   }
 }
 
-void abSynDlg::exportData(abSynData &p)
+void abSynDlg::exportData()
 {
+  abSynData &p = abSynProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -111,9 +119,11 @@ void abSynDlg::exportData(abSynData &p)
   assignments->exportData(p.assign);
 }
 
-void abSynDlg::importData(abSynData p)
+void abSynDlg::importData()
 {
+  abSynData &p = abSynProxy::p[idx];
   QString num;   
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);

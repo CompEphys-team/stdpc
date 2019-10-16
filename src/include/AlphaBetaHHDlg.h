@@ -20,22 +20,21 @@
 #ifndef AlphaBetaHHDLG_H
 #define AlphaBetaHHDLG_H
 
-
+#include "ConductanceDlg.h"
 #include "ui_AlphaBetaHHDlg.h"
 #include "ObjectDataTypes.h"
 
-class AlphaBetaHHDlg : public QDialog, private Ui::AlphaBetaHHDlg
+class AlphaBetaHHDlg : public ConductanceDlg, private Ui::AlphaBetaHHDlg
 {
      Q_OBJECT
 
   public:
-     AlphaBetaHHDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
-     void exportData(abHHData &);
-     void importData(abHHData);
-     void setIndex(int);
-     typedef abHHData param_type;
-
-     QString label;
-}; 
+     AlphaBetaHHDlg(size_t, QWidget *parent= nullptr);
+     void exportData();
+     void importData();
+     void setIndex(size_t);
+private slots:
+     void on_buttonBox_clicked(QAbstractButton *button);
+};
 
 #endif

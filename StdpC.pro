@@ -1,5 +1,8 @@
 # StdpC project file #
 
+# To enable DigiData support, uncoment the following line (requires mingw)
+#CONFIG += digidata
+
 # To enable NI support, uncomment the following line (requires NIDAQmx 15.5.1 or newer)
 # If NIDAQmx is detected, this has no effect.
 #CONFIG += nidaqmx
@@ -9,33 +12,27 @@
 
 TARGET = StdpC
 QT+= widgets printsupport
-DEPENDPATH += $$PWD/ \
-    $$PWD/src \
-    $$PWD/src/core \
-    $$PWD/src/drivers \
-    $$PWD/src/gui \
-    $$PWD/src/models \
+INCLUDEPATH += \
     $$PWD/src/include \
-    $$PWD/lib
-INCLUDEPATH += $$PWD \
-    $$PWD/src \
-    $$PWD/src/core \
-    $$PWD/src/drivers \
-    $$PWD/src/gui \
-    $$PWD/src/models \
-    $$PWD/src/include \
-    $$PWD/lib
+    $$PWD/src/lib
 TEMPLATE = app
 CONFIG += qt \
     thread \
-    debug_and_release
+    debug_and_release \
+    c++11
 
 CONFIG(release, debug|release): DEFINES += NDEBUG
 
-QMAKE_CXXFLAGS += -std=c++11
+mingw {
+    QMAKE_CXXFLAGS_RELEASE += -O3 -flto
+    QMAKE_LFLAGS_RELEASE += -O3 -flto
 
-static {
-    QMAKE_LFLAGS += -static
+    static {
+        QMAKE_LFLAGS += -static
+    }
+}
+msvc {
+    QMAKE_CXXFLAGS_RELEASE += /Ox
 }
 
 # A directory to place intermediary build files.
@@ -56,7 +53,6 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/AlphaBetaHHDlg.ui \
     $$PWD/src/gui/OutputChannelDlg.ui \
     $$PWD/src/gui/SimulDAQDlg.ui \
-    $$PWD/src/gui/DigiDataDlg.ui \
     $$PWD/src/gui/ElectrodeCompDlg.ui \
     $$PWD/src/gui/AbSynDlg.ui \
     $$PWD/src/gui/DataSavingDlg.ui \
@@ -67,7 +63,16 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/DaqWidget.ui \
     $$PWD/src/gui/DaqFactoryWidget.ui \
     $$PWD/src/gui/SpikeGenDlg.ui \
-    $$PWD/src/gui/PerformanceMonitor.ui
+    $$PWD/src/gui/PerformanceMonitor.ui \
+    $$PWD/src/gui/GraphWidget.ui \
+    $$PWD/src/gui/SynapticNoiseDlg.ui \
+    $$PWD/src/gui/TriggerDlg.ui \
+    $$PWD/src/gui/VoltageClampDlg.ui \
+    $$PWD/src/gui/VStepsDlg.ui \
+    $$PWD/src/gui/WireDlg.ui \
+    src/gui/treewidgetitem_datasources.ui \
+    src/gui/treewidgetitem_models.ui \
+    src/gui/InputConductanceDlg.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -81,12 +86,8 @@ HEADERS += \
     $$PWD/src/include/LUtables.h \
     $$PWD/src/include/InputChannelDlg.h \
     $$PWD/src/include/OutputChannelDlg.h \
-    $$PWD/src/include/DigiData.h \
     $$PWD/src/include/Channels.h \
-    $$PWD/src/include/Pt_ioctl_tn.h \
-    $$PWD/src/include/PortTalkX_IOCTL.h \
     $$PWD/src/include/SimulDAQDlg.h \
-    $$PWD/src/include/DigiDataDlg.h \
     $$PWD/src/include/ChemSyn.h \
     $$PWD/src/include/GapJunction.h \
     $$PWD/src/include/HH.h \
@@ -120,7 +121,6 @@ HEADERS += \
     $$PWD/src/include/DaqTable.h \
     $$PWD/src/include/DaqWidget.h \
     $$PWD/src/include/DeviceManager.h \
-    $$PWD/src/include/ComponentPrototype.h \
     $$PWD/src/include/Component.h \
     $$PWD/src/include/WideComboBox.h \
     $$PWD/src/include/DaqOpts.h \
@@ -135,7 +135,26 @@ HEADERS += \
     $$PWD/src/include/ModelOpts.h \
     $$PWD/src/include/ModelDlg.h \
     $$PWD/src/include/Util.h \
-    $$PWD/src/include/PerformanceMonitor.h
+    $$PWD/src/include/PerformanceMonitor.h \
+    $$PWD/src/include/ConductanceManager.h \
+    $$PWD/src/include/Conductance.h \
+    $$PWD/src/include/Synapse.h \
+    $$PWD/src/include/ConductanceDlg.h \
+    $$PWD/src/include/IonicCurrent.h \
+    $$PWD/src/include/GraphWidget.h \
+    $$PWD/src/include/SynapticNoise.h \
+    $$PWD/src/include/SynapticNoiseDlg.h \
+    $$PWD/src/include/TriggerDlg.h \
+    $$PWD/src/include/VoltageClampDlg.h \
+    $$PWD/src/include/VoltageClamp.h \
+    $$PWD/src/include/VStepsDlg.h \
+    $$PWD/src/include/VSteps.h \
+    $$PWD/src/include/Wire.h \
+    $$PWD/src/include/WireDlg.h \
+    src/include/treewidgetitem_datasources.h \
+    src/include/treewidgetitem_models.h \
+    src/include/InputConductance.h \
+    src/include/InputConductanceDlg.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -151,10 +170,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/core/Global.cpp \
     $$PWD/src/core/Global_func.cpp \
     $$PWD/src/gui/OutputChannelDlg.cpp \
-    $$PWD/src/drivers/DigiData.cpp \
     $$PWD/src/core/Channels.cpp \
     $$PWD/src/gui/SimulDAQDlg.cpp \
-    $$PWD/src/gui/DigiDataDlg.cpp \
     $$PWD/src/models/ChemSyn.cpp \
     $$PWD/src/models/GapJunction.cpp \
     $$PWD/src/models/HH.cpp \
@@ -194,9 +211,41 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/ModelOpts.cpp \
     $$PWD/src/gui/DaqOpts.cpp \
     $$PWD/src/core/Util.cpp \
-    $$PWD/src/gui/PerformanceMonitor.cpp
+    $$PWD/src/gui/PerformanceMonitor.cpp \
+    $$PWD/src/core/ConductanceManager.cpp \
+    $$PWD/src/models/Synapse.cpp \
+    $$PWD/src/models/IonicCurrent.cpp \
+    $$PWD/src/gui/Component.cpp \
+    $$PWD/src/gui/GraphWidget.cpp \
+    $$PWD/src/models/SynapticNoise.cpp \
+    $$PWD/src/gui/SynapticNoiseDlg.cpp \
+    $$PWD/src/gui/TriggerDlg.cpp \
+    $$PWD/src/gui/VoltageClampDlg.cpp \
+    $$PWD/src/models/VoltageClamp.cpp \
+    $$PWD/src/gui/VStepsDlg.cpp \
+    $$PWD/src/models/VSteps.cpp \
+    $$PWD/src/models/Wire.cpp \
+    src/gui/WireDlg.cpp \
+    src/gui/treewidgetitem_datasources.cpp \
+    src/gui/treewidgetitem_models.cpp \
+    src/models/InputConductance.cpp \
+    src/gui/InputConductanceDlg.cpp
 
-LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+digidata {
+    mingw {
+        LIBS += $$PWD/staticlib/pt_ioctl_tn.a
+        FORMS += $$PWD/src/gui/DigiDataDlg.ui
+        HEADERS += $$PWD/src/include/DigiData.h \
+            $$PWD/src/include/DigiDataDlg.h \
+            $$PWD/src/include/Pt_ioctl_tn.h \
+            $$PWD/src/include/PortTalkX_IOCTL.h
+        SOURCES += $$PWD/src/drivers/DigiData.cpp \
+            $$PWD/src/gui/DigiDataDlg.cpp
+        DEFINES += DIGIDATA_PT
+    } else {
+        message("Digidata is not supported in msvc build.")
+    }
+}
 
 NIDAQPATH = $$(NIEXTCCOMPILERSUPP)
 isEmpty(NIDAQPATH) {
@@ -208,15 +257,26 @@ isEmpty(NIDAQPATH) {
 
 nidaqmx {
     # NIDAQmx static build based on NI DAQmx 15.5.1
-    DEPENDPATH += $$PWD/src/nidaqmx
+    mingw {
+        DEPENDPATH += $$PWD/src/nidaqmx
+        INCLUDEPATH += $$PWD/src/nidaqmx
+        LIBS += $$PWD/src/nidaqmx/nidaqmx.a
+    }
+    msvc {
+        contains(QMAKE_HOST.arch, x86_64) {
+            LIBS += $$NIDAQPATH/lib64/msvc/NIDAQmx.lib
+        } else {
+            LIBS += $$NIDAQPATH/lib32/msvc/NIDAQmx.lib
+        }
+        INCLUDEPATH += $$NIDAQPATH/include
+    }
+
     SOURCES += $$PWD/src/gui/NIDAQDlg.cpp \
-    $$PWD/src/drivers/Nidaq.cpp
+        $$PWD/src/drivers/Nidaq.cpp
     FORMS += $$PWD/src/gui/NIDAQDlg.ui
 
     HEADERS += $$PWD/src/include/NIDAQDlg.h \
-    $$PWD/src/include/Nidaq.h
+        $$PWD/src/include/Nidaq.h
 
-    INCLUDEPATH += $$PWD/src/nidaqmx
-    LIBS += $$PWD/src/nidaqmx/nidaqmx.a
     DEFINES += NATIONAL_INSTRUMENTS
 }

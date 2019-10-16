@@ -27,13 +27,12 @@ DigiDataDlg::DigiDataDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
     setupUi(this);
     connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
     connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
-    label = DAQLabel->text();
     setIndex(idx);
 }
 
 void DigiDataDlg::setIndex(size_t no)
 {
-    DAQLabel->setText(label.arg(no));
+    DAQLabel->setText(QString("%1 %2").arg(DigiDataProxy::get()->prettyName()).arg(no));
     DAQDlg::setIndex(no);
 }
 
@@ -45,6 +44,7 @@ void DigiDataDlg::exportData(bool forceInit)
     if (success) {
         getEntry(DigiDataProxy::p[idx].baseAddress, tmp, change);
     }
+    getEntry<QString>(DigiDataProxy::p[idx].label, leLabel->text(), change);
     DAQDlg::exportData(forceInit || change);
 }
 
@@ -53,6 +53,7 @@ void DigiDataDlg::importData()
     QString num;
     num.setNum(DigiDataProxy::p[idx].baseAddress,16);
     BaseAddressE->setText(num);
+    leLabel->setText(DigiDataProxy::p[idx].label);
     DAQDlg::importData();
 }
 

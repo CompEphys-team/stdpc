@@ -22,19 +22,19 @@
 
 #include "ui_HHDlg.h"
 #include "ObjectDataTypes.h"
+#include "ConductanceDlg.h"
 
-class HHDlg : public QDialog, private Ui::HHDlg
+class HHDlg : public ConductanceDlg, private Ui::HHDlg
 {
      Q_OBJECT
 
   public:
-     HHDlg(int, ChannelListModel *in, ChannelListModel *out, QWidget *parent= 0);
-     void exportData(mhHHData &);
-     void importData(mhHHData);
-     void setIndex(int);
-     typedef mhHHData param_type;
-
-     QString label;
-}; 
+     HHDlg(size_t, QWidget *parent= nullptr);
+     void exportData();
+     void importData();
+     void setIndex(size_t);
+private slots:
+     void on_buttonBox_clicked(QAbstractButton *button);
+};
 
 #endif

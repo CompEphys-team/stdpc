@@ -23,6 +23,7 @@
 #include "Global.h"
 #include "ModelManager.h"
 #include "DeviceManager.h"
+#include "ConductanceManager.h"
 
 ChannelIndex::ChannelIndex() :
     isValid(false),
@@ -33,10 +34,15 @@ ChannelIndex::ChannelIndex() :
     modelID(0),
     instID(0),
     isAnalog(false),
+    isDigital(false),
     daqClass(""),
     devID(0),
     isInChn(true),
     chanID(0),
+    isConductance(false),
+    conductanceID(0),
+    assignID(0),
+    multiplexID(0),
     isLegacy(false)
 {
 
@@ -48,10 +54,12 @@ ChannelIndex::ChannelIndex(DAQProxy *proxy, size_t devID, size_t chanID, bool is
     isPrototype(false),
     isVirtual(false),
     isAnalog(proxy != nullptr),
+    isDigital(false),
     daqClass(proxy->daqClass()),
     devID(devID),
     isInChn(isInChn),
     chanID(chanID),
+    isConductance(false),
     isLegacy(false)
 {}
 
@@ -64,10 +72,12 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID) :
     modelID(modelID),
     instID(0),
     isAnalog(false),
+    isDigital(false),
+    isConductance(false),
     isLegacy(false)
 {}
 
-ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
+ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID, bool isInChn) :
     isValid(proxy != nullptr),
     isNone(false),
     isPrototype(false),
@@ -76,6 +86,24 @@ ChannelIndex::ChannelIndex(ModelProxy *proxy, size_t modelID, size_t instID) :
     modelID(modelID),
     instID(instID),
     isAnalog(false),
+    isDigital(false),
+    isInChn(isInChn),
+    isConductance(false),
+    isLegacy(false)
+{}
+
+ChannelIndex::ChannelIndex(ConductanceProxy *proxy, size_t conductanceID, size_t assignID, size_t multiplexID) :
+    isValid(proxy != nullptr),
+    isNone(false),
+    isPrototype(false),
+    isVirtual(false),
+    isAnalog(false),
+    isDigital(false),
+    isConductance(true),
+    conductanceClass(proxy->conductanceClass()),
+    conductanceID(conductanceID),
+    assignID(assignID),
+    multiplexID(multiplexID),
     isLegacy(false)
 {}
 
@@ -117,32 +145,123 @@ QString ChannelIndex::prettyName() const
         return ret;
     } else if ( isNone ) {
         ret = "None";
-    } else if ( isAnalog ) {
-        ret = QString("%1 %2 on %3, device %4").arg(isInChn ? "AI" : "AO").arg(chanID).arg(daqClass).arg(devID);
+    } else if ( isAnalog || isDigital ) {
+        QString label;
+        DAQProxy *proxy = Devices.Register().value(daqClass);
+        if ( proxy->size() > devID )
+            label = proxy->param(devID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(devID);
+        if ( isAnalog )
+            ret = QString("%1 %2 on %3").arg(isInChn ? "AI" : "AO").arg(chanID).arg(label);
+        else if ( isDigital )
+            ret = QString("%1 %2 on %3").arg(isInChn ? "DI" : "DO").arg(chanID).arg(label);
     } else if ( isPrototype || isVirtual ) {
+        QString label;
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID )
+            label = proxy->param(modelID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(modelID);
         if ( isPrototype )
-            ret = QString("%1 %2:all (model %2, all instances)").arg(modelClass).arg(modelID);
+            ret = QString("%1 %2:all (%4, all instances)").arg(modelClass).arg(modelID).arg(label);
         else
-            ret = QString("%1 %2:%3 (model %2, instance %3)").arg(modelClass).arg(modelID).arg(instID);
+            ret = QString("%1 %2:%3 (%4, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(label);
+    } else if ( isConductance ) {
+        QString label;
+        ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
+        if ( proxy->size() > conductanceID )
+            label = proxy->param(conductanceID).label;
+        if ( label.isEmpty() )
+            label = QString("%1 %2").arg(proxy->prettyName()).arg(conductanceID);
+        ret = QString("%1, assignment %2").arg(label).arg(assignID);
     } else ret = "Oops: Invalid channel index";
     return ret;
 }
 
-QString ChannelIndex::toString(QChar sep) const
+QString ChannelIndex::toString(QChar sep, bool withDetails) const
 {
     QString ret;
     if ( !isValid || isNone ) {
         ret = "None";
     } else if ( isAnalog ) {
         ret = QString("Analog/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "ai" : "ao").arg(chanID);
+    } else if ( isDigital ) {
+        ret = QString("Digital/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "di" : "do").arg(chanID);
     } else if ( isPrototype ) {
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
     } else if ( isVirtual ) {
-        ret = QString("Virtual/%1/%2/%3").arg(modelClass).arg(modelID).arg(instID);
+        QString direction = "";
+        if ( withDetails )
+            direction = (isInChn ? "in" : "out");
+        ret = QString("Virtual/%1/%2/%3%4").arg(modelClass).arg(modelID).arg(direction).arg(instID);
+    } else if ( isConductance ) {
+        QString multi = "";
+        if ( withDetails )
+            multi = QString("/multi%1").arg(multiplexID);
+        ret = QString("Conductance/%1/%2/%3%4").arg(conductanceClass).arg(conductanceID).arg(assignID).arg(multi);
     }
     if ( sep != QChar('/') )
         ret.replace('/', sep);
     return ret;
+}
+
+QJsonObject ChannelIndex::toJson() const
+{
+    QJsonObject obj;
+    if ( !isValid || isNone ) {
+        return obj;
+    } else if ( isAnalog || isDigital ) {
+        obj = QJsonObject {
+            {"type", "DAQ"},
+            {"class", daqClass},
+            {"class_id", int(devID)},
+            {"channel_id", int(chanID)},
+            {"is_input_channel", isInChn}
+        };
+        if ( isAnalog )
+            obj.insert("units", isInChn ? "V" : "A");
+        else
+            obj.insert("units", "bit");
+        DAQProxy *proxy = Devices.Register().value(daqClass);
+        if ( proxy->size() > devID && !proxy->param(devID).label.isEmpty() )
+            obj.insert("label", proxy->param(devID).label);
+        return obj;
+    } else if ( isPrototype ) {
+        obj = QJsonObject {
+            {"type", "Prototype"},
+            {"class", modelClass},
+            {"class_id", int(modelID)}
+        };
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
+            obj.insert("label", proxy->param(modelID).label);
+    } else if ( isVirtual ) {
+        obj = QJsonObject {
+            {"type", "Virtual"},
+            {"class", modelClass},
+            {"class_id", int(modelID)},
+            {"instance_id", int(instID)},
+            {"is_input_channel", isInChn},
+            {"units", isInChn ? "V" : "A"}
+        };
+        ModelProxy *proxy = Models.Register().value(modelClass);
+        if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
+            obj.insert("label", proxy->param(modelID).label);
+    } else if ( isConductance ) {
+        obj = QJsonObject {
+            {"type", "Conductance"},
+            {"class", conductanceClass},
+            {"class_id", int(conductanceID)},
+            {"assignment_id", int(assignID)},
+            {"multiplex_id", int(multiplexID)},
+            {"units", "S"}
+        };
+        ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
+        if ( proxy->size() > conductanceID && !proxy->param(conductanceID).label.isEmpty() )
+            obj.insert("label", proxy->param(conductanceID).label);
+    }
+    return obj;
 }
 
 std::ostream &operator<<(std::ostream &os, const ChannelIndex &dex)
@@ -182,6 +301,26 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.devID = parts.at(2).toUInt();
         dex.chanID = parts.at(3).mid(2).toUInt();
         dex.isValid = true;
+    } else if ( !parts.at(0).compare("Digital", Qt::CaseInsensitive) ) {
+        if ( parts.size() != 4 )
+            return is;
+
+        if ( DeviceManager::Register().contains(parts.at(1)) )
+            dex.daqClass = parts.at(1);
+        else
+            return is;
+
+        if ( parts.at(3).startsWith("di", Qt::CaseInsensitive) )
+            dex.isInChn = true;
+        else if ( parts.at(3).startsWith("do", Qt::CaseInsensitive) )
+            dex.isInChn = false;
+        else
+            return is;
+
+        dex.isDigital = true;
+        dex.devID = parts.at(2).toUInt();
+        dex.chanID = parts.at(3).mid(2).toUInt();
+        dex.isValid = true;
     } else if ( !parts.at(0).compare("Prototype", Qt::CaseInsensitive) ) {
         if ( parts.size() != 3 )
             return is;
@@ -207,6 +346,19 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.modelID = parts.at(2).toUInt();
         dex.instID = parts.at(3).toUInt();
         dex.isValid = true;
+    } else if ( !parts.at(0).compare("Conductance", Qt::CaseInsensitive) ) {
+        if ( parts.size() != 4 )
+            return is;
+
+        if ( ConductanceManager::Register().contains(parts.at(1)) )
+            dex.conductanceClass = parts.at(1);
+        else
+            return is;
+
+        dex.isConductance = true;
+        dex.conductanceID = parts.at(2).toUInt();
+        dex.assignID = parts.at(3).toUInt();
+        dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
         dex.isLegacy = true;
         dex.chanID = parts.at(0).toInt();
@@ -229,8 +381,11 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             a.isPrototype==b.isPrototype &&
             a.isVirtual==b.isVirtual &&
             (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&
-            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID)) &&
+            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID && a.isInChn==b.isInChn)) &&
             a.isAnalog==b.isAnalog &&
-            (!a.isAnalog || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
+            a.isDigital==b.isDigital &&
+            (!(a.isAnalog || a.isDigital) || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&
+            a.isConductance==b.isConductance &&
+            (!a.isConductance || (a.conductanceClass==b.conductanceClass && a.conductanceID==b.conductanceID && a.assignID==b.assignID && a.multiplexID==b.multiplexID)) &&
             a.isLegacy == b.isLegacy;
 }

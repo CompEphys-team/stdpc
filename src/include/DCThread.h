@@ -23,17 +23,12 @@
 #include <QThread>
 #include <functional>
 #include "Global.h"
-#include "ChemSyn.h"
-#include "AbSyn.h"
-#include "GapJunction.h"
-#include "DestexheSyn.h"
-#include "HH.h"
-#include "AbHH.h"
+#include "Channels.h"
 #include "DataSaver.h"
 
 #include "ChannelBufferHelper.h"
 
-class GraphDlg;
+class GraphWidget;
 class PerformanceMonitor;
 
 class DCThread : public QThread 
@@ -48,15 +43,13 @@ class DCThread : public QThread
 private:
      DataSaver *dataSaver;
 
-     inline void start(Priority pr = TimeCriticalPriority) { QThread::start(pr); }
-
  public:
      DCThread();
      virtual ~DCThread();
      bool LoadScript(QString &);
      void UnloadScript();
 
-     void setGraph(GraphDlg * = nullptr, double dt = 0.0);
+     void setGraph(GraphWidget * = nullptr, double dt = 0.0);
      void setPerformanceMonitor(PerformanceMonitor * = nullptr, double dt = 0.0);
 
      void setup_and_go();
@@ -65,33 +58,13 @@ private:
      outChannel *getOutChan(ChannelIndex const& dex);
      std::vector<ChannelIndex> getChanIndices(ChannelIndex const& dex);
 
-     template <typename T>
-     void instantiate(std::vector<T> &pre, std::vector<T> &in, typename T::param_type &, CurrentAssignment &);
-     template <typename T>
-     void instantiate(std::vector<T> &pre, std::vector<T> &post, typename T::param_type &, SynapseAssignment &);
-     template <typename T>
-     void instantiate(std::vector<T> &, typename T::param_type &, GapJunctionAssignment &);
-
-     QVector<inChannel *> inChnsToSave;
-     QVector<outChannel *> outChnsToSave;
+     QVector<const double *> valuesToSave;
      
      bool stopped;
      bool finished;
      bool scripting;
-     std::vector<ChemSyn> csynPre;
-     std::vector<ChemSyn> csynPost;
-     std::vector<abSyn> absynPre;
-     std::vector<abSyn> absynPost;
-
-     std::vector<GapJunction> esyn;
-
-     std::vector<DestexheSyn> dsynPre;
-     std::vector<DestexheSyn> dsynPost;
-
-     std::vector<HH> hhPre;
-     std::vector<HH> hhIn;
-     std::vector<abHH> abhhPre;
-     std::vector<abHH> abhhIn;
+     bool settling;
+     bool wakeFromSettling;
 
      outChnData outNoneData;
      outChannel outChnNone;
@@ -111,8 +84,8 @@ private:
      QVector<inChannel*> aecIn;
      QVector<outChannel*> aecOut, aecCopy;
 
-     GraphDlg *graph;
-     QVector<double *> graphVar;
+     GraphWidget *graph;
+     QVector<const double *> graphVar;
      double graphDt;
      double graphDummy;
 

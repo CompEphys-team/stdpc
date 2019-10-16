@@ -35,7 +35,7 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      Q_OBJECT
 
   public:
-     InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= nullptr);
      void init();
      void importData();
      virtual ~InputChannelDlg();

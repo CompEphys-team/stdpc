@@ -31,7 +31,7 @@ class AssignmentWidgetQ : public QTableWidget
 {
     Q_OBJECT
 public:
-    explicit AssignmentWidgetQ(QWidget *parent = 0) : QTableWidget(parent) {}
+    explicit AssignmentWidgetQ(QWidget *parent = nullptr) : QTableWidget(parent) {}
     ~AssignmentWidgetQ() {}
 
 protected slots:
@@ -43,7 +43,7 @@ template <class Assignment>
 class AssignmentWidget : public AssignmentWidgetQ
 {
 public:
-    AssignmentWidget(QWidget *parent = 0) : AssignmentWidgetQ(parent) {}
+    AssignmentWidget(QWidget *parent = nullptr) : AssignmentWidgetQ(parent) {}
     ~AssignmentWidget()
     {
         for ( AssignmentCellBase<Assignment> *d : cell )
@@ -104,6 +104,7 @@ protected:
         if ( row < 0 )
             row = rowCount();
         insertRow(row);
+        setVerticalHeaderItem(row, new QTableWidgetItem(QString::number(row)));
         int i = 0;
         for ( AssignmentCellBase<Assignment> *d : cell ) {
             setCellWidget(row, i++, d->extend(row));

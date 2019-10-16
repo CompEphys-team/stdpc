@@ -23,77 +23,48 @@
 #include "ComponentWidget.h"
 #include "ChannelListModel.h"
 
-class GenericComponent
+class Component : public QObject
 {
+    Q_OBJECT
 public:
-    GenericComponent() {}
-    virtual ~GenericComponent() {}
+    Component(ConductanceProxy *proxy, size_t idx);
 
-    virtual void importData() = 0;
-    virtual void exportData() = 0;
+    void importData();
+    void exportData();
 
-    virtual void setIndex(int i) = 0;
-
-    virtual ComponentWidget *widget() = 0;
-    virtual void regenerateWidget() = 0;
-};
-
-template <class ComponentDlg>
-class Component : public GenericComponent
-{
-public:
-    Component(QString label, std::vector<typename ComponentDlg::param_type> *params,
-              int idx, ChannelListModel *in, ChannelListModel *out) :
-        params(params),
-        dlg(new ComponentDlg(idx, in, out)),
-        idx(idx),
-        label(label)
-    {
-        regenerateWidget();
-        _widget->label->setText(label + " " + QString::number(idx));
-    }
-
-    ~Component()
-    {
-        delete dlg;
-    }
-
-    void importData()
-    {
-        dlg->importData(params->at(idx));
-        _widget->active->setChecked(params->at(idx).active);
-    }
-
-    void exportData()
-    {
-        if ( idx >= (int) params->size() )
-            params->resize(idx+1);
-        dlg->exportData(params->at(idx));
-        (*params)[idx].active = _widget->active->isChecked();
-    }
-
-    void setIndex(int i)
-    {
-        idx = i;
-        _widget->label->setText(label + " " + QString::number(idx));
-        dlg->setIndex(idx);
-    }
+    void setIndex(int i);
 
     inline ComponentWidget *widget() { return _widget; }
-
-    void regenerateWidget()
-    {
-        _widget = new ComponentWidget();
-        QObject::connect(_widget->params, SIGNAL(clicked(bool)), dlg, SLOT(show()));
-        QObject::connect(_widget->params, SIGNAL(clicked(bool)), dlg, SLOT(raise()));
-    }
+    void regenerateWidget();
 
 protected:
-    std::vector<typename ComponentDlg::param_type> *params;
-    ComponentDlg *dlg;
-    int idx;
-    QString label;
+    ConductanceProxy *proxy;
+    size_t idx;
     ComponentWidget *_widget;
+    ConductanceDlg *dlg;
+
+protected slots:
+    void setLabel();
+    void setExplicitLabel(QString label);
+};
+
+class ComponentPrototype
+{
+public:
+    ComponentPrototype(ConductanceProxy *proxy);
+    ~ComponentPrototype();
+
+    inline QString label() { return proxy->prettyName(); }
+
+    Component *create(int idx);
+    void createAll();
+    void clearInactive();
+    void exportData();
+
+    QVector<Component *> inst;
+
+protected:
+    ConductanceProxy *proxy;
 };
 
 #endif // COMPONENT_H

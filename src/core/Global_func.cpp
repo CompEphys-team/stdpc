@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "LUtables.h"
+#include "Global_func.h"
 
 expFunction expFunc;
 expSigmoidFunction expSigmoidFunc;

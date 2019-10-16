@@ -25,14 +25,15 @@
 // DigiData 1200 device driver
 
 /// Construct a single self-registering proxy
-static DigiDataProxy prox;
+static DigiDataProxy *prox = DigiDataProxy::get();
 std::vector<DigiDataData> DigiDataProxy::p;
-DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, &prox); }
-DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, &prox, parent); }
+DAQ *DigiDataProxy::createDAQ(size_t devID) { return new DigiData(devID, prox); }
+DAQDlg *DigiDataProxy::createDialog(size_t devID, QWidget *parent) { return new DigiDataDlg(devID, prox, parent); }
 
 DigiDataProxy::DigiDataProxy() :
     regAP {
         addAP("DigiDatap[#].active", &p, &DigiDataData::active),
+        addAP("DigiDatap[#].label", &p, &DigiDataData::label),
         addAP("DigiDatap[#].baseAddress", &p, &DigiDataData::baseAddress),
         addAP("DigiDatap[#].syncIOMask", &p, &DigiDataData::syncIOMask),
         addAP("DigiDatap[#].inChn[#].active", &p, &DigiDataData::inChn, &inChnData::active),
@@ -213,11 +214,11 @@ void DigiData::digital_out(unsigned char outbyte)
 
 
 //---------------------------------------------------------------------------
-void DigiData::generate_scan_list(short int chnNo, short int *Chns)
+void DigiData::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
   short int i, Chan_Gain_Code;
   DAQData *p = params();
-  ChannelIndex dex(&prox, devID, 0, true);
+  ChannelIndex dex(prox, devID, 0, true);
 
   actInChnNo= chnNo;  
   WriteWord(ADCDAC_control, ADCSCANLISTENABLE);
@@ -235,7 +236,7 @@ void DigiData::generate_scan_list(short int chnNo, short int *Chns)
 }
 
 //---------------------------------------------------------------------------
-void DigiData::get_scan()
+void DigiData::get_scan(bool)
 {
    short int i, scan;
 
@@ -263,10 +264,10 @@ void DigiData::get_single_scan(inChannel *in)
 
 
 //---------------------------------------------------------------------------
-void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
+void DigiData::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
   DAQData *p = params();
-  ChannelIndex dex(&prox, devID, 0, false);
+  ChannelIndex dex(prox, devID, 0, false);
 
   // collect the active out channels
   actOutChnNo= chnNo;
@@ -280,7 +281,7 @@ void DigiData::generate_analog_out_list(short int chnNo, short int *Chns)
 
 
 //---------------------------------------------------------------------------
-void DigiData::write_analog_out()
+void DigiData::write_analog_out(bool)
 {
   static short int int_I;
   for (int i= 0; i < actOutChnNo; i++) {

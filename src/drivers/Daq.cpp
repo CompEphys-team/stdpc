@@ -23,7 +23,8 @@
 DAQ::DAQ(size_t devID, DAQProxy *proxy) :
     devID(devID),
     proxy(proxy),
-    t(DAQClock.t)
+    t(DAQClock.t),
+    digInChnNo(0)
 {
   initialized= false;
 }
@@ -44,7 +45,7 @@ void DAQ::init_chans()
 {
     DAQData *p = params();
     short int No = 0;
-    short int Chns[p->inChn.size()];
+    QVector<short int> Chns(p->inChn.size());
     in.resize(p->inChn.size());
     vHiLim.resize(p->inChn.size());
     vLoLim.resize(p->inChn.size());
@@ -103,31 +104,23 @@ void DAQ::process_scan(double t)
 }
 
 //---------------------------------------------------------------------------
-QPair<QVector<QString>, QVector<inChannel*>> DAQ::inChans_to_save()
+QPair<QVector<ChannelIndex>, QVector<const double *>> DAQ::valuesToSave()
 {
-    QVector<QString> labels;
-    QVector<inChannel*> chans;
+    QVector<ChannelIndex> indices;
+    QVector<const double *> values;
     for ( int i = 0; i < actInChnNo; i++ ) {
         if ( in[inIdx[i]].save ) {
-            labels.push_back(QString("%1_%2_V%3").arg(proxy->daqClass()).arg(devID).arg(inIdx[i]));
-            chans.push_back(&in[inIdx[i]]);
+            indices.push_back(ChannelIndex(proxy, devID, inIdx[i], true));
+            values.push_back(&in[inIdx[i]].V);
         }
     }
-    return qMakePair(labels, chans);
-}
-
-//---------------------------------------------------------------------------
-QPair<QVector<QString>, QVector<outChannel*>> DAQ::outChans_to_save()
-{
-    QVector<QString> labels;
-    QVector<outChannel*> chans;
     for ( int i = 0; i < actOutChnNo; i++ ) {
         if ( out[outIdx[i]].save ) {
-            labels.push_back(QString("%1_%2_I%3").arg(proxy->daqClass()).arg(devID).arg(outIdx[i]));
-            chans.push_back(&out[outIdx[i]]);
+            indices.push_back(ChannelIndex(proxy, devID, outIdx[i], false));
+            values.push_back(&out[outIdx[i]].I);
         }
     }
-    return qMakePair(labels, chans);
+    return qMakePair(indices, values);
 }
 
 //---------------------------------------------------------------------------

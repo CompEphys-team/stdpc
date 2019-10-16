@@ -65,12 +65,12 @@ void ModelPrototype::restoreCurrent(double t)
                 m->restoreCurrent(t);
 }
 
-void ModelPrototype::RK4(double t, double dt, size_t n)
+void ModelPrototype::RK4(double t, double dt, size_t n, bool settling)
 {
     if ( params().active )
         for ( std::shared_ptr<Model> &m : inst )
             if ( params().instance(m->id()).active )
-                m->RK4(t, dt, n);
+                m->RK4(t, dt, n, settling);
 }
 
 QString ModelPrototype::getStatus() const
@@ -82,28 +82,19 @@ QString ModelPrototype::getStatus() const
     return QString("Model %1 %2: %3 instance%4 active").arg(prefix()).arg(modelID).arg(nInst).arg(nInst>1 ? "s":"");
 }
 
-QPair<QVector<QString>, QVector<inChannel *>> ModelPrototype::inChans_to_save() const
+QPair<QVector<ChannelIndex>, QVector<const double *>> ModelPrototype::valuesToSave() const
 {
-    QVector<QString> labels;
-    QVector<inChannel*> chans;
+    QVector<ChannelIndex> indices;
+    QVector<const double *> values;
     for ( std::shared_ptr<Model> const& m : inst ) {
         if ( m->in.save ) {
-            labels.push_back(QString("%1_%2_V%3").arg(prefix()).arg(modelID).arg(m->id()));
-            chans.push_back(&(m->in));
+            indices.push_back(ChannelIndex(proxy(), modelID, m->id(), true));
+            values.push_back(&(m->in.V));
         }
-    }
-    return qMakePair(labels, chans);
-}
-
-QPair<QVector<QString>, QVector<outChannel *>> ModelPrototype::outChans_to_save() const
-{
-    QVector<QString> labels;
-    QVector<outChannel*> chans;
-    for ( std::shared_ptr<Model> const& m : inst ) {
         if ( m->out.save ) {
-            labels.push_back(QString("%1_%2_I%3").arg(prefix()).arg(modelID).arg(m->id()));
-            chans.push_back(&(m->out));
+            indices.push_back(ChannelIndex(proxy(), modelID, m->id(), false));
+            values.push_back(&(m->out.I));
         }
     }
-    return qMakePair(labels, chans);
+    return qMakePair(indices, values);
 }

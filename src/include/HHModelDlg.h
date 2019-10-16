@@ -33,7 +33,7 @@ class HHModelDlg : public ModelDlg
     Q_OBJECT
 
 public:
-    explicit HHModelDlg(size_t idx, QWidget *parent = 0);
+    explicit HHModelDlg(size_t idx, QWidget *parent = nullptr);
     ~HHModelDlg();
 
     void importData();
@@ -45,8 +45,6 @@ private:
     QVector<QCheckBox*> actives, vSaves, spkDs, iSaves;
     QVector<QDoubleSpinBox*> vBiases, spkThrs, iBiases;
     QMetaObject::Connection activec, vSavec, vBiasc, spkDc, spkThrc, iSavec, iBiasc;
-
-    QString label;
 
     void addRow(int row, QCheckBox *active,
                 QCheckBox *vSave, QDoubleSpinBox *vBias, QCheckBox *spkD, QDoubleSpinBox *spkThr,

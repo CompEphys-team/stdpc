@@ -27,7 +27,7 @@ class ModelDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit ModelDlg(size_t idx, QWidget *parent = 0) : QDialog(parent), idx(idx) {}
+    explicit ModelDlg(size_t idx, QWidget *parent = nullptr) : QDialog(parent), idx(idx) {}
     virtual ~ModelDlg() {}
 
     virtual void importData() = 0;

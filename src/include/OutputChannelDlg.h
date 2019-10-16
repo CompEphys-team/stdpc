@@ -32,7 +32,7 @@ class OutputChannelDlg : public QDialog, private Ui::OutputChannelDlg
      Q_OBJECT
 
   public:
-     OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= 0);
+     OutputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent= nullptr);
      void init();
      void exportData();
      void importData();

@@ -56,6 +56,8 @@ public:
 
     /// Return a collection of core AP-registered params that should be saved to StdpC.conf on exit
     virtual const std::vector<AP*> &coreAPs() const = 0;
+
+    virtual ~DAQProxy() = default;
 };
 
 enum class DeviceStatus { Active, Inactive, Failed };

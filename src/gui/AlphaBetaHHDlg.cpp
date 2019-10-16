@@ -17,32 +17,37 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-
+#include "AbHH.h"
 #include "AlphaBetaHHDlg.h"
 #include <QMessageBox>
 
-AlphaBetaHHDlg::AlphaBetaHHDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
-     : QDialog(parent)
+AlphaBetaHHDlg::AlphaBetaHHDlg(size_t no, QWidget *parent)
+     : ConductanceDlg(no, parent)
  {
   setupUi(this);
 
-  label = HHDlgLabel->text();
   setIndex(no);
 
   QVector<AssignmentCellBase<CurrentAssignment>*> vec;
   vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::active, "Active", 47));
-  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 180, in));
-  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 180, out));
+  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::VChannel, "V in", 165,
+        ChannelListModel::getModel(ChannelListModel::AnalogIn | ChannelListModel::Prototype | ChannelListModel::Blank)));
+  vec.push_back(new AssignmentCellChannel<CurrentAssignment>(&CurrentAssignment::IChannel, "I out", 165,
+        ChannelListModel::getModel(ChannelListModel::AnalogOut | ChannelListModel::Prototype | ChannelListModel::Blank)));
+  vec.push_back(new AssignmentCellBool<CurrentAssignment>(&CurrentAssignment::save, "Save", 30));
   assignments->init(vec);
 }
 
-void AlphaBetaHHDlg::setIndex(int no)
+void AlphaBetaHHDlg::setIndex(size_t no)
 {
-    HHDlgLabel->setText(label.arg(no));
+    ConductanceDlg::setIndex(no);
+    HHDlgLabel->setText(QString("%1 %2").arg(abHHProxy::get()->prettyName()).arg(no));
 }
 
-void AlphaBetaHHDlg::exportData(abHHData &p)
+void AlphaBetaHHDlg::exportData()
 {
+  abHHData &p = abHHProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
@@ -69,10 +74,11 @@ void AlphaBetaHHDlg::exportData(abHHData &p)
   assignments->exportData(p.assign);
 }
 
-void AlphaBetaHHDlg::importData(abHHData p)
+void AlphaBetaHHDlg::importData()
 {
+  abHHData &p = abHHProxy::p[idx];
   QString num;
-     
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gMax*1e9);
@@ -114,4 +120,11 @@ void AlphaBetaHHDlg::importData(abHHData p)
   hsbE->setText(num);
 
   assignments->importData(p.assign);
+}
+
+void AlphaBetaHHDlg::on_buttonBox_clicked(QAbstractButton *button)
+{
+    if ( button->text() == "Close" )
+        hide();
+    emit labelChanged(leLabel->text());
 }

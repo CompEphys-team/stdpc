@@ -27,7 +27,7 @@ void DeviceManager::clear()
     allDAQ.clear();
     for ( DAQProxy *proxy : Register() )
         while ( proxy->size() )
-            proxy->remove(proxy->size());
+            proxy->remove(proxy->size()-1);
 }
 
 DeviceStatus DeviceManager::initSingle(QString &name, DAQProxy *proxy, size_t idx)
@@ -81,7 +81,7 @@ void DeviceManager::remove(DAQProxy *proxy, size_t idx)
 
 DAQ *DeviceManager::getDevice(const ChannelIndex &dex)
 {
-    if ( !dex.isValid || !dex.isAnalog )
+    if ( !dex.isValid || !(dex.isAnalog || dex.isDigital) )
         return nullptr;
     QVector<std::shared_ptr<DAQ>> &vec = allDAQ[dex.daqClass];
     if ( vec.size() > (int)dex.devID )

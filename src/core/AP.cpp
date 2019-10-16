@@ -20,294 +20,45 @@
 #include "AP.h"
 #include "Global.h"
 #include "ModelManager.h"
+#include "Synapse.h"
+#include "GapJunction.h"
+#include "IonicCurrent.h"
 
 void initAP()
 {
-    // CSynp STPlast
-    addAP("CSynp[#].ST.AMinus", &CSynp, &CSynData::ST, &STPlast::AMinus);
-    addAP("CSynp[#].ST.tauMinus", &CSynp, &CSynData::ST, &STPlast::tauMinus);
-    addAP("CSynp[#].ST.APlus", &CSynp, &CSynData::ST, &STPlast::APlus);
-    addAP("CSynp[#].ST.tauPlus", &CSynp, &CSynData::ST, &STPlast::tauPlus);
-    addAP("CSynp[#].ST.Exponent", &CSynp, &CSynData::ST, &STPlast::Exponent);
-    addAP("CSynp[#].ST.Shift", &CSynp, &CSynData::ST, &STPlast::Shift);
-    addAP("CSynp[#].ST.History", &CSynp, &CSynData::ST, &STPlast::History);
-    addAP("CSynp[#].ST.Table", &CSynp, &CSynData::ST, &STPlast::Table);
-    addAP("CSynp[#].ST.tableDt", &CSynp, &CSynData::ST, &STPlast::tableDt);
-    addAP("CSynp[#].ST.tableDgMin", &CSynp, &CSynData::ST, &STPlast::tableDgMin);
-    addAP("CSynp[#].ST.gMax", &CSynp, &CSynData::ST, &STPlast::gMax);
-    addAP("CSynp[#].ST.gMid", &CSynp, &CSynData::ST, &STPlast::gMid);
-    addAP("CSynp[#].ST.gSlope", &CSynp, &CSynData::ST, &STPlast::gSlope);
-    addAP("CSynp[#].ST.sigmoidTable", &CSynp, &CSynData::ST, &STPlast::sigmoidTable);
-    addAP("CSynp[#].ST.sigmoidTableDg", &CSynp, &CSynData::ST, &STPlast::sigmoidTableDg);
-    addAP("CSynp[#].ST.sigmoidTableMaxEntry", &CSynp, &CSynData::ST, &STPlast::sigmoidTableMaxEntry);
-
-    // CSynp ODEPlast
-    addAP("CSynp[#].ODE.InitialP", &CSynp, &CSynData::ODE, &ODEPlast::InitialP);
-    addAP("CSynp[#].ODE.InitialD", &CSynp, &CSynData::ODE, &ODEPlast::InitialD);
-    addAP("CSynp[#].ODE.betaP", &CSynp, &CSynData::ODE, &ODEPlast::betaP);
-    addAP("CSynp[#].ODE.betaD", &CSynp, &CSynData::ODE, &ODEPlast::betaD);
-    addAP("CSynp[#].ODE.gamma", &CSynp, &CSynData::ODE, &ODEPlast::gamma);
-    addAP("CSynp[#].ODE.eta", &CSynp, &CSynData::ODE, &ODEPlast::eta);
-    addAP("CSynp[#].ODE.highP", &CSynp, &CSynData::ODE, &ODEPlast::highP);
-    addAP("CSynp[#].ODE.lowP", &CSynp, &CSynData::ODE, &ODEPlast::lowP);
-    addAP("CSynp[#].ODE.highD", &CSynp, &CSynData::ODE, &ODEPlast::highD);
-    addAP("CSynp[#].ODE.lowD", &CSynp, &CSynData::ODE, &ODEPlast::lowD);
-    addAP("CSynp[#].ODE.gMax", &CSynp, &CSynData::ODE, &ODEPlast::gMax);
-    addAP("CSynp[#].ODE.gMid", &CSynp, &CSynData::ODE, &ODEPlast::gMid);
-    addAP("CSynp[#].ODE.gSlope", &CSynp, &CSynData::ODE, &ODEPlast::gSlope);
-    addAP("CSynp[#].ODE.sigmoidTable", &CSynp, &CSynData::ODE, &ODEPlast::sigmoidTable);
-    addAP("CSynp[#].ODE.sigmoidTableDg", &CSynp, &CSynData::ODE, &ODEPlast::sigmoidTableDg);
-    addAP("CSynp[#].ODE.sigmoidTableMaxEntry", &CSynp, &CSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
-
-    // main Csynp
-    addAP("CSynp[#].active", &CSynp, &CSynData::active);
-    addAP("CSynp[#].LUTables", &CSynp, &CSynData::LUTables);
-    addAP("CSynp[#].MgBlock", &CSynp, &CSynData::MgBlock);
-    addAP("CSynp[#].gSyn", &CSynp, &CSynData::gSyn);
-    addAP("CSynp[#].VSyn", &CSynp, &CSynData::VSyn);
-    addAP("CSynp[#].tauSyn", &CSynp, &CSynData::tauSyn);
-    addAP("CSynp[#].VThresh", &CSynp, &CSynData::VThresh);
-    addAP("CSynp[#].VSlope", &CSynp, &CSynData::VSlope);
-    addAP("CSynp[#].STD", &CSynp, &CSynData::STD);
-    addAP("CSynp[#].STDAmpl", &CSynp, &CSynData::STDAmpl);
-    addAP("CSynp[#].STDVThresh", &CSynp, &CSynData::STDVThresh);
-    addAP("CSynp[#].STDVSlope", &CSynp, &CSynData::STDVSlope);
-    addAP("CSynp[#].STDtauAmpl", &CSynp, &CSynData::STDtauAmpl);
-    addAP("CSynp[#].STDtau0", &CSynp, &CSynData::STDtau0);
-    addAP("CSynp[#].STDtauVThresh", &CSynp, &CSynData::STDtauVThresh);
-    addAP("CSynp[#].STDtauVSlope", &CSynp, &CSynData::STDtauVSlope);
-    addAP("CSynp[#].fixVpost", &CSynp, &CSynData::fixVpost);
-    addAP("CSynp[#].Vpost", &CSynp, &CSynData::Vpost);
-    addAP("CSynp[#].Mgfac", &CSynp, &CSynData::Mgfac);
-    addAP("CSynp[#].Mgexpo", &CSynp, &CSynData::Mgexpo);
-    addAP("CSynp[#].Plasticity", &CSynp, &CSynData::Plasticity);
-    addAP("CSynp[#].assign[#].active", &CSynp, &CSynData::assign, &SynapseAssignment::active);
-    addAP("CSynp[#].assign[#].PreSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PreSynChannel);
-    addAP("CSynp[#].assign[#].PostSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::PostSynChannel);
-    addAP("CSynp[#].assign[#].OutSynChannel", &CSynp, &CSynData::assign, &SynapseAssignment::OutSynChannel);
-    addAP("CSynp[#].assign[#].delay", &CSynp, &CSynData::assign, &SynapseAssignment::delay);
-
-    addAP("CSynp[#].PreSynChannel", &CSynp, &CSynData::legacy_PreSyn);
-    addAP("CSynp[#].PostSynChannel", &CSynp, &CSynData::legacy_PostSyn);
-    addAP("CSynp[#].OutSynChannel", &CSynp, &CSynData::legacy_OutSyn);
-
-
-    // abSynp STPlast
-    addAP("abSynp[#].ST.AMinus", &abSynp, &abSynData::ST, &STPlast::AMinus);
-    addAP("abSynp[#].ST.tauMinus", &abSynp, &abSynData::ST, &STPlast::tauMinus);
-    addAP("abSynp[#].ST.APlus", &abSynp, &abSynData::ST, &STPlast::APlus);
-    addAP("abSynp[#].ST.tauPlus", &abSynp, &abSynData::ST, &STPlast::tauPlus);
-    addAP("abSynp[#].ST.Exponent", &abSynp, &abSynData::ST, &STPlast::Exponent);
-    addAP("abSynp[#].ST.Shift", &abSynp, &abSynData::ST, &STPlast::Shift);
-    addAP("abSynp[#].ST.History", &abSynp, &abSynData::ST, &STPlast::History);
-    addAP("abSynp[#].ST.Table", &abSynp, &abSynData::ST, &STPlast::Table);
-    addAP("abSynp[#].ST.tableDt", &abSynp, &abSynData::ST, &STPlast::tableDt);
-    addAP("abSynp[#].ST.tableDgMin", &abSynp, &abSynData::ST, &STPlast::tableDgMin);
-    addAP("abSynp[#].ST.gMax", &abSynp, &abSynData::ST, &STPlast::gMax);
-    addAP("abSynp[#].ST.gMid", &abSynp, &abSynData::ST, &STPlast::gMid);
-    addAP("abSynp[#].ST.gSlope", &abSynp, &abSynData::ST, &STPlast::gSlope);
-    addAP("abSynp[#].ST.sigmoidTable", &abSynp, &abSynData::ST, &STPlast::sigmoidTable);
-    addAP("abSynp[#].ST.sigmoidTableDg", &abSynp, &abSynData::ST, &STPlast::sigmoidTableDg);
-    addAP("abSynp[#].ST.sigmoidTableMaxEntry", &abSynp, &abSynData::ST, &STPlast::sigmoidTableMaxEntry);
-
-    // abSynp ODEPlast
-    addAP("abSynp[#].ODE.InitialP", &abSynp, &abSynData::ODE, &ODEPlast::InitialP);
-    addAP("abSynp[#].ODE.InitialD", &abSynp, &abSynData::ODE, &ODEPlast::InitialD);
-    addAP("abSynp[#].ODE.betaP", &abSynp, &abSynData::ODE, &ODEPlast::betaP);
-    addAP("abSynp[#].ODE.betaD", &abSynp, &abSynData::ODE, &ODEPlast::betaD);
-    addAP("abSynp[#].ODE.gamma", &abSynp, &abSynData::ODE, &ODEPlast::gamma);
-    addAP("abSynp[#].ODE.eta", &abSynp, &abSynData::ODE, &ODEPlast::eta);
-    addAP("abSynp[#].ODE.highP", &abSynp, &abSynData::ODE, &ODEPlast::highP);
-    addAP("abSynp[#].ODE.lowP", &abSynp, &abSynData::ODE, &ODEPlast::lowP);
-    addAP("abSynp[#].ODE.highD", &abSynp, &abSynData::ODE, &ODEPlast::highD);
-    addAP("abSynp[#].ODE.lowD", &abSynp, &abSynData::ODE, &ODEPlast::lowD);
-    addAP("abSynp[#].ODE.gMax", &abSynp, &abSynData::ODE, &ODEPlast::gMax);
-    addAP("abSynp[#].ODE.gMid", &abSynp, &abSynData::ODE, &ODEPlast::gMid);
-    addAP("abSynp[#].ODE.gSlope", &abSynp, &abSynData::ODE, &ODEPlast::gSlope);
-    addAP("abSynp[#].ODE.sigmoidTable", &abSynp, &abSynData::ODE, &ODEPlast::sigmoidTable);
-    addAP("abSynp[#].ODE.sigmoidTableDg", &abSynp, &abSynData::ODE, &ODEPlast::sigmoidTableDg);
-    addAP("abSynp[#].ODE.sigmoidTableMaxEntry", &abSynp, &abSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
-
-    // main abSynp
-    addAP("abSynp[#].active", &abSynp, &abSynData::active);
-    addAP("abSynp[#].LUTables", &abSynp, &abSynData::LUTables);
-    addAP("abSynp[#].gSyn", &abSynp, &abSynData::gSyn);
-    addAP("abSynp[#].Vrev", &abSynp, &abSynData::Vrev);
-    addAP("abSynp[#].aS", &abSynp, &abSynData::aS);
-    addAP("abSynp[#].bS", &abSynp, &abSynData::bS);
-    addAP("abSynp[#].aR", &abSynp, &abSynData::aR);
-    addAP("abSynp[#].VaR", &abSynp, &abSynData::VaR);
-    addAP("abSynp[#].saR", &abSynp, &abSynData::saR);
-    addAP("abSynp[#].bR", &abSynp, &abSynData::bR);
-    addAP("abSynp[#].fixVpost", &abSynp, &abSynData::fixVpost);
-    addAP("abSynp[#].Vpost", &abSynp, &abSynData::Vpost);
-    addAP("abSynp[#].Plasticity", &abSynp, &abSynData::Plasticity);
-    addAP("abSynp[#].assign[#].active", &abSynp, &abSynData::assign, &SynapseAssignment::active);
-    addAP("abSynp[#].assign[#].PreSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PreSynChannel);
-    addAP("abSynp[#].assign[#].PostSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::PostSynChannel);
-    addAP("abSynp[#].assign[#].OutSynChannel", &abSynp, &abSynData::assign, &SynapseAssignment::OutSynChannel);
-    addAP("abSynp[#].assign[#].delay", &abSynp, &abSynData::assign, &SynapseAssignment::delay);
-
-    addAP("abSynp[#].PreSynChannel", &abSynp, &abSynData::legacy_PreSyn);
-    addAP("abSynp[#].PostSynChannel", &abSynp, &abSynData::legacy_PostSyn);
-    addAP("abSynp[#].OutSynChannel", &abSynp, &abSynData::legacy_OutSyn);
-
-
-    // DxheSynp STPlast
-    addAP("DxheSynp[#].ST.AMinus", &DxheSynp, &DestexheSynData::ST, &STPlast::AMinus);
-    addAP("DxheSynp[#].ST.tauMinus", &DxheSynp, &DestexheSynData::ST, &STPlast::tauMinus);
-    addAP("DxheSynp[#].ST.APlus", &DxheSynp, &DestexheSynData::ST, &STPlast::APlus);
-    addAP("DxheSynp[#].ST.tauPlus", &DxheSynp, &DestexheSynData::ST, &STPlast::tauPlus);
-    addAP("DxheSynp[#].ST.Exponent", &DxheSynp, &DestexheSynData::ST, &STPlast::Exponent);
-    addAP("DxheSynp[#].ST.Shift", &DxheSynp, &DestexheSynData::ST, &STPlast::Shift);
-    addAP("DxheSynp[#].ST.History", &DxheSynp, &DestexheSynData::ST, &STPlast::History);
-    addAP("DxheSynp[#].ST.Table", &DxheSynp, &DestexheSynData::ST, &STPlast::Table);
-    addAP("DxheSynp[#].ST.tableDt", &DxheSynp, &DestexheSynData::ST, &STPlast::tableDt);
-    addAP("DxheSynp[#].ST.tableDgMin", &DxheSynp, &DestexheSynData::ST, &STPlast::tableDgMin);
-    addAP("DxheSynp[#].ST.gMax", &DxheSynp, &DestexheSynData::ST, &STPlast::gMax);
-    addAP("DxheSynp[#].ST.gMid", &DxheSynp, &DestexheSynData::ST, &STPlast::gMid);
-    addAP("DxheSynp[#].ST.gSlope", &DxheSynp, &DestexheSynData::ST, &STPlast::gSlope);
-    addAP("DxheSynp[#].ST.sigmoidTable", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTable);
-    addAP("DxheSynp[#].ST.sigmoidTableDg", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTableDg);
-    addAP("DxheSynp[#].ST.sigmoidTableMaxEntry", &DxheSynp, &DestexheSynData::ST, &STPlast::sigmoidTableMaxEntry);
-
-    // DxheSynp ODEPlast
-    addAP("DxheSynp[#].ODE.InitialP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::InitialP);
-    addAP("DxheSynp[#].ODE.InitialD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::InitialD);
-    addAP("DxheSynp[#].ODE.betaP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::betaP);
-    addAP("DxheSynp[#].ODE.betaD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::betaD);
-    addAP("DxheSynp[#].ODE.gamma", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gamma);
-    addAP("DxheSynp[#].ODE.eta", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::eta);
-    addAP("DxheSynp[#].ODE.highP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::highP);
-    addAP("DxheSynp[#].ODE.lowP", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::lowP);
-    addAP("DxheSynp[#].ODE.highD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::highD);
-    addAP("DxheSynp[#].ODE.lowD", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::lowD);
-    addAP("DxheSynp[#].ODE.gMax", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gMax);
-    addAP("DxheSynp[#].ODE.gMid", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gMid);
-    addAP("DxheSynp[#].ODE.gSlope", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::gSlope);
-    addAP("DxheSynp[#].ODE.sigmoidTable", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTable);
-    addAP("DxheSynp[#].ODE.sigmoidTableDg", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTableDg);
-    addAP("DxheSynp[#].ODE.sigmoidTableMaxEntry", &DxheSynp, &DestexheSynData::ODE, &ODEPlast::sigmoidTableMaxEntry);
-
-    // main DxheSynp
-    addAP("DxheSynp[#].active", &DxheSynp, &DestexheSynData::active);
-    addAP("DxheSynp[#].LUTables", &DxheSynp, &DestexheSynData::LUTables);
-    addAP("DxheSynp[#].gSyn", &DxheSynp, &DestexheSynData::gSyn);
-    addAP("DxheSynp[#].Vpre", &DxheSynp, &DestexheSynData::Vpre);
-    addAP("DxheSynp[#].Vrev", &DxheSynp, &DestexheSynData::Vrev);
-    addAP("DxheSynp[#].trelease", &DxheSynp, &DestexheSynData::trelease);
-    addAP("DxheSynp[#].alpha", &DxheSynp, &DestexheSynData::alpha);
-    addAP("DxheSynp[#].beta", &DxheSynp, &DestexheSynData::beta);
-    addAP("DxheSynp[#].fixVpost", &DxheSynp, &DestexheSynData::fixVpost);
-    addAP("DxheSynp[#].Vpost", &DxheSynp, &DestexheSynData::Vpost);
-    addAP("DxheSynp[#].Plasticity", &DxheSynp, &DestexheSynData::Plasticity);
-    addAP("DxheSynp[#].assign[#].active", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::active);
-    addAP("DxheSynp[#].assign[#].PreSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PreSynChannel);
-    addAP("DxheSynp[#].assign[#].PostSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::PostSynChannel);
-    addAP("DxheSynp[#].assign[#].OutSynChannel", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::OutSynChannel);
-    addAP("DxheSynp[#].assign[#].delay", &DxheSynp, &DestexheSynData::assign, &SynapseAssignment::delay);
-
-    addAP("DxheSynp[#].PreSynChannel", &DxheSynp, &DestexheSynData::legacy_PreSyn);
-    addAP("DxheSynp[#].PostSynChannel", &DxheSynp, &DestexheSynData::legacy_PostSyn);
-    addAP("DxheSynp[#].OutSynChannel", &DxheSynp, &DestexheSynData::legacy_OutSyn);
-
-
-    // ESynp
-    addAP("ESynp[#].active", &ESynp, &GJunctData::active);
-    addAP("ESynp[#].type", &ESynp, &GJunctData::type);
-    addAP("ESynp[#].gSyn", &ESynp, &GJunctData::gSyn);
-    addAP("ESynp[#].assign[#].active", &ESynp, &GJunctData::assign, &GapJunctionAssignment::active);
-    addAP("ESynp[#].assign[#].preInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preInChannel);
-    addAP("ESynp[#].assign[#].postInChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postInChannel);
-    addAP("ESynp[#].assign[#].preOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::preOutChannel);
-    addAP("ESynp[#].assign[#].postOutChannel", &ESynp, &GJunctData::assign, &GapJunctionAssignment::postOutChannel);
-
-    addAP("ESynp[#].preInChannel", &ESynp, &GJunctData::legacy_PreIn);
-    addAP("ESynp[#].postInChannel", &ESynp, &GJunctData::legacy_PostIn);
-    addAP("ESynp[#].preOutChannel", &ESynp, &GJunctData::legacy_PreOut);
-    addAP("ESynp[#].postOutChannel", &ESynp, &GJunctData::legacy_PostOut);
-
-
-    // mhHH
-    addAP("mhHHp[#].active", &mhHHp, &mhHHData::active);
-    addAP("mhHHp[#].LUTables", &mhHHp, &mhHHData::LUTables);
-    addAP("mhHHp[#].gMax", &mhHHp, &mhHHData::gMax);
-    addAP("mhHHp[#].Vrev", &mhHHp, &mhHHData::Vrev);
-    addAP("mhHHp[#].mExpo", &mhHHp, &mhHHData::mExpo);
-    addAP("mhHHp[#].hExpo", &mhHHp, &mhHHData::hExpo);
-    addAP("mhHHp[#].Vm", &mhHHp, &mhHHData::Vm);
-    addAP("mhHHp[#].sm", &mhHHp, &mhHHData::sm);
-    addAP("mhHHp[#].Cm", &mhHHp, &mhHHData::Cm);
-    addAP("mhHHp[#].taumType", &mhHHp, &mhHHData::taumType);
-    addAP("mhHHp[#].taum", &mhHHp, &mhHHData::taum);
-    addAP("mhHHp[#].taumAmpl", &mhHHp, &mhHHData::taumAmpl);
-    addAP("mhHHp[#].Vtaum", &mhHHp, &mhHHData::Vtaum);
-    addAP("mhHHp[#].staum", &mhHHp, &mhHHData::staum);
-    addAP("mhHHp[#].Vh", &mhHHp, &mhHHData::Vh);
-    addAP("mhHHp[#].sh", &mhHHp, &mhHHData::sh);
-    addAP("mhHHp[#].Ch", &mhHHp, &mhHHData::Ch);
-    addAP("mhHHp[#].tauhType", &mhHHp, &mhHHData::tauhType);
-    addAP("mhHHp[#].tauh", &mhHHp, &mhHHData::tauh);
-    addAP("mhHHp[#].tauhAmpl", &mhHHp, &mhHHData::tauhAmpl);
-    addAP("mhHHp[#].Vtauh", &mhHHp, &mhHHData::Vtauh);
-    addAP("mhHHp[#].stauh", &mhHHp, &mhHHData::stauh);
-    addAP("mhHHp[#].assign[#].active", &mhHHp, &mhHHData::assign, &CurrentAssignment::active);
-    addAP("mhHHp[#].assign[#].VChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::VChannel);
-    addAP("mhHHp[#].assign[#].IChannel", &mhHHp, &mhHHData::assign, &CurrentAssignment::IChannel);
-
-    addAP("mhHHp[#].VChannel", &mhHHp, &mhHHData::legacy_V);
-    addAP("mhHHp[#].IChannel", &mhHHp, &mhHHData::legacy_I);
-
-
-    // abHH
-    addAP("abHHp[#].active", &abHHp, &abHHData::active);
-    addAP("abHHp[#].LUTables", &abHHp, &abHHData::LUTables);
-    addAP("abHHp[#].gMax", &abHHp, &abHHData::gMax);
-    addAP("abHHp[#].Vrev", &abHHp, &abHHData::Vrev);
-    addAP("abHHp[#].mExpo", &abHHp, &abHHData::mExpo);
-    addAP("abHHp[#].hExpo", &abHHp, &abHHData::hExpo);
-    addAP("abHHp[#].maFunc", &abHHp, &abHHData::maFunc);
-    addAP("abHHp[#].mka", &abHHp, &abHHData::mka);
-    addAP("abHHp[#].mVa", &abHHp, &abHHData::mVa);
-    addAP("abHHp[#].msa", &abHHp, &abHHData::msa);
-    addAP("abHHp[#].mbFunc", &abHHp, &abHHData::mbFunc);
-    addAP("abHHp[#].mkb", &abHHp, &abHHData::mkb);
-    addAP("abHHp[#].mVb", &abHHp, &abHHData::mVb);
-    addAP("abHHp[#].msb", &abHHp, &abHHData::msb);
-    addAP("abHHp[#].haFunc", &abHHp, &abHHData::haFunc);
-    addAP("abHHp[#].hka", &abHHp, &abHHData::hka);
-    addAP("abHHp[#].hVa", &abHHp, &abHHData::hVa);
-    addAP("abHHp[#].hsa", &abHHp, &abHHData::hsa);
-    addAP("abHHp[#].hbFunc", &abHHp, &abHHData::hbFunc);
-    addAP("abHHp[#].hkb", &abHHp, &abHHData::hkb);
-    addAP("abHHp[#].hVb", &abHHp, &abHHData::hVb);
-    addAP("abHHp[#].hsb", &abHHp, &abHHData::hsb);
-    addAP("abHHp[#].assign[#].active", &abHHp, &abHHData::assign, &CurrentAssignment::active);
-    addAP("abHHp[#].assign[#].VChannel", &abHHp, &abHHData::assign, &CurrentAssignment::VChannel);
-    addAP("abHHp[#].assign[#].IChannel", &abHHp, &abHHData::assign, &CurrentAssignment::IChannel);
-
-    addAP("abHHp[#].VChannel", &abHHp, &abHHData::legacy_V);
-    addAP("abHHp[#].IChannel", &abHHp, &abHHData::legacy_I);
-
-
     // Data saving
     addAP("dataSavingPs.enabled", &(dataSavingPs.enabled));
     addAP("dataSavingPs.fileName", &(dataSavingPs.fileName));
     addAP("dataSavingPs.savingFreq", &(dataSavingPs.savingFreq));
     addAP("dataSavingPs.isBinary", &(dataSavingPs.isBinary));
+    addAP("dataSavingPs.binaryLittleEndian", &dataSavingPs.binaryLittleEndian);
+    addAP("dataSavingPs.binaryDoublePrecision", &dataSavingPs.binaryDoublePrecision);
+    addAP("dataSavingPs.asciiSeparator", &dataSavingPs.asciiSeparator);
+    addAP("dataSavingPs.asciiHeaderPrefix", &dataSavingPs.asciiHeaderPrefix);
+    addAP("dataSavingPs.asciiCRLF", &dataSavingPs.asciiCRLF);
 
 
     // Graphs
-    addAP("Plotp.bufferExp", &Plotp, &PlotData::bufferExp);
-    addAP("Plotp.interval", &Plotp, &PlotData::interval);
-    addAP("Plotp.graphs[#].active", &Plotp, &PlotData::graphs, &GraphData::active);
-    AP *graphCol = addAP("Plotp.graphs[#].color", &Plotp, &PlotData::graphs, &GraphData::color);
-    AP *graphVol = addAP("Plotp.graphs[#].isVoltage", &Plotp, &PlotData::graphs, &GraphData::isVoltage);
-    AP *graphChn = addAP("Plotp.graphs[#].chan", &Plotp, &PlotData::graphs, &GraphData::chan);
+    addAP("Plotp.active", &Plotp, &BasePlotData::active);
+    addAP("Plotp.bufferExp", &Plotp, &BasePlotData::bufferExp);
+    addAP("Plotp.interval", &Plotp, &BasePlotData::interval);
+    addAP("Plotp.xRange", &Plotp, &BasePlotData::xRange);
+    addAP("Plotp.plot[#].height", &Plotp, &BasePlotData::plot, &PlotData::height);
+    addAP("Plotp.plot[#].yLower", &Plotp, &BasePlotData::plot, &PlotData::yLower);
+    addAP("Plotp.plot[#].yUpper", &Plotp, &BasePlotData::plot, &PlotData::yUpper);
+    AP *graphActive = addAP("Plotp.plot[#].graph[#].active", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::active);
+    AP *graphChan =   addAP("Plotp.plot[#].graph[#].chan", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::chan);
+    AP *graphVolt =   addAP("Plotp.plot[#].graph[#].isVoltage", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::isVoltage);
+    AP *graphColor =  addAP("Plotp.plot[#].graph[#].color", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::color);
+    addAP("Plotp.plot[#].graph[#].unitMod", &Plotp, &BasePlotData::plot, &PlotData::graph, &GraphData::unitMod);
 
-    addDeprecatedAP("Graphp[#].chan", graphChn);
-    addDeprecatedAP("Graphp[#].isVoltage", graphVol);
-    addDeprecatedAP("Graphp[#].color", graphCol);
+    addDeprecatedAP("Plotp.graphs[#].active", graphActive, 1);
+    addDeprecatedAP("Plotp.graphs[#].color", graphColor, 1);
+    addDeprecatedAP("Plotp.graphs[#].isVoltage", graphVolt, 1);
+    addDeprecatedAP("Plotp.graphs[#].chan", graphChan, 1);
+    addDeprecatedAP("Graphp[#].chan", graphChan, 1);
+    addDeprecatedAP("Graphp[#].isVoltage", graphVolt, 1);
+    addDeprecatedAP("Graphp[#].color", graphColor, 1);
 
 
     // Sample & hold
@@ -319,6 +70,24 @@ void initAP()
     // Performance monitor
     addAP("PerfMonp.active", &PerfMonp, &PerformanceMonitorData::active);
     addAP("PerfMonp.interval", &PerfMonp, &PerformanceMonitorData::interval);
+
+
+    // Trigger
+    addAP("Triggerp.active", &Triggerp, &TriggerData::active);
+    addAP("Triggerp.channel", &Triggerp, &TriggerData::channel);
+
+    // Settling
+    addAP("Settlingp.active", &Settlingp, &SettlingData::active);
+    addAP("Settlingp.duration", &Settlingp, &SettlingData::duration);
+
+    // Thread priority
+    addAP("ClampThreadPriority", &ClampThreadPriority);
+
+    // GUI
+    addAP("GUIp.openDAQ", &GUIp, &GuiData::openDAQ);
+    addAP("GUIp.openTools", &GUIp, &GuiData::openTools);
+    addAP("GUIp.openSynapses", &GUIp, &GuiData::openSynapses);
+    addAP("GUIp.openCurrents", &GUIp, &GuiData::openCurrents);
 }
 
 std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
@@ -349,9 +118,11 @@ std::vector<std::unique_ptr<AP>> deprecateChannelsTo(QString prefix)
 }
 
 #include "SimulDAQ.h"
-#include "DigiData.h"
+#ifdef DIGIDATA_PT
+    #include "DigiData.h"
+#endif
 #ifdef NATIONAL_INSTRUMENTS
-#include "Nidaq.h"
+    #include "Nidaq.h"
 #endif
 bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
 {
@@ -360,7 +131,9 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     int pos = is.tellg();
     std::vector<std::unique_ptr<AP>> deprec;
     SDAQData sdaq;
+#ifdef DIGIDATA_PT
     DigiDataData dd;
+#endif
 #ifdef NATIONAL_INSTRUMENTS
     NIDAQData nidaq;
 #endif
@@ -395,18 +168,23 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
     // Unversioned legacy config
     if ( !version ) {
         int selection, sdaqInChnNo, sdaqOutChnNo;
+        short dd_baseAddress;
         is >> selection;
         is >> sdaq.inFileName >> sdaq.outFileName >> sdaqInChnNo >> sdaqOutChnNo >> sdaq.inTFac >> sdaq.outDt;
         sdaq.inChn.resize(sdaqInChnNo);
         sdaq.outChn.resize(sdaqOutChnNo);
-        is >> dd.baseAddress;
+        is >> dd_baseAddress;
         if ( selection == 0 ) {
             sdaq.active = true;
             deprec = deprecateChannelsTo("SDAQp[#]");
-        } else if ( selection == 1 ) {
+        }
+#ifdef DIGIDATA_PT
+        dd.baseAddress = dd_baseAddress;
+        if ( selection == 1 ) {
             dd.active = true;
             deprec = deprecateChannelsTo("DigiDatap[#]");
         }
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( selection == 2 ) {
             is >> nidaq.deviceName;
@@ -417,16 +195,18 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         if ( !is.good() )
             return false;
 
+        SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
+        if ( sdaq.active )
+            LEGACY_DAQ_CLASS = "SimulDAQ";
+#ifdef DIGIDATA_PT
         AP *syncio = AP::find("DigiDatap[#].syncIOMask");
         if ( syncio )
             deprec.push_back(std::unique_ptr<AP>(new APDeprec("DigiDatap.syncIOMask", syncio, 1)));
 
-        SimulDAQProxy::p.insert(SimulDAQProxy::p.begin(), sdaq);
-        if ( sdaq.active )
-            LEGACY_DAQ_CLASS = "SimulDAQ";
         DigiDataProxy::p.insert(DigiDataProxy::p.begin(), dd);
         if ( dd.active )
             LEGACY_DAQ_CLASS = "DigiData1200";
+#endif
 #ifdef NATIONAL_INSTRUMENTS
         if ( nidaq.active ) {
             NIDAQProxy::p.insert(NIDAQProxy::p.begin(), nidaq);
@@ -505,68 +285,56 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             }
         }
 
-        for ( CSynData &syn : CSynp ) {
-            SynapseAssignment assign;
-            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
-                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
-            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
-                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
-            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
-                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
-            syn.assign.push_back(assign);
-        }
-
-        for ( abSynData &syn : abSynp ) {
-            SynapseAssignment assign;
-            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
-                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
-            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
-                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
-            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
-                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
-            syn.assign.push_back(assign);
-        }
-
-        for ( DestexheSynData &syn : DxheSynp ) {
-            SynapseAssignment assign;
-            if ( syn.legacy_PreSyn >= 0 && syn.legacy_PreSyn < int(legacyIn.size()) )
-                assign.PreSynChannel = legacyIn[syn.legacy_PreSyn];
-            if ( syn.legacy_PostSyn >= 0 && syn.legacy_PostSyn < int(legacyIn.size()) )
-                assign.PostSynChannel = legacyIn[syn.legacy_PostSyn];
-            if ( syn.legacy_OutSyn >= 0 && syn.legacy_OutSyn < int(legacyOut.size()) )
-                assign.OutSynChannel = legacyOut[syn.legacy_OutSyn];
-            syn.assign.push_back(assign);
-        }
-
-        for ( GJunctData &syn : ESynp ) {
-            GapJunctionAssignment assign;
-            if ( syn.legacy_PreIn >= 0 && syn.legacy_PreIn < int(legacyIn.size()) )
-                assign.preInChannel = legacyIn[syn.legacy_PreIn];
-            if ( syn.legacy_PostIn >= 0 && syn.legacy_PostIn < int(legacyIn.size()) )
-                assign.postInChannel = legacyIn[syn.legacy_PostIn];
-            if ( syn.legacy_PreOut >= 0 && syn.legacy_PreOut < int(legacyOut.size()) )
-                assign.preOutChannel = legacyOut[syn.legacy_PreOut];
-            if ( syn.legacy_PostOut >= 0 && syn.legacy_PostOut < int(legacyOut.size()) )
-                assign.postOutChannel = legacyOut[syn.legacy_PostOut];
-            syn.assign.push_back(assign);
-        }
-
-        for ( mhHHData &current : mhHHp ) {
-            CurrentAssignment assign;
-            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
-                assign.VChannel = legacyIn[current.legacy_V];
-            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
-                assign.IChannel = legacyOut[current.legacy_I];
-            current.assign.push_back(assign);
-        }
-
-        for ( abHHData &current : abHHp ) {
-            CurrentAssignment assign;
-            if ( current.legacy_V >= 0 && current.legacy_V < int(legacyIn.size()) )
-                assign.VChannel = legacyIn[current.legacy_V];
-            if ( current.legacy_I >= 0 && current.legacy_I < int(legacyOut.size()) )
-                assign.IChannel = legacyOut[current.legacy_I];
-            current.assign.push_back(assign);
+        for ( ConductanceProxy *prox : Conductances.Register() ) {
+            SynapseProxy *synprox  = dynamic_cast<SynapseProxy*>(prox);
+            if ( synprox ) {
+                for ( size_t i = 0; i < synprox->size(); i++ ) {
+                    SynapseAssignment assign;
+                    SynapseData &p = synprox->param(i);
+                    if ( p.legacy_PreSyn >= 0 && p.legacy_PreSyn < int(legacyIn.size()) )
+                        assign.PreSynChannel = legacyIn[p.legacy_PreSyn];
+                    if ( p.legacy_PostSyn >= 0 && p.legacy_PostSyn < int(legacyIn.size()) )
+                        assign.PostSynChannel = legacyIn[p.legacy_PostSyn];
+                    if ( p.legacy_OutSyn >= 0 && p.legacy_OutSyn < int(legacyIn.size()) )
+                        assign.OutSynChannel = legacyIn[p.legacy_OutSyn];
+                    if ( assign.PreSynChannel.isValid && assign.PostSynChannel.isValid && assign.OutSynChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+                continue;
+            }
+            GapJunctionProxy *gjprox = dynamic_cast<GapJunctionProxy*>(prox);
+            if ( gjprox ) {
+                for ( size_t i = 0; i < gjprox->size(); i++ ) {
+                    GapJunctionAssignment assign;
+                    GJunctData &p = gjprox->param(i);
+                    if ( p.legacy_PreIn >= 0 && p.legacy_PreIn < int(legacyIn.size()) )
+                        assign.preInChannel = legacyIn[p.legacy_PreIn];
+                    if ( p.legacy_PostIn >= 0 && p.legacy_PostIn < int(legacyIn.size()) )
+                        assign.postInChannel = legacyIn[p.legacy_PostIn];
+                    if ( p.legacy_PreOut >= 0 && p.legacy_PreOut < int(legacyOut.size()) )
+                        assign.preOutChannel = legacyOut[p.legacy_PreOut];
+                    if ( p.legacy_PostOut >= 0 && p.legacy_PostOut < int(legacyOut.size()) )
+                        assign.postOutChannel = legacyOut[p.legacy_PostOut];
+                    if ( assign.preInChannel.isValid && assign.postInChannel.isValid
+                         && assign.preOutChannel.isValid && assign.postOutChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+                continue;
+            }
+            IonicCurrentProxy *cprox = dynamic_cast<IonicCurrentProxy*>(prox);
+            if ( cprox ) {
+                for ( size_t i = 0; i < cprox->size(); i++ ) {
+                    CurrentAssignment assign;
+                    CurrentData &p = cprox->param(i);
+                    if ( p.legacy_V >= 0 && p.legacy_V < int(legacyIn.size()) )
+                        assign.VChannel = legacyIn[p.legacy_V];
+                    if ( p.legacy_I >= 0 && p.legacy_I < int(legacyOut.size()) )
+                        assign.IChannel = legacyOut[p.legacy_I];
+                    if ( assign.VChannel.isValid && assign.IChannel.isValid )
+                        p.assign.push_back(assign);
+                }
+                continue;
+            }
         }
 
         for ( int i(elecCalibPs.size() - 1); i >= 0; i-- ) {
@@ -587,6 +355,7 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
             legacyGraphData &graphp = legacyGraphp[j];
             if ( graphp.dt )
                 Plotp.interval = graphp.dt;
+            PlotData plot;
             for ( int i = 0; i < 4; i++ ) {
                 GraphData g;
                 g.active = graphp.active[i];
@@ -603,10 +372,46 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
                     g.chan = legacyOut[chan - legacyIn.size()]; // Out
                 g.color = QColor(graphp.color[i]);
                 g.isVoltage = g.chan.isInChn || g.chan.isVirtual;
-                Plotp.graphs.push_back(g);
+                plot.graph.push_back(g);
+            }
+            Plotp.plot.push_back(plot);
+        }
+    }
+
+    if ( version < 4 ) {
+        // version 4 introduced a restriction on HH channel assignments: no model instances.
+        // Compat: Reassigns all model instances to model prototypes
+        for ( ConductanceProxy *prox : Conductances.Currents() ) {
+            IonicCurrentProxy *cprox = dynamic_cast<IonicCurrentProxy*>(prox);
+            if ( cprox ) {
+                for ( size_t i = 0; i < cprox->size(); i++ ) {
+                    CurrentData &p = cprox->param(i);
+                    std::vector<ChannelIndex> mod;
+                    std::vector<CurrentAssignment> dest;
+                    dest.reserve(p.assign.size());
+                    for ( CurrentAssignment &a : p.assign ) {
+                        if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
+                            a.IChannel.isPrototype = true;
+                            a.VChannel.isPrototype = true;
+                            a.IChannel.isVirtual = false;
+                            a.VChannel.isVirtual = false;
+                            if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
+                                continue; // Drop duplicate entries
+                            }
+                            mod.push_back(a.IChannel);
+                        } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
+                            mod.push_back(a.IChannel);
+                        }
+                        dest.push_back(a);
+                    }
+                    p.assign = dest;
+                }
             }
         }
     }
+
+    for ( auto hook : AP::hooks_post_load() )
+        hook();
 
     return true;
 }

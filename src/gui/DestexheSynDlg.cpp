@@ -20,20 +20,23 @@
 #include <QDoubleSpinBox>
 #include "DestexheSynDlg.h"
 #include <QMessageBox>
+#include "DestexheSyn.h"
 
-DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *out, QWidget *parent)
-     : QDialog(parent)
+DestexheSynDlg::DestexheSynDlg(size_t no, QWidget *parent)
+     : ConductanceDlg(no, parent)
  {
      setupUi(this);
 
      STDP= new STDPDlg(this);
      ODESTDP= new ODESTDPDlg(this);
 
-     label = DestexheSynDlgLabel->text();
      setIndex(no);
 
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
+
+     ChannelListModel *in = ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank);
+     ChannelListModel *out = ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank);
 
      QVector<AssignmentCellBase<SynapseAssignment>*> vec;
      vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
@@ -46,12 +49,14 @@ DestexheSynDlg::DestexheSynDlg(int no, ChannelListModel *in, ChannelListModel *o
      tmp->setDecimals(3);
      tmp->setFactor(1e-3);
      vec.push_back(tmp);
+     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
      assignments->init(vec);
 }
 
-void DestexheSynDlg::setIndex(int no)
+void DestexheSynDlg::setIndex(size_t no)
 {
-    QString lb = label.arg(no);
+    ConductanceDlg::setIndex(no);
+    QString lb = QString("%1 %2").arg(DestexheSynProxy::get()->prettyName()).arg(no);
     DestexheSynDlgLabel->setText(lb);
     STDP->setLabel(lb);
     ODESTDP->setLabel(lb);
@@ -65,6 +70,7 @@ void DestexheSynDlg::ResCloseClicked(QAbstractButton *but)
   if (but->text() == QString("Reset")) {
 //    reset();
   }
+  emit labelChanged(leLabel->text());
 }
 
 void DestexheSynDlg::PlastMethodChange()
@@ -89,8 +95,10 @@ void DestexheSynDlg::PlastMethodChange()
   }
 }
 
-void DestexheSynDlg::exportData(DestexheSynData &p)
+void DestexheSynDlg::exportData()
 {
+  DestexheSynData &p = DestexheSynProxy::p[idx];
+  p.label = leLabel->text();
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gSyn= gSynE->text().toDouble()*1e-9;
   p.Vpre= VpreE->text().toDouble()*1e-3;
@@ -109,9 +117,11 @@ void DestexheSynDlg::exportData(DestexheSynData &p)
   assignments->exportData(p.assign);
 }
 
-void DestexheSynDlg::importData(DestexheSynData p)
+void DestexheSynDlg::importData()
 {
+  DestexheSynData &p = DestexheSynProxy::p[idx];
   QString num;
+  leLabel->setText(p.label);
   if (p.LUTables) LUCombo->setCurrentIndex(1);
   else LUCombo->setCurrentIndex(0);
   num.setNum(p.gSyn*1e9);

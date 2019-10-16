@@ -24,9 +24,9 @@
 #include "SpikeGenDlg.h"
 
 /// Construct a single self-registering proxy
-static SpkGenProxy prox;
+static SpkGenProxy *prox = SpkGenProxy::get();
 std::vector<SGData> SpkGenProxy::p;
-ModelProxy *SpkGenPrototype::proxy() const { return &prox; }
+ModelProxy *SpkGenPrototype::proxy() const { return prox; }
 ModelPrototype *SpkGenProxy::createPrototype(size_t modelID) { return new SpkGenPrototype(modelID); }
 ModelDlg *SpkGenProxy::createDialog(size_t modelID, QWidget *parent) { return new SpikeGenDlg(modelID, parent); }
 
@@ -34,6 +34,7 @@ SpkGenProxy::SpkGenProxy()
 {
     ModelManager::RegisterModel(modelClass(), this);
     AP *sgAc = addAP("SGp[#].active", &SpkGenProxy::p, &SGData::active);
+               addAP("SGp[#].label", &SpkGenProxy::p, &SGData::label);
     AP *sgLU = addAP("SGp[#].LUTables", &SpkGenProxy::p, &SGData::LUTables);
     AP *sgVS = addAP("SGp[#].VSpike", &SpkGenProxy::p, &SGData::VSpike);
     AP *sgTS = addAP("SGp[#].spkTimeScaling", &SpkGenProxy::p, &SGData::spkTimeScaling);
@@ -75,15 +76,15 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     p(static_cast<const SGData *>(&(parent->params()))),
     instp(static_cast<const SgInstData *>(&params())),
     V(p->VRest),
-    bdChn(DCT->getInChan(instp->bdChannel)),
+    bdChn(nullptr),
     SGactive(p->bdType == 0),
     burstDetected(false),
     tOverThresh(0.),
     tUnderThresh(0.),
     onThreshold(false),
     burstNo(0),
-    ISI_time(0.),
     period(p->period),
+    epoch(0.),
     initial(true),
     active(true)
 {
@@ -100,12 +101,17 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     }
 }
 
-void SpkGen::RK4(double t, double dt, size_t n)
+void SpkGen::setBdChn(DCThread *DCT)
+{
+    bdChn = DCT->getInChan(instp->bdChannel);
+}
+
+void SpkGen::RK4(double t, double dt, size_t n, bool settling)
 {
     /// Cheapskate RK, because SG isn't really a candidate for it
     /// Note the 2*dt, which is the actual full step length for this RK cycle
     /// Note also that burst detection may be slightly inaccurate if the bd channel is another model
-    if ( n == 0 )
+    if ( n == 0 && !settling )
         update(t, 2*dt);
     // Need neither further changes on `in` (nobody touches its voltage),
     // nor on `out` (it's inactive anyway)
@@ -117,10 +123,10 @@ void SpkGen::update(double t, double dt)
         return;
 
     if (initial) {
-        ISI_time = t;
+        epoch = t;
+        spkIterator = p->SpikeT[burstNo].begin();
+        spkOffsetCutoff = 100.0 / p->spkTimeScaling;
         initial = false;
-    } else {
-        ISI_time += dt;
     }
 
     if (p->bdType > 0 && !SGactive && bdChn ) { // taking care of the burst detection options
@@ -133,8 +139,8 @@ void SpkGen::update(double t, double dt)
                     SGactive = true;
                     tUnderThresh = 0.;
                     burstDetected = false;
-                    ISI_time = 0.0;
                     period = p->SpikeT[burstNo].back() + (20.0/p->spkTimeScaling);
+                    epoch = t;
                 }
             } else if ( p->bdtOverCont ) {
                 if ( !onThreshold &&
@@ -176,17 +182,24 @@ void SpkGen::update(double t, double dt)
         // routine that calculates the membrane potential of the CN taking
         // in account all the spikes (superimposing) the voltage due to each spike
         V = 0.0;
-        for ( double const& tSpike : p->SpikeT[burstNo] )
-            if ( tSpike > 0 )
-                V += VSpike((ISI_time - tSpike) * p->spkTimeScaling);
+
+        // Advance spike iterator to only consider spikes starting after t-spkWidth
+        while ( epoch + *spkIterator < t - spkOffsetCutoff && spkIterator != p->SpikeT[burstNo].end() )
+            ++spkIterator;
+
+        // Compute contributory voltage only from spikes in [t-spkWidth, t+spkWidth]
+        for ( auto spkIt = spkIterator; spkIt != p->SpikeT[burstNo].end() && *spkIt < t + spkOffsetCutoff; ++spkIt )
+            if ( *spkIt > 0 )
+                V += VSpike((t - epoch - *spkIt) * p->spkTimeScaling);
+
         V *= p->VSpike;
         V += p->VRest;
 
-        if (ISI_time > period) {
+        if (t > epoch + period) {
             if (p->bdType > 0) {
                 SGactive = false;
             } else {
-                ISI_time -= (period = p->period);
+                epoch = t;
             }
             if ( ++burstNo == (int)p->SpikeT.size() ) {
                 if ( p->loopBursts ) {
@@ -197,6 +210,7 @@ void SpkGen::update(double t, double dt)
                     active = false;
                 }
             }
+            spkIterator = p->SpikeT[burstNo].begin();
         }
     } else {
         V = p->VRest;
@@ -235,9 +249,8 @@ double SpkGen::VSpike(double t){
   #undef T0
   #undef A1
   #undef A2
-  #undef NORMALIZE
+#undef NORMALIZE
 }
-
 
 void SpkGenPrototype::init(DCThread *DCT)
 {
@@ -245,4 +258,11 @@ void SpkGenPrototype::init(DCThread *DCT)
     for ( size_t i = 0; i < params().numInst(); i++ )
         if ( params().instance(i).active )
             inst.emplace_back(new SpkGen(this, i, DCT));
+}
+
+void SpkGenPrototype::post_init(DCThread *DCT)
+{
+    for ( auto ptr : inst ) {
+        static_cast<SpkGen*>(ptr.get())->setBdChn(DCT);
+    }
 }

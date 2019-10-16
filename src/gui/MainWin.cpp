@@ -21,7 +21,7 @@
 #include "ui_MainWin.h"
 #include "LUtables.h"
 #include "AP.h"
-#include <windows.h>
+#include <Windows.h>
 #include <QScrollBar>
 #include "ModelOpts.h"
 #include "DaqOpts.h"
@@ -32,45 +32,8 @@ MyMainWindow::MyMainWindow(QWidget *parent)
  {
      ui->setupUi(this);
 
-     inChnModel = new ChannelListModel(ChannelListModel::In | ChannelListModel::Blank, this);
-     outChnModel = new ChannelListModel(ChannelListModel::Out | ChannelListModel::Blank, this);
-
      DSDlg= new DataSavingDlg(this);
-
-     ui->graphtab->link(this);
-
-     QVector<ComponentPrototypeBase *> prototypes;
-     prototypes.push_back(new ComponentPrototype<HHDlg>("m/h/tau HH", &mhHHp));
-     prototypes.push_back(new ComponentPrototype<AlphaBetaHHDlg>("a/b HH", &abHHp));
-     ui->currentTable->init(prototypes, inChnModel, outChnModel);
-
-     prototypes.clear();
-     prototypes.push_back(new ComponentPrototype<ChemSynDlg>("ChemSyn", &CSynp));
-     prototypes.push_back(new ComponentPrototype<abSynDlg>("a/b Syn", &abSynp));
-     prototypes.push_back(new ComponentPrototype<GapJunctionDlg>("Gap Junction", &ESynp));
-     prototypes.push_back(new ComponentPrototype<DestexheSynDlg>("DestexheSyn", &DxheSynp));
-     ui->synapseTable->init(prototypes, inChnModel, outChnModel);
-
-     QVector<DaqOptsPrototypeBase*> dprot;
-     for ( DAQProxy *proxy : DeviceManager::Register() )
-         dprot.push_back(new DaqOptsPrototype(proxy));
-     for ( ModelProxy *proxy : ModelManager::Register() )
-         dprot.push_back(new ModelOptsPrototype(proxy));
-     ui->DAQTable->init(dprot, this);
-     
-     ExportLogFileDlg= new QFileDialog(this, QString("Export Log File Dialog"), QString("."), 
-               QString("*.log"));
-     ExportLogFileDlg->setAcceptMode(QFileDialog::AcceptSave);
-     
-     LoadProtocolFileDlg= new QFileDialog(this, QString("Load Protocol File Dialog"), QString("."), 
-               QString("*.cpr"));
-     LoadProtocolFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
-     SaveProtocolFileDlg= new QFileDialog(this, QString("Save Protocol File Dialog"), QString("."), 
-               QString("*.cpr"));
-     SaveProtocolFileDlg->setAcceptMode(QFileDialog::AcceptSave);
-     LoadScriptFileDlg= new QFileDialog(this, QString("Load Script File Dialog"), QString("."), 
-               QString("*.scr"));
-     LoadScriptFileDlg->setAcceptMode(QFileDialog::AcceptOpen);
+     TrigDlg= new TriggerDlg(this);
 
      rateIndicator = new QLabel("Ready");
      ui->statusbar->addPermanentWidget(rateIndicator);
@@ -81,39 +44,50 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      
      connect(ui->StartBut, SIGNAL(clicked()), SLOT(StartButClicked()));
      connect(ui->StopBut, SIGNAL(clicked()), SLOT(StopButClicked()));
+     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &MyMainWindow::TabChanged);
      
      connect(ui->actionExit, SIGNAL(triggered()), SLOT(close()));
-     connect(ui->actionData_saving, SIGNAL(triggered()), DSDlg, SLOT(open()));
-     connect(ui->actionSave_config, SIGNAL(triggered()), SLOT(SaveConfig()));
-     connect(ui->actionExport_Log, SIGNAL(triggered()), ExportLogFileDlg, SLOT(show()));
-     connect(ExportLogFileDlg, SIGNAL(accepted()), SLOT(ExportLog()));
+     connect(ui->actionExport_Log, SIGNAL(triggered()), this, SLOT(ExportLog()));
      connect(ui->actionClear_Log, SIGNAL(triggered()), SLOT(ClearLog()));
-     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), LoadProtocolFileDlg, SLOT(show()));
-     connect(LoadProtocolFileDlg, SIGNAL(accepted()), SLOT(LoadProtocol()));
-     connect(ui->actionSave_Protocol, SIGNAL(triggered()), SaveProtocolFileDlg, SLOT(show()));
-     connect(SaveProtocolFileDlg, SIGNAL(accepted()), SLOT(SaveProtocol()));
-     connect(ui->actionLoad_Script, SIGNAL(triggered()), LoadScriptFileDlg, SLOT(show()));
-     connect(LoadScriptFileDlg, SIGNAL(accepted()), SLOT(LoadScript()));
+     connect(ui->actionLoad_Protocol, SIGNAL(triggered()), this, SLOT(LoadProtocol()));
+     connect(ui->actionSave_Protocol, SIGNAL(triggered()), this, SLOT(SaveProtocol()));
+     connect(ui->actionLoad_Script, SIGNAL(triggered()), this, SLOT(LoadScript()));
      connect(ui->actionUnload_Script, SIGNAL(triggered()), SLOT(UnLoadScript()));
      connect(ui->actionAbout, SIGNAL(triggered()), this, SLOT(DisplayAbout()));
+     connect(ui->actionStart_trigger, SIGNAL(triggered(bool)), TrigDlg, SLOT(open()));
+     connect(ui->actionData_saving, SIGNAL(triggered(bool)), DSDlg, SLOT(open()));
      connect(this, SIGNAL(destroyed()), SLOT(close()));
 
-     connect(this, SIGNAL(channelsChanged()), inChnModel, SLOT(updateChns()));
-     connect(this, SIGNAL(channelsChanged()), outChnModel, SLOT(updateChns()));
-     connect(this, SIGNAL(modelRemoved(ChannelIndex)), inChnModel, SLOT(updateChns(ChannelIndex)));
-     connect(this, SIGNAL(modelRemoved(ChannelIndex)), outChnModel, SLOT(updateChns(ChannelIndex)));
+     connect(this, &MyMainWindow::channelsChanged, &ChannelListModel::updateChns_static_noargs);
+     connect(this, &MyMainWindow::modelRemoved, &ChannelListModel::updateChns_static);
+     connect(this, &MyMainWindow::channelsChanged, TrigDlg, &TriggerDlg::updateChannels);
 
-     connect(ui->HHActivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(activateAll()));
-     connect(ui->HHDeactivate, SIGNAL(clicked(bool)), ui->currentTable, SLOT(deactivateAll()));
-     connect(ui->HHClear, &QPushButton::clicked, [=](){ui->currentTable->importData(true);});
-     connect(ui->HHReset, SIGNAL(clicked(bool)), ui->currentTable, SLOT(importData()));
+     QTreeWidgetItem *hDAQ = new QTreeWidgetItem(ui->treeWidget);
+     hDAQ->setText(0, "Data sources");
+     QTreeWidgetItem *bDAQ = new QTreeWidgetItem(hDAQ);
+     DAQ_tree_item = new TreeWidgetItem_DataSources(this);
+     ui->treeWidget->setItemWidget(bDAQ, 0, DAQ_tree_item);
 
-     connect(ui->SynActivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(activateAll()));
-     connect(ui->SynDeactivate, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(deactivateAll()));
-     connect(ui->SynClear, &QPushButton::clicked, [=](){ui->synapseTable->importData(true);});
-     connect(ui->SynReset, SIGNAL(clicked(bool)), ui->synapseTable, SLOT(importData()));
+     QTreeWidgetItem *hTools = new QTreeWidgetItem(ui->treeWidget, hDAQ);
+     hTools->setText(0, "Tools");
+     QTreeWidgetItem *bTools = new QTreeWidgetItem(hTools);
+     TreeWidgetItem_Models *box = new TreeWidgetItem_Models(ConductanceManager::Tools());
+     ui->treeWidget->setItemWidget(bTools, 0, box);
+     model_tree_items.push_back(box);
 
-     connect(ui->DAQClear, &QPushButton::clicked, [=](){ui->DAQTable->importData(true);});
+     QTreeWidgetItem *hSynapses = new QTreeWidgetItem(ui->treeWidget, hTools);
+     hSynapses->setText(0, "Synapses");
+     QTreeWidgetItem *bSynapses = new QTreeWidgetItem(hSynapses);
+     box = new TreeWidgetItem_Models(ConductanceManager::Synapses());
+     ui->treeWidget->setItemWidget(bSynapses, 0, box);
+     model_tree_items.push_back(box);
+
+     QTreeWidgetItem *hCurrents = new QTreeWidgetItem(ui->treeWidget, hSynapses);
+     hCurrents->setText(0, "Ionic conductances");
+     QTreeWidgetItem *bCurrents = new QTreeWidgetItem(hCurrents);
+     box = new TreeWidgetItem_Models(ConductanceManager::Currents());
+     ui->treeWidget->setItemWidget(bCurrents, 0, box);
+     model_tree_items.push_back(box);
    
      connect(DCT,SIGNAL(message(QString)),SLOT(DisplayMessage(QString)));
      connect(DCT, &DCThread::updateRate, [this](int rate){
@@ -127,6 +101,11 @@ MyMainWindow::MyMainWindow(QWidget *parent)
      initAP();
      LoadConfig();
 
+     hDAQ->setExpanded(GUIp.openDAQ);
+     hTools->setExpanded(GUIp.openTools);
+     hSynapses->setExpanded(GUIp.openSynapses);
+     hCurrents->setExpanded(GUIp.openCurrents);
+
      DisplayMessage(QString("Main: Dynamic Clamp starting ..."));
      exportData(true);
      updateDeviceStatus();
@@ -134,14 +113,12 @@ MyMainWindow::MyMainWindow(QWidget *parent)
 
 MyMainWindow::~MyMainWindow()
 {
-  delete inChnModel;
-  delete outChnModel;
-  
-  delete ExportLogFileDlg;
-  delete LoadProtocolFileDlg;
-  delete SaveProtocolFileDlg;
-
   delete ui;
+  delete DSDlg;
+  delete TrigDlg;
+  delete DCT;
+
+  ChannelListModel::destruct();
 }
 
 void MyMainWindow::CloseToLimitWarning(QString what, QString channelName, double lowLimit, double highLimit, double value)
@@ -173,7 +150,6 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
         DisplayMessage(QString("Bad news: %1 not found or not opened successfully!").arg(name));
         break;
     case DeviceStatus::Inactive :
-    default:
         break;
     }
 
@@ -195,7 +171,6 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
     while (!DCT->finished) Sleep(100);
-    delete DCT;
   }
   SaveConfig();
   fname= QString("StdpC_last.log");
@@ -205,21 +180,37 @@ void MyMainWindow::closeEvent(QCloseEvent *event)
 
 void MyMainWindow::StartButClicked() 
 {
+  if ( !DCT->stopped && DCT->settling ) {
+      DCT->wakeFromSettling = true;
+      return;
+  }
   ui->actionLoad_Protocol->setEnabled(false);
   ui->actionSave_Protocol->setEnabled(false);
   ui->actionLoad_Script->setEnabled(false);
   ui->actionUnload_Script->setEnabled(false);
   ui->actionExport_Log->setEnabled(false);
   ui->actionExit->setEnabled(false);
-  ui->actionSave_config->setEnabled(false);
-  ui->menuConfig->setEnabled(false);
-  ui->DAQTable->setEnabled(false);
+  ui->menuConfigure->setEnabled(false);
+  ui->cbDatasaving->setEnabled(false);
+  ui->cbTrigger->setEnabled(false);
+  ui->cbSettle->setEnabled(false);
+  ui->dblSettleDuration->setEnabled(false);
+  DAQ_tree_item->setEnabled(false);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
   }
-  while (!DCT->finished) Sleep(100);
+  if (!DCT->finished) {
+      Sleep(10);
+      emit ui->StartBut->clicked();
+      return;
+  }
   exportData();
+
+  QPalette pal = palette();
+  pal.setColor(QPalette::Background, QColor(255,140,0));
+  ui->controlPanel->setAutoFillBackground(true);
+  ui->controlPanel->setPalette(pal);
 
   if ( !ui->graphtab->startPlotting(DCT) )
       ui->tabWidget->setTabEnabled(1, false);
@@ -237,9 +228,12 @@ void MyMainWindow::StopButClicked()
   ui->actionUnload_Script->setEnabled(DCT->scripting);
   ui->actionExport_Log->setEnabled(true);
   ui->actionExit->setEnabled(true);
-  ui->actionSave_config->setEnabled(true);
-  ui->menuConfig->setEnabled(true);
-  ui->DAQTable->setEnabled(true);
+  ui->menuConfigure->setEnabled(true);
+  ui->cbDatasaving->setEnabled(true);
+  ui->cbTrigger->setEnabled(true);
+  ui->cbSettle->setEnabled(true);
+  ui->dblSettleDuration->setEnabled(true);
+  DAQ_tree_item->setEnabled(true);
   if (!DCT->stopped) {
     DCT->stopped= true;
     DisplayMessage(QString("Main: Dynamic Clamp stopped."));
@@ -248,24 +242,52 @@ void MyMainWindow::StopButClicked()
   ui->performancetab->stopPlotting();
   ui->tabWidget->setTabEnabled(1, true);
   ui->tabWidget->setTabEnabled(2, true);
+  ui->controlPanel->setPalette(palette());
+}
+
+void MyMainWindow::TabChanged(int idx)
+{
+    static int prevIdx = 0;
+    if ( prevIdx == 0 && idx != 0 )
+        exportData();
+    prevIdx = idx;
 }
 
 void MyMainWindow::exportData(bool ignoreDAQ)
 {
-  ui->synapseTable->exportData();
-  ui->currentTable->exportData();
-  ui->DAQTable->exportData(ignoreDAQ);
+  DAQ_tree_item->exportData(ignoreDAQ);
+  for ( TreeWidgetItem_Models *box : model_tree_items )
+      box->exportData();
   DSDlg->exportData();
+  dataSavingPs.enabled = ui->cbDatasaving->isChecked();
+  TrigDlg->exportData();
+  Triggerp.active = ui->cbTrigger->isChecked();
+  Settlingp.active = ui->cbSettle->isChecked();
+  Settlingp.duration = ui->dblSettleDuration->value();
+  ClampThreadPriority = ui->threadPriority->currentIndex();
   ui->graphtab->exportData();
   ui->performancetab->exportData();
+  emit channelsChanged();
+
+  QTreeWidgetItemIterator it(ui->treeWidget, QTreeWidgetItemIterator::HasChildren);
+  GUIp.openDAQ = (*it++)->isExpanded();
+  GUIp.openTools = (*it++)->isExpanded();
+  GUIp.openSynapses = (*it++)->isExpanded();
+  GUIp.openCurrents = (*it)->isExpanded();
 }
  
 void MyMainWindow::importData()
 {
-  ui->DAQTable->importData();
-  ui->synapseTable->importData();
-  ui->currentTable->importData();
+  DAQ_tree_item->importData();
+  for ( TreeWidgetItem_Models *box : model_tree_items )
+      box->importData();
   DSDlg->importData();
+  ui->cbDatasaving->setChecked(dataSavingPs.enabled);
+  TrigDlg->importData();
+  ui->cbTrigger->setChecked(Triggerp.active);
+  ui->cbSettle->setChecked(Settlingp.active);
+  ui->dblSettleDuration->setValue(Settlingp.duration);
+  ui->threadPriority->setCurrentIndex(ClampThreadPriority);
   ui->graphtab->importData();
   ui->performancetab->importData();
   updateStartButton();
@@ -273,35 +295,34 @@ void MyMainWindow::importData()
 
 void MyMainWindow::SaveConfig()
 {
-  ui->DAQTable->exportData();
-
   ofstream os("StdpC.conf");
-  os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
-
-  for ( DAQProxy *proxy : DeviceManager::Register() )
-      for ( AP *ap : proxy->coreAPs() )
-          ap->write(os);
-
+  DoSaveProtocol(os);
   os.close();
 }
 
 void MyMainWindow::LoadConfig()
 {
     ifstream is("StdpC.conf");
-    if ( readProtocol(is) )
-        ui->DAQTable->importData();
-    else
-        DisplayMessage(QString("No valid config file found; reverting to standard settings"));
+    if ( !DoLoadProtocol(is) )
+        DisplayMessage(QString("No valid config file found; reverting to default settings"));
     is.close();
-
-    // special Sample-and-Hold for Attila
-    SampleHoldp.active= false;
-    SampleHoldp.threshV= 0.0;
 }
 
-void MyMainWindow::doSaveProtocol(QString &fname)
+void MyMainWindow::SaveProtocol()
 {
+  QString fname = QFileDialog::getSaveFileName(this, "Save protocol to file", "", "StdpC protocols (*.cpr);;All files(*)");
+  if ( fname.isEmpty() )
+      return;
+  if ( !fname.endsWith(".cpr") && !QFileInfo(fname).exists() && !QFileInfo(QString("%1.cpr").arg(fname)).exists() )
+      fname.append(".cpr");
+
   ofstream os(fname.toLatin1());
+  DoSaveProtocol(os);
+  os.close();
+}
+
+void MyMainWindow::DoSaveProtocol(ofstream &os)
+{
   os << STDPC_PROTOCOL_HEADER << " " << STDPC_PROTOCOL_VERSION << endl << endl;
 
   exportData();
@@ -309,50 +330,61 @@ void MyMainWindow::doSaveProtocol(QString &fname)
   for ( auto const& ap : AP::params() ) {
       ap->write(os);
   }
-
-  os.close();
 }
 
 
-void MyMainWindow::doLoadProtocol(QString &fname)
+void MyMainWindow::LoadProtocol()
 {
+  QString fname = QFileDialog::getOpenFileName(this, "Load protocol file", "", "StdpC protocols (*.cpr);;All files(*)");
+  if ( fname.isEmpty() )
+    return;
+
   ifstream is(fname.toLatin1());
   if (!is.good()) {
-    DisplayMessage(QString("Error opening Protocol file"));
+    DisplayMessage(QString("Error opening protocol file"));
     return;
   }
 
+  bool ret = DoLoadProtocol(is);
+  is.close();
+
+  if ( ret )
+      loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
+  else
+      DisplayMessage(QString("Error reading protocol file"));
+}
+
+bool MyMainWindow::DoLoadProtocol(ifstream &is)
+{
   // Clear params before loading
-  CSynp.clear();
-  abSynp.clear();
-  ESynp.clear();
-  DxheSynp.clear();
-  mhHHp.clear();
-  abHHp.clear();
   Models.clear();
   Devices.clear();
-  Plotp.graphs.clear();
+  Conductances.clear();
+  Plotp.plot.clear();
 
   std::function<bool(QString)> callback = [=](QString name) {
       DisplayMessage(QString("Warning: Failed to read parameter \"%1\"").arg(name));
       return false;
   };
-  readProtocol(is, &callback);
-  is.close();
+  bool ret = readProtocol(is, &callback);
 
   importData();
 
-  loadedProtocolStatus->setText(QString("Loaded protocol file: %1").arg(fname));
+  return ret;
 }
 
 
 void MyMainWindow::ExportLog()
 {
-  QStringList fnlist= ExportLogFileDlg->selectedFiles();
-  doExportLog(*fnlist.begin());
+  QString fname = QFileDialog::getSaveFileName(this, "Export log to file", "", "Log files (*.log);;All files (*)");
+  if ( fname.isEmpty() )
+      return;
+  if ( !fname.endsWith(".log") && !QFileInfo(fname).exists() && !QFileInfo(QString("%1.log").arg(fname)).exists() )
+      fname.append(".log");
+  doExportLog(fname);
 }
 
-void MyMainWindow::doExportLog(QString &fname)
+void MyMainWindow::doExportLog(QString fname)
 {
   ofstream os(fname.toLatin1());
   int i= 0, done= 0;
@@ -360,7 +392,7 @@ void MyMainWindow::doExportLog(QString &fname)
   
   while (!done) {
     it= ui->MessageWindow->item(i);
-    if (it != NULL) {
+    if (it != nullptr) {
       os << it->text().toStdString() << endl;
     }
     else done= 1;
@@ -374,22 +406,10 @@ void MyMainWindow::ClearLog()
   ui->MessageWindow->clear();
 }
 
-void MyMainWindow::LoadProtocol()
-{
-  QStringList fnlist= LoadProtocolFileDlg->selectedFiles();
-  doLoadProtocol(*fnlist.begin());
-}
-
-void MyMainWindow::SaveProtocol()
-{
-  QStringList fnlist= SaveProtocolFileDlg->selectedFiles();
-  doSaveProtocol(*fnlist.begin());
-}
-
 void MyMainWindow::LoadScript()
 {
-  QStringList fnlist= LoadScriptFileDlg->selectedFiles();
-  if (DCT->LoadScript(*fnlist.begin())) {
+  QString fname = QFileDialog::getOpenFileName(this, "Load script file", "", "StdpC scripts(*.scr);;All files(*)");
+  if ( !fname.isEmpty() && DCT->LoadScript(fname) ) {
     ui->actionLoad_Script->setEnabled(false);
     ui->actionUnload_Script->setEnabled(true);
   }
@@ -409,6 +429,6 @@ tr(R"EOF(
 StdpC is free dynamic clamp software including plasticity of synapses and active electrode compensation.
 It is distributed under the GPL v2 license.
 For more information, visit https://github.com/tnowotny/stdpc/ .
-You are running version StdpC 2017.
+You are running StdpC version 6.1.
 )EOF"));
 }

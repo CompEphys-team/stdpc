@@ -23,6 +23,8 @@
 #include "ModelDlg.h"
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QStyledItemDelegate>
+#include <QStandardItemModel>
 #include "WideComboBox.h"
 #include "ChannelListModel.h"
 
@@ -30,12 +32,32 @@ namespace Ui {
 class SpikeGenDlg;
 }
 
+class STDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    STDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    ~STDelegate() {}
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,
+                          const QModelIndex &/*index*/) const override;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override;
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const override;
+
+    void updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const override;
+};
+
 class SpikeGenDlg : public ModelDlg
 {
     Q_OBJECT
 
 public:
-    explicit SpikeGenDlg(size_t idx, QWidget *parent = 0);
+    explicit SpikeGenDlg(size_t idx, QWidget *parent = nullptr);
     ~SpikeGenDlg();
 
     void importData();
@@ -44,26 +66,26 @@ public:
 
 private:
     Ui::SpikeGenDlg *ui;
-    QString label;
 
-    ChannelListModel clm;
+    ChannelListModel *clm;
 
     QVector<QCheckBox*> actives, vSaves;
     QVector<QDoubleSpinBox*> vBiases, bdThresholds;
     QVector<WideComboBox*> bdChannels;
     QMetaObject::Connection activec, vSavec, vBiasc, bdChannelc, bdThresholdc;
 
+    QStandardItemModel model;
+    STDelegate delegate;
+
     void addInstRow(int row, QCheckBox *active, QCheckBox *vSave, QDoubleSpinBox *vBias,
                     WideComboBox *bdChannel, QDoubleSpinBox *bdThresh);
     void setCellCheckBox(int row, int column, QCheckBox *box);
 
-    QDoubleSpinBox *makeSTCell(int row, int col);
     void importST(std::vector<std::vector<double>> &);
     void exportST(std::vector<std::vector<double>> &);
 
 private slots:
     void growInstTable(bool = true);
-    void growSTTable(int row, int col);
 };
 
 #endif // SPIKEGENDLG_H

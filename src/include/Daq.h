@@ -46,20 +46,23 @@ class DAQ {
     virtual ~DAQ();
     virtual bool initialize_board(QString &)= 0;
     virtual void start() = 0;
-    virtual void generate_scan_list(short int, short int *)= 0;
-    virtual void generate_analog_out_list(short int, short int *)= 0;
-    virtual void get_scan()= 0;
+    virtual void generate_scan_list(short int, QVector<short int>)= 0;
+    virtual void generate_analog_out_list(short int, QVector<short int> )= 0;
+    virtual void get_scan(bool settling = false)= 0;
     virtual void get_single_scan(inChannel *)= 0;
-    virtual void write_analog_out()= 0;
+    virtual void write_analog_out(bool settling = false)= 0;
+    virtual void settling_complete() {} //!< Called when DC exits settling loop and enters standard clamp mode.
     virtual void reset_board()= 0;
+
+    virtual inline void armTrigger(ChannelIndex) {}
+    virtual inline bool triggerFired() { return true; }
 
     DAQData *params();
 
     void init_chans(); // Sets up scan list, analog out list
     void reset_chans();
     void process_scan(double t); // detects spikes, updates channel buffer
-    QPair<QVector<QString>, QVector<inChannel*>> inChans_to_save();
-    QPair<QVector<QString>, QVector<outChannel*>> outChans_to_save();
+    QPair<QVector<ChannelIndex>, QVector<const double *>> valuesToSave();
     QVector<AECChannel*> aecChans();
 
     struct ChannelLimitWarning {QString what; QString chan_label; double hiLim; double loLim; double value;};
@@ -72,6 +75,7 @@ class DAQ {
 
     int inChnNo;
     int outChnNo;
+    int digInChnNo;
 
     int inGainNo;
     QVector<double> inLow;
