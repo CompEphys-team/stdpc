@@ -251,7 +251,7 @@ void SimulDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns
   actOutChnNo= chnNo;
   for (i= 0; i < actOutChnNo; i++) {
     outIdx[i]= Chns[i];
-    outGainFac[i]= params()->outChn[outIdx[i]].gainFac*1.0e9;  // write nA
+    outGainFac[i]= params()->outChn[outIdx[i]].gainFac;  // write A
     dex.chanID = outIdx[i];
     outChnLabels[outIdx[i]] = dex.toString();
   }
@@ -268,7 +268,7 @@ void SimulDAQ::write_analog_out(bool settling)
     lastWrite= t;
     outtq.append(t);
     for (int i= 0; i < outChnNo; i++) {
-      outq[i].append(out[outIdx[i]].I);
+      outq[i].append(out[outIdx[i]].I * outGainFac[i]);
     }
   }
 }
