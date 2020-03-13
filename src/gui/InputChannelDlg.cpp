@@ -229,7 +229,7 @@ InputChannelDlg::~InputChannelDlg()
 void InputChannelDlg::exportData()
 {
   DAQData *p =& proxy->param(idx);
-  for (int i= 0; i < ChnNo; i++) {
+  for (int i= 0; i < ChnNo && size_t(i) < p->inChn.size(); i++) {
     p->inChn[i].active= (act[i]->checkState() > 0);
     p->inChn[i].gain= rng[i]->currentIndex();
     double gainFac = factor[i]->text().toDouble();
