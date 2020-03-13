@@ -70,6 +70,7 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/VoltageClampDlg.ui \
     $$PWD/src/gui/VStepsDlg.ui \
     $$PWD/src/gui/WireDlg.ui \
+    src/gui/pipedaqdlg.ui \
     src/gui/treewidgetitem_datasources.ui \
     src/gui/treewidgetitem_models.ui \
     src/gui/InputConductanceDlg.ui
@@ -151,6 +152,8 @@ HEADERS += \
     $$PWD/src/include/VSteps.h \
     $$PWD/src/include/Wire.h \
     $$PWD/src/include/WireDlg.h \
+    src/include/PipeDAQ.h \
+    src/include/pipedaqdlg.h \
     src/include/treewidgetitem_datasources.h \
     src/include/treewidgetitem_models.h \
     src/include/InputConductance.h \
@@ -225,7 +228,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/VStepsDlg.cpp \
     $$PWD/src/models/VSteps.cpp \
     $$PWD/src/models/Wire.cpp \
+    src/drivers/PipeDAQ.cpp \
     src/gui/WireDlg.cpp \
+    src/gui/pipedaqdlg.cpp \
     src/gui/treewidgetitem_datasources.cpp \
     src/gui/treewidgetitem_models.cpp \
     src/models/InputConductance.cpp \
