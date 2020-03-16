@@ -64,6 +64,7 @@ void DAQ::init_chans()
     generate_scan_list(No, Chns);
 
     No = 0;
+    Chns.resize(p->outChn.size());
     out.resize(p->outChn.size());
     iHiLim.resize(p->outChn.size());
     iLoLim.resize(p->outChn.size());
