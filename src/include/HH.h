@@ -28,8 +28,8 @@ struct mhHHData : public CurrentData {
   bool LUTables;
   double gMax;
   double Vrev;
-  int mExpo;
-  int hExpo;
+  double mExpo;
+  double hExpo;
   double Vm;
   double sm;
   double Cm;
@@ -87,6 +87,9 @@ class HH : public IonicCurrent
     double m, h;
     double km[4], kh[4], mi, hi;
     double minf, taum, hinf, tauh;
+
+    bool mExpo_isInt, hExpo_isInt;
+    int mExpo_int, hExpo_int;
     
   public:
     HH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);

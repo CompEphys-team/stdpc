@@ -51,8 +51,8 @@ void AlphaBetaHHDlg::exportData()
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
-  p.mExpo= mExpoE->text().toInt();
-  p.hExpo= hExpoE->text().toInt();
+  p.mExpo= mExpoE->text().toDouble();
+  p.hExpo= hExpoE->text().toDouble();
   // ab formalism
   p.maFunc= maFuncCombo->currentIndex();
   p.mka= mkaE->text().toDouble()*1e3;
@@ -85,9 +85,9 @@ void AlphaBetaHHDlg::importData()
   gMaxE->setText(num);
   num.setNum(p.Vrev*1e3);
   VrevE->setText(num);
-  num.setNum(p.mExpo);
+  num.setNum(p.mExpo, 'f', 2);
   mExpoE->setText(num);
-  num.setNum(p.hExpo);
+  num.setNum(p.hExpo, 'f', 2);
   hExpoE->setText(num);
   // ab formalism
   maFuncCombo->setCurrentIndex(p.maFunc);

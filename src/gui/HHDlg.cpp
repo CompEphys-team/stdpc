@@ -51,8 +51,8 @@ void HHDlg::exportData()
   p.LUTables= (LUCombo->currentIndex() == 1);
   p.gMax= gMaxE->text().toDouble()*1e-9;
   p.Vrev= VrevE->text().toDouble()*1e-3;
-  p.mExpo= mExpoE->text().toInt();
-  p.hExpo= hExpoE->text().toInt();
+  p.mExpo= mExpoE->text().toDouble();
+  p.hExpo= hExpoE->text().toDouble();
   // mh formalism
   p.Vm= VmE->text().toDouble()*1e-3;
   p.sm= smE->text().toDouble()*1e-3;
@@ -85,9 +85,9 @@ void HHDlg::importData()
   gMaxE->setText(num);
   num.setNum(p.Vrev*1e3);
   VrevE->setText(num);
-  num.setNum(p.mExpo);
+  num.setNum(p.mExpo, 'f', 2);
   mExpoE->setText(num);
-  num.setNum(p.hExpo);
+  num.setNum(p.hExpo, 'f', 2);
   hExpoE->setText(num);
   // mh formalism
   num.setNum(p.Vm*1e3);

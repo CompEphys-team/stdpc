@@ -92,9 +92,13 @@ abHH::abHH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outCha
         theTanh= &tanhFunc;
     }
 
-    // Can't do this in the initialiser list, whyeverthefuck
     mi = m;
     hi = h;
+
+    mExpo_int = std::round(p->mExpo);
+    mExpo_isInt = ( abs(p->mExpo-mExpo_int) < 0.01 );
+    hExpo_int = std::round(p->hExpo);
+    hExpo_isInt = ( abs(p->hExpo-hExpo_int) < 0.01 );
 }
 
 inline double abHH::mhFunc(double x, int thetype)
@@ -118,23 +122,33 @@ void abHH::step(double, double dt, bool settling)
   
   if (p->active && a->active && in->active && out->active) {
     V= in->V;
-    if (p->mExpo > 0) {
+    if ( !mExpo_isInt || p->mExpo > 0 ) {
       // Linear Euler:
       m+= (ma*(1.0-m)-mb*m)*dt;    // calculate m with previous values of ma, m, mb
       ma= p->mka*mhFunc((V-p->mVa)/p->msa, p->maFunc);
       mb= p->mkb*mhFunc((V-p->mVb)/p->msb, p->mbFunc);
-      powm= m;
-      for (i= 0; i < p->mExpo-1; i++) powm*= m;
+
+      if ( mExpo_isInt ) {
+          powm = m;
+          for(i= 0; i < mExpo_int-1; i++) powm*= m;
+      } else {
+          powm = std::pow(m, p->mExpo);
+      }
     }
     else powm= 1.0;
     
-    if(p->hExpo > 0) {
+    if( !hExpo_isInt || p->hExpo > 0 ) {
       // Linear Euler:
       h+= (ha*(1.0-h)-hb*h)*dt;     // calculate h with previous values of ha, h, hb
       ha= p->hka*mhFunc((V-p->hVa)/p->hsa, p->haFunc);
       hb= p->hkb*mhFunc((V-p->hVb)/p->hsb, p->hbFunc);
-      powh= h;
-      for (i= 0; i < p->hExpo-1; i++) powh*= h;
+
+      if ( hExpo_isInt ) {
+          powh= h;
+          for(i= 0; i < hExpo_int-1; i++) powh*= h;
+      } else {
+          powh = std::pow(h, p->hExpo);
+      }
     }
     else powh= 1.0;
 
@@ -154,15 +168,19 @@ void abHH::RK4(double, double dt, size_t n, bool settling)
 
     if (p->active && a->active && in->active && out->active) {
       V = in->V;
-      if (p->mExpo > 0) {
+      if ( !mExpo_isInt || p->mExpo > 0 ) {
           /// Calculate km[n]=dm/dt based on the previous intermediates (Vi, mi)
           ma= p->mka*mhFunc((V-p->mVa)/p->msa, p->maFunc);
           mb= p->mkb*mhFunc((V-p->mVb)/p->msb, p->mbFunc);
           km[n] = (ma*(1.0-mi)-mb*mi);
 
           /// Calculate output based on (still) the previous intermediate mi (to allow calculating kV[n]=dV/dt)
-          powm = mi;
-          for (i= 0; i < p->mExpo-1; i++) powm*= mi;
+          if ( mExpo_isInt ) {
+              powm = mi;
+              for(i= 0; i < mExpo_int-1; i++) powm*= mi;
+          } else {
+              powm = std::pow(mi, p->mExpo);
+          }
 
           /// Create a new intermediate mi(="m_n") based on km[n]=dm/dt and m0, the initial value of m in this RK cycle
           if ( n < 3 ) {
@@ -180,13 +198,17 @@ void abHH::RK4(double, double dt, size_t n, bool settling)
       }
       else powm= 1.0;
 
-      if(p->hExpo > 0) {
+      if( !hExpo_isInt || p->hExpo > 0 ) {
           ha= p->hka*mhFunc((V-p->hVa)/p->hsa, p->haFunc);
           hb= p->hkb*mhFunc((V-p->hVb)/p->hsb, p->hbFunc);
           kh[n] = ha*(1.0-hi)-hb*hi;
 
-          powh = hi;
-          for (i= 0; i < p->hExpo-1; i++) powh*= hi;
+          if ( hExpo_isInt ) {
+              powh = hi;
+              for(i= 0; i < hExpo_int-1; i++) powh*= hi;
+          } else {
+              powh = std::pow(hi, p->hExpo);
+          }
 
           if ( n < 3 ) {
               hi = h + kh[n]*dt;

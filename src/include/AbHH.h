@@ -27,8 +27,8 @@ struct abHHData : public CurrentData {
   bool LUTables;
   double gMax;
   double Vrev;
-  int mExpo;
-  int hExpo;
+  double mExpo;
+  double hExpo;
   int maFunc;
   double mka;
   double mVa;
@@ -88,6 +88,9 @@ class abHH : public IonicCurrent
     double m, h;
     double ma, mb, ha, hb;
     double km[4], kh[4], mi, hi;
+
+    bool mExpo_isInt, hExpo_isInt;
+    int mExpo_int, hExpo_int;
     
   public:
     abHH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);

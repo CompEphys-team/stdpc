@@ -94,6 +94,11 @@ HH::HH(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel
 
     mi = m;
     hi = h;
+
+    mExpo_int = std::round(p->mExpo);
+    mExpo_isInt = ( abs(p->mExpo-mExpo_int) < 0.01 );
+    hExpo_int = std::round(p->hExpo);
+    hExpo_isInt = ( abs(p->hExpo-hExpo_int) < 0.01 );
 }
 
 void HH::step(double, double dt, bool settling)
@@ -104,7 +109,7 @@ void HH::step(double, double dt, bool settling)
     
   if (p->active && a->active && in->active && out->active) {
     V= in->V;
-    if (p->mExpo > 0) {
+    if ( !mExpo_isInt || p->mExpo > 0 ) {
       // linear Euler:
       // m+= (minf-m)*dt/taum;   // calculate m with previous values of minf, m, taum
       // exponential Euler:
@@ -122,12 +127,16 @@ void HH::step(double, double dt, bool settling)
           taum = p->taum + p->taumAmpl*V*1e3;
       }
 
-      powm = m;
-      for(i= 0; i < p->mExpo-1; i++) powm*= m;
+      if ( mExpo_isInt ) {
+          powm = m;
+          for(i= 0; i < mExpo_int-1; i++) powm*= m;
+      } else {
+          powm = std::pow(m, p->mExpo);
+      }
     }
     else powm= 1.0;
     
-    if (p->hExpo > 0){
+    if ( !hExpo_isInt || p->hExpo > 0 ){
       // linear Euler: 
       // h+= (hinf-h)*dt/tauh;   // calculate h with previous values of hinf, h, tauh
       // exponential Euler:
@@ -144,8 +153,13 @@ void HH::step(double, double dt, bool settling)
       } else if (p->tauhType == 3) {
           tauh = p->tauh + p->tauhAmpl*V*1e3;
       }
-      powh= h;
-      for(i= 0; i < p->hExpo-1; i++) powh*= h;   
+
+      if ( hExpo_isInt ) {
+          powh= h;
+          for(i= 0; i < hExpo_int-1; i++) powh*= h;
+      } else {
+          powh = std::pow(h, p->hExpo);
+      }
     }
     else powh = 1.0;
 
@@ -165,7 +179,7 @@ void HH::RK4(double, double dt, size_t n, bool settling)
 
     if (p->active && a->active && in->active && out->active) {
       V= in->V;
-      if (p->mExpo > 0) {
+      if ( !mExpo_isInt || p->mExpo > 0 ) {
           minf = (1.0-p->Cm)*(*theExpSigmoid)((V-p->Vm)/p->sm)+p->Cm;
           switch ( p->taumType ) {
           case 0:
@@ -185,8 +199,12 @@ void HH::RK4(double, double dt, size_t n, bool settling)
           }
           km[n] = (minf-mi)/taum;
 
-          powm = mi;
-          for(i= 0; i < p->mExpo-1; i++) powm*= mi;
+          if ( mExpo_isInt ) {
+              powm = mi;
+              for(i= 0; i < mExpo_int-1; i++) powm*= mi;
+          } else {
+              powm = std::pow(mi, p->mExpo);
+          }
 
           if ( n < 3 ) {
               mi = m + km[n]*dt;
@@ -203,7 +221,7 @@ void HH::RK4(double, double dt, size_t n, bool settling)
       }
       else powm= 1.0;
 
-      if (p->hExpo > 0){
+      if ( !hExpo_isInt || p->hExpo > 0 ){
           hinf = (1.0-p->Ch)*(*theExpSigmoid)((V-p->Vh)/p->sh)+p->Ch;
           switch ( p->tauhType ) {
           case 0:
@@ -223,8 +241,12 @@ void HH::RK4(double, double dt, size_t n, bool settling)
           }
           kh[n] = (hinf-hi)/tauh;
 
-          powh = hi;
-          for(i= 0; i < p->hExpo-1; i++) powh*= hi;
+          if ( hExpo_isInt ) {
+              powh = hi;
+              for(i= 0; i < hExpo_int-1; i++) powh*= hi;
+          } else {
+              powh = std::pow(hi, p->hExpo);
+          }
 
           if ( n < 3 ) {
               hi = h + kh[n]*dt;
