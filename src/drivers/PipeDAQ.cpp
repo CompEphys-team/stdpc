@@ -139,6 +139,8 @@ QString PipeDAQ::connectPipe()
             } else {
                 return QString("PipeDAQ (%1) failed to connect to server, error %2").arg(QString::fromWCharArray(pipeName)).arg(err);
             }
+        } else {
+            connected = true;
         }
 
         DWORD mode = PIPE_READMODE_MESSAGE | PIPE_NOWAIT;
