@@ -144,7 +144,8 @@ void MyMainWindow::updateDeviceStatus(DeviceStatus status, const QString &name)
 {
     switch ( status ) {
     case DeviceStatus::Active :
-        DisplayMessage(QString("Good news: %1 found and opened successfully!").arg(name));
+        if ( name.length() )
+            DisplayMessage(QString("Good news: %1 found and opened successfully!").arg(name));
         break;
     case DeviceStatus::Failed :
         DisplayMessage(QString("Bad news: %1 not found or not opened successfully!").arg(name));

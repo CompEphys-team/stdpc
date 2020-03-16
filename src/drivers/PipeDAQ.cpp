@@ -210,13 +210,12 @@ bool PipeDAQ::initialize_board(QString &name)
             initialized = false;
         } else {
             initialized = true;
+            name = QString("PipeDAQ (%1)").arg(QString::fromWCharArray(pipeName));
         }
     } else {
         initialized = true; // Client has nothing to do at config
     }
 
-    if ( initialized )
-        name = QString("PipeDAQ (%1)").arg(QString::fromWCharArray(pipeName));
     return initialized;
 }
 
