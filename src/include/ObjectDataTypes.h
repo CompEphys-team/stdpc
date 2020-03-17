@@ -150,16 +150,16 @@ struct elecCalibParams {
 
 typedef struct {
   bool enabled;
-  QuotedString fileName;
-  double savingFreq;
-  bool isBinary;
+  QuotedString fileName = "data_%n.dat";
+  double savingFreq = 20000;
+  bool isBinary = false;
 
-  bool binaryLittleEndian;
-  bool binaryDoublePrecision;
+  bool binaryLittleEndian = true;
+  bool binaryDoublePrecision = true;
 
-  QuotedString asciiSeparator;
-  QuotedString asciiHeaderPrefix;
-  bool asciiCRLF;
+  QuotedString asciiSeparator = "\t";
+  QuotedString asciiHeaderPrefix = "% ";
+  bool asciiCRLF = true;
 
 } dataSavingParams;
  
