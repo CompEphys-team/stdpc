@@ -167,6 +167,8 @@ QString ChannelIndex::prettyName() const
             ret = QString("%1 %2:all (%4, all instances)").arg(modelClass).arg(modelID).arg(label);
         else
             ret = QString("%1 %2:%3 (%4, instance %3)").arg(modelClass).arg(modelID).arg(instID).arg(label);
+        if ( isDirectional )
+            ret.append(isInChn ? " VChan" : " IChan");
     } else if ( isConductance ) {
         QString label;
         ConductanceProxy *proxy = Conductances.Register().value(conductanceClass);
@@ -190,11 +192,13 @@ QString ChannelIndex::toString(QChar sep, bool withDetails) const
         ret = QString("Digital/%1/%2/%3%4").arg(daqClass).arg(devID).arg(isInChn ? "di" : "do").arg(chanID);
     } else if ( isPrototype ) {
         ret = QString("Prototype/%1/%2").arg(modelClass).arg(modelID);
+        if ( isDirectional )
+            ret.append(isInChn ? "/in" : "/out");
     } else if ( isVirtual ) {
         QString direction = "";
-        if ( withDetails )
-            direction = (isInChn ? "in" : "out");
-        ret = QString("Virtual/%1/%2/%3%4").arg(modelClass).arg(modelID).arg(direction).arg(instID);
+        if ( withDetails || isDirectional )
+            direction = (isInChn ? "/in" : "/out");
+        ret = QString("Virtual/%1/%2/%3%4").arg(modelClass).arg(modelID).arg(instID).arg(direction);
     } else if ( isConductance ) {
         QString multi = "";
         if ( withDetails )
@@ -233,6 +237,8 @@ QJsonObject ChannelIndex::toJson() const
             {"class", modelClass},
             {"class_id", int(modelID)}
         };
+        if ( isDirectional )
+            obj.insert("is_input_channel", isInChn);
         ModelProxy *proxy = Models.Register().value(modelClass);
         if ( proxy->size() > modelID && !proxy->param(modelID).label.isEmpty() )
             obj.insert("label", proxy->param(modelID).label);
@@ -322,7 +328,7 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.chanID = parts.at(3).mid(2).toUInt();
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Prototype", Qt::CaseInsensitive) ) {
-        if ( parts.size() != 3 )
+        if ( parts.size() != 3 && parts.size() != 4 )
             return is;
 
         if ( ModelManager::Register().contains(parts.at(1)) )
@@ -332,9 +338,20 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
 
         dex.isPrototype = true;
         dex.modelID = parts.at(2).toUInt();
+
+        if ( parts.size() == 4 ) {
+            dex.isDirectional = true;
+            if ( parts.at(3).startsWith("in", Qt::CaseInsensitive) )
+                dex.isInChn = true;
+            else if ( parts.at(3).startsWith("out", Qt::CaseInsensitive) )
+                dex.isInChn = false;
+            else
+                return is;
+        }
+
         dex.isValid = true;
     } else if ( !parts.at(0).compare("Virtual", Qt::CaseInsensitive) ) {
-        if ( parts.size() != 4 )
+        if ( parts.size() != 4 && parts.size() != 5 )
             return is;
 
         if ( ModelManager::Register().contains(parts.at(1)) )
@@ -358,6 +375,17 @@ std::istream &operator>>(std::istream &is, ChannelIndex &dex)
         dex.isConductance = true;
         dex.conductanceID = parts.at(2).toUInt();
         dex.assignID = parts.at(3).toUInt();
+
+        if ( parts.size() == 5 ) {
+            dex.isDirectional = true;
+            if ( parts.at(4).startsWith("in", Qt::CaseInsensitive) )
+                dex.isInChn = true;
+            else if ( parts.at(4).startsWith("out", Qt::CaseInsensitive) )
+                dex.isInChn = false;
+            else
+                return is;
+        }
+
         dex.isValid = true;
     } else if ( parts.size() == 1 && LOADED_PROTOCOL_VERSION == 0 ) {
         dex.isLegacy = true;
@@ -380,8 +408,8 @@ bool operator==(ChannelIndex const& a, ChannelIndex const& b)
             a.isNone==b.isNone &&
             a.isPrototype==b.isPrototype &&
             a.isVirtual==b.isVirtual &&
-            (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID)) &&
-            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID && a.isInChn==b.isInChn)) &&
+            (!a.isPrototype || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.isInChn==b.isInChn && a.isDirectional==b.isDirectional)) &&
+            (!a.isVirtual || (a.modelClass==b.modelClass && a.modelID==b.modelID && a.instID==b.instID && a.isInChn==b.isInChn && a.isDirectional==b.isDirectional)) &&
             a.isAnalog==b.isAnalog &&
             a.isDigital==b.isDigital &&
             (!(a.isAnalog || a.isDigital) || (a.daqClass==b.daqClass && a.devID==b.devID && a.isInChn==b.isInChn && a.chanID==b.chanID)) &&

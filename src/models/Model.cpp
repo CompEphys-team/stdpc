@@ -89,10 +89,12 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ModelPrototype::valuesToSa
     for ( std::shared_ptr<Model> const& m : inst ) {
         if ( m->in.save ) {
             indices.push_back(ChannelIndex(proxy(), modelID, m->id(), true));
+            indices.last().isDirectional = true;
             values.push_back(&(m->in.V));
         }
         if ( m->out.save ) {
             indices.push_back(ChannelIndex(proxy(), modelID, m->id(), false));
+            indices.last().isDirectional = true;
             values.push_back(&(m->out.I));
         }
     }

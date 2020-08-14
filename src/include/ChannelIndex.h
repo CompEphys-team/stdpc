@@ -60,12 +60,13 @@ public:
     QString modelClass;
     size_t modelID;
     size_t instID;
+    bool isDirectional = false;
 
     bool isAnalog;
     bool isDigital;
     QString daqClass;
     size_t devID;
-    bool isInChn;
+    bool isInChn = true;
     size_t chanID;
 
     bool isConductance;
