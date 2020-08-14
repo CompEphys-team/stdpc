@@ -26,6 +26,7 @@
 #include "ConductanceDlg.h"
 
 class DCThread;
+class ConductanceManager;
 
 class ConductanceProxy {
 public:
@@ -46,10 +47,7 @@ public:
     virtual inline QString prettyName() { return conductanceClass(); }
 
     /// Instantiate all assignments (multiplexed as appropriate) from a parameter set
-    virtual void instantiate(size_t conductanceID, size_t assignID, DCThread *,
-                             std::vector<Conductance*> &preD,
-                             std::vector<Conductance*> &inD,
-                             std::vector<Conductance*> &postD) = 0;
+    virtual void instantiate(size_t conductanceID, size_t assignID, DCThread *, ConductanceManager *manager) = 0;
 
     /// Create a new conductance dialog
     virtual ConductanceDlg *createDialog(size_t conductanceID, QWidget *parent=nullptr) = 0;
@@ -81,10 +79,6 @@ public:
 
     QPair<QVector<ChannelIndex>, QVector<const double *>> toSave() const;
 
-    inline const std::vector<Conductance *> &preDigital() const { return preD; }
-    inline const std::vector<Conductance *> &inDigital() const { return inD; }
-    inline const std::vector<Conductance *> &postDigital() const { return postD; }
-
     static QMap<QString, ConductanceProxy*> &Register() { static QMap<QString, ConductanceProxy*> r; return r; } //!< All conductances
     static QMap<QString, ConductanceProxy*> &Synapses() { static QMap<QString, ConductanceProxy*> r; return r; } //!< Synapse subset
     static QMap<QString, ConductanceProxy*> &Currents() { static QMap<QString, ConductanceProxy*> r; return r; } //!< Current subset
@@ -93,7 +87,6 @@ public:
     static inline void RegisterCurrent(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Currents()[proxy->conductanceClass()] = proxy; }
     static inline void RegisterTool(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Tools()[proxy->conductanceClass()] = proxy; }
 
-private:
     std::vector<Conductance *> preD, inD, postD;
 };
 

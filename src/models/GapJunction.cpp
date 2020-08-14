@@ -48,7 +48,7 @@ GapJunctionProxy::GapJunctionProxy()
     addAP("ESynp[#].postOutChannel", &p, &GJunctData::legacy_PostOut);
 }
 
-void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, std::vector<Conductance *> &preD, std::vector<Conductance *> &, std::vector<Conductance *> &)
+void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, ConductanceManager *manager)
 {
     const GapJunctionAssignment &a = param(condID).assignment(assignID);
     struct postChanPointers {
@@ -84,7 +84,7 @@ void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT
             outChannel *outC = DCT->getOutChan(pre);
             if ( inC && outC ) {
                 for ( postChanPointers &post : postChans ) {
-                    preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
+                    manager->preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
                 }
             }
         }
@@ -95,7 +95,7 @@ void GapJunctionProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT
                 outChannel *outC = DCT->getOutChan(out);
                 if ( inC && outC ) {
                     for ( postChanPointers &post : postChans ) {
-                        preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
+                        manager->preD.push_back(new GapJunction(condID, assignID, multi++, inC, outC, post.inC, post.outC));
                     }
                 }
             }

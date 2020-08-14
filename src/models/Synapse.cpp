@@ -20,10 +20,7 @@
 #include "Synapse.h"
 #include "DCThread.h"
 
-void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *DCT,
-                               std::vector<Conductance *> &preD,
-                               std::vector<Conductance *> &,
-                               std::vector<Conductance *> &postD)
+void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *DCT, ConductanceManager *manager)
 {
     const SynapseAssignment &a = param(conductanceID).assignment(assignID);
     std::vector<ChannelIndex> preSynInst = DCT->getChanIndices(a.PreSynChannel);
@@ -39,9 +36,9 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
                 if ( (preC=DCT->getInChan(pre)) && (postC=DCT->getInChan(post)) && (outC=DCT->getOutChan(post)) ) {
                     Synapse *tmp = createAssigned(conductanceID, assignID, multi++, DCT, preC, postC, outC);
                     if ( pre.isVirtual && post.isAnalog )
-                        postD.push_back(tmp);
+                        manager->postD.push_back(tmp);
                     else
-                        preD.push_back(tmp);
+                        manager->preD.push_back(tmp);
                 }
             }
         }
@@ -52,9 +49,9 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
                     if ( (preC=DCT->getInChan(pre)) && (postC=DCT->getInChan(post)) && (outC=DCT->getOutChan(out)) ) {
                         Synapse *tmp = createAssigned(conductanceID, assignID, multi++, DCT, preC, postC, outC);
                         if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
-                            postD.push_back(tmp);
+                            manager->postD.push_back(tmp);
                         else
-                            preD.push_back(tmp);
+                            manager->preD.push_back(tmp);
                     }
                 }
             }

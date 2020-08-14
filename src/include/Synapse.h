@@ -49,10 +49,7 @@ class SynapseProxy : public ConductanceProxy
 {
 public:
     virtual SynapseData &param(size_t i) const = 0;
-    void instantiate(size_t conductanceID, size_t assignID, DCThread *,
-                    std::vector<Conductance*> &preD,
-                    std::vector<Conductance*> &inD,
-                    std::vector<Conductance*> &postD);
+    void instantiate(size_t conductanceID, size_t assignID, DCThread *, ConductanceManager *manager);
 
     virtual Synapse *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, DCThread *,
                                     inChannel *pre, inChannel *post, outChannel *out) = 0;

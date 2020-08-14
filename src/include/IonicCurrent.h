@@ -44,10 +44,7 @@ class IonicCurrentProxy : public ConductanceProxy
 {
 public:
     virtual CurrentData &param(size_t i) const = 0;
-    void instantiate(size_t conductanceID, size_t assignID, DCThread *,
-                     std::vector<Conductance*> &preD,
-                     std::vector<Conductance*> &inD,
-                     std::vector<Conductance*> &postD);
+    void instantiate(size_t conductanceID, size_t assignID, DCThread *, ConductanceManager *manager);
 
     virtual IonicCurrent *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
                                          inChannel *in, outChannel *out) = 0;

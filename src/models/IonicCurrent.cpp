@@ -27,7 +27,7 @@ IonicCurrent::IonicCurrent(size_t condID, size_t assignID, size_t multiID, inCha
 {
 }
 
-void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, std::vector<Conductance *> &preD, std::vector<Conductance *> &inD, std::vector<Conductance *> &postD)
+void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, ConductanceManager *manager)
 {
     const CurrentAssignment &a = param(condID).assignment(assignID);
     size_t multi = 0;
@@ -37,7 +37,7 @@ void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DC
             inChannel *inC = DCT->getInChan(VIChan);
             outChannel *outC = DCT->getOutChan(VIChan);
             if ( inC && outC ) {
-                inD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
+                manager->inD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
             }
         }
     } else {
@@ -47,9 +47,9 @@ void IonicCurrentProxy::instantiate(size_t condID, size_t assignID, DCThread *DC
                 outChannel *outC = DCT->getOutChan(IChan);
                 if ( inC && outC ) {
                     if ( VChan.isVirtual && IChan.isAnalog )
-                        postD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
+                        manager->postD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
                     else
-                        preD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
+                        manager->preD.push_back(createAssigned(condID, assignID, multi++, inC, outC));
                 }
             }
         }

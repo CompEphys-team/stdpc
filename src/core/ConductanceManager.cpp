@@ -47,7 +47,7 @@ void ConductanceManager::init(DCThread *DCT)
             if ( proxy->param(j).active ) {
                 for ( size_t i = 0; i < proxy->param(j).numAssignments(); i++ ) {
                     if ( proxy->param(j).assignment(i).active ) {
-                        proxy->instantiate(j, i, DCT, preD, inD, postD);
+                        proxy->instantiate(j, i, DCT, this);
                     }
                 }
             }

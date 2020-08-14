@@ -55,10 +55,7 @@ public:
     inline QString conductanceClass() { return "ESyn"; }
     inline QString prettyName() { return "Gap Junction"; }
 
-    void instantiate(size_t conductanceID, size_t assignID, DCThread *,
-                     std::vector<Conductance*> &preD,
-                     std::vector<Conductance*> &inD,
-                     std::vector<Conductance*> &postD);
+    void instantiate(size_t conductanceID, size_t assignID, DCThread *, ConductanceManager *manager);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
 
