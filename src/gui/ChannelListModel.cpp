@@ -63,8 +63,15 @@ ChannelListModel::ChannelListModel(int displayFlags, QObject *parent)
 {
     for ( DAQProxy *proxy : DeviceManager::Register() )
         daqHelpers.push_back(DAQHelper(proxy, this));
-    for ( ModelProxy *proxy : ModelManager::Register() )
-        modelHelpers.push_back(ModelHelper(proxy, this));
+    if ( displayFlags & Directional ) {
+        for ( ModelProxy *proxy : ModelManager::Register() ) {
+            modelHelpers.push_back(ModelHelper(proxy, this, true));
+            modelHelpers.push_back(ModelHelper(proxy, this, false));
+        }
+    } else {
+        for ( ModelProxy *proxy : ModelManager::Register() )
+            modelHelpers.push_back(ModelHelper(proxy, this));
+    }
     for ( ConductanceProxy *proxy : ConductanceManager::Register() )
         conductanceHelpers.push_back(ConductanceHelper(proxy, this));
     connect(&Devices, SIGNAL(removedDevice(ChannelIndex)), this, SLOT(updateChns(ChannelIndex)));
@@ -219,6 +226,8 @@ void ChannelListModel::ModelHelper::updateChns(QModelIndexList &currentIdx, QMod
     int mvOffset = 0;
     if ( parent->displayFlags & Prototype ) {
         ChannelIndex dex(proxy);
+        dex.isDirectional = parent->displayFlags & Directional;
+        dex.isInChn = inChn;
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
             currentIdx.append(parent->index(dex, Prototype));
             if ( parent->rmDevDex == ChannelIndex(proxy, dex.modelID) ) {
@@ -235,6 +244,8 @@ void ChannelListModel::ModelHelper::updateChns(QModelIndexList &currentIdx, QMod
     mvOffset = 0;
     if ( parent->displayFlags & Virtual ) {
         ChannelIndex dex(proxy, 0, 0);
+        dex.isDirectional = parent->displayFlags & Directional;
+        dex.isInChn = inChn;
         for ( dex.modelID = 0; dex.modelID < nInst.size(); dex.modelID++ ) {
             rmModel = parent->rmDevDex == ChannelIndex(proxy, dex.modelID);
             for ( dex.instID = 0; dex.instID < nInst[dex.modelID]; dex.instID++ ) {
@@ -394,6 +405,8 @@ bool ChannelListModel::ModelHelper::data(int row, int role, int &offset, QVarian
                 }
             }
             ChannelIndex dex(proxy, row - offset - mvOffset);
+            dex.isDirectional = parent->displayFlags & Directional;
+            dex.isInChn = inChn;
             switch ( role ) {
             case Qt::DisplayRole:   ret = dex.prettyName();                 return true;
             case Qt::UserRole:      ret.setValue(dex);                      return true;
@@ -414,6 +427,8 @@ bool ChannelListModel::ModelHelper::data(int row, int role, int &offset, QVarian
                     return true;
                 }
                 ChannelIndex dex(proxy, i - mvOffset, row - offset);
+                dex.isDirectional = parent->displayFlags & Directional;
+                dex.isInChn = inChn;
                 ModelData &p = proxy->param(dex.modelID);
                 switch ( role ) {
                 case Qt::DisplayRole:   ret = dex.prettyName();                          return true;
@@ -529,8 +544,9 @@ bool ChannelListModel::DAQHelper::index(const ChannelIndex &dex, ChannelType typ
 
 bool ChannelListModel::ModelHelper::index(const ChannelIndex &dex, ChannelType type, int &offset, QModelIndex &ret) const
 {
+    bool directional = parent->displayFlags & Directional;
     if ( parent->displayFlags & Prototype ) {
-        if ( type & Prototype && dex.modelClass == proxy->modelClass() ) {
+        if ( type & Prototype && dex.modelClass == proxy->modelClass() && (!directional || dex.isInChn==inChn) ) {
             if ( dex.modelID < nInst.size() )
                 ret = parent->createIndex(dex.modelID + offset, 0);
             return true;
@@ -539,7 +555,8 @@ bool ChannelListModel::ModelHelper::index(const ChannelIndex &dex, ChannelType t
     }
     if ( parent->displayFlags & Virtual ) {
         for ( size_t i = 0; i < nInst.size(); i++ ) {
-            if ( type & Virtual && dex.modelClass == proxy->modelClass() && dex.modelID == i ) {
+            if ( type & Virtual && dex.modelClass == proxy->modelClass()
+                 && dex.modelID == i && (!directional || dex.isInChn==inChn) ) {
                 if ( dex.instID < nInst[i] )
                     ret = parent->createIndex(dex.instID + offset, 0);
                 return true;

@@ -44,6 +44,7 @@ public:
         AnalogIn =   16,
         AnalogOut =  32,
         Prototype =  64, // Model prototypes, applies multiplexed over all instances
+        Directional = 128, // Model prototypes and instances: Separate entries for input and output channel, directional ChannelIndex
 
         __MAX = 256, // Internal use only: Maximum enum value
 
@@ -89,8 +90,10 @@ protected:
     private:
         ChannelListModel *const parent;
         ModelProxy *proxy;
+        bool inChn;
     public:
-        ModelHelper(ModelProxy *proxy, ChannelListModel *parent) : parent(parent), proxy(proxy), nInst(0) {}
+        ModelHelper(ModelProxy *proxy, ChannelListModel *parent, bool inChn = true) :
+            parent(parent), proxy(proxy), inChn(inChn), nInst(0) {}
         void updateCount();
         void updateChns(QModelIndexList &currentIdx, QModelIndexList &newIdx, ChannelListModel &newM);
         bool data(int row, int role, int &offset, QVariant &ret) const;
