@@ -79,7 +79,7 @@ struct CurrentData : public ConductanceData {
     int legacy_I = -1;
 };
 
-typedef struct {
+struct STPlast {
   double AMinus;
   double tauMinus;
   double APlus;
@@ -96,9 +96,9 @@ typedef struct {
   bool sigmoidTable;
   double sigmoidTableDg;
   double sigmoidTableMaxEntry;
-} STPlast;
+};
 
-typedef struct {
+struct ODEPlast {
   double InitialP;
   double InitialD;
   double betaP;
@@ -115,7 +115,7 @@ typedef struct {
   bool sigmoidTable;
   double sigmoidTableDg;
   double sigmoidTableMaxEntry;
-} ODEPlast;
+};
 
 struct elecCalibParams {
   // channel copy parameters
@@ -148,7 +148,7 @@ struct elecCalibParams {
   int legacy_out = -1;
 };
 
-typedef struct {
+struct dataSavingParams {
   bool enabled;
   QuotedString fileName = "data_%n.dat";
   double savingFreq = 20000;
@@ -161,7 +161,7 @@ typedef struct {
   QuotedString asciiHeaderPrefix = "% ";
   bool asciiCRLF = true;
 
-} dataSavingParams;
+};
  
 struct inChnData {
   bool active;
@@ -227,11 +227,11 @@ struct PerformanceMonitorData {
     PerformanceMonitorData() : active(false), interval(1) {}
 };
 
-typedef struct {
+struct SampleHoldData {
   bool active;
   double threshV;
   ChannelIndex trigChn;
-} SampleHoldData;
+};
 
 struct vInstData {
     bool active;
