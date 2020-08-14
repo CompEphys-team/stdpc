@@ -88,6 +88,7 @@ public:
     static inline void RegisterTool(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Tools()[proxy->conductanceClass()] = proxy; }
 
     std::vector<Conductance *> preD, inD, postD;
+    std::vector<Conductance *> transform_devIn, transform_devOut, transform_modIn, transform_modOut;
 };
 
 #endif // CONDUCTANCEMANAGER_H

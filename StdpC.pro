@@ -153,6 +153,7 @@ HEADERS += \
     $$PWD/src/include/Wire.h \
     $$PWD/src/include/WireDlg.h \
     src/include/PipeDAQ.h \
+    src/include/channeltransform.h \
     src/include/pipedaqdlg.h \
     src/include/treewidgetitem_datasources.h \
     src/include/treewidgetitem_models.h \
@@ -234,7 +235,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/gui/treewidgetitem_datasources.cpp \
     src/gui/treewidgetitem_models.cpp \
     src/models/InputConductance.cpp \
-    src/gui/InputConductanceDlg.cpp
+    src/gui/InputConductanceDlg.cpp \
+    src/models/channeltransform.cpp
 
 digidata {
     mingw {

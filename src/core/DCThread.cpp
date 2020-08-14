@@ -345,6 +345,8 @@ void DCThread::run()
          if ( processAnalogs ) {
              for ( auto &b : Devices.active() )
                  b->process_scan(t);
+             for ( Conductance *c : Conductances.transform_devIn )
+                 c->step(t, dt, settling);
              processAnalogs = false;
          }
          for ( auto const& m : Models.active() )
@@ -355,6 +357,8 @@ void DCThread::run()
              c->step(t, dt, settling);
          // Dynamic clamp: models (d2d currents)
          if ( Models.active().size() ) { // Runge-Kutta 4
+             for ( Conductance *c : Conductances.transform_modOut )
+                 c->step(t, dt, settling);
              for ( auto const& m : Models.active() )
                  m->retainCurrent(t);
 
@@ -402,10 +406,15 @@ void DCThread::run()
              tFull[tFullOff] = dt;
              tFullOff = (tFullOff+1) % tDepth;
              sumTFull = sumTFull - tFull[tFullOff] + dt;
+
+             for ( Conductance *c : Conductances.transform_modIn )
+                 c->step(t, dt, settling);
          } // end RK4
 
          // Dynamic clamp: d2a synapses
          for ( Conductance *c : Conductances.postD )
+             c->step(t, dt, settling);
+         for ( Conductance *c : Conductances.transform_devOut )
              c->step(t, dt, settling);
 
          // copy AEC compensated input values to output channels if desired
@@ -517,7 +526,7 @@ inChannel *DCThread::getInChan(ChannelIndex const& dex)
 {
     if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
-    } else if ( dex.isVirtual ) {
+    } else if ( dex.isVirtual && (!dex.isDirectional || dex.isInChn) ) {
         return Models.getInChan(dex);
     } else if ( dex.isAnalog && dex.isInChn ) {
         return Devices.getInChan(dex);
@@ -529,7 +538,7 @@ outChannel *DCThread::getOutChan(ChannelIndex const& dex)
 {
     if ( !dex.isValid || dex.isPrototype ) {
         return nullptr;
-    } else if ( dex.isVirtual ) {
+    } else if ( dex.isVirtual && (!dex.isDirectional || !dex.isInChn) ) {
         return Models.getOutChan(dex);
     } else if ( dex.isNone ) {
         return &outChnNone;

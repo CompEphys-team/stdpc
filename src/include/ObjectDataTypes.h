@@ -52,6 +52,10 @@ struct CurrentAssignment : public AssignmentData {
     ChannelIndex IChannel;
 };
 
+struct ChannelTransformAssignment : public AssignmentData {
+    ChannelIndex target;
+};
+
 struct ConductanceData {
     bool active;
     bool activeSettling = false;
@@ -77,6 +81,13 @@ struct CurrentData : public ConductanceData {
     std::vector<CurrentAssignment> assign;
     int legacy_V = -1;
     int legacy_I = -1;
+};
+
+struct ChannelTransformData : public ConductanceData {
+    inline const ChannelTransformAssignment &assignment(size_t i) const { return assign[i]; }
+    inline size_t numAssignments() const { return assign.size(); }
+    std::vector<ChannelTransformAssignment> assign;
+    int seq = 0;
 };
 
 struct STPlast {
