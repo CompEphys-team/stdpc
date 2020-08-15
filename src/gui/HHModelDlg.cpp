@@ -109,6 +109,7 @@ void HHModelDlg::importData()
     ui->Vlimit->setChecked(HHNeuronProxy::p[idx].Vlimit);
     ui->Vmin->setValue(HHNeuronProxy::p[idx].Vmin * 1e3);
     ui->Vmax->setValue(HHNeuronProxy::p[idx].Vmax * 1e3);
+    ui->V0->setValue(HHNeuronProxy::p[idx].V0 * 1e3);
 }
 
 void HHModelDlg::exportData()
@@ -134,6 +135,7 @@ void HHModelDlg::exportData()
     HHNeuronProxy::p[idx].Vlimit = ui->Vlimit->isChecked();
     HHNeuronProxy::p[idx].Vmin = ui->Vmin->value() * 1e-3;
     HHNeuronProxy::p[idx].Vmax = ui->Vmax->value() * 1e-3;
+    HHNeuronProxy::p[idx].V0 = ui->V0->value() * 1e-3;
     emit channelsChanged();
     emit modelStatusChanged();
 }
