@@ -26,8 +26,8 @@ static ChannelSinusoidProxy *prox = ChannelSinusoidProxy::get();
 std::vector<ChannelSinusoidData> ChannelSinusoidProxy::p;
 ChannelSinusoidProxy *ChannelSinusoid::proxy() const { return prox; }
 ConductanceDlg *ChannelSinusoidProxy::createDialog(size_t condID, QWidget *parent) { return new ChannelSinusoidDlg(condID, parent); }
-ChannelTransform *ChannelSinusoidProxy::createAssigned(size_t conductanceID, size_t assignID, inChannel *in, outChannel *out) {
-    return new ChannelSinusoid(conductanceID, assignID, in, out);
+ChannelTransform *ChannelSinusoidProxy::createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) {
+    return new ChannelSinusoid(conductanceID, assignID, multiID, in, out);
 }
 
 ChannelSinusoidProxy::ChannelSinusoidProxy()
@@ -46,8 +46,8 @@ ChannelSinusoidProxy::ChannelSinusoidProxy()
 }
 
 
-ChannelSinusoid::ChannelSinusoid(size_t condID, size_t assignID, inChannel *in, outChannel *out) :
-    ChannelTransform(condID, assignID, in, out),
+ChannelSinusoid::ChannelSinusoid(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out) :
+    ChannelTransform(condID, assignID, multiID, in, out),
     p(&params()),
     a(&assignment())
 {

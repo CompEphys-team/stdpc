@@ -26,7 +26,7 @@
 class ChannelTransform : public Conductance
 {
 public:
-    ChannelTransform(size_t condID, size_t assignID, inChannel *in, outChannel *out);
+    ChannelTransform(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
     ~ChannelTransform() {}
 
     inline virtual const ChannelTransformAssignment &assignment() const { return params().assignment(assignID); }
@@ -46,7 +46,8 @@ public:
     virtual ChannelTransformData &param(size_t i) const = 0;
     void instantiate(size_t conductanceID, size_t assignID, DCThread *, ConductanceManager *manager);
 
-    virtual ChannelTransform *createAssigned(size_t conductanceID, size_t assignID, inChannel *in, outChannel *out) = 0;
+    virtual ChannelTransform *createAssigned(size_t conductanceID, size_t assignID, size_t multiID,
+                                             inChannel *in, outChannel *out) = 0;
 };
 
 #endif // CHANNELTRANSFORM_H

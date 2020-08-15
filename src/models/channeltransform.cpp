@@ -20,8 +20,8 @@
 #include "channeltransform.h"
 #include "DCThread.h"
 
-ChannelTransform::ChannelTransform(size_t condID, size_t assignID, inChannel *in, outChannel *out):
-    Conductance(condID, assignID, 0),
+ChannelTransform::ChannelTransform(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out):
+    Conductance(condID, assignID, multiID),
     channel_active(in ? in->active : out->active),
     channel_value(in ? in->V : out->I)
 {
@@ -31,13 +31,14 @@ ChannelTransform::ChannelTransform(size_t condID, size_t assignID, inChannel *in
 void ChannelTransformProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, ConductanceManager *manager)
 {
     const ChannelTransformAssignment &a = param(condID).assignment(assignID);
+    size_t multi = 0;
     for ( ChannelIndex dex : DCT->getChanIndices(a.target) ) {
         if ( dex.isVirtual && !dex.isDirectional ) { // ensure consistent treatment of unsupported non-directional dex
             dex.isDirectional = dex.isInChn = true;
         }
         inChannel *inC = DCT->getInChan(dex);
         outChannel *outC = DCT->getOutChan(dex);
-        ChannelTransform *assigned = createAssigned(condID, assignID, inC, outC);
+        ChannelTransform *assigned = createAssigned(condID, assignID, multi++, inC, outC);
         if ( dex.isVirtual ) {
             if ( dex.isInChn )
                 manager->transform_modIn.push_back(assigned);

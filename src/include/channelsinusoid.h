@@ -45,7 +45,7 @@ public:
     inline QString conductanceClass() { return "ChannelSinusoid"; }
     inline QString prettyName() { return "Sinusoidal transform"; }
 
-    ChannelTransform *createAssigned(size_t conductanceID, size_t assignID, inChannel *in, outChannel *out);
+    ChannelTransform *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
 
@@ -59,7 +59,7 @@ private:
   const ChannelTransformAssignment *a;
 
 public:
-  ChannelSinusoid(size_t condID, size_t assignID, inChannel *in, outChannel *out);
+  ChannelSinusoid(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
   void step(double t, double dt, bool settling);
 
   inline const ChannelSinusoidData &params() const { return ChannelSinusoidProxy::p[condID]; }
