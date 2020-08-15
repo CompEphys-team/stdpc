@@ -40,6 +40,7 @@ HHNeuronProxy::HHNeuronProxy()
     addAP("HHNeuronp[#].Vlimit", &HHNeuronProxy::p, &HHNeuronData::Vlimit);
     addAP("HHNeuronp[#].Vmin", &HHNeuronProxy::p, &HHNeuronData::Vmin);
     addAP("HHNeuronp[#].Vmax", &HHNeuronProxy::p, &HHNeuronData::Vmax);
+    addAP("HHNeuronp[#].V0", &HHNeuronProxy::p, &HHNeuronData::V0);
     addAP("HHNeuronp[#].inst[#].active", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::active);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetect", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetect);
     addAP("HHNeuronp[#].inst[#].inChn.spkDetectThresh", &HHNeuronProxy::p, &HHNeuronData::inst, &vInstData::inChn, &inChnData::spkDetectThresh);
@@ -52,7 +53,7 @@ HHNeuronProxy::HHNeuronProxy()
 
 HHNeuron::HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     Model(parent, instID, DCT),
-    V(-0.06)
+    V(static_cast<HHNeuronData const&>(parent->params()).V0)
 {
     Vi = V;
     in.V = V + params().inChn.bias;
