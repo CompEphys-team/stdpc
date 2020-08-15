@@ -22,25 +22,20 @@
 
 ConductanceManager::~ConductanceManager()
 {
-    for ( Conductance *c : preD )
-        delete c;
-    for ( Conductance *c : inD )
-        delete c;
-    for ( Conductance *c : postD )
-        delete c;
+    for ( std::vector<Conductance*> *vec : _all ) {
+        for ( Conductance *c : *vec )
+            delete c;
+        vec->clear();
+    }
 }
 
 void ConductanceManager::init(DCThread *DCT)
 {
-    for ( Conductance *c : preD )
-        delete c;
-    for ( Conductance *c : inD )
-        delete c;
-    for ( Conductance *c : postD )
-        delete c;
-    preD.clear();
-    inD.clear();
-    postD.clear();
+    for ( std::vector<Conductance*> *vec : _all ) {
+        for ( Conductance *c : *vec )
+            delete c;
+        vec->clear();
+    }
 
     for ( ConductanceProxy *proxy : Register() ) {
         for ( size_t j = 0; j < proxy->size(); j++ ) {
@@ -57,15 +52,11 @@ void ConductanceManager::init(DCThread *DCT)
 
 void ConductanceManager::clear()
 {
-    for ( Conductance *c : preD )
-        delete c;
-    for ( Conductance *c : inD )
-        delete c;
-    for ( Conductance *c : postD )
-        delete c;
-    preD.clear();
-    inD.clear();
-    postD.clear();
+    for ( std::vector<Conductance*> *vec : _all ) {
+        for ( Conductance *c : *vec )
+            delete c;
+        vec->clear();
+    }
     for ( ConductanceProxy *proxy : Register() )
         while ( proxy->size() )
             proxy->remove(proxy->size()-1);
@@ -86,8 +77,9 @@ const double *ConductanceManager::conductance(const ChannelIndex &dex)
     const double *ret = nullptr;
     if ( !dex.isConductance )
         return ret;
-    if ( (ret = match(preD, dex)) || (ret = match(inD, dex)) || (ret = match(postD, dex)) )
-        return ret;
+    for ( std::vector<Conductance*> *vec : _all )
+        if ( (ret = match(*vec, dex)) )
+            return ret;
     return ret;
 }
 
@@ -95,7 +87,7 @@ QStringList ConductanceManager::getStatus() const
 {
     QStringList statuses;
     for ( ConductanceProxy *proxy : Register() ) {
-        int euler = 0, rk4 = 0;
+        int euler = 0, rk4 = 0, transform = 0;
         for ( Conductance *c : preD )
             if ( c->proxy() == proxy )
                 ++euler;
@@ -105,12 +97,18 @@ QStringList ConductanceManager::getStatus() const
         for ( Conductance *c : postD )
             if ( c->proxy() == proxy )
                 ++euler;
+        for ( const std::vector<Conductance*> *vec : {&transform_devIn, &transform_devOut, &transform_modIn, &transform_modOut})
+            for ( const Conductance *c : *vec )
+                if( c->proxy() == proxy )
+                    ++transform;
         if ( euler+rk4 > 0 )
             statuses << QString("DC: %1 %2 conductances (%3 Euler, %4 Runge-Kutta)")
                         .arg(euler+rk4)
                         .arg(proxy->prettyName())
                         .arg(euler)
                         .arg(rk4);
+        if ( transform > 0 )
+            statuses << QString("DC: %1 %2 transforms").arg(transform).arg(proxy->prettyName());
     }
     return statuses;
 }
@@ -119,8 +117,8 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ConductanceManager::toSave
 {
     QVector<ChannelIndex> indices;
     QVector<const double *> values;
-    for ( auto&& any : {preD, inD, postD} ) {
-        for ( Conductance *c : any ) {
+    for ( std::vector<Conductance*> *vec : _all ) {
+        for ( Conductance *c : *vec ) {
             if ( c->assignment().save ) {
                 indices.push_back(ChannelIndex(c->proxy(), c->conductanceID(), c->assignmentID(), c->multiplexID()));
                 values.push_back(&c->conductance());

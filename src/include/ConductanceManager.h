@@ -60,7 +60,7 @@ class ConductanceManager : public QObject
 {
     Q_OBJECT
 public:
-    ConductanceManager() {}
+    ConductanceManager() : _all({&preD, &inD, &postD, &transform_devIn, &transform_devOut, &transform_modIn, &transform_modOut}) {}
     ~ConductanceManager();
 
     /// Initialise all active conductances for end use
@@ -89,6 +89,8 @@ public:
 
     std::vector<Conductance *> preD, inD, postD;
     std::vector<Conductance *> transform_devIn, transform_devOut, transform_modIn, transform_modOut;
+
+    std::vector<std::vector<Conductance*>*> _all;
 };
 
 #endif // CONDUCTANCEMANAGER_H
