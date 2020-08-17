@@ -21,10 +21,10 @@
 #define COMPONENTFACTORYWIDGET_H
 
 #include <QWidget>
-#include <QComboBox>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QLabel>
+#include "WideComboBox.h"
 
 namespace Ui {
 class ComponentFactoryWidget;
@@ -42,7 +42,7 @@ public:
     explicit ComponentFactoryWidget(QWidget *parent = nullptr);
     ~ComponentFactoryWidget();
 
-    QComboBox *&combo;
+    WideComboBox *&combo;
     QPushButton *&button;
 };
 

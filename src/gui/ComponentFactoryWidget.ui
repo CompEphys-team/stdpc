@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>113</width>
-    <height>94</height>
+    <height>98</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,7 +80,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QComboBox" name="combo"/>
+       <widget class="WideComboBox" name="combo"/>
       </item>
       <item row="2" column="0">
        <widget class="QPushButton" name="button">
@@ -94,6 +94,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>WideComboBox</class>
+   <extends>QComboBox</extends>
+   <header>WideComboBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
