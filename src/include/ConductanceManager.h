@@ -27,6 +27,7 @@
 
 class DCThread;
 class ConductanceManager;
+class ChannelTransform;
 
 class ConductanceProxy {
 public:
@@ -94,9 +95,10 @@ public:
     static inline void RegisterTool(ConductanceProxy *proxy) { Register()[proxy->conductanceClass()] = Tools()[proxy->conductanceClass()] = proxy; }
 
     std::vector<Conductance *> preD, inD, postD;
-    std::vector<Conductance *> transform_devIn, transform_devOut, transform_modIn, transform_modOut;
+    std::vector<ChannelTransform *> transform_devIn, transform_devOut, transform_modIn, transform_modOut;
 
-    std::vector<std::vector<Conductance*>*> _conds, _transforms;
+    std::vector<std::vector<Conductance*>*> _conds;
+    std::vector<std::vector<ChannelTransform*>*> _transforms;
 };
 
 #endif // CONDUCTANCEMANAGER_H

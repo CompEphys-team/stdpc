@@ -19,6 +19,7 @@
 
 #include "ConductanceManager.h"
 #include "DCThread.h"
+#include "channeltransform.h"
 
 ConductanceManager::~ConductanceManager()
 {
@@ -56,21 +57,11 @@ void ConductanceManager::clearLiveObjects()
             delete c;
         vec->clear();
     }
-    for ( std::vector<Conductance*> *vec : _transforms ) {
+    for ( std::vector<ChannelTransform*> *vec : _transforms ) {
         for ( Conductance *c : *vec )
             delete c;
         vec->clear();
     }
-}
-
-const double *match(const std::vector<Conductance*> ref, const ChannelIndex &dex)
-{
-    for ( Conductance *c : ref )
-        if ( c->proxy()->conductanceClass() == dex.conductanceClass &&
-             c->conductanceID() == dex.conductanceID &&
-             c->assignmentID() == dex.assignID )
-            return &c->conductance();
-    return nullptr;
 }
 
 const double *ConductanceManager::conductance(const ChannelIndex &dex)
@@ -79,11 +70,17 @@ const double *ConductanceManager::conductance(const ChannelIndex &dex)
     if ( !dex.isConductance )
         return ret;
     for ( std::vector<Conductance*> *vec : _conds )
-        if ( (ret = match(*vec, dex)) )
-            return ret;
-    for ( std::vector<Conductance*> *vec : _transforms )
-        if ( (ret = match(*vec, dex)) )
-            return ret;
+        for ( Conductance *c : *vec )
+            if ( c->proxy()->conductanceClass() == dex.conductanceClass &&
+                 c->conductanceID() == dex.conductanceID &&
+                 c->assignmentID() == dex.assignID )
+                return &c->conductance();
+    for ( std::vector<ChannelTransform*> *vec : _transforms )
+        for ( ChannelTransform *c : *vec )
+            if ( c->proxy()->conductanceClass() == dex.conductanceClass &&
+                 c->conductanceID() == dex.conductanceID &&
+                 c->assignmentID() == dex.assignID )
+                return &c->conductance();
     return ret;
 }
 
@@ -101,8 +98,8 @@ QStringList ConductanceManager::getStatus() const
         for ( Conductance *c : postD )
             if ( c->proxy() == proxy )
                 ++euler;
-        for ( std::vector<Conductance*> *vec : _transforms )
-            for ( Conductance *c : *vec )
+        for ( std::vector<ChannelTransform*> *vec : _transforms )
+            for ( ChannelTransform *c : *vec )
                 if( c->proxy() == proxy )
                     ++transform;
         if ( euler+rk4 > 0 )
@@ -129,7 +126,7 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ConductanceManager::toSave
             }
         }
     }
-    for ( std::vector<Conductance*> *vec : _transforms ) {
+    for ( std::vector<ChannelTransform*> *vec : _transforms ) {
         for ( Conductance *c : *vec ) {
             if ( c->assignment().save ) {
                 indices.push_back(ChannelIndex(c->proxy(), c->conductanceID(), c->assignmentID(), c->multiplexID()));
