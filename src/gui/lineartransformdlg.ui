@@ -100,7 +100,11 @@
     </widget>
    </item>
    <item row="4" column="1" colspan="2">
-    <widget class="QLineEdit" name="factor"/>
+    <widget class="QLineEdit" name="factor">
+     <property name="text">
+      <string>1</string>
+     </property>
+    </widget>
    </item>
    <item row="4" column="3">
     <widget class="QLabel" name="label_2">
@@ -110,7 +114,11 @@
     </widget>
    </item>
    <item row="4" column="4">
-    <widget class="QLineEdit" name="offset"/>
+    <widget class="QLineEdit" name="offset">
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
    </item>
    <item row="5" column="0" colspan="4">
     <widget class="QLabel" name="label_3">

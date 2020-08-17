@@ -24,8 +24,8 @@
 
 struct SinusoidalTransformData : public ChannelTransformData
 {
-    double slope;
-    double offset;
+    double slope = 1;
+    double offset = 0;
 };
 
 class SinusoidalTransformProxy : public ChannelTransformProxy

@@ -24,8 +24,8 @@
 
 struct LinearTransformData : public ChannelTransformData
 {
-    double factor;
-    double offset;
+    double factor = 1;
+    double offset = 0;
 };
 
 class LinearTransformProxy : public ChannelTransformProxy
