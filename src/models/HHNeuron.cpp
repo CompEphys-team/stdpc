@@ -25,8 +25,8 @@
 /// Construct a single self-registering proxy
 static HHNeuronProxy *prox = HHNeuronProxy::get();
 std::vector<HHNeuronData> HHNeuronProxy::p;
-ModelProxy *HHNeuronModel::proxy() const { return prox; }
-ModelPrototype *HHNeuronProxy::createPrototype(size_t modelID) { return new HHNeuronModel(modelID); }
+HHNeuronProxy *HHNeuron::proxy() const { return prox; }
+Model *HHNeuronProxy::instantiate(size_t modelID, size_t instID, DCThread *DCT) { return new HHNeuron(modelID, instID, DCT); }
 ModelDlg *HHNeuronProxy::createDialog(size_t modelID, QWidget *parent) { return new HHModelDlg(modelID, parent); }
 
 HHNeuronProxy::HHNeuronProxy()
@@ -51,18 +51,18 @@ HHNeuronProxy::HHNeuronProxy()
 }
 
 
-HHNeuron::HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT) :
-    Model(parent, instID, DCT),
-    V(static_cast<HHNeuronData const&>(parent->params()).V0)
+HHNeuron::HHNeuron(size_t modelID, size_t instID, DCThread *DCT) :
+    Model(modelID, instID, DCT),
+    V(params().V0)
 {
     Vi = V;
-    in.V = V + params().inChn.bias;
+    in.V = V + instance().inChn.bias;
 }
 
 void HHNeuron::RK4(double, double dt, size_t n, bool)
 {
     // instance update
-    const HHNeuronData &p = static_cast<HHNeuronData const&>(parent->params());
+    const HHNeuronData &p = params();
     kV[n] = (out.I + p.gLeak * (p.ELeak - Vi)) / p.C;
     if ( n < 3 ) {
         Vi = V + kV[n]*dt;
@@ -78,20 +78,10 @@ void HHNeuron::RK4(double, double dt, size_t n, bool)
     if ( n == 3 )
         V = Vi;
 
-    in.V = Vi + params().inChn.bias;
+    in.V = Vi + instance().inChn.bias;
 
     // restore current (except on last step, where it's better to keep the final value for output/graphing)
     if ( n < 3 ) {
         out.I = retainedI;
     }
-}
-
-
-
-void HHNeuronModel::init(DCThread *DCT)
-{
-    inst.reserve(params().numInst());
-    for ( size_t i = 0; i < params().numInst(); i++ )
-        if ( params().instance(i).active )
-            inst.emplace_back(new HHNeuron(this, i, DCT));
 }

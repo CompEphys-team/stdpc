@@ -48,7 +48,7 @@ public:
     virtual inline QString prettyName() { return modelClass(); }
 
     /// Create a new model object
-    virtual ModelPrototype *createPrototype(size_t modelID) = 0;
+    virtual Model *instantiate(size_t modelID, size_t instID, DCThread *) = 0;
 
     /// Create a new model dialog
     virtual ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr) = 0;
@@ -64,8 +64,8 @@ public:
     ModelManager() {}
     ~ModelManager() {}
 
-    /// Initialise all active models for end use
-    void initActive(DCThread *);
+    /// Initialise all active conductances for end use
+    void init(DCThread *);
 
     /// Remove all models and parameter sets e.g. in preparation for parameter import
     void clear();
@@ -73,23 +73,20 @@ public:
     /// Returns false if at least one registered parameter set is active (active prototype with at least one active instance)
     bool empty() const;
 
-    /// Create a model of the given type from proxy->param(idx)
-    void initSingle(ModelProxy *proxy, size_t idx);
-
     inChannel *getInChan(ChannelIndex const&);
     outChannel *getOutChan(ChannelIndex const&);
 
-    typedef QHash<QString, QVector<std::shared_ptr<ModelPrototype>>> map_type;
+    QStringList getStatus() const;
 
-    inline QVector<std::shared_ptr<ModelPrototype>> const& active() const { return activeModels; }
-    inline map_type const& all() const { return allModels; }
+    QPair<QVector<ChannelIndex>, QVector<const double *>> toSave() const;
+
+    inline std::vector<std::shared_ptr<Model>> const& active() const { return activeModels; }
 
     static QMap<QString, ModelProxy*> &Register() { static QMap<QString, ModelProxy*> r; return r; }
     static inline void RegisterModel(QString modelName, ModelProxy *proxy) { Register()[modelName] = proxy; }
 
 private:
-    QVector<std::shared_ptr<ModelPrototype>> activeModels;
-    map_type allModels;
+    std::vector<std::shared_ptr<Model>> activeModels;
 };
 
 #endif // MODELMANAGER_H

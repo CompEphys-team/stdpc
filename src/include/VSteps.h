@@ -19,12 +19,10 @@
 
 #pragma once
 
-#include <vector>
-#include "Global_func.h"
 #include "ModelManager.h"
 
-
-struct VStepsData : public ModelData {
+struct VStepsData : public ModelData
+{
   double holdV;
   double startV;
   int nSteps;
@@ -34,7 +32,7 @@ struct VStepsData : public ModelData {
   double tHold;
   vInstData inst;
 
-  inline vInstData &instance(size_t) { return inst; }
+  inline const vInstData &instance(size_t) const { return inst; }
   inline size_t numInst() const { return 1; }
 
   VStepsData();
@@ -48,7 +46,7 @@ public:
     void operator=(const VStepsProxy &) = delete;
     static VStepsProxy *get() { static VStepsProxy proxy; return &proxy; }
 
-    inline ModelData &param(size_t i) { return p[i]; }
+    inline VStepsData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
@@ -56,7 +54,7 @@ public:
     inline QString modelClass() { return "VStep"; }
     inline QString prettyName() { return "Voltage stepper"; }
 
-    ModelPrototype *createPrototype(size_t modelID);
+    Model *instantiate(size_t modelID, size_t instID, DCThread *);
     ModelDlg *createDialog(size_t modelID, QWidget *parent);
 
     static std::vector<VStepsData> p;
@@ -65,14 +63,19 @@ public:
 class VSteps : public Model
 {
 public:
-    VSteps(ModelPrototype *, size_t, DCThread *);
+    VSteps(size_t modelID, size_t instID, DCThread *);
     ~VSteps() {}
 
     // Override processing on unused out
     inline void updateOut(double) {}
+    inline void retainCurrent(double) {}
+    inline void restoreCurrent(double) {}
 
     void update(double t, double dt);
     virtual void RK4(double t, double dt, size_t n, bool settling);
+
+    inline VStepsData &params() const { return VStepsProxy::p[modID]; }
+    VStepsProxy *proxy() const;
 
 protected:
     const VStepsData * const p;
@@ -82,21 +85,3 @@ protected:
     std::vector<double>::iterator cmdTI, cmdVI;
     bool active;
 };
-
-class VStepsPrototype : public ModelPrototype
-{
-public:
-    VStepsPrototype(size_t modelID) : ModelPrototype (modelID) {}
-    ~VStepsPrototype() {}
-
-    void init(DCThread *);
-
-    // Override processing on unused Model::out
-    inline void retainCurrent(double) {}
-    inline void restoreCurrent(double) {}
-
-    inline ModelData &params() const { return VStepsProxy::p[modelID]; }
-    ModelProxy *proxy() const;
-    inline QString prefix() const { return "VStep"; }
-};
-

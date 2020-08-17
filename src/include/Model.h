@@ -29,19 +29,23 @@
 #include "Channels.h"
 
 class ModelProxy;
-class ModelPrototype;
 
 class Model : public QObject
 {
     Q_OBJECT
 public:
-    Model(ModelPrototype *parent, size_t instID, DCThread *DCT);
+    Model(size_t modelID, size_t instID, DCThread *DCT);
     virtual ~Model() {}
+
+    /// Post-init call for any additional setup that requires other models to be present
+    /// Derived classes should call Model::post_init in their overridden versions to ensure complete channel setup.
+    virtual void post_init(DCThread *);
 
     /// Process channels:
     /// Applies bias to out.I and calls in.process(t).
+    virtual void updateChannels(double t);
     virtual inline void updateIn(double t) { in.process(t); }
-    virtual inline void updateOut(double /*t*/) { out.I = params().outChn.bias; }
+    virtual inline void updateOut(double /*t*/) { out.I = instance().outChn.bias; }
 
     /// Retain out.I (which includes bias + any a2d contributions) prior to entering RK4 iterations
     virtual inline void retainCurrent(double /*t*/) { retainedI = out.I; }
@@ -57,8 +61,13 @@ public:
     /// Note, out.I must be reset to the retained value at the end of every step, except for the last one (n=3).
     virtual void RK4(double t, double dt, size_t n, bool settling) = 0;
 
-    vInstData &params() const;
-    inline size_t id() const { return instID; }
+    inline virtual const vInstData &instance() const { return params().instance(instID); }
+    inline size_t instanceID() const { return instID; }
+
+    virtual const ModelData &params() const = 0;
+    inline size_t modelID() const { return modID; }
+
+    virtual ModelProxy *proxy() const = 0;
 
     inChannel in;
     outChannel out;
@@ -67,59 +76,10 @@ signals:
     void message(const QString &);
 
 protected:
-    const ModelPrototype *parent;
+    const size_t modID;
     const size_t instID;
 
     double retainedI;
-};
-
-
-class ModelPrototype
-{
-public:
-    ModelPrototype(size_t modelID) : modelID(modelID) {}
-    virtual ~ModelPrototype() {}
-
-    /// Prepare for action: Populate inst with newly constructed Models
-    virtual void init(DCThread *) = 0;
-
-    /// Post-init call for any additional setup that requires other models to be present
-    virtual void post_init(DCThread *) {}
-
-    /// Return a reference to the specific parameter set used for this model
-    virtual ModelData &params() const = 0;
-
-    /// Return this model's registered proxy (ideally, point to a static local instance)
-    virtual ModelProxy *proxy() const = 0;
-
-    /// Return a (unique) prefix to identify this model class
-    virtual QString prefix() const = 0;
-
-    /// Clears out inst
-    virtual void reset();
-
-    /// Processes associated channels via Model::updateIn(t) and Model::updateOut(t)
-    virtual void updateChannels(double t);
-
-    /// Delegates to Model::retainCurrent(t)
-    virtual void retainCurrent(double t);
-
-    /// Delegates to Model::restoreCurrent(t)
-    virtual void restoreCurrent(double t);
-
-    /// Delegates to Model::RK4(t,dt,n)
-    virtual void RK4(double t, double dt, size_t n, bool settling);
-
-    QString getStatus() const;
-    QPair<QVector<ChannelIndex>, QVector<const double *>> valuesToSave()const;
-
-    inline std::vector<std::shared_ptr<Model>> const& instances() const { return inst; }
-
-protected:
-    size_t modelID;
-    std::vector<std::shared_ptr<Model>> inst;
-
-    friend class ModelManager;
 };
 
 #endif // MODEL_H

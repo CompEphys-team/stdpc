@@ -242,7 +242,7 @@ struct vInstData {
 struct ModelData {
     bool active;
     QuotedString label;
-    virtual vInstData &instance(size_t i) = 0;
+    virtual const vInstData &instance(size_t i) const = 0;
     virtual size_t numInst() const = 0;
     ModelData() : active(false) {}
     virtual ~ModelData() = default;

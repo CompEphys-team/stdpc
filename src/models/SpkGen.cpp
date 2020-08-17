@@ -26,8 +26,8 @@
 /// Construct a single self-registering proxy
 static SpkGenProxy *prox = SpkGenProxy::get();
 std::vector<SGData> SpkGenProxy::p;
-ModelProxy *SpkGenPrototype::proxy() const { return prox; }
-ModelPrototype *SpkGenProxy::createPrototype(size_t modelID) { return new SpkGenPrototype(modelID); }
+SpkGenProxy *SpkGen::proxy() const { return prox; }
+Model *SpkGenProxy::instantiate(size_t modelID, size_t instID, DCThread *DCT) { return new SpkGen(modelID, instID, DCT); }
 ModelDlg *SpkGenProxy::createDialog(size_t modelID, QWidget *parent) { return new SpikeGenDlg(modelID, parent); }
 
 SpkGenProxy::SpkGenProxy()
@@ -71,10 +71,10 @@ SpkGenProxy::SpkGenProxy()
 }
 
 
-SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
-    Model(parent, instID, DCT),
-    p(static_cast<const SGData *>(&(parent->params()))),
-    instp(static_cast<const SgInstData *>(&params())),
+SpkGen::SpkGen(size_t modelID, size_t instID, DCThread *DCT) :
+    Model(modelID, instID, DCT),
+    p(&params()),
+    instp(&instance()),
     V(p->VRest),
     bdChn(nullptr),
     SGactive(p->bdType == 0),
@@ -101,8 +101,9 @@ SpkGen::SpkGen(ModelPrototype *parent, size_t instID, DCThread *DCT) :
     }
 }
 
-void SpkGen::setBdChn(DCThread *DCT)
+void SpkGen::post_init(DCThread *DCT)
 {
+    Model::post_init(DCT);
     bdChn = DCT->getInChan(instp->bdChannel);
 }
 
@@ -250,19 +251,4 @@ double SpkGen::VSpike(double t){
   #undef A1
   #undef A2
 #undef NORMALIZE
-}
-
-void SpkGenPrototype::init(DCThread *DCT)
-{
-    inst.reserve(params().numInst());
-    for ( size_t i = 0; i < params().numInst(); i++ )
-        if ( params().instance(i).active )
-            inst.emplace_back(new SpkGen(this, i, DCT));
-}
-
-void SpkGenPrototype::post_init(DCThread *DCT)
-{
-    for ( auto ptr : inst ) {
-        static_cast<SpkGen*>(ptr.get())->setBdChn(DCT);
-    }
 }

@@ -33,7 +33,7 @@ struct HHNeuronData : public ModelData
     double V0;
     std::vector<vInstData> inst;
 
-    inline vInstData &instance(size_t i) { return inst[i]; }
+    inline const vInstData &instance(size_t i) const { return inst[i]; }
     inline size_t numInst() const { return inst.size(); }
     HHNeuronData() : C(3.5e-9), gLeak(20e-9), ELeak(-20e-3), Vlimit(false), Vmin(-0.2), Vmax(0.2), V0(-60e-3) {}
 };
@@ -54,7 +54,7 @@ public:
     inline QString modelClass() { return "HH"; }
     inline QString prettyName() { return "HH Model"; }
 
-    ModelPrototype *createPrototype(size_t modelID);
+    Model *instantiate(size_t modelID, size_t instID, DCThread *);
     ModelDlg *createDialog(size_t modelID, QWidget *parent=nullptr);
 
     static std::vector<HHNeuronData> p;
@@ -64,27 +64,16 @@ public:
 class HHNeuron : public Model
 {
 public:
-    HHNeuron(ModelPrototype *parent, size_t instID, DCThread *DCT);
+    HHNeuron(size_t modelID, size_t instID, DCThread *DCT);
 
     void RK4(double t, double dt, size_t n, bool settling);
+
+    inline const HHNeuronData &params() const { return HHNeuronProxy::p[modID]; }
+    HHNeuronProxy *proxy() const;
 
 protected:
     double V;
     double kV[4], Vi;
-};
-
-
-class HHNeuronModel : public ModelPrototype
-{
-public:
-    HHNeuronModel(size_t modelID) : ModelPrototype(modelID) {}
-    ~HHNeuronModel() {}
-
-    void init(DCThread *);
-
-    inline ModelData &params() const { return HHNeuronProxy::p[modelID]; }
-    ModelProxy *proxy() const;
-    inline QString prefix() const { return "HH"; }
 };
 
 #endif // HHNEURON_H

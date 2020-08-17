@@ -26,8 +26,8 @@
 /// Construct a single self-registering proxy
 static VStepsProxy *prox = VStepsProxy::get();
 std::vector<VStepsData> VStepsProxy::p;
-ModelProxy *VStepsPrototype::proxy() const { return prox; }
-ModelPrototype *VStepsProxy::createPrototype(size_t modelID) { return new VStepsPrototype(modelID); }
+VStepsProxy *VSteps::proxy() const { return prox; }
+Model *VStepsProxy::instantiate(size_t modelID, size_t instID, DCThread *DCT) { return new VSteps(modelID, instID, DCT); }
 ModelDlg *VStepsProxy::createDialog(size_t modelID, QWidget *parent) { return new VStepsDlg(modelID, parent); }
 
 VStepsData::VStepsData()
@@ -54,10 +54,10 @@ VStepsProxy::VStepsProxy()
     addAP("VSteps[#].inst.inChn.save", &VStepsProxy::p, &VStepsData::inst, &vInstData::inChn, &inChnData::chnlSaving);
 }
 
-VSteps::VSteps(ModelPrototype *parent, size_t instID, DCThread *DCT) :
-    Model(parent, instID, DCT),
-    p(static_cast<const VStepsData *>(&(parent->params()))),
-    instp(static_cast<const vInstData *>(&params())),
+VSteps::VSteps(size_t modelID, size_t instID, DCThread *DCT) :
+    Model(modelID, instID, DCT),
+    p(&params()),
+    instp(&instance()),
     V(p->holdV),
     active(true)
 {
@@ -99,12 +99,4 @@ void VSteps::update(double t, double dt)
     }
     V= *cmdVI;
     in.V= V;
-}
-
-void VStepsPrototype::init(DCThread *DCT)
-{
-    inst.reserve(params().numInst());
-    for ( size_t i = 0; i < params().numInst(); i++ )
-        if ( params().instance(i).active )
-            inst.emplace_back(new VSteps(this, i, DCT));
 }

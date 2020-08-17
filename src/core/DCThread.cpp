@@ -76,11 +76,8 @@ void DCThread::setup_and_go()
    for ( auto &b : Devices.active() )
        b->init_chans();
 
-   // Populate Models in absence of UI doing it
-   for ( ModelProxy *proxy : ModelManager::Register() )
-       for ( size_t j = 0; j < proxy->size(); j++ )
-           Models.initSingle(proxy, j);
-   Models.initActive(this);
+   // Initialise models
+   Models.init(this);
 
    // Prepare the buffer helper for delayed synapses
    bufferHelper.reset(new ChannelBufferHelper);
@@ -114,10 +111,10 @@ void DCThread::setup_and_go()
        message(QString("Added %1 channels for display").arg(graphVar.size()));
    }
 
+   for ( const QString &status : Models.getStatus() )
+       message(status);
    for ( const QString &status : Conductances.getStatus() )
        message(status);
-   for ( auto const& m : Models.active() )
-       message(m->getStatus());
 
    // Generate lookup tables
    int sz;
@@ -168,8 +165,8 @@ void DCThread::setup_and_go()
            header += toSave.first;
            valuesToSave += toSave.second;
        }
-       for ( auto const& m : Models.active() ) {
-           auto toSave = m->valuesToSave();
+       {
+           auto toSave = Models.toSave();
            header += toSave.first;
            valuesToSave += toSave.second;
        }
@@ -505,8 +502,6 @@ void DCThread::run()
        b->reset_chans();
    }
    for ( int i=0; i<aecChannels.size(); i++ ) if ( aecChannels[i]->IsActive() ) aecChannels[i]->ResetChannel();
-   for ( auto const& m : Models.active() )
-       m->reset();
 
    emit done();
    finished= true;
@@ -545,9 +540,9 @@ std::vector<ChannelIndex> DCThread::getChanIndices(ChannelIndex const& dex)
     if ( !dex.isValid ) {
         return ret;
     } else if ( dex.isPrototype ) {
-        if ( Models.all().value(dex.modelClass).size() > (int)dex.modelID )
-            for ( size_t i = 0, end = Models.all().value(dex.modelClass)[dex.modelID]->params().numInst(); i < end; i++ )
-                ret.push_back(dex.toInstance(i));
+        for ( auto const& m : Models.active() )
+            if ( m->proxy()->modelClass() == dex.modelClass && m->modelID() == dex.modelID )
+                ret.push_back(dex.toInstance(m->instanceID()));
     } else {
         ret.push_back(dex);
     }

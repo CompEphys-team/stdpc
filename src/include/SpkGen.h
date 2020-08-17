@@ -47,7 +47,7 @@ struct SGData : public ModelData {
 
   std::vector<SgInstData> inst;
 
-  inline vInstData &instance(size_t i) { return inst[i]; }
+  inline const SgInstData &instance(size_t i) const { return inst[i]; }
   inline size_t numInst() const { return inst.size(); }
 };
 
@@ -59,7 +59,7 @@ public:
     void operator=(const SpkGenProxy &) = delete;
     static SpkGenProxy *get() { static SpkGenProxy proxy; return &proxy; }
 
-    inline ModelData &param(size_t i) { return p[i]; }
+    inline SGData &param(size_t i) { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
@@ -67,7 +67,7 @@ public:
     inline QString modelClass() { return "SG"; }
     inline QString prettyName() { return "Spike generator"; }
 
-    ModelPrototype *createPrototype(size_t modelID);
+    Model *instantiate(size_t modelID, size_t instID, DCThread *);
     ModelDlg *createDialog(size_t modelID, QWidget *parent);
 
     static std::vector<SGData> p;
@@ -76,16 +76,22 @@ public:
 class SpkGen : public Model
 {
 public:
-    SpkGen(ModelPrototype *, size_t, DCThread *);
+    SpkGen(size_t modelID, size_t instID, DCThread *);
     ~SpkGen() {}
+
+    void post_init(DCThread *);
 
     // Override processing on unused out
     inline void updateOut(double) {}
+    inline void retainCurrent(double) {}
+    inline void restoreCurrent(double) {}
 
     void update(double t, double dt);
     void RK4(double, double, size_t, bool settling);
 
-    void setBdChn(DCThread *DCT);
+    inline SGData &params() const { return SpkGenProxy::p[modID]; }
+    inline const SgInstData &instance() const { return params().instance(instID); }
+    SpkGenProxy *proxy() const;
 
 protected:
     const SGData * const p;
@@ -110,24 +116,6 @@ protected:
     std::vector<double>::const_iterator spkIterator;
 
     double VSpike(double t);
-};
-
-class SpkGenPrototype : public ModelPrototype
-{
-public:
-    SpkGenPrototype(size_t modelID) : ModelPrototype(modelID) {}
-    ~SpkGenPrototype() {}
-
-    void init(DCThread *);
-    void post_init(DCThread *);
-
-    // Override processing on unused Model::out
-    inline void retainCurrent(double) {}
-    inline void restoreCurrent(double) {}
-
-    inline ModelData &params() const { return SpkGenProxy::p[modelID]; }
-    inline ModelProxy *proxy() const;
-    inline QString prefix() const { return "SG"; }
 };
 
 #endif

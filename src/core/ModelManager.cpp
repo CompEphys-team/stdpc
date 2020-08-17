@@ -19,48 +19,30 @@
 
 #include "ModelManager.h"
 
-void ModelManager::initActive(DCThread *DCT)
+void ModelManager::init(DCThread *DCT)
 {
-    for ( std::shared_ptr<ModelPrototype> &m : activeModels )
-        m->init(DCT);
-    for ( std::shared_ptr<ModelPrototype> &m : activeModels )
+    activeModels.clear();
+    for ( ModelProxy *proxy : Register() ) {
+        for ( size_t j = 0; j < proxy->size(); j++ ) {
+            if ( proxy->param(j).active ) {
+                for ( size_t i = 0; i < proxy->param(j).numInst(); i++ ) {
+                    if ( proxy->param(j).instance(i).active ) {
+                        activeModels.emplace_back(proxy->instantiate(j, i, DCT));
+                    }
+                }
+            }
+        }
+    }
+    for ( auto &m : activeModels )
         m->post_init(DCT);
 }
 
 void ModelManager::clear()
 {
     activeModels.clear();
-    allModels.clear();
     for ( ModelProxy *proxy : Register() )
         while ( proxy->size() )
             proxy->remove(proxy->size()-1);
-}
-
-void ModelManager::initSingle(ModelProxy *proxy, size_t idx)
-{
-    QString const& mc = proxy->modelClass();
-
-    // Clear existing active model
-    for ( int i = 0; i < activeModels.size(); i++ )
-        if ( activeModels[i]->proxy()->modelClass() == mc && activeModels[i]->modelID == idx )
-            activeModels.remove(i);
-
-    // Ensure enough space in allModels
-    if ( allModels[mc].size() <= (int)idx )
-        allModels[mc].resize(idx+1);
-
-    // Assign new to allModels
-    allModels[mc][idx].reset(proxy->createPrototype(idx));
-
-    // Assign to activeModels if appropriate
-    if ( proxy->param(idx).active ) {
-        for ( size_t i = 0; i < proxy->param(idx).numInst(); i++ ) {
-            if ( proxy->param(idx).instance(i).active ) {
-                activeModels.push_back(allModels[mc][idx]);
-                break;
-            }
-        }
-    }
 }
 
 bool ModelManager::empty() const
@@ -76,20 +58,56 @@ bool ModelManager::empty() const
 
 inChannel *ModelManager::getInChan(const ChannelIndex &dex)
 {
-    if ( dex.isValid && dex.isVirtual
-         && allModels[dex.modelClass].size() > (int)dex.modelID
-         && allModels[dex.modelClass][dex.modelID]->instances().size() > dex.instID ) {
-        return &(allModels[dex.modelClass][dex.modelID]->instances()[dex.instID]->in);
-    }
+    if ( !dex.isValid || !dex.isVirtual )
+        return nullptr;
+    for ( auto const& m : activeModels )
+        if ( m->proxy()->modelClass() == dex.modelClass && m->modelID() == dex.modelID && m->instanceID() == dex.instID )
+            return &m->in;
     return nullptr;
 }
 
 outChannel *ModelManager::getOutChan(const ChannelIndex &dex)
 {
-    if ( dex.isValid && dex.isVirtual
-         && allModels[dex.modelClass].size() > (int)dex.modelID
-         && allModels[dex.modelClass][dex.modelID]->instances().size() > dex.instID ) {
-        return &(allModels[dex.modelClass][dex.modelID]->instances()[dex.instID]->out);
-    }
+    if ( !dex.isValid || !dex.isVirtual )
+        return nullptr;
+    for ( auto const& m : activeModels )
+        if ( m->proxy()->modelClass() == dex.modelClass && m->modelID() == dex.modelID && m->instanceID() == dex.instID )
+            return &m->out;
     return nullptr;
+}
+
+QStringList ModelManager::getStatus() const
+{
+    QStringList statuses;
+    for ( ModelProxy *proxy : Register() ) {
+        for ( size_t i = 0; i < proxy->size(); i++ ) {
+            if ( proxy->param(i).active ) {
+                int nInst = 0;
+                for ( size_t j = 0; j < proxy->param(i).numInst(); j++ ) {
+                    if ( proxy->param(i).instance(j).active )
+                        ++nInst;
+                }
+                statuses.push_back(QString("Model %1 %2: %3 instance%4 active")
+                                   .arg(proxy->modelClass()).arg(i).arg(nInst).arg(nInst>1 ? "s":""));
+            }
+        }
+    }
+    return statuses;
+}
+
+QPair<QVector<ChannelIndex>, QVector<const double *>> ModelManager::toSave() const
+{
+    QVector<ChannelIndex> indices;
+    QVector<const double *> values;
+    for ( std::shared_ptr<Model> const& m : activeModels ) {
+        if ( m->in.save ) {
+            indices.push_back(ChannelIndex(m->proxy(), m->modelID(), m->instanceID(), true));
+            values.push_back(&(m->in.V));
+        }
+        if ( m->out.save ) {
+            indices.push_back(ChannelIndex(m->proxy(), m->modelID(), m->instanceID(), false));
+            values.push_back(&(m->out.I));
+        }
+    }
+    return qMakePair(indices, values);
 }
