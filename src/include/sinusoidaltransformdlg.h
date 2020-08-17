@@ -17,24 +17,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef CHANNELSINUSOIDDLG_H
-#define CHANNELSINUSOIDDLG_H
+#ifndef SINUSOIDALTRANSFORMDLG_H
+#define SINUSOIDALTRANSFORMDLG_H
 
 #include <QAbstractButton>
 #include "ObjectDataTypes.h"
 #include "ConductanceDlg.h"
 
 namespace Ui {
-class ChannelSinusoidDlg;
+class SinusoidalTransformDlg;
 }
 
-class ChannelSinusoidDlg : public ConductanceDlg
+class SinusoidalTransformDlg : public ConductanceDlg
 {
     Q_OBJECT
 
 public:
-    explicit ChannelSinusoidDlg(size_t, QWidget *parent = nullptr);
-    ~ChannelSinusoidDlg();
+    explicit SinusoidalTransformDlg(size_t, QWidget *parent = nullptr);
+    ~SinusoidalTransformDlg();
     void exportData();
     void importData();
     void setIndex(size_t);
@@ -42,7 +42,7 @@ private slots:
     void on_buttonBox_clicked(QAbstractButton *);
 
 private:
-    Ui::ChannelSinusoidDlg *ui;
+    Ui::SinusoidalTransformDlg *ui;
 };
 
-#endif // CHANNELSINUSOIDDLG_H
+#endif // SINUSOIDALTRANSFORMDLG_H

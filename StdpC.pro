@@ -70,7 +70,7 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     $$PWD/src/gui/VoltageClampDlg.ui \
     $$PWD/src/gui/VStepsDlg.ui \
     $$PWD/src/gui/WireDlg.ui \
-    src/gui/channelsinusoiddlg.ui \
+    src/gui/sinusoidaltransformdlg.ui \
     src/gui/pipedaqdlg.ui \
     src/gui/treewidgetitem_datasources.ui \
     src/gui/treewidgetitem_models.ui \
@@ -155,9 +155,9 @@ HEADERS += \
     $$PWD/src/include/WireDlg.h \
     src/include/PipeDAQ.h \
     src/include/channeltransform.h \
-    src/include/channelsinusoid.h \
-    src/include/channelsinusoiddlg.h \
     src/include/pipedaqdlg.h \
+    src/include/sinusoidaltransform.h \
+    src/include/sinusoidaltransformdlg.h \
     src/include/treewidgetitem_datasources.h \
     src/include/treewidgetitem_models.h \
     src/include/InputConductance.h \
@@ -234,14 +234,14 @@ SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/models/Wire.cpp \
     src/drivers/PipeDAQ.cpp \
     src/gui/WireDlg.cpp \
-    src/gui/channelsinusoiddlg.cpp \
     src/gui/pipedaqdlg.cpp \
+    src/gui/sinusoidaltransformdlg.cpp \
     src/gui/treewidgetitem_datasources.cpp \
     src/gui/treewidgetitem_models.cpp \
     src/models/InputConductance.cpp \
     src/gui/InputConductanceDlg.cpp \
-    src/models/channelsinusoid.cpp \
-    src/models/channeltransform.cpp
+    src/models/channeltransform.cpp \
+    src/models/sinusoidaltransform.cpp
 
 digidata {
     mingw {

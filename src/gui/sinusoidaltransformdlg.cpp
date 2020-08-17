@@ -17,13 +17,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "channelsinusoiddlg.h"
-#include "ui_channelsinusoiddlg.h"
-#include "channelsinusoid.h"
+#include "sinusoidaltransformdlg.h"
+#include "ui_sinusoidaltransformdlg.h"
+#include "sinusoidaltransform.h"
 
-ChannelSinusoidDlg::ChannelSinusoidDlg(size_t no, QWidget *parent) :
+SinusoidalTransformDlg::SinusoidalTransformDlg(size_t no, QWidget *parent) :
     ConductanceDlg(no, parent),
-    ui(new Ui::ChannelSinusoidDlg)
+    ui(new Ui::SinusoidalTransformDlg)
 {
     ui->setupUi(this);
     setIndex(no);
@@ -36,20 +36,20 @@ ChannelSinusoidDlg::ChannelSinusoidDlg(size_t no, QWidget *parent) :
     ui->assignments->init(vec);
 }
 
-ChannelSinusoidDlg::~ChannelSinusoidDlg()
+SinusoidalTransformDlg::~SinusoidalTransformDlg()
 {
     delete ui;
 }
 
-void ChannelSinusoidDlg::setIndex(size_t no)
+void SinusoidalTransformDlg::setIndex(size_t no)
 {
     ConductanceDlg::setIndex(no);
-    ui->DlgLabel->setText(QString("%1 %2").arg(ChannelSinusoidProxy::get()->prettyName()).arg(no));
+    ui->DlgLabel->setText(QString("%1 %2").arg(SinusoidalTransformProxy::get()->prettyName()).arg(no));
 }
 
-void ChannelSinusoidDlg::exportData()
+void SinusoidalTransformDlg::exportData()
 {
-    ChannelSinusoidData &p = ChannelSinusoidProxy::p[idx];
+    SinusoidalTransformData &p = SinusoidalTransformProxy::p[idx];
     p.label = ui->leLabel->text();
     p.seq = ui->order->value();
     p.slope = ui->slope->text().toDouble();
@@ -58,9 +58,9 @@ void ChannelSinusoidDlg::exportData()
     ui->assignments->exportData(p.assign);
 }
 
-void ChannelSinusoidDlg::importData()
+void SinusoidalTransformDlg::importData()
 {
-    ChannelSinusoidData &p = ChannelSinusoidProxy::p[idx];
+    SinusoidalTransformData &p = SinusoidalTransformProxy::p[idx];
     ui->leLabel->setText(p.label);
     ui->order->setValue(p.seq);
     ui->slope->setText(QString::number(p.slope));
@@ -69,7 +69,7 @@ void ChannelSinusoidDlg::importData()
     ui->assignments->importData(p.assign);
 }
 
-void ChannelSinusoidDlg::on_buttonBox_clicked(QAbstractButton *)
+void SinusoidalTransformDlg::on_buttonBox_clicked(QAbstractButton *)
 {
     hide();
     emit labelChanged(ui->leLabel->text());

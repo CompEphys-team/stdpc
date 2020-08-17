@@ -17,53 +17,53 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#ifndef CHANNELSINUSOID_H
-#define CHANNELSINUSOID_H
+#ifndef SINUSOIDALTRANSFORM_H
+#define SINUSOIDALTRANSFORM_H
 
 #include "channeltransform.h"
 
-struct ChannelSinusoidData : public ChannelTransformData
+struct SinusoidalTransformData : public ChannelTransformData
 {
     double slope;
     double offset;
 };
 
-class ChannelSinusoidProxy : public ChannelTransformProxy
+class SinusoidalTransformProxy : public ChannelTransformProxy
 {
 private:
-    ChannelSinusoidProxy();
+    SinusoidalTransformProxy();
 public:
-    ChannelSinusoidProxy(const ChannelSinusoidProxy &) = delete;
-    void operator=(const ChannelSinusoidProxy &) = delete;
-    static ChannelSinusoidProxy *get() { static ChannelSinusoidProxy proxy; return &proxy; }
+    SinusoidalTransformProxy(const SinusoidalTransformProxy &) = delete;
+    void operator=(const SinusoidalTransformProxy &) = delete;
+    static SinusoidalTransformProxy *get() { static SinusoidalTransformProxy proxy; return &proxy; }
 
-    inline ChannelSinusoidData &param(size_t i) const { return p[i]; }
+    inline SinusoidalTransformData &param(size_t i) const { return p[i]; }
     inline size_t size() { return p.size(); }
     inline void resize(size_t sz) { p.resize(sz); }
     inline void remove(size_t i) { p.erase(p.begin() + i); }
 
-    inline QString conductanceClass() { return "ChannelSinusoid"; }
+    inline QString conductanceClass() { return "SinusoidalTransform"; }
     inline QString prettyName() { return "Sinusoidal transform"; }
 
     ChannelTransform *createAssigned(size_t conductanceID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
 
     ConductanceDlg *createDialog(size_t condID, QWidget *parent=nullptr);
 
-    static std::vector<ChannelSinusoidData> p;
+    static std::vector<SinusoidalTransformData> p;
 };
 
-class ChannelSinusoid : public ChannelTransform
+class SinusoidalTransform : public ChannelTransform
 {
 private:
-  const ChannelSinusoidData *p;
+  const SinusoidalTransformData *p;
   const ChannelTransformAssignment *a;
 
 public:
-  ChannelSinusoid(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
+  SinusoidalTransform(size_t condID, size_t assignID, size_t multiID, inChannel *in, outChannel *out);
   void step(double t, double dt, bool settling);
 
-  inline const ChannelSinusoidData &params() const { return ChannelSinusoidProxy::p[condID]; }
-  ChannelSinusoidProxy *proxy() const;
+  inline const SinusoidalTransformData &params() const { return SinusoidalTransformProxy::p[condID]; }
+  SinusoidalTransformProxy *proxy() const;
 };
 
-#endif // CHANNELSINUSOID_H
+#endif // SINUSOIDALTRANSFORM_H
