@@ -60,7 +60,10 @@ class ConductanceManager : public QObject
 {
     Q_OBJECT
 public:
-    ConductanceManager() : _all({&preD, &inD, &postD, &transform_devIn, &transform_devOut, &transform_modIn, &transform_modOut}) {}
+    ConductanceManager() :
+        _conds {&preD, &inD, &postD},
+        _transforms {&transform_devIn, &transform_devOut, &transform_modIn, &transform_modOut}
+    {}
     ~ConductanceManager();
 
     /// Initialise all active conductances for end use
@@ -68,6 +71,9 @@ public:
 
     /// Remove all conductances and parameter sets e.g. in preparation for parameter import
     void clear();
+
+    /// Remove all conductances, leaving parameters in place
+    void clearLiveObjects();
 
     /// Returns false if at least one registered parameter set is active (active conductance with at least one active assignment)
     bool empty() const;
@@ -90,7 +96,7 @@ public:
     std::vector<Conductance *> preD, inD, postD;
     std::vector<Conductance *> transform_devIn, transform_devOut, transform_modIn, transform_modOut;
 
-    std::vector<std::vector<Conductance*>*> _all;
+    std::vector<std::vector<Conductance*>*> _conds, _transforms;
 };
 
 #endif // CONDUCTANCEMANAGER_H
