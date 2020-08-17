@@ -28,6 +28,11 @@ ChannelTransform::ChannelTransform(size_t condID, size_t assignID, size_t multiI
 
 }
 
+bool ChannelTransform::compare(const ChannelTransform *lhs, const ChannelTransform *rhs)
+{
+    return lhs->params().seq < rhs->params().seq;
+}
+
 void ChannelTransformProxy::instantiate(size_t condID, size_t assignID, DCThread *DCT, ConductanceManager *manager)
 {
     const ChannelTransformAssignment &a = param(condID).assignment(assignID);

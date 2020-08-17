@@ -40,6 +40,10 @@ void ConductanceManager::init(DCThread *DCT)
             }
         }
     }
+
+    for ( std::vector<ChannelTransform*> *vec : _transforms ) {
+        std::stable_sort(vec->begin(), vec->end(), ChannelTransform::compare);
+    }
 }
 
 void ConductanceManager::clear()

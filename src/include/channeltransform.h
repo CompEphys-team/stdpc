@@ -35,6 +35,8 @@ public:
     virtual void RK4(double, double, size_t, bool) {}
     virtual void step(double t, double dt, bool settling) = 0;
 
+    static bool compare(const ChannelTransform *lhs, const ChannelTransform *rhs);
+
 protected:
     bool &channel_active;
     double &channel_value;
