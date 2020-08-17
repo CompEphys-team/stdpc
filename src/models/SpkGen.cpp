@@ -208,6 +208,7 @@ void SpkGen::update(double t, double dt)
                 } else {
                     message(QString("Spike time data exhausted ... stopping spike Generator"));
                     V = p->VRest;
+                    burstNo = 0;
                     active = false;
                 }
             }
