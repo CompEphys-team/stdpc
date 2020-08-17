@@ -58,7 +58,7 @@ void ChannelSinusoid::step(double t, double dt, bool settling)
 {
     if ( p->active && a->active && channel_active && (p->activeSettling || !settling) ) {
         m_conductance = channel_value;
-        channel_value = 1. / (1. + exp((channel_value - p->offset) / p->slope));
+        channel_value = 1. / (1. + exp((p->offset - channel_value) / p->slope));
     } else {
         m_conductance = 0;
     }
