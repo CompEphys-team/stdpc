@@ -107,6 +107,7 @@ SpikeGenDlg::SpikeGenDlg(size_t idx, QWidget *parent) :
     connect(ui->BurstDetectionCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int i){
         ui->bdGroupW->setEnabled(i > 0);
         ui->Period->setEnabled(i == 0);
+        ui->Loop->setEnabled(i == 0);
     });
     connect(ui->tOContiguous, &QCheckBox::stateChanged, [this](int){
         ui->bdStrict->setEnabled(ui->tOContiguous->isChecked() && ui->tUContiguous->isChecked());
