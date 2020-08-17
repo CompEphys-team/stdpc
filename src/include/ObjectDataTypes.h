@@ -177,7 +177,7 @@ struct dataSavingParams {
 struct inChnData {
   bool active;
   int gain;
-  double gainFac = 0.1;
+  double gainFac = 1.0;
   bool spkDetect;
   double spkDetectThresh = -0.01;
   double bias;
@@ -190,7 +190,7 @@ struct inChnData {
 struct outChnData {
   bool active;
   int gain;
-  double gainFac = 0.1;
+  double gainFac = 1.0;
   double bias;
   double minCurrent;
   double maxCurrent;
