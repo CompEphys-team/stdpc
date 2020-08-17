@@ -83,5 +83,4 @@ protected:
     double V;
     std::vector<double> cmdT, cmdV;
     std::vector<double>::iterator cmdTI, cmdVI;
-    bool active;
 };

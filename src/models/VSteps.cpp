@@ -58,8 +58,7 @@ VSteps::VSteps(size_t modelID, size_t instID, DCThread *DCT) :
     Model(modelID, instID, DCT),
     p(&params()),
     instp(&instance()),
-    V(p->holdV),
-    active(true)
+    V(p->holdV)
 {
     // intitialize vector of step times and step voltages
     cmdT.clear();
@@ -91,8 +90,6 @@ void VSteps::RK4(double t, double dt, size_t n, bool settling)
 
 void VSteps::update(double t, double dt)
 {
-    if ( !active )
-        return;
     while ((cmdTI != cmdT.end()) && (*cmdTI < t + dt)) {
         cmdTI++;
         cmdVI++;
