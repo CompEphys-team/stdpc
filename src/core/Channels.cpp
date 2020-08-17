@@ -31,7 +31,7 @@ inChannel::~inChannel()
     delete Vbuf;
 }
 
-void inChannel::init(inChnData *inp)
+void inChannel::init(const inChnData *inp)
 {
   p= inp;
   save = inp->chnlSaving;
@@ -93,7 +93,7 @@ outChannel::outChannel() : active(true)
   I= 0.0;
 }
 
-void outChannel::init(outChnData *outp)
+void outChannel::init(const outChnData *outp)
 {
   p= outp;
   save = outp->chnlSaving;

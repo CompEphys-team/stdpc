@@ -30,7 +30,7 @@ class DCThread;
 
 class inChannel {
  public:
-    inChnData *p;
+     const inChnData *p;
      bool active;
      bool save;
      double V;
@@ -43,7 +43,7 @@ class inChannel {
      inChannel();
      ~inChannel();
 
-     void init(inChnData *);
+     void init(const inChnData *);
      void process(double);
 
      size_t getBufferHandle(double duration, std::shared_ptr<ChannelBufferHelper> &);
@@ -59,12 +59,12 @@ private:
 
 class outChannel {
  public:
-    outChnData *p;
+     const outChnData *p;
      bool active;
      bool save;
      double I;
      outChannel();
-     void init(outChnData *);
+     void init(const outChnData *);
      void reset();
 };
 
