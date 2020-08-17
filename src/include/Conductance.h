@@ -42,7 +42,7 @@ public:
     /// Compute a forward-integrating time step, updating m_conductance and adding current to the output channel(s)
     virtual void step(double t, double dt, bool settling) = 0;
 
-    inline const AssignmentData &assignment() const { return params().assignment(assignID); }
+    inline virtual const AssignmentData &assignment() const { return params().assignment(assignID); }
     inline size_t assignmentID() const { return assignID; }
 
     virtual const ConductanceData &params() const = 0;
