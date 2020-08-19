@@ -378,38 +378,6 @@ bool readProtocol(std::istream &is, std::function<bool(QString)> *callback)
         }
     }
 
-    if ( version < 4 ) {
-        // version 4 introduced a restriction on HH channel assignments: no model instances.
-        // Compat: Reassigns all model instances to model prototypes
-        for ( ConductanceProxy *prox : Conductances.Currents() ) {
-            IonicCurrentProxy *cprox = dynamic_cast<IonicCurrentProxy*>(prox);
-            if ( cprox ) {
-                for ( size_t i = 0; i < cprox->size(); i++ ) {
-                    CurrentData &p = cprox->param(i);
-                    std::vector<ChannelIndex> mod;
-                    std::vector<CurrentAssignment> dest;
-                    dest.reserve(p.assign.size());
-                    for ( CurrentAssignment &a : p.assign ) {
-                        if ( a.IChannel.isVirtual && a.VChannel == a.IChannel ) {
-                            a.IChannel.isPrototype = true;
-                            a.VChannel.isPrototype = true;
-                            a.IChannel.isVirtual = false;
-                            a.VChannel.isVirtual = false;
-                            if ( std::find(mod.begin(), mod.end(), a.IChannel)!=mod.end() ) {
-                                continue; // Drop duplicate entries
-                            }
-                            mod.push_back(a.IChannel);
-                        } else if ( a.IChannel.isPrototype && a.VChannel == a.IChannel ) {
-                            mod.push_back(a.IChannel);
-                        }
-                        dest.push_back(a);
-                    }
-                    p.assign = dest;
-                }
-            }
-        }
-    }
-
     for ( auto hook : AP::hooks_post_load() )
         hook();
 
