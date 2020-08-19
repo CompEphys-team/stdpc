@@ -102,10 +102,12 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ModelManager::toSave() con
     for ( std::shared_ptr<Model> const& m : activeModels ) {
         if ( m->in.save ) {
             indices.push_back(ChannelIndex(m->proxy(), m->modelID(), m->instanceID(), true));
+            indices.last().isDirectional = true;
             values.push_back(&(m->in.V));
         }
         if ( m->out.save ) {
             indices.push_back(ChannelIndex(m->proxy(), m->modelID(), m->instanceID(), false));
+            indices.last().isDirectional = true;
             values.push_back(&(m->out.I));
         }
     }
