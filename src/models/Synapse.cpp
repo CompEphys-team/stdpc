@@ -46,7 +46,7 @@ void SynapseProxy::instantiate(size_t conductanceID, size_t assignID, DCThread *
         for ( ChannelIndex post : postSynInst ) {
             for ( ChannelIndex out : outSynInst ) {
                 for ( ChannelIndex pre : preSynInst ) {
-                    if ( (preC=DCT->getInChan(pre)) && (postC=DCT->getInChan(post)) && (outC=DCT->getOutChan(out)) ) {
+                    if ( (preC=DCT->getInChan(pre)) && ((postC=DCT->getInChan(post)) || post.isNone) && (outC=DCT->getOutChan(out)) ) {
                         Synapse *tmp = createAssigned(conductanceID, assignID, multi++, DCT, preC, postC, outC);
                         if ( (pre.isVirtual || post.isVirtual) && out.isAnalog )
                             manager->postD.push_back(tmp);

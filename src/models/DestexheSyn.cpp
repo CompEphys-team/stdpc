@@ -164,7 +164,7 @@ void DestexheSyn::step(double t, double dt, bool settling)
 {
   static double rt, dS;
 
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+  if ( !p->active || !a->active || !pre->active || (post && !post->active) || !out->active || t < a->delay ) {
       m_conductance = 0;
       return;
   }
@@ -190,7 +190,7 @@ void DestexheSyn::step(double t, double dt, bool settling)
   if (S > 1.0) S= 1.0;
   else if (S < 0.0 || std::isnan(S)) S= 0.0;
 
-  double postV = p->fixVpost ? p->Vpost : post->V;
+  double postV = p->fixVpost ? p->Vpost : post ? post->V : 0;
 
   // if plastic, learn
   switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
@@ -199,11 +199,12 @@ void DestexheSyn::step(double t, double dt, bool settling)
       break;
     case 1:
       m_conductance = g * S;
-      STlearn(t);   
+      if ( post )
+        STlearn(t);
       break; 
     case 2:
       m_conductance = g * S;
-      ODElearn(dt);
+      ODElearn(dt, postV);
       break; 
   }
 
@@ -279,7 +280,7 @@ double DestexheSyn::D_f(double V)
   return Dslope*(V-p->ODE.lowD); 
 }
 
-void DestexheSyn::ODElearn(double dt)
+void DestexheSyn::ODElearn(double dt, double postV)
 {
   static double tmp1, tmp2;
 
@@ -293,5 +294,5 @@ void DestexheSyn::ODElearn(double dt)
   g= gFilter(graw);
 
   P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
-  D+= dt * (D_f(post->V) - p->ODE.betaD * D);
+  D+= dt * (D_f(postV) - p->ODE.betaD * D);
 }

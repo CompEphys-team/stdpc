@@ -78,7 +78,7 @@ class DestexheSyn : public Synapse {
 
     void STlearn(double);
     double STDPFunc(double);
-    void ODElearn(double);
+    void ODElearn(double, double postV);
     
   protected:
     double S;

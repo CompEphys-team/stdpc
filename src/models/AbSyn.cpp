@@ -166,7 +166,7 @@ void abSyn::step(double t, double dt, bool settling)
 {
   static double dS, dR;
 
-  if ( !p->active || !a->active || !pre->active || !post->active || !out->active || t < a->delay ) {
+  if ( !p->active || !a->active || !pre->active || (post && !post->active) || !out->active || t < a->delay ) {
       m_conductance = 0;
       return;
   }
@@ -182,7 +182,7 @@ void abSyn::step(double t, double dt, bool settling)
   if (R > 1.0) R= 1.0;
   else if (R < 0.0 || std::isnan(R)) R= 0.0;
   
-  double postV = p->fixVpost ? p->Vpost : post->V;
+  double postV = p->fixVpost ? p->Vpost : post ? post->V : 0;
 
   // if plastic, learn
   switch ( (settling && !p->activeSettling) ? 0 : p->Plasticity ) {
@@ -191,11 +191,12 @@ void abSyn::step(double t, double dt, bool settling)
       break;
     case 1:
       m_conductance = g * S;
-      STlearn(t);   
+      if ( post )
+        STlearn(t);
       break; 
     case 2:
       m_conductance = g * S;
-      ODElearn(dt);
+      ODElearn(dt, postV);
       break; 
   }
 
@@ -271,7 +272,7 @@ double abSyn::D_f(double V)
   return Dslope*(V-p->ODE.lowD); 
 }
 
-void abSyn::ODElearn(double dt)
+void abSyn::ODElearn(double dt, double postV)
 {
   static double tmp1, tmp2;
 
@@ -285,5 +286,5 @@ void abSyn::ODElearn(double dt)
   g= gFilter(graw);
 
   P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
-  D+= dt * (D_f(post->V) - p->ODE.betaD * D);
+  D+= dt * (D_f(postV) - p->ODE.betaD * D);
 }
