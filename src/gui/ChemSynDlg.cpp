@@ -35,21 +35,22 @@ ChemSynDlg::ChemSynDlg(size_t no, QWidget *parent)
      connect(PlasticityCombo, SIGNAL(currentIndexChanged(QString)), SLOT(PlastMethodChange()));
      connect(ResCloseBox, SIGNAL(clicked(QAbstractButton *)), SLOT(ResCloseClicked(QAbstractButton *)));
 
-     QVector<AssignmentCellBase<SynapseAssignment>*> vec;
-     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::active, "Active", 47));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PreSynChannel, "Presyn V", 95,
+     QVector<AssignmentCellBase<ChemSynAssignment>*> vec;
+     vec.push_back(new AssignmentCellBool<ChemSynAssignment>(&ChemSynAssignment::active, "Active", 47));
+     vec.push_back(new AssignmentCellChannel<ChemSynAssignment>(&ChemSynAssignment::PreSynChannel, "Presyn V", 95,
                                                                 ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::Blank)));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::PostSynChannel, "Postsyn V", 95,
+     vec.push_back(new AssignmentCellChannel<ChemSynAssignment>(&ChemSynAssignment::PostSynChannel, "Postsyn V", 95,
                                                                 ChannelListModel::getModel(ChannelListModel::In | ChannelListModel::None | ChannelListModel::Blank)));
-     vec.push_back(new AssignmentCellChannel<SynapseAssignment>(&SynapseAssignment::OutSynChannel, "Postsyn I", 95,
+     vec.push_back(new AssignmentCellChannel<ChemSynAssignment>(&ChemSynAssignment::OutSynChannel, "Postsyn I", 95,
                                                                 ChannelListModel::getModel(ChannelListModel::Out | ChannelListModel::Blank)));
-     AssignmentCellDouble<SynapseAssignment> *tmp = new AssignmentCellDouble<SynapseAssignment>
-             (&SynapseAssignment::delay, "Delay (ms)", 95);
+     AssignmentCellDouble<ChemSynAssignment> *tmp = new AssignmentCellDouble<ChemSynAssignment>
+             (&ChemSynAssignment::delay, "Delay (ms)", 95);
      tmp->setRange(0., 1000.);
      tmp->setDecimals(3);
      tmp->setFactor(1e-3);
      vec.push_back(tmp);
-     vec.push_back(new AssignmentCellBool<SynapseAssignment>(&SynapseAssignment::save, "Save", 30));
+     vec.push_back(new AssignmentCellBool<ChemSynAssignment>(&ChemSynAssignment::save, "Save", 30));
+     vec.push_back(new AssignmentCellBool<ChemSynAssignment>(&ChemSynAssignment::saveSpikeTimes, "Save tSpike", 70));
      assignments->init(vec);
 }
 

@@ -20,6 +20,7 @@
 #ifndef CHEMSYNDLG_H
 #define CHEMSYNDLG_H
 
+#include "ChemSyn.h"
 #include "ConductanceDlg.h"
 #include <QAbstractButton>
 #include "ui_ChemSynDlg.h"

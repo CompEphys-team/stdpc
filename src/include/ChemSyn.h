@@ -23,6 +23,10 @@
 #include "Synapse.h"
 #include "Global_func.h"
 
+struct ChemSynAssignment : public SynapseAssignment {
+    bool saveSpikeTimes = false;
+};
+
 struct CSynData : public SynapseData {
   bool LUTables;
   bool MgBlock;
@@ -51,6 +55,10 @@ struct CSynData : public SynapseData {
   int stoch_nRel = 5;
   double stoch_pRel = 0.6;
   double stoch_variance = 0.05;
+
+  inline const ChemSynAssignment &assignment(size_t i) const { return assign[i]; }
+  inline size_t numAssignments() const { return assign.size(); }
+  std::vector<ChemSynAssignment> assign;
 };
 
 class ChemSynProxy : public SynapseProxy {
@@ -81,7 +89,7 @@ class ChemSyn : public Synapse
 {
   private:
     const CSynData *p;
-    const SynapseAssignment *a;
+    const ChemSynAssignment *a;
 
     stdpc::function *theExp;
     stdpc::function *theTanh;
@@ -111,6 +119,7 @@ class ChemSyn : public Synapse
 
     bool spike = false;
     std::vector<double> stoch_S, stoch_amplitude;
+    double lastSpikeTime = -1;
 
   public:
     ChemSyn(size_t condID, size_t assignID, size_t multiID, DCThread *, inChannel *pre, inChannel *post, outChannel *out);
@@ -118,6 +127,9 @@ class ChemSyn : public Synapse
     void step(double t, double dt, bool settling);
 
     ChemSynProxy *proxy() const;
+
+    const ChemSynAssignment &assignment() const { return params().assignment(assignID); }
+    QPair<QVector<ChannelIndex>, QVector<const double *>> toSave();
 };
 
 #endif

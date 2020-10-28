@@ -110,6 +110,7 @@ ChemSynProxy::ChemSynProxy()
     addAP("CSynp[#].assign[#].OutSynChannel", &p, &CSynData::assign, &SynapseAssignment::OutSynChannel);
     addAP("CSynp[#].assign[#].delay", &p, &CSynData::assign, &SynapseAssignment::delay);
     addAP("CSynp[#].assign[#].save", &p, &CSynData::assign, &SynapseAssignment::save);
+    addAP("CSynp[#].assign[#].saveSpikeTimes", &p, &CSynData::assign, &ChemSynAssignment::saveSpikeTimes);
 
     addAP("CSynp[#].PreSynChannel", &p, &CSynData::legacy_PreSyn);
     addAP("CSynp[#].PostSynChannel", &p, &CSynData::legacy_PostSyn);
@@ -219,6 +220,8 @@ void ChemSyn::step(double t, double dt, bool settling)
             }
         }
         Sinf= (*theTanh)((preV - p->VThresh)/p->VSlope);
+        if ( !spike )
+            lastSpikeTime = t;
         spike = true;
     } else if ( spike ) {
         Sinf= 0.0;
@@ -375,4 +378,17 @@ void ChemSyn::ODElearn(double dt, double postV)
 
   P+= dt * (P_f(buffered ? pre->getBufferedV(bufferHandle) : pre->V) - p->ODE.betaP * P);
   D+= dt * (D_f(postV) - p->ODE.betaD * D);
+}
+
+QPair<QVector<ChannelIndex>, QVector<const double *>> ChemSyn::toSave()
+{
+    QVector<ChannelIndex> idx;
+    QVector<const double *> ptr;
+    if ( a->saveSpikeTimes ) {
+        ChannelIndex dex(proxy(), conductanceID(), assignmentID(), multiplexID());
+        dex.extraInfo = "SpikeTime";
+        idx.push_back(dex);
+        ptr.push_back(&lastSpikeTime);
+    }
+    return qMakePair(idx, ptr);
 }
