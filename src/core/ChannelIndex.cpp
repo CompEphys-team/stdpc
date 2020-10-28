@@ -178,6 +178,8 @@ QString ChannelIndex::prettyName() const
             label = QString("%1 %2").arg(proxy->prettyName()).arg(conductanceID);
         ret = QString("%1, assignment %2").arg(label).arg(assignID);
     } else ret = "Oops: Invalid channel index";
+    if ( !extraInfo.isEmpty() )
+        ret += QString(" [%1]").arg(extraInfo);
     return ret;
 }
 
@@ -205,6 +207,8 @@ QString ChannelIndex::toString(QChar sep, bool withDetails) const
             multi = QString("/multi%1").arg(multiplexID);
         ret = QString("Conductance/%1/%2/%3%4").arg(conductanceClass).arg(conductanceID).arg(assignID).arg(multi);
     }
+    if ( !extraInfo.isEmpty() )
+        ret += '/' + extraInfo;
     if ( sep != QChar('/') )
         ret.replace('/', sep);
     return ret;
@@ -267,6 +271,8 @@ QJsonObject ChannelIndex::toJson() const
         if ( proxy->size() > conductanceID && !proxy->param(conductanceID).label.isEmpty() )
             obj.insert("label", proxy->param(conductanceID).label);
     }
+    if ( !extraInfo.isEmpty() )
+        obj.insert("extraInfo", extraInfo);
     return obj;
 }
 

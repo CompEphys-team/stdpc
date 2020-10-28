@@ -75,6 +75,8 @@ public:
     size_t assignID;
     size_t multiplexID;
 
+    QString extraInfo = "";
+
     bool isLegacy;
 
     friend std::ostream &operator<<(std::ostream &os, ChannelIndex const&);
