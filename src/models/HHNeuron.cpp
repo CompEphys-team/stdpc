@@ -56,6 +56,11 @@ HHNeuron::HHNeuron(size_t modelID, size_t instID, DCThread *DCT) :
     V(params().V0)
 {
     Vi = V;
+}
+
+void HHNeuron::post_init(DCThread *DCT)
+{
+    Model::post_init(DCT);
     in.V = V + instance().inChn.bias;
 }
 

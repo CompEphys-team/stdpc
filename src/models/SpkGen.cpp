@@ -88,8 +88,6 @@ SpkGen::SpkGen(size_t modelID, size_t instID, DCThread *DCT) :
     initial(true),
     active(true)
 {
-    in.V = V + instp->inChn.bias;
-    out.save = out.active = false;
     if (p->LUTables) {
         theExp= &expLU;
         expLU.require(-50.0, 50.0, 0.02);
@@ -104,6 +102,8 @@ SpkGen::SpkGen(size_t modelID, size_t instID, DCThread *DCT) :
 void SpkGen::post_init(DCThread *DCT)
 {
     Model::post_init(DCT);
+    in.V = V + instp->inChn.bias;
+    out.save = out.active = false;
     bdChn = DCT->getInChan(instp->bdChannel);
 }
 
