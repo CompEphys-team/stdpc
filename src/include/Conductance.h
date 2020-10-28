@@ -54,6 +54,9 @@ public:
 
     inline const double &conductance() const { return m_conductance; }
 
+    virtual QPair<QVector<ChannelIndex>, QVector<const double *>> toSave()
+    { return qMakePair(QVector<ChannelIndex>(), QVector<const double*>()); }
+
 protected:
     const size_t condID;
     const size_t assignID;

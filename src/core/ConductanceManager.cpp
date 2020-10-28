@@ -128,6 +128,11 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ConductanceManager::toSave
                 indices.push_back(ChannelIndex(c->proxy(), c->conductanceID(), c->assignmentID(), c->multiplexID()));
                 values.push_back(&c->conductance());
             }
+            auto pair = c->toSave();
+            if ( !pair.first.empty() && pair.first.size() == pair.second.size() ) {
+                indices.append(pair.first);
+                values.append(pair.second);
+            }
         }
     }
     for ( std::vector<ChannelTransform*> *vec : _transforms ) {
@@ -135,6 +140,11 @@ QPair<QVector<ChannelIndex>, QVector<const double *>> ConductanceManager::toSave
             if ( c->assignment().save ) {
                 indices.push_back(ChannelIndex(c->proxy(), c->conductanceID(), c->assignmentID(), c->multiplexID()));
                 values.push_back(&c->conductance());
+            }
+            auto pair = c->toSave();
+            if ( !pair.first.empty() && pair.first.size() == pair.second.size() ) {
+                indices.append(pair.first);
+                values.append(pair.second);
             }
         }
     }
