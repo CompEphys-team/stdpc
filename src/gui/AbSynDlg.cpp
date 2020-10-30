@@ -108,7 +108,7 @@ void abSynDlg::exportData()
   p.VaR= VaRE->text().toDouble()*1e-3;
   p.saR= saRE->text().toDouble()*1e-3;
   p.bR= bRE->text().toDouble()*1e3;
-  p.fixVpost= fixVpostCombo->currentIndex();
+  p.fixVpost= fixVpostCombo->isChecked();
   p.Vpost= VpostE->text().toDouble()*1e-3;
   p.Plasticity= PlasticityCombo->currentIndex();
   // ST plasticity
@@ -142,7 +142,7 @@ void abSynDlg::importData()
   saRE->setText(num);
   num.setNum(p.bR*1e-3);
   bRE->setText(num);
-  fixVpostCombo->setCurrentIndex(p.fixVpost);
+  fixVpostCombo->setChecked(p.fixVpost);
   num.setNum(p.Vpost*1e3);
   VpostE->setText(num);
   PlasticityCombo->setCurrentIndex(p.Plasticity);
