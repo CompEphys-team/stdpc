@@ -40,13 +40,13 @@ void STDPDlg::exportData(STPlast &d)
   d.Exponent= ExponentE->text().toInt();
   d.Shift= ShiftE->text().toDouble()*1e-3;
   d.History= HistoryE->text().toInt();
-  d.Table= TableCombo->currentIndex();
+  d.Table= TableCombo->isChecked();
   d.tableDt= tableDtE->text().toDouble()*1e-3;
   d.tableDgMin= tableDgMinE->text().toDouble()*1e-9;
   d.gMax= gMaxE->text().toDouble()*1e-9;
   d.gMid= gMidE->text().toDouble()*1e-9;
   d.gSlope= gSlopeE->text().toDouble()*1e-9;
-  d.sigmoidTable= sigmoidTableCombo->currentIndex();
+  d.sigmoidTable= sigmoidTableCombo->isChecked();
   d.sigmoidTableDg= sigmoidTableDgE->text().toDouble()*1e-9;
   d.sigmoidTableMaxEntry= sigmoidTableMaxEntryE->text().toDouble()*1e-9;
 }
@@ -69,7 +69,7 @@ void STDPDlg::importData(STPlast d)
   ShiftE->setText(num);
   num.setNum(d.History);
   HistoryE->setText(num);
-  TableCombo->setCurrentIndex(d.Table);
+  TableCombo->setChecked(d.Table);
   num.setNum(d.tableDt*1e3);
   tableDtE->setText(num);
   num.setNum(d.tableDgMin*1e9);
@@ -80,7 +80,7 @@ void STDPDlg::importData(STPlast d)
   gMidE->setText(num);
   num.setNum(d.gSlope*1e9);
   gSlopeE->setText(num);
-  sigmoidTableCombo->setCurrentIndex(d.sigmoidTable);
+  sigmoidTableCombo->setChecked(d.sigmoidTable);
   num.setNum(d.sigmoidTableDg*1e9);
   sigmoidTableDgE->setText(num);
   num.setNum(d.sigmoidTableMaxEntry*1e9);

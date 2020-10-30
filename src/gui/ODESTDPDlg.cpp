@@ -46,7 +46,7 @@ void ODESTDPDlg::exportData(ODEPlast &d)
   d.gMax= gMaxE->text().toDouble()*1e-9;
   d.gMid= gMidE->text().toDouble()*1e-9;
   d.gSlope= gSlopeE->text().toDouble()*1e-9;
-  d.sigmoidTable= sigmoidTableCombo->currentIndex();
+  d.sigmoidTable= sigmoidTableCombo->isChecked();
   d.sigmoidTableDg= sigmoidTableDgE->text().toDouble()*1e-9;
   d.sigmoidTableMaxEntry= sigmoidTableMaxEntryE->text().toDouble()*1e-9;
 }
@@ -81,7 +81,7 @@ void ODESTDPDlg::importData(ODEPlast d)
   gMidE->setText(num);
   num.setNum(d.gSlope*1e9);
   gSlopeE->setText(num);
-  sigmoidTableCombo->setCurrentIndex(d.sigmoidTable);
+  sigmoidTableCombo->setChecked(d.sigmoidTable);
   num.setNum(d.sigmoidTableDg*1e9);
   sigmoidTableDgE->setText(num);
   num.setNum(d.sigmoidTableMaxEntry*1e9);
