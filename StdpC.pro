@@ -297,3 +297,9 @@ nidaqmx {
 
     DEFINES += NATIONAL_INSTRUMENTS
 }
+
+CONFIG( release, debug|release ) {
+    DEPLOY_TARGET = $$shell_quote($$shell_path($${OUT_PWD}/release/$${TARGET}.exe))
+    DEPLOY_COMMAND = $$shell_quote($$shell_path($$[QT_INSTALL_BINS]\windeployqt))
+    QMAKE_POST_LINK += $${DEPLOY_COMMAND} $${DEPLOY_TARGET} --release --no-translations --compiler-runtime
+}
