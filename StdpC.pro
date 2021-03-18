@@ -298,6 +298,10 @@ nidaqmx {
     DEFINES += NATIONAL_INSTRUMENTS
 }
 
+LIBS += -L$$PWD/src/lib/libzmq/ -llibzmq-v141-mt-4_3_2
+INCLUDEPATH += $$PWD/src/lib/libzmq
+DEPENDPATH += $$PWD/src/lib/libzmq
+
 CONFIG( release, debug|release ) {
     DEPLOY_TARGET = $$shell_quote($$shell_path($${OUT_PWD}/release/$${TARGET}.exe))
     DEPLOY_COMMAND = $$shell_quote($$shell_path($$[QT_INSTALL_BINS]\windeployqt))
