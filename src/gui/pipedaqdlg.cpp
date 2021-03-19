@@ -4,12 +4,8 @@ PipeDAQDlg::PipeDAQDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
     DAQDlg(idx, proxy, parent)
 {
   setupUi(this);
-  connect(channelsBtn, &QPushButton::clicked, this, [=](){
-      if ( readCombo->currentIndex() )
-          openInChnDlg();
-      else
-          openOutChnDlg();
-  });
+  connect(inChanBtn, &QPushButton::clicked, this, &PipeDAQDlg::openInChnDlg);
+  connect(outChanBtn, &QPushButton::clicked, this, &PipeDAQDlg::openOutChnDlg);
   setIndex(idx);
 }
 
@@ -24,25 +20,27 @@ void PipeDAQDlg::exportData(bool forceInit)
     PipeDAQData &p = PipeDAQProxy::p[idx];
     bool change = false;
 
-    uint nChans = nChannelsSpin->value();
-    getEntry<bool>(p.read, readCombo->currentIndex(), change);
-    if ( change || (p.read && nChans != p.inChn.size()) || (!p.read && nChans != p.outChn.size()) ) {
-        if ( p.read ) {
-            p.inChn.resize(nChans);
-            for ( inChnData &i : p.inChn )
-                i.active = true;
-        } else {
-            p.outChn.resize(nChans);
-            for ( outChnData &i : p.outChn )
-                i.active = true;
-        }
+    getEntry<bool>(p.read, read->isChecked(), change);
+    getEntry<QString>(p.readAddr, inAddress->text(), change);
+    getEntry<bool>(p.bind_read, inServer->isChecked(), change);
+    uint nInChans = nInChanSpin->value();
+    if ( nInChans != p.inChn.size() ) {
+        p.inChn.resize(nInChans);
+        for ( inChnData &i : p.inChn )
+            i.active = true;
         change = true;
     }
 
-    getEntry<QString>(p.pipeName, pipenameE->text(), change);
-    getEntry<QString>(p.hostName, hostnameE->text(), change);
-    getEntry(p.server, serverCheck->isChecked(), change);
-    getEntry(p.connectLater, connectLaterCheck->isChecked(), change);
+    getEntry<bool>(p.write, write->isChecked(), change);
+    getEntry<QString>(p.writeAddr, outAddress->text(), change);
+    getEntry<bool>(p.bind_write, outServer->isChecked(), change);
+    uint nOutChans = nOutChanSpin->value();
+    if ( nOutChans != p.outChn.size() ) {
+        p.outChn.resize(nOutChans);
+        for ( outChnData &i : p.outChn )
+            i.active = true;
+        change = true;
+    }
 
     getEntry<QString>(PipeDAQProxy::p[idx].label, leLabel->text(), change);
 
@@ -53,12 +51,16 @@ void PipeDAQDlg::importData()
 {
     PipeDAQData &p = PipeDAQProxy::p[idx];
     leLabel->setText(p.label);
-    pipenameE->setText(p.pipeName);
-    hostnameE->setText(p.hostName);
-    serverCheck->setChecked(p.server);
-    connectLaterCheck->setChecked(p.connectLater);
-    readCombo->setCurrentIndex(p.read);
-    nChannelsSpin->setValue(p.read ? p.inChn.size() : p.outChn.size());
+
+    read->setChecked(p.read);
+    inAddress->setText(p.readAddr);
+    inServer->setChecked(p.bind_read);
+    nInChanSpin->setValue(int(p.inChn.size()));
+
+    write->setChecked(p.write);
+    outAddress->setText(p.writeAddr);
+    outServer->setChecked(p.bind_write);
+    nOutChanSpin->setValue(int(p.outChn.size()));
 
     DAQDlg::importData();
 }

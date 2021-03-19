@@ -6,22 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>391</width>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Pipe DAQ</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="3">
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0">
     <widget class="QLineEdit" name="leLabel">
      <property name="placeholderText">
       <string>Label...</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
+   <item row="0" column="1">
     <widget class="QLabel" name="DAQLabel">
      <property name="enabled">
       <bool>true</bool>
@@ -59,88 +59,134 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="InputFileL">
-     <property name="text">
-      <string>Pipe name</string>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="read">
+     <property name="title">
+      <string>Read input</string>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QLineEdit" name="pipenameE"/>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QCheckBox" name="serverCheck">
-     <property name="text">
-      <string>Act as pipe server</string>
-     </property>
-     <property name="checked">
+     <property name="checkable">
       <bool>true</bool>
      </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="InputFileL">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Address:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QLineEdit" name="inAddress"/>
+      </item>
+      <item row="1" column="0" colspan="4">
+       <widget class="QCheckBox" name="inServer">
+        <property name="text">
+         <string>Act as server</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="inChannelL">
+        <property name="text">
+         <string>Number of channels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSpinBox" name="nInChanSpin">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QPushButton" name="inChanBtn">
+        <property name="text">
+         <string>Input channel setup</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QComboBox" name="readCombo">
-     <property name="currentIndex">
-      <number>1</number>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="write">
+     <property name="title">
+      <string>Send output</string>
      </property>
-     <item>
-      <property name="text">
-       <string>Write to pipe</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Read from pipe</string>
-      </property>
-     </item>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="InputFileL_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Address:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QLineEdit" name="outAddress"/>
+      </item>
+      <item row="1" column="0" colspan="4">
+       <widget class="QCheckBox" name="outServer">
+        <property name="text">
+         <string>Act as server</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="inChannelL_2">
+        <property name="text">
+         <string>Number of channels</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSpinBox" name="nOutChanSpin">
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QPushButton" name="outChanBtn">
+        <property name="text">
+         <string>Output channel setup</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="OutputFileL">
-     <property name="text">
-      <string>Host name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="3">
-    <widget class="QLineEdit" name="hostnameE"/>
-   </item>
-   <item row="4" column="0" colspan="4">
-    <widget class="QCheckBox" name="connectLaterCheck">
-     <property name="toolTip">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked, PipeDAQ will attempt to connect to a disconnected pipe at every clamp cycle iteration. as well as attempting to reconnect if a connection drops. This carries a slight performance penalty, but allows the peer process(es) more flexibility.&lt;/p&gt;&lt;p&gt;If unchecked, connection will be attempted at clamp cycle start only, and associated channels marked inactive if connection fails.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="text">
-      <string>Allow pipe connection to occur during clamp cycle</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QLabel" name="inChannelL">
-     <property name="text">
-      <string>Number of channels</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="QSpinBox" name="nChannelsSpin">
-     <property name="minimum">
-      <number>1</number>
-     </property>
-     <property name="maximum">
-      <number>999</number>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="3">
-    <widget class="QPushButton" name="channelsBtn">
-     <property name="text">
-      <string>Channel setup</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="3">
+   <item row="3" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

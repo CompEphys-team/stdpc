@@ -20,31 +20,29 @@
 #ifndef PIPEDAQ_H
 #define PIPEDAQ_H
 
-#include <Windows.h>
 #include "DeviceManager.h"
 
 class PipeDAQData : public DAQData {
   public:
-    QuotedString pipeName; // Local pipe name. When PipeDAQ is a server, a pipe will be created at "\\.\pipe\<pipeName>".
-    QuotedString hostName; // Pipe host name; only used if server==false, connecting to "\\<hostName>\pipe\<pipeName>".
-    bool read; // Use pipe as input channel(s) if true, output if false
-    bool server; // Create pipe if true, connect to existing pipe if false. Note, creation happens at config, connection at clamp setup (or later, see connectLater)
-    bool connectLater; // If true, and connecting to pipe fails at clamp setup, PipeDAQ will attempt to connect at read time. This setting is ignored if wait==true.
-    bool wait; // [[NYI]] Wait for samples if true (use pipe in blocking mode); provide previously acquired sample until new one arrives if false
+    bool read, write;
+    QuotedString readAddr, writeAddr; // Full socket addresses for PUB/SUB sockets, including protocol.
+    bool bind_read, bind_write; // If true, use bind() instead of connect() on the sockets.
 
     PipeDAQData() : DAQData(),
-        pipeName("stdpc"),
-        hostName(""),
         read(true),
-        server(true),
-        connectLater(true),
-        wait(false)
+        write(false),
+        readAddr("tcp://localhost:5555"),
+        writeAddr("tcp://localhost:5556"),
+        bind_read(true),
+        bind_write(true)
     {}
 };
 
 class PipeDAQProxy : public DAQProxy {
 private:
     PipeDAQProxy();
+    ~PipeDAQProxy();
+    void *m_context;
 public:
     PipeDAQProxy(const PipeDAQProxy &) = delete;
     void operator=(const PipeDAQProxy &) = delete;
@@ -64,6 +62,7 @@ public:
     inline const std::vector<AP*> &coreAPs() const { return regAP; }
 
     static std::vector<PipeDAQData> p;
+    void *context() { return m_context; }
 };
 
 class PipeDAQ: public DAQ
@@ -81,18 +80,15 @@ class PipeDAQ: public DAQ
     virtual void reset_board();
 
   private:
-    HANDLE hPipe = INVALID_HANDLE_VALUE;
-    wchar_t *pipeName = nullptr;
-    int pipeName_len = 0;
-    double *sampleBuffer = nullptr, *backupSamples = nullptr;
-    DWORD sampleBufSz = 0;
+    int readBufSz = 0, writeBufSz = 0;
+    double *readBuffer = nullptr, *writeBuffer = nullptr;
+
     bool connected = false;
+    void *subscriber = nullptr;
+    void *publisher = nullptr;
 
-    QString connectPipe();
-    void disconnectPipe();
-    void removePipe();
-
-    unsigned long debug_counter = 0;
+    bool connect();
+    void disconnect();
 };
 
 #endif
