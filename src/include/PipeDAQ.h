@@ -33,8 +33,8 @@ class PipeDAQData : public DAQData {
         write(false),
         readAddr("tcp://localhost:5555"),
         writeAddr("tcp://localhost:5556"),
-        bind_read(true),
-        bind_write(true)
+        bind_read(false),
+        bind_write(false)
     {}
 };
 
