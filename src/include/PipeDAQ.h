@@ -41,8 +41,7 @@ class PipeDAQData : public DAQData {
 class PipeDAQProxy : public DAQProxy {
 private:
     PipeDAQProxy();
-    ~PipeDAQProxy();
-    void *m_context;
+    ~PipeDAQProxy() {}
 public:
     PipeDAQProxy(const PipeDAQProxy &) = delete;
     void operator=(const PipeDAQProxy &) = delete;
@@ -62,7 +61,7 @@ public:
     inline const std::vector<AP*> &coreAPs() const { return regAP; }
 
     static std::vector<PipeDAQData> p;
-    void *context() { return m_context; }
+    std::shared_ptr<void> m_context;
 };
 
 class PipeDAQ: public DAQ
@@ -86,6 +85,8 @@ class PipeDAQ: public DAQ
     bool connected = false;
     void *subscriber = nullptr;
     void *publisher = nullptr;
+\
+    std::shared_ptr<void> context;
 
     bool connect();
     void disconnect();

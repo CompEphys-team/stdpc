@@ -23,6 +23,8 @@
 #include "AP.h"
 #include "pipedaqdlg.h"
 
+void ContextDeleter(void * context) { zmq_ctx_term(context); }
+
 /// Construct a single self-registering proxy
 static PipeDAQProxy *prox = PipeDAQProxy::get();
 std::vector<PipeDAQData> PipeDAQProxy::p;
@@ -30,7 +32,7 @@ DAQ *PipeDAQProxy::createDAQ(size_t devID) { return new PipeDAQ(devID, prox); }
 DAQDlg *PipeDAQProxy::createDialog(size_t devID, QWidget *parent) { return new PipeDAQDlg(devID, prox, parent); }
 
 PipeDAQProxy::PipeDAQProxy() :
-    m_context { zmq_ctx_new() },
+    m_context { zmq_ctx_new(), ContextDeleter },
     regAP {
         addAP("PipeDAQp[#].active", &p, &PipeDAQData::active),
         addAP("PipeDAQp[#].label", &p, &PipeDAQData::label),
@@ -54,21 +56,18 @@ PipeDAQProxy::PipeDAQProxy() :
         addAP("PipeDAQp[#].outChn[#].chnlSaving", &p, &PipeDAQData::outChn, &outChnData::chnlSaving)
     }
 {
-    if ( m_context == nullptr ) {
+    if ( m_context.get() == nullptr ) {
         std::cerr << "PipeDAQ: Error setting up ZMQ context: " << zmq_strerror(zmq_errno()) << std::endl;
     } else {
         DeviceManager::RegisterDAQ(daqClass(), this);
     }
 }
 
-PipeDAQProxy::~PipeDAQProxy() {
-    zmq_ctx_term(m_context);
-}
-
 //---------------------------------------------------------------------------
 
 PipeDAQ::PipeDAQ(size_t devID, DAQProxy *proxy) :
-    DAQ(devID, proxy)
+    DAQ(devID, proxy),
+    context(prox->m_context)
 {
     inChnNo = PipeDAQProxy::p[devID].read ? params()->inChn.size() : 0;
     outChnNo = PipeDAQProxy::p[devID].write ? params()->outChn.size() : 0;
@@ -121,7 +120,7 @@ bool PipeDAQ::connect()
     PipeDAQData &p = PipeDAQProxy::p[devID];
     int ret, opt, sz = sizeof(int);
     if ( p.read ) {
-        subscriber = zmq_socket(prox->context(), ZMQ_SUB);
+        subscriber = zmq_socket(context.get(), ZMQ_SUB);
         opt = 1; zmq_setsockopt(subscriber, ZMQ_CONFLATE, &opt, sz); // Discard anything but the latest message. Note, not multipart compatible.
         opt = inChnNo*sizeof(double); zmq_setsockopt(subscriber, ZMQ_MAXMSGSIZE, &opt, sz); // Accept #inchans doubles per message.
         if ( p.bind_read )
@@ -139,7 +138,7 @@ bool PipeDAQ::connect()
         connected = true;
     }
     if ( p.write ) {
-        publisher = zmq_socket(prox->context(), ZMQ_PUB);
+        publisher = zmq_socket(context.get(), ZMQ_PUB);
         opt = 0; zmq_setsockopt(publisher, ZMQ_LINGER, &opt, sz); // Discard messages on close.
         if ( p.bind_write )
             ret = zmq_bind(publisher, p.writeAddr.toStdString().c_str());
