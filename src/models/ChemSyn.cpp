@@ -211,7 +211,7 @@ void ChemSyn::step(double t, double dt, bool settling)
             if ( !spike ) {
                 int nRel = RNG.variate<int, std::binomial_distribution>(p->stoch_nRel, p->stoch_pRel);
                 if ( nRel > 0 ) {
-                    double Smax = RNG.variate<double>(nRel, nRel * std::sqrt(p->stoch_variance)) / (p->stoch_nRel * p->stoch_pRel);
+                    double Smax = RNG.variate<double>(1, std::sqrt(p->stoch_variance)) * nRel;
                     if ( Smax > 0 ) {
                         stoch_S.push_back(0.0);
                         stoch_amplitude.push_back(Smax);
