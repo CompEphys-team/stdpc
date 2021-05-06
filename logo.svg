@@ -26,11 +26,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="594.94086"
-     inkscape:cy="183.2985"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="552.9548"
+     inkscape:cy="215.8027"
      inkscape:document-units="mm"
-     inkscape:current-layer="g1123"
+     inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
      showgrid="false"
      showguides="true"
@@ -533,14 +533,14 @@
     </g>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'TeX Gyre Adventor';-inkscape-font-specification:'TeX Gyre Adventor Bold';stroke-width:0.264583"
-       x="134.44144"
-       y="44.314472"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.1111px;line-height:1.25;font-family:'TeX Gyre Adventor';-inkscape-font-specification:'TeX Gyre Adventor Bold';fill:#a70000;fill-opacity:1;stroke-width:0.264583;"
+       x="129.18657"
+       y="43.995289"
        id="text1127"><tspan
          sodipodi:role="line"
          id="tspan1125"
-         x="134.44144"
-         y="44.314472"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'TeX Gyre Adventor';-inkscape-font-specification:'TeX Gyre Adventor Bold';stroke-width:0.264583">StdpC</tspan></text>
+         x="129.18657"
+         y="43.995289"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.1111px;font-family:'TeX Gyre Adventor';-inkscape-font-specification:'TeX Gyre Adventor Bold';fill:#a70000;fill-opacity:1;stroke-width:0.264583;">StdpC</tspan></text>
   </g>
 </svg>
