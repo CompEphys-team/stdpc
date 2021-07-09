@@ -43,33 +43,6 @@
            <enum>QFrame::StyledPanel</enum>
           </property>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="0" column="1">
-            <widget class="QPushButton" name="StopBut">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>Stop</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="cbDatasaving">
-             <property name="text">
-              <string>Save data</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="0">
             <widget class="QCheckBox" name="cbTrigger">
              <property name="text">
@@ -101,6 +74,26 @@
              </property>
              <property name="text">
               <string>Start</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="StopBut">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Stop</string>
              </property>
             </widget>
            </item>
@@ -152,6 +145,20 @@
                <string>Time-critical</string>
               </property>
              </item>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QCheckBox" name="cbDatasaving">
+             <property name="text">
+              <string>Save data</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="cbStopTrigger">
+             <property name="text">
+              <string>Triggered stop</string>
+             </property>
             </widget>
            </item>
           </layout>
@@ -295,7 +302,7 @@
   </action>
   <action name="actionStart_trigger">
    <property name="text">
-    <string>Start trigger</string>
+    <string>Trigger channel</string>
    </property>
   </action>
  </widget>

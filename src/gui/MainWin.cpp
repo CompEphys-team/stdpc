@@ -194,6 +194,7 @@ void MyMainWindow::StartButClicked()
   ui->menuConfigure->setEnabled(false);
   ui->cbDatasaving->setEnabled(false);
   ui->cbTrigger->setEnabled(false);
+  ui->cbStopTrigger->setEnabled(false);
   ui->cbSettle->setEnabled(false);
   ui->dblSettleDuration->setEnabled(false);
   DAQ_tree_item->setEnabled(false);
@@ -232,6 +233,7 @@ void MyMainWindow::StopButClicked()
   ui->menuConfigure->setEnabled(true);
   ui->cbDatasaving->setEnabled(true);
   ui->cbTrigger->setEnabled(true);
+  ui->cbStopTrigger->setEnabled(true);
   ui->cbSettle->setEnabled(true);
   ui->dblSettleDuration->setEnabled(true);
   DAQ_tree_item->setEnabled(true);
@@ -263,6 +265,7 @@ void MyMainWindow::exportData(bool ignoreDAQ)
   dataSavingPs.enabled = ui->cbDatasaving->isChecked();
   TrigDlg->exportData();
   Triggerp.active = ui->cbTrigger->isChecked();
+  Triggerp.activeStop = ui->cbStopTrigger->isChecked();
   Settlingp.active = ui->cbSettle->isChecked();
   Settlingp.duration = ui->dblSettleDuration->value();
   ClampThreadPriority = ui->threadPriority->currentIndex();
@@ -286,6 +289,7 @@ void MyMainWindow::importData()
   ui->cbDatasaving->setChecked(dataSavingPs.enabled);
   TrigDlg->importData();
   ui->cbTrigger->setChecked(Triggerp.active);
+  ui->cbStopTrigger->setChecked(Triggerp.activeStop);
   ui->cbSettle->setChecked(Settlingp.active);
   ui->dblSettleDuration->setValue(Settlingp.duration);
   ui->threadPriority->setCurrentIndex(ClampThreadPriority);

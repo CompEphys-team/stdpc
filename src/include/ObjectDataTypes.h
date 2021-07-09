@@ -261,6 +261,7 @@ struct ModelData {
 
 struct TriggerData {
     bool active;
+    bool activeStop = false;
     ChannelIndex channel;
 };
 

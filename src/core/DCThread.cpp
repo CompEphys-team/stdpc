@@ -232,15 +232,17 @@ void DCThread::run()
    wakeFromSettling = false;
 
    DAQ *triggerDev = nullptr;
-   if ( Triggerp.active && (triggerDev = Devices.getDevice(Triggerp.channel)) ) {
-       message(QString("DynClamp: Waiting for trigger on %1...").arg(Triggerp.channel.prettyName()));
+   if ( (Triggerp.active || Triggerp.activeStop) && (triggerDev = Devices.getDevice(Triggerp.channel)) ) {
        triggerDev->armTrigger(Triggerp.channel);
-       if ( !settling ) {
-           while ( !stopped && !triggerDev->triggerFired() ) {
-               // Wait patiently.
+       if ( Triggerp.active ) {
+           message(QString("DynClamp: Waiting for trigger on %1...").arg(Triggerp.channel.prettyName()));
+           if ( !settling ) {
+               while ( !stopped && !triggerDev->triggerFired() ) {
+                   // Wait patiently.
+               }
+               if ( !stopped )
+                   message(QString("DynClamp: Triggered, clamping..."));
            }
-           if ( !stopped )
-               message(QString("DynClamp: Triggered, clamping..."));
        }
    } else if ( settling ) {
        message("DynClamp: Settling ...");
@@ -270,7 +272,7 @@ void DCThread::run()
      if ( settling && (
               (Settlingp.duration > 0 && t > Settlingp.duration) // Timed wake
               || wakeFromSettling // Manual wake
-              || (triggerDev && triggerDev->triggerFired())) ) { // Triggered wake
+              || (Triggerp.active && triggerDev && triggerDev->triggerFired())) ) { // Triggered wake
          t = 0.0;
          rateCounter = 0;
          lastRateReport = 0;
@@ -295,6 +297,9 @@ void DCThread::run()
 
          message("DynClamp: Settled, clamping ...");
          settling = false;
+     } else if ( Triggerp.activeStop && triggerDev && !triggerDev->triggerFired() ) {
+         stopped = true;
+         break;
      }
 
      if (!SampleHoldOn) {
