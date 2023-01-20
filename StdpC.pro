@@ -75,7 +75,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     src/gui/pipedaqdlg.ui \
     src/gui/treewidgetitem_datasources.ui \
     src/gui/treewidgetitem_models.ui \
-    src/gui/InputConductanceDlg.ui
+    src/gui/InputConductanceDlg.ui \
+    src/gui/MicroManagerDAQDlg.ui \
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -164,7 +165,9 @@ HEADERS += \
     src/include/treewidgetitem_datasources.h \
     src/include/treewidgetitem_models.h \
     src/include/InputConductance.h \
-    src/include/InputConductanceDlg.h
+    src/include/InputConductanceDlg.h \
+    src/include/MicroManagerDAQ.h \
+    src/include/MicroManagerDAQDlg.h \
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -246,7 +249,9 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/gui/InputConductanceDlg.cpp \
     src/models/channeltransform.cpp \
     src/models/lineartransform.cpp \
-    src/models/sinusoidaltransform.cpp
+    src/models/sinusoidaltransform.cpp \
+    src/drivers/MicroManagerDAQ.cpp \
+    src/gui/MicroManagerDAQDlg.cpp \
 
 digidata {
     mingw {
