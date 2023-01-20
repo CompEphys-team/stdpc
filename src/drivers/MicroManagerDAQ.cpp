@@ -235,7 +235,7 @@ void MicroManagerDAQ::get_single_scan(inChannel *)
 
 void MicroManagerDAQ::generate_analog_out_list(short int chnNo, QVector<short int> Chns)
 {
-    // No output channels, ignore
+    actOutChnNo = 0;
 }
 
 void MicroManagerDAQ::write_analog_out(bool)
