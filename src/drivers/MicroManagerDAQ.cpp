@@ -100,52 +100,92 @@ bool MicroManagerDAQ::connect()
     if ( connected )
         return true;
 
-    // Create socket
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        std::cerr << "MMDAQ: Failed to create socket" << std::endl;
-        return false;
+    if ( !connecting ) {
+        // Create socket
+        sock = socket(AF_INET, SOCK_STREAM, 0);
+        if (sock < 0) {
+            std::cerr << "MMDAQ: Failed to create socket" << std::endl;
+            return false;
+        }
+
+        // Make it non-blocking
+        u_long one = 1;
+        if ( ioctlsocket(sock, FIONBIO, &one) != NO_ERROR ){
+            closesocket(sock);
+            std::cerr << "MMDAQ: Failed to make socket non-blocking" << std::endl;
+            return false;
+        }
+
+        // Get host info
+        HOSTENT* host = gethostbyname("localhost");
+        if (host == nullptr) {
+            closesocket(sock);
+            std::cerr << "MMDAQ: Failed to gethostbyname" << std::endl;
+            return false;
+        }
+
+        // Define server info
+        SOCKADDR_IN sin;
+        ZeroMemory(&sin, sizeof(sin));
+        sin.sin_port = htons(6666);
+        sin.sin_family = AF_INET;
+        memcpy(&sin.sin_addr.S_un.S_addr, host->h_addr_list[0], sizeof(sin.sin_addr.S_un.S_addr));
+
+        // Connect to server
+        if ( ::connect(sock, (const sockaddr*)&sin, sizeof(sin)) == SOCKET_ERROR ) {
+            if ( WSAGetLastError() == WSAEWOULDBLOCK ) {
+                // Non-blocking connect -- come back later.
+                connecting = true;
+            } else {
+                closesocket(sock);
+                std::cerr << "MMDAQ: Failed to connect" << std::endl;
+            }
+            return false;
+        }
     }
 
-    // Get host info
-    HOSTENT* host = gethostbyname("localhost");
-    if (host == nullptr) {
-        closesocket(sock);
-        std::cerr << "MMDAQ: Failed to gethostbyname" << std::endl;
-        return false;
+    if ( connecting ) {
+        FD_SET fds;
+        FD_ZERO(&fds);
+        FD_SET(sock, &fds);
+        timeval t;
+        t.tv_sec = 0;
+        t.tv_usec = 0;
+        int ret = select(0, 0, &fds, 0, &t);
+        if ( ret == 1 ) {
+            connecting = false;
+
+            // Restore blocking mode
+            u_long zero = 0;
+            if ( ioctlsocket(sock, FIONBIO, &zero) != NO_ERROR ){
+                closesocket(sock);
+                std::cerr << "MMDAQ: Failed to make socket blocking" << std::endl;
+                return false;
+            }
+
+            // Send greeting to server
+            const char szMsg[] = "hello server\r\n";
+            if (!send(sock, szMsg, strlen(szMsg), 0)) {
+                closesocket(sock);
+                std::cerr << "MMDAQ: Failed to send" << std::endl;
+                return false;
+            }
+
+            // Receive greeting
+            char szTemp[4096];
+            if ( recv(sock, szTemp, 4096, 0) < 1 || strcmp(szTemp, "hello client") ) {
+                closesocket(sock);
+                std::cerr << "MMDAQ: Failed to receive (appropriate) greeting" << std::endl;
+                return false;
+            }
+
+            connected = true;
+        } else if ( ret == SOCKET_ERROR ) {
+            std::cerr << "MMDAQ: Failed to check connection status" << std::endl;
+            return false;
+        }
     }
 
-    // Define server info
-    SOCKADDR_IN sin;
-    ZeroMemory(&sin, sizeof(sin));
-    sin.sin_port = htons(6666);
-    sin.sin_family = AF_INET;
-    memcpy(&sin.sin_addr.S_un.S_addr, host->h_addr_list[0], sizeof(sin.sin_addr.S_un.S_addr));
-
-    // Connect to server
-    if (::connect(sock, (const sockaddr*)&sin, sizeof(sin)) != 0) {
-        closesocket(sock);
-        std::cerr << "MMDAQ: Failed to connect" << std::endl;
-        return false;
-    }
-
-    // Send greeting to server
-    const char szMsg[] = "hello server\r\n";
-    if (!send(sock, szMsg, strlen(szMsg), 0)) {
-        closesocket(sock);
-        std::cerr << "MMDAQ: Failed to send" << std::endl;
-        return false;
-    }
-
-    // Receive greeting
-    char szTemp[4096];
-    if ( recv(sock, szTemp, 4096, 0) < 1 || strcmp(szTemp, "hello client") ) {
-        closesocket(sock);
-        std::cerr << "MMDAQ: Failed to receive (appropriate) greeting" << std::endl;
-        return false;
-    }
-
-    connected = true;
     return true;
 }
 

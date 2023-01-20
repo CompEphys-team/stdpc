@@ -69,6 +69,7 @@ class MicroManagerDAQ: public DAQ
 
   private:
     bool connected = false;
+    bool connecting = false;
     SOCKET sock;
 
     bool connect();
