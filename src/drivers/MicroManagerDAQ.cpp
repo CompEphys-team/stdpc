@@ -173,7 +173,7 @@ bool MicroManagerDAQ::connect()
 
             // Receive greeting
             char szTemp[4096];
-            if ( recv(sock, szTemp, 4096, 0) < 1 || strcmp(szTemp, "hello client") ) {
+            if ( recv(sock, szTemp, 4096, 0) < 1 || strncmp(szTemp, "hello client", 12) ) {
                 closesocket(sock);
                 std::cerr << "MMDAQ: Failed to receive (appropriate) greeting" << std::endl;
                 return false;
@@ -249,8 +249,13 @@ void MicroManagerDAQ::get_scan(bool)
     QString message(szTemp);
     QStringList lines(message.split('\n', Qt::SkipEmptyParts));
     for ( auto line : lines ) {
+        line = line.trimmed();
         if ( !line.startsWith("!!!S") || !line.endsWith("E!!!") )
             continue;
+        else {
+            line.remove(0, 4);
+            line.remove(line.length()-4, 4);
+        }
         QStringList values = line.split('\t');
         int roi = values[0].toInt();
         // values[1] is a timestamp, ignore.
