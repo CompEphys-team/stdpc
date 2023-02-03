@@ -210,19 +210,13 @@ bool MicroManagerDAQ::initialize_board(QString &name)
 
 void MicroManagerDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
 {
-    if ( !connected ) {
-        if ( !connect() ) {
-            return;
-        }
-    } else {
-        actInChnNo = chnNo;
-        ChannelIndex dex(prox, devID, 0, true);
-        for(int i = 0; i < actInChnNo; i++) {
-            inIdx[i]= Chns[i];
-            inGainFac[i]= params()->inChn[inIdx[i]].gainFac;
-            dex.chanID = inIdx[i];
-            inChnLabels[inIdx[i]] = dex.toString();
-        }
+    actInChnNo = chnNo;
+    ChannelIndex dex(prox, devID, 0, true);
+    for(int i = 0; i < actInChnNo; i++) {
+        inIdx[i]= Chns[i];
+        inGainFac[i]= params()->inChn[inIdx[i]].gainFac;
+        dex.chanID = inIdx[i];
+        inChnLabels[inIdx[i]] = dex.toString();
     }
 }
 
