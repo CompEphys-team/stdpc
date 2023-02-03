@@ -191,9 +191,10 @@ bool MicroManagerDAQ::connect()
 
 void MicroManagerDAQ::disconnect()
 {
-    if ( connected ) {
-        connected = false;
+    if ( connected || connecting ) {
+        connected = connecting = false;
         closesocket(sock);
+        sock = INVALID_SOCKET;
     }
 }
 
