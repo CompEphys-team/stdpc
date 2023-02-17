@@ -76,6 +76,7 @@ MicroManagerDAQ::MicroManagerDAQ(size_t devID, DAQProxy *proxy) :
 
     inIdx= new short int[inChnNo];
     inGainFac= new double[inChnNo];
+    inBuffer = new double[inChnNo];
     inGainNo= 1;
     inGainText= new char*[inGainNo];
     inGainText[0]= new char[80];
@@ -91,6 +92,7 @@ MicroManagerDAQ::~MicroManagerDAQ()
     disconnect();
     delete[] inIdx;
     delete[] inGainFac;
+    delete[] inBuffer;
     delete[] inGainText[0];
     delete[] inGainText;
 }
@@ -216,6 +218,7 @@ void MicroManagerDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
     for(int i = 0; i < actInChnNo; i++) {
         inIdx[i]= Chns[i];
         inGainFac[i]= params()->inChn[inIdx[i]].gainFac;
+        inBuffer[i] = 0.0;
         dex.chanID = inIdx[i];
         inChnLabels[inIdx[i]] = dex.toString();
     }
@@ -224,46 +227,46 @@ void MicroManagerDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
 void MicroManagerDAQ::get_scan(bool)
 {
     if ( !connected ) {
-        if ( !connect() ) {
-            return;
+        connect();
+    } else {
+        // Check for existing messages
+        FD_SET readfds;
+        FD_ZERO(&readfds);
+        FD_SET(sock, &readfds);
+        timeval t;
+        t.tv_sec = 0;
+        t.tv_usec = 0;
+        if ( select(0, &readfds, 0, 0, &t) > 0 ) {
+            // Read everything
+            char szTemp[4096];
+            int bytes_received = recv(sock, szTemp, 4096, 0);
+            if ( bytes_received > 0 ) {
+                // Process line by line
+                QString message(szTemp);
+                QStringList lines(message.split('\n', Qt::SkipEmptyParts));
+                for ( auto line : lines ) {
+                    line = line.trimmed();
+                    if ( !line.startsWith("!!!S") || !line.endsWith("E!!!") )
+                        continue;
+                    else {
+                        line.remove(0, 4);
+                        line.remove(line.length()-4, 4);
+                    }
+                    QStringList values = line.split('\t');
+                    int roi = values[0].toInt();
+                    // values[1] is a timestamp, ignore.
+                    double v = values[2].toDouble();
+
+                    if ( roi < actInChnNo )
+                        inBuffer[inIdx[roi]] = inGainFac[roi]*v;
+                }
+            }
         }
     }
 
-    // Check for existing messages
-    FD_SET readfds;
-    FD_ZERO(&readfds);
-    FD_SET(sock, &readfds);
-    timeval t;
-    t.tv_sec = 0;
-    t.tv_usec = 0;
-    if ( select(0, &readfds, 0, 0, &t) < 1 )
-        // Nothing to read, bail.
-        return;
-
-    // Read everything
-    char szTemp[4096];
-    int bytes_received = recv(sock, szTemp, 4096, 0);
-    if ( bytes_received < 1 )
-        return;
-
-    // Process line by line
-    QString message(szTemp);
-    QStringList lines(message.split('\n', Qt::SkipEmptyParts));
-    for ( auto line : lines ) {
-        line = line.trimmed();
-        if ( !line.startsWith("!!!S") || !line.endsWith("E!!!") )
-            continue;
-        else {
-            line.remove(0, 4);
-            line.remove(line.length()-4, 4);
-        }
-        QStringList values = line.split('\t');
-        int roi = values[0].toInt();
-        // values[1] is a timestamp, ignore.
-        double v = values[2].toDouble();
-
-        if ( roi < actInChnNo )
-            in[inIdx[roi]].V = inGainFac[roi]*v;
+    // Apply to channel
+    for(int i = 0; i < actInChnNo; i++) {
+        in[i].V = inBuffer[i];
     }
 }
 

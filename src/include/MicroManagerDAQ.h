@@ -71,6 +71,7 @@ class MicroManagerDAQ: public DAQ
     bool connected = false;
     bool connecting = false;
     SOCKET sock;
+    double *inBuffer = nullptr;
 
     bool connect();
     void disconnect();
