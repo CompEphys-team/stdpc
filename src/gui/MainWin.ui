@@ -161,7 +161,7 @@
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="setuptab">
         <attribute name="title">
@@ -193,6 +193,11 @@
           </widget>
          </item>
         </layout>
+       </widget>
+       <widget class="ConfigWidget" name="configtab">
+        <attribute name="title">
+         <string>Page</string>
+        </attribute>
        </widget>
        <widget class="GraphWidget" name="graphtab">
         <attribute name="title">
@@ -310,6 +315,12 @@
    <class>GraphWidget</class>
    <extends>QWidget</extends>
    <header>GraphWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ConfigWidget</class>
+   <extends>QWidget</extends>
+   <header>configwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

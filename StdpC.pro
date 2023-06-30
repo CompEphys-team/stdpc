@@ -14,7 +14,8 @@ TARGET = StdpC
 QT+= widgets printsupport
 INCLUDEPATH += \
     $$PWD/src/include \
-    $$PWD/src/lib
+    $$PWD/src/lib \
+    $$PWD/src/newgui
 TEMPLATE = app
 CONFIG += qt \
     thread \
@@ -75,7 +76,8 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     src/gui/pipedaqdlg.ui \
     src/gui/treewidgetitem_datasources.ui \
     src/gui/treewidgetitem_models.ui \
-    src/gui/InputConductanceDlg.ui
+    src/gui/InputConductanceDlg.ui \
+    src/newgui/configwidget.ui
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -164,7 +166,11 @@ HEADERS += \
     src/include/treewidgetitem_datasources.h \
     src/include/treewidgetitem_models.h \
     src/include/InputConductance.h \
-    src/include/InputConductanceDlg.h
+    src/include/InputConductanceDlg.h \
+    src/newgui/configwidget.h \
+    src/newgui/modulefactory.h \
+    src/newgui/module.h \
+    src/newgui/moduleregistry.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -246,7 +252,11 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/gui/InputConductanceDlg.cpp \
     src/models/channeltransform.cpp \
     src/models/lineartransform.cpp \
-    src/models/sinusoidaltransform.cpp
+    src/models/sinusoidaltransform.cpp \
+    src/newgui/configwidget.cpp \
+    src/newgui/modulefactory.cpp \
+    src/newgui/module.cpp \
+    src/newgui/moduleregistry.cpp
 
 digidata {
     mingw {
