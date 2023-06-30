@@ -76,6 +76,7 @@ public:
                 inst[i]->widget()->active->setChecked(true);
                 inst[i]->setIndex(i);
             } else {
+                inst[i]->setIndex(i);
                 inst[i]->removeDevice();
                 delete inst[i];
                 inst.remove(i);
