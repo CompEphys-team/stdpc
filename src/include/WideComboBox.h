@@ -26,9 +26,15 @@ class WideComboBox : public QComboBox
 {
     Q_OBJECT
 public:
-    WideComboBox(QWidget *parent = nullptr);
+    WideComboBox(QWidget *parent = nullptr, QString unselectedLabel="");
+    QString getUnselectedLabel() const;
+    void setUnselectedLabel(const QString &newUnselectedLabel);
+
 protected:
     bool event(QEvent *event);
+    void paintEvent(QPaintEvent*) override;
+private:
+    QString unselectedLabel;
 };
 
 #endif // WIDECOMBOBOX_H

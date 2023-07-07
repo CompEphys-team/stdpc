@@ -18,12 +18,15 @@
 */
 
 #include "WideComboBox.h"
+#include "qdebug.h"
 #include <QEvent>
 #include <QAbstractItemView>
 #include <QApplication>
+#include <QPainter>
 
-WideComboBox::WideComboBox(QWidget *parent) :
-    QComboBox(parent)
+WideComboBox::WideComboBox(QWidget *parent, QString unselectedLabel) :
+    QComboBox(parent),
+    unselectedLabel(unselectedLabel)
 {}
 
 bool WideComboBox::event(QEvent *e)
@@ -48,4 +51,30 @@ bool WideComboBox::event(QEvent *e)
         return true;
     }
     return QComboBox::event(e);
+}
+
+void WideComboBox::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+    QStyleOptionComboBox option;
+    initStyleOption(&option);
+
+    if (currentIndex() == -1) {
+        // Customize the text when no item is selected
+        option.currentText = unselectedLabel;
+    }
+    qDebug() << currentIndex();
+
+    style()->drawComplexControl(QStyle::CC_ComboBox, &option, &painter, this);
+    style()->drawControl(QStyle::CE_ComboBoxLabel, &option, &painter, this);
+}
+
+QString WideComboBox::getUnselectedLabel() const
+{
+    return unselectedLabel;
+}
+
+void WideComboBox::setUnselectedLabel(const QString &newUnselectedLabel)
+{
+    unselectedLabel = newUnselectedLabel;
 }
