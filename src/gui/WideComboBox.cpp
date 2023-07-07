@@ -63,7 +63,6 @@ void WideComboBox::paintEvent(QPaintEvent*)
         // Customize the text when no item is selected
         option.currentText = unselectedLabel;
     }
-    qDebug() << currentIndex();
 
     style()->drawComplexControl(QStyle::CC_ComboBox, &option, &painter, this);
     style()->drawControl(QStyle::CE_ComboBoxLabel, &option, &painter, this);
