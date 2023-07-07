@@ -14,39 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>GroupBox</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="active">
-        <property name="text">
-         <string>Active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="settling">
-        <property name="text">
-         <string>Active during settling</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="params">
-        <property name="text">
-         <string>Parameters...</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="WideComboBox" name="comboBox"/>
-   </item>
    <item row="2" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
@@ -60,6 +27,39 @@
      </property>
     </spacer>
    </item>
+   <item row="0" column="0">
+    <widget class="WideComboBox" name="comboBox"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>GroupBox</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="settling">
+        <property name="text">
+         <string>Active during settling</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="active">
+        <property name="text">
+         <string>Active</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="params">
+        <property name="text">
+         <string>Parameters...</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
    <item row="1" column="0" rowspan="2">
     <widget class="QTreeView" name="treeView">
      <property name="alternatingRowColors">
@@ -68,6 +68,13 @@
      <attribute name="headerVisible">
       <bool>false</bool>
      </attribute>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="remove">
+     <property name="text">
+      <string>Remove selected</string>
+     </property>
     </widget>
    </item>
   </layout>
