@@ -18,21 +18,22 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     availableModulesView->header()->hide();
     availableModulesView->expandAll();
 
-    // Stick the combobox instructions in the top. Is there a cleaner way to do this?
-    QStandardItem *addnew = new QStandardItem("Add new...");
-    model->insertRow(0, addnew);
+    // Disable category headings
     for(int row = 0; row < model->rowCount(); ++row) {
         QStandardItem *item = model->item(row);
         item->setEnabled(false);
     }
-    ui->comboBox->setCurrentIndex(0);
+
+    // Ensure consistent instructions
+    ui->comboBox->setUnselectedLabel("Add new...");
+    ui->comboBox->setCurrentIndex(-1);
 
     // Add a new Module on combobox select
     connect(ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int idx){
-        const QString& text = ui->comboBox->currentText();
-        if (text == addnew->text())
+        if (idx == -1)
             return;
 
+        const QString& text = ui->comboBox->currentText();
         Module *module = ModuleFactory::instance().createModule(text);
         QModelIndex index = ModuleRegistry::instance().addModule(module);
         if ( index.isValid() ) {
@@ -45,7 +46,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             ui->treeView->setFocus();
         }
 
-        ui->comboBox->setCurrentIndex(0);
+        ui->comboBox->setCurrentIndex(-1);
     });
 
     // Set up tree widget with the ModuleRegistry contents
