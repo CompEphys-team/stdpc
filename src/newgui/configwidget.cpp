@@ -28,7 +28,8 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     ui->comboBox->setCurrentIndex(0);
 
     // Add a new Module on combobox select
-    connect(ui->comboBox, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), [=](const QString &text){
+    connect(ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int idx){
+        const QString& text = ui->comboBox->currentText();
         if (text == addnew->text())
             return;
 
@@ -52,7 +53,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     ui->treeView->setModel(registryModel);
 
     // Link tree widget selection to sidebox
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, [=](const QModelIndex &current, const QModelIndex &previous){
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current, const QModelIndex &previous){
         if ( previous.isValid() ) {
             Module *prevModule = previous.data(ModuleRegistry::ModPtr).value<Module*>();
             if ( prevModule ) {
