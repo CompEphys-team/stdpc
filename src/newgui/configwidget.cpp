@@ -89,7 +89,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
                   });
 
         // Remove the selected items from the model
-        for (const QModelIndex& index : selectedIndexes) {
+        for (const QModelIndex& index : qAsConst(selectedIndexes)) {
             QStandardItem* item = registryModel->itemFromIndex(index);
             if (item) {
                 QStandardItem* parentItem = item->parent();
