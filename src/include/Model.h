@@ -72,12 +72,10 @@ public:
     inChannel in;
     outChannel out;
 
-signals:
-    void message(const QString &);
-
 protected:
     const size_t modID;
     const size_t instID;
+    DCThread *DCT;
 
     double retainedI;
 };

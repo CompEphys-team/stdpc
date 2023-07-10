@@ -22,9 +22,9 @@
 
 Model::Model(size_t modelID, size_t instID, DCThread *DCT) :
     modID(modelID),
-    instID(instID)
+    instID(instID),
+    DCT(DCT)
 {
-    connect(this, SIGNAL(message(QString)), DCT, SIGNAL(message(QString)));
 }
 
 void Model::post_init(DCThread *)
