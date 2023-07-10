@@ -30,9 +30,8 @@
 
 class ModelProxy;
 
-class Model : public QObject
+class Model
 {
-    Q_OBJECT
 public:
     Model(size_t modelID, size_t instID, DCThread *DCT);
     virtual ~Model() {}
