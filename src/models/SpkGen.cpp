@@ -99,9 +99,9 @@ SpkGen::SpkGen(size_t modelID, size_t instID, DCThread *DCT) :
     }
 }
 
-void SpkGen::post_init(DCThread *DCT)
+void SpkGen::post_init()
 {
-    Model::post_init(DCT);
+    Model::post_init();
     in.V = V + instp->inChn.bias;
     out.save = out.active = false;
     bdChn = DCT->getInChan(instp->bdChannel);

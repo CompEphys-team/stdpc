@@ -27,7 +27,7 @@ Model::Model(size_t modelID, size_t instID, DCThread *DCT) :
 {
 }
 
-void Model::post_init(DCThread *)
+void Model::post_init()
 {
     in.init(&(instance().inChn));
     out.init(&(instance().outChn));

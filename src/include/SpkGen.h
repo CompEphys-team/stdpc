@@ -79,7 +79,7 @@ public:
     SpkGen(size_t modelID, size_t instID, DCThread *);
     ~SpkGen() {}
 
-    void post_init(DCThread *);
+    void post_init();
 
     // Override processing on unused out
     inline void updateOut(double) {}

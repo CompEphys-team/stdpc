@@ -38,7 +38,7 @@ public:
 
     /// Post-init call for any additional setup that requires other models to be present
     /// Derived classes should call Model::post_init in their overridden versions to ensure complete channel setup.
-    virtual void post_init(DCThread *);
+    virtual void post_init();
 
     /// Process channels:
     /// Applies bias to out.I and calls in.process(t).

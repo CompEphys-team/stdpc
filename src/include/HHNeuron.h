@@ -67,7 +67,7 @@ public:
     HHNeuron(size_t modelID, size_t instID, DCThread *DCT);
     ~HHNeuron() {}
 
-    void post_init(DCThread *);
+    void post_init();
 
     void RK4(double t, double dt, size_t n, bool settling);
 

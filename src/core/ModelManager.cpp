@@ -34,7 +34,7 @@ void ModelManager::init(DCThread *DCT)
         }
     }
     for ( auto &m : activeModels )
-        m->post_init(DCT);
+        m->post_init();
 }
 
 void ModelManager::clear()
