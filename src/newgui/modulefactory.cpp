@@ -2,6 +2,8 @@
 
 ModuleFactory::ModuleFactory()
 {
+    for (const QString& name : {"Data acquisition", "Tools", "Synapses", "Ionic currents"})
+        groupModel.appendRow(new QStandardItem(name));
 }
 
 ModuleFactory::~ModuleFactory()
