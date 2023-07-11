@@ -60,6 +60,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             if ( prevModule ) {
                 disconnect(ui->active, &QCheckBox::toggled, prevModule, &Module::setActive);
                 disconnect(ui->settling, &QCheckBox::toggled, prevModule, &Module::setActiveSettling);
+                disconnect(ui->params, &QPushButton::toggled, this, &ConfigWidget::openParams);
             }
         }
 
@@ -70,6 +71,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
                 ui->settling->setChecked(currentModule->activeSettling());
                 connect(ui->active, &QCheckBox::toggled, currentModule, &Module::setActive);
                 connect(ui->settling, &QCheckBox::toggled, currentModule, &Module::setActiveSettling);
+                connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
             }
         } else {
             ui->active->setChecked(false);
@@ -106,4 +108,17 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 ConfigWidget::~ConfigWidget()
 {
     delete ui;
+}
+
+void ConfigWidget::openParams()
+{
+    QItemSelectionModel *selectionModel = ui->treeView->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+    if ( selectedIndexes.length() != 1 )
+        return;
+    QModelIndex &index = selectedIndexes.first();
+    Module *module = index.data(ModuleRegistry::ModPtr).value<Module*>();
+    QWidget *dialog = module->createWidget(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    dialog->show();
 }

@@ -15,6 +15,9 @@ public:
     explicit ConfigWidget(QWidget *parent = nullptr);
     ~ConfigWidget();
 
+private slots:
+    void openParams();
+
 private:
     Ui::ConfigWidget *ui;
 };
