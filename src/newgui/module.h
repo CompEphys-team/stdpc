@@ -38,6 +38,7 @@ class MyModule : public Module
 public:
     static const QString NAME;
     static const QString GROUP;
+    static const ModuleFactory::Registrar<MyModule> REG;
 
     explicit MyModule(QObject *parent = nullptr);
     ~MyModule() override;
@@ -47,14 +48,6 @@ public:
     QWidget * createWidget(QWidget *parent) override;
 
 private:
-    struct Registrar
-    {
-        Registrar()
-        {
-            ModuleFactory::instance().registerModule(NAME, GROUP,  []() { return new MyModule; });
-        }
-    };
-    static Registrar registrar;
 
     struct Parameters : public CurrentData
     {

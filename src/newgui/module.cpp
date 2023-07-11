@@ -33,7 +33,7 @@ void Module::setActiveSettling(bool activeSettling)
 
 const QString MyModule::NAME = "MyModule";
 const QString MyModule::GROUP = "MyGroup";
-MyModule::Registrar MyModule::registrar;
+const ModuleFactory::Registrar<MyModule> MyModule::REG(MyModule::NAME, MyModule::GROUP);
 
 MyModule::MyModule(QObject *parent)
 {

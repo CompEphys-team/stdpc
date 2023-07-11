@@ -20,6 +20,16 @@ public:
     Module* createModule(const QString& moduleName);
     QStandardItemModel* getGroupModel() const;
 
+    template <class T>
+    class Registrar
+    {
+    public:
+        Registrar(const QString& name, const QString& group)
+        {
+            ModuleFactory::instance().registerModule(name, group, [](){ return new T; });
+        }
+    };
+
 private:
     ModuleFactory();
     ~ModuleFactory();
