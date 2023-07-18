@@ -21,7 +21,9 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     // Disable category headings
     for(int row = 0; row < model->rowCount(); ++row) {
         QStandardItem *item = model->item(row);
-        item->setEnabled(false);
+        // setDisabled(false) leads to stray selection of the last hovered item. This leads to wonky keyboard navigation. Choose your poison.
+        item->setSelectable(false);
+        item->setData(ui->comboBox->palette().color(QPalette::Disabled, QPalette::Text), Qt::TextColorRole);
     }
 
     // Ensure consistent instructions
