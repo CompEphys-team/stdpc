@@ -170,7 +170,8 @@ HEADERS += \
     src/newgui/configwidget.h \
     src/newgui/modulefactory.h \
     src/newgui/module.h \
-    src/newgui/moduleregistry.h
+    src/newgui/moduleregistry.h \
+    src/newgui/parameters.h
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -256,7 +257,8 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/newgui/configwidget.cpp \
     src/newgui/modulefactory.cpp \
     src/newgui/module.cpp \
-    src/newgui/moduleregistry.cpp
+    src/newgui/moduleregistry.cpp \
+    src/newgui/parameters.cpp
 
 digidata {
     mingw {

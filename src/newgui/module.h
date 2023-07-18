@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "modulefactory.h"
+#include "parameters.h"
 
 class Module : public QObject
 {
@@ -30,8 +31,16 @@ private:
 
 
 // Mock
-#include "ObjectDataTypes.h"
 
+PARAMETERS_DECL(Child, Parameters)
+    double value;
+};
+PARAMETERS_DECL(MyParameters, Parameters)
+    int myParam;
+    QString myString;
+    Child child;
+    std::vector<Child> children;
+};
 class MyModule : public Module
 {
     Q_OBJECT
@@ -48,12 +57,11 @@ public:
     QWidget * createWidget(QWidget *parent) override;
 
 private:
-
-    struct Parameters : public CurrentData
-    {
-        int myParam;
+    PARAMETERS_DECL(Derived, MyParameters)
+        QString addendum;
     };
-    Parameters p;
+
+    Derived p;
 };
 
 #endif // MODULE_H
