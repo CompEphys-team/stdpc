@@ -1,4 +1,5 @@
 #include "modulefactory.h"
+#include <stdexcept>
 
 ModuleFactory::ModuleFactory()
 {
@@ -16,9 +17,11 @@ ModuleFactory& ModuleFactory::instance()
     return factory;
 }
 
-void ModuleFactory::registerModule(const QString& moduleName, const QString& group, std::function<Module*()> createFunction)
+void ModuleFactory::registerModule(const QString &UID, const QString& displayName, const QString& group, std::function<Module*()> createFunction)
 {
-    moduleCreators.insert(moduleName, createFunction);
+    if ( moduleCreators.contains(UID) )
+        throw std::runtime_error(QString("Module UID %1 has already been registered.").arg(UID).toStdString());
+    moduleCreators.insert(UID, createFunction);
 
     QStandardItem* groupItem = nullptr;
     for (int i = 0; i < groupModel.rowCount(); ++i)
@@ -37,7 +40,8 @@ void ModuleFactory::registerModule(const QString& moduleName, const QString& gro
         groupModel.appendRow(groupItem);
     }
 
-    QStandardItem* moduleItem = new QStandardItem(moduleName);
+    QStandardItem* moduleItem = new QStandardItem(displayName);
+    moduleItem->setData(UID, UIDRole);
     groupItem->appendRow(moduleItem);
 }
 
@@ -71,9 +75,9 @@ QStringList ModuleFactory::getAvailableModules(const QString& group) const
     return moduleList;
 }
 
-Module* ModuleFactory::createModule(const QString& moduleName)
+Module* ModuleFactory::createModule(const QString& UID)
 {
-    std::function<Module*()> createFunction = moduleCreators.value(moduleName, nullptr);
+    std::function<Module*()> createFunction = moduleCreators.value(UID, nullptr);
     if (createFunction)
     {
         return createFunction();

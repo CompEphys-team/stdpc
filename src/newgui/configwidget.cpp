@@ -33,8 +33,8 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
         if (idx == -1)
             return;
 
-        const QString& text = ui->comboBox->currentText();
-        Module *module = ModuleFactory::instance().createModule(text);
+        const QString& UID = ui->comboBox->currentData(ModuleFactory::UIDRole).toString();
+        Module *module = ModuleFactory::instance().createModule(UID);
         QModelIndex index = ModuleRegistry::instance().addModule(module);
         if ( index.isValid() ) {
             QModelIndex parent = index.parent();

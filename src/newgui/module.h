@@ -12,6 +12,7 @@ public:
     explicit Module(QObject *parent = nullptr);
     virtual ~Module();
 
+    virtual const QString& uid() const = 0;
     virtual const QString& name() const = 0;
     virtual const QString& group() const = 0;
     virtual QWidget *createWidget(QWidget *parent) = 0;
@@ -45,6 +46,7 @@ class MyModule : public Module
 {
     Q_OBJECT
 public:
+    static const QString UID;
     static const QString NAME;
     static const QString GROUP;
     static const ModuleFactory::Registrar<MyModule> REG;
@@ -52,6 +54,7 @@ public:
     explicit MyModule(QObject *parent = nullptr);
     ~MyModule() override;
 
+    const QString& uid() const override { return UID; }
     const QString& name() const override { return NAME; }
     const QString& group() const override { return GROUP; }
     QWidget * createWidget(QWidget *parent) override;
