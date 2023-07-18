@@ -24,10 +24,14 @@ public:
     class Registrar
     {
     public:
-        Registrar(const QString& UID, const QString& name, const QString& group)
+        Registrar(const QString& UID, const QString& name, const QString& group) :
+            UID(UID),
+            NAME(name),
+            GROUP(group)
         {
             ModuleFactory::instance().registerModule(UID, name, group, [](){ return new T; });
         }
+        const QString UID, NAME, GROUP;
     };
 
     static const int UIDRole = Qt::UserRole + 2;

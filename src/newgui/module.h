@@ -46,17 +46,14 @@ class MyModule : public Module
 {
     Q_OBJECT
 public:
-    static const QString UID;
-    static const QString NAME;
-    static const QString GROUP;
     static const ModuleFactory::Registrar<MyModule> REG;
 
     explicit MyModule(QObject *parent = nullptr);
     ~MyModule() override;
 
-    const QString& uid() const override { return UID; }
-    const QString& name() const override { return NAME; }
-    const QString& group() const override { return GROUP; }
+    const QString& uid() const override { return REG.UID; }
+    const QString& name() const override { return REG.NAME; }
+    const QString& group() const override { return REG.GROUP; }
     QWidget * createWidget(QWidget *parent) override;
 
 private:
