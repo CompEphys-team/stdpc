@@ -46,6 +46,8 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             QItemSelectionModel *selection = ui->treeView->selectionModel();
             selection->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
             ui->treeView->setFocus();
+        } else {
+            delete module;
         }
 
         ui->comboBox->setCurrentIndex(-1);
