@@ -11,26 +11,6 @@ Module::~Module()
 
 }
 
-bool Module::active() const
-{
-    return m_active;
-}
-
-void Module::setActive(bool active)
-{
-    m_active = active;
-}
-
-bool Module::activeSettling() const
-{
-    return m_activeSettling;
-}
-
-void Module::setActiveSettling(bool activeSettling)
-{
-    m_activeSettling = activeSettling;
-}
-
 
 const ModuleFactory::Registrar<MyModule> MyModule::REG("MyMod", "My Module", "My Group");
 

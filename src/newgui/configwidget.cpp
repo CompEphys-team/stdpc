@@ -59,7 +59,8 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             Module *prevModule = previous.data(ModuleRegistry::ModPtr).value<Module*>();
             if ( prevModule ) {
                 disconnect(ui->active, &QCheckBox::toggled, prevModule, &Module::setActive);
-                disconnect(ui->settling, &QCheckBox::toggled, prevModule, &Module::setActiveSettling);
+                if ( prevModule->canSettle() )
+                    disconnect(ui->settling, &QCheckBox::toggled, prevModule, &Module::setActiveSettling);
                 disconnect(ui->params, &QPushButton::toggled, this, &ConfigWidget::openParams);
             }
         }
@@ -68,9 +69,14 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             Module *currentModule = current.data(ModuleRegistry::ModPtr).value<Module*>();
             if ( currentModule ) {
                 ui->active->setChecked(currentModule->active());
-                ui->settling->setChecked(currentModule->activeSettling());
                 connect(ui->active, &QCheckBox::toggled, currentModule, &Module::setActive);
-                connect(ui->settling, &QCheckBox::toggled, currentModule, &Module::setActiveSettling);
+                ui->settling->setEnabled(currentModule->canSettle());
+                if ( currentModule->canSettle() ) {
+                    ui->settling->setChecked(currentModule->activeSettling());
+                    connect(ui->settling, &QCheckBox::toggled, currentModule, &Module::setActiveSettling);
+                } else {
+                    ui->settling->setChecked(false);
+                }
                 connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
             }
         } else {

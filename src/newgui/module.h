@@ -17,18 +17,14 @@ public:
     virtual const QString& group() const = 0;
     virtual QWidget *createWidget(QWidget *parent) = 0;
 
-    bool active() const;
-    bool activeSettling() const;
+    virtual bool active() const = 0;
+    virtual inline bool activeSettling() const { return false; };
+    virtual inline bool canSettle() const { return false; }
 
 public slots:
-    void setActive(bool active);
-    void setActiveSettling(bool activeSettling);
-
-private:
-    bool m_active;
-    bool m_activeSettling;
+    virtual void setActive(bool active) = 0;
+    virtual inline void setActiveSettling(bool /*activeSettling*/) { /*no-op*/ };
 };
-
 
 
 // Mock
@@ -37,6 +33,8 @@ PARAMETERS_DECL(Child, Parameters)
     double value;
 };
 PARAMETERS_DECL(MyParameters, Parameters)
+    bool active;
+    bool activeSettling;
     int myParam;
     QString myString;
     Child child;
@@ -55,6 +53,14 @@ public:
     const QString& name() const override { return REG.NAME; }
     const QString& group() const override { return REG.GROUP; }
     QWidget * createWidget(QWidget *parent) override;
+
+    inline bool active() const override { return p.active; }
+    inline bool activeSettling() const override { return p.activeSettling; }
+    inline bool canSettle() const override { return true; }
+
+public slots:
+    inline void setActive(bool active) override { p.active = active; }
+    inline void setActiveSettling(bool active) override { p.activeSettling = active; }
 
 private:
     PARAMETERS_DECL(Derived, MyParameters)
