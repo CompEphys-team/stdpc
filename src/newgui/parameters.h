@@ -16,6 +16,8 @@
  * the latter of which should be followed by a brace-enclosed function body calling PARAMETER(derivedclass, paramname),
  * or, if member names in code and in protocol disagree, function calls of the form `add("protocol-name", &derivedclass::membername);`.
  * Parameters declared within enclosing scope must use the PARAMETERS_IMPL_INSCOPE(derivedclass, scope) instead of PARAMETERS_IMPL.
+ * Members can be deprecated (i.e., the old name registered as read-only) using the DEPRECATED_PARAMETER(derivedclass, membername, "oldparamname") macro,
+ * which translates to `add("oldparamname", &derivedclass::membername, true);`. Note that oldparamname must be quoted.
  *
  * Note that multi-level inheritance is possible (with registration, i.e. macro usage, optional at intermediate levels),
  * but care should be taken not to register the same member twice.
@@ -71,7 +73,7 @@ protected:
         // Simple types
         template <typename T, typename Owner>
         typename std::enable_if<(std::is_arithmetic_v<T> || std::is_base_of_v<QString, T>) && std::is_base_of_v<Owner, Params>, void>::type
-        add(const QString& parameterName, T Owner::* paramPtr)
+        add(const QString& parameterName, T Owner::* paramPtr, bool deprecated=false)
         {
             readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
                 if ( index < path.size() )
@@ -79,30 +81,32 @@ protected:
                 self->*paramPtr = value.value<T>();
                 return {QString(), index};
             };
-            writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
-                os << prefix << parameterName << ' ' << self->*paramPtr << std::endl;
-            };
+            if ( !deprecated )
+                writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
+                    os << prefix << parameterName << ' ' << self->*paramPtr << std::endl;
+                };
         }
 
         // Parameters
         template<typename T, typename Owner>
         typename std::enable_if<std::is_base_of_v<Parameters, T> && std::is_base_of_v<Owner, Params>, void>::type
-        add(const QString& parameterName, T Owner::* structPtr)
+        add(const QString& parameterName, T Owner::* structPtr, bool deprecated=false)
         {
             readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
                 if ( index >= path.size() )
                     return {QString("Expected child of %2 at position %3 in %4.").arg(parameterName, QString::number(index), path.join('.')), index};
                 return (self->*structPtr)._read(path, value, index);
             };
-            writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
-                (self->*structPtr).write(os, QString("%1%2.").arg(prefix, parameterName));
-            };
+            if ( !deprecated )
+                writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
+                    (self->*structPtr).write(os, QString("%1%2.").arg(prefix, parameterName));
+                };
         }
 
         // std::vector<Parameters>
         template<typename T, typename Owner>
         typename std::enable_if<std::is_base_of_v<Parameters, T> && std::is_base_of_v<Owner, Params>, void>::type
-        add(const QString& parameterName, std::vector<T> Owner::* vectorPtr)
+        add(const QString& parameterName, std::vector<T> Owner::* vectorPtr, bool deprecated=false)
         {
             readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
                 std::vector<T> &vec = self->*vectorPtr;
@@ -118,13 +122,14 @@ protected:
                     vec.resize(vecIdx + 1);
                 return vec[vecIdx]._read(path, value, index);
             };
-            writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
-                const std::vector<T> &vec = self->*vectorPtr;
-                QString extendedPrefix = QString("%1%2[%3].").arg(prefix, parameterName);
-                for ( int i = int(vec.size()-1); i >= 0; --i ) {
-                    vec[i].write(os, extendedPrefix.arg(i));
-                }
-            };
+            if ( !deprecated )
+                writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
+                    const std::vector<T> &vec = self->*vectorPtr;
+                    QString extendedPrefix = QString("%1%2[%3].").arg(prefix, parameterName);
+                    for ( int i = int(vec.size()-1); i >= 0; --i ) {
+                        vec[i].write(os, extendedPrefix.arg(i));
+                    }
+                };
         }
 
     private:
@@ -180,5 +185,6 @@ scope::classname::Registry::Registry() \
 // Follow with { a brace-enclosed function body }.
 
 #define PARAMETER(classname, varname) add(#varname, &classname::varname);
+#define DEPRECATED_PARAMETER(classname, varname, oldname) add(oldname, &classname::varname, true);
 
 #endif // PARAMETERS_H
