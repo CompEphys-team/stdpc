@@ -75,6 +75,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             ui->settling->setChecked(currentModule->canSettle() && currentModule->activeSettling());
             connect(ui->settling, &QCheckBox::clicked, currentModule, &Module::setActiveSettling);
 
+            ui->params->setEnabled(true);
             connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
         } else {
             ui->active->setEnabled(false);
@@ -82,6 +83,8 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 
             ui->settling->setEnabled(false);
             ui->settling->setChecked(false);
+
+            ui->params->setEnabled(false);
         }
     });
 
