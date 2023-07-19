@@ -58,33 +58,29 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     ui->treeView->setModel(registryModel);
 
     // Link tree widget selection to sidebox
-    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current, const QModelIndex &previous){
-        if ( previous.isValid() ) {
-            Module *prevModule = previous.data(ModuleRegistry::ModPtr).value<Module*>();
-            if ( prevModule ) {
-                disconnect(ui->active, &QCheckBox::toggled, prevModule, &Module::setActive);
-                if ( prevModule->canSettle() )
-                    disconnect(ui->settling, &QCheckBox::toggled, prevModule, &Module::setActiveSettling);
-                disconnect(ui->params, &QPushButton::toggled, this, &ConfigWidget::openParams);
-            }
-        }
+    connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current, const QModelIndex &){
+        disconnect(ui->active, SIGNAL(clicked(bool)), nullptr, nullptr);
+        disconnect(ui->settling, SIGNAL(clicked(bool)), nullptr, nullptr);
+        disconnect(ui->params, SIGNAL(clicked(bool)), nullptr, nullptr);
 
-        if ( current.isValid() ) {
-            Module *currentModule = current.data(ModuleRegistry::ModPtr).value<Module*>();
-            if ( currentModule ) {
-                ui->active->setChecked(currentModule->active());
-                connect(ui->active, &QCheckBox::toggled, currentModule, &Module::setActive);
-                ui->settling->setEnabled(currentModule->canSettle());
-                if ( currentModule->canSettle() ) {
-                    ui->settling->setChecked(currentModule->activeSettling());
-                    connect(ui->settling, &QCheckBox::toggled, currentModule, &Module::setActiveSettling);
-                } else {
-                    ui->settling->setChecked(false);
-                }
-                connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
-            }
+        Module *currentModule = nullptr;
+        if ( current.isValid() )
+            currentModule = current.data(ModuleRegistry::ModPtr).value<Module*>();
+        if ( currentModule ) {
+            ui->active->setEnabled(true);
+            ui->active->setChecked(currentModule->active());
+            connect(ui->active, &QCheckBox::clicked, currentModule, &Module::setActive);
+
+            ui->settling->setEnabled(currentModule->canSettle());
+            ui->settling->setChecked(currentModule->canSettle() && currentModule->activeSettling());
+            connect(ui->settling, &QCheckBox::clicked, currentModule, &Module::setActiveSettling);
+
+            connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
         } else {
+            ui->active->setEnabled(false);
             ui->active->setChecked(false);
+
+            ui->settling->setEnabled(false);
             ui->settling->setChecked(false);
         }
     });
