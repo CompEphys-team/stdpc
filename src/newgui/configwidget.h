@@ -20,6 +20,7 @@ protected:
 
 private slots:
     void openParams();
+    void removeModule();
 
 private:
     Ui::ConfigWidget *ui;

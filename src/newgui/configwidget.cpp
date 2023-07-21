@@ -98,29 +98,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     });
 
     // Remove registered modules
-    connect(ui->remove, &QPushButton::clicked, this, [=](bool){
-        QItemSelectionModel *selectionModel = ui->treeView->selectionModel();
-        QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
-
-        // Sort the selected indexes in reverse order
-        std::sort(selectedIndexes.begin(), selectedIndexes.end(),
-                  [](const QModelIndex& index1, const QModelIndex& index2) {
-                      return index1.row() > index2.row();
-                  });
-
-        // Remove the selected items from the model
-        for (const QModelIndex& index : qAsConst(selectedIndexes)) {
-            QStandardItem* item = registryModel->itemFromIndex(index);
-            if (item) {
-                QStandardItem* parentItem = item->parent();
-                if (parentItem) {
-                    parentItem->removeRow(item->row());
-                } else {
-                   registryModel->removeRow(item->row());
-                }
-            }
-        }
-    });
+    connect(ui->remove, &QPushButton::clicked, this, &ConfigWidget::removeModule);
 }
 
 ConfigWidget::~ConfigWidget()
@@ -136,6 +114,8 @@ bool ConfigWidget::eventFilter(QObject *obj, QEvent *event)
         if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Space) {
             openParams();
             return true; // Indicate that the event was handled
+        } else if (keyEvent->key() == Qt::Key_Backspace || keyEvent->key() == Qt::Key_Delete) {
+            removeModule();
         }
     }
     return QObject::eventFilter(obj, event);
@@ -152,4 +132,31 @@ void ConfigWidget::openParams()
     QWidget *dialog = module->createWidget(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
+}
+
+void ConfigWidget::removeModule()
+{
+    QStandardItemModel* registryModel = ModuleRegistry::instance().getModuleModel();
+    QSortFilterProxyModel* filter = qobject_cast<QSortFilterProxyModel*>(ui->treeView->model());
+    QItemSelectionModel* selectionModel = ui->treeView->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    // Sort the selected indexes in reverse order
+    std::sort(selectedIndexes.begin(), selectedIndexes.end(), [](const QModelIndex& index1, const QModelIndex& index2) {
+        return index1.row() > index2.row();
+    });
+
+    // Remove the selected items from the model
+    for (const QModelIndex& index : qAsConst(selectedIndexes)) {
+        QModelIndex sourceIndex = filter->mapToSource(index);
+        QStandardItem* item = registryModel->itemFromIndex(sourceIndex);
+        if (item) {
+            QStandardItem* parentItem = item->parent();
+            if (parentItem) {
+                parentItem->removeRow(item->row());
+            } else {
+                registryModel->removeRow(item->row());
+            }
+        }
+    }
 }
