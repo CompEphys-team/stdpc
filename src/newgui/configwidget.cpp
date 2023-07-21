@@ -65,6 +65,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
         disconnect(ui->active, SIGNAL(clicked(bool)), nullptr, nullptr);
         disconnect(ui->settling, SIGNAL(clicked(bool)), nullptr, nullptr);
         disconnect(ui->params, SIGNAL(clicked(bool)), nullptr, nullptr);
+        disconnect(ui->treeView, SIGNAL(doubleClicked(const QModelIndex&)), nullptr, nullptr);
 
         Module *currentModule = nullptr;
         if ( current.isValid() )
@@ -80,6 +81,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 
             ui->params->setEnabled(true);
             connect(ui->params, &QPushButton::clicked, this, &ConfigWidget::openParams);
+            connect(ui->treeView, &QTreeView::doubleClicked, this, &ConfigWidget::openParams);
         } else {
             ui->active->setEnabled(false);
             ui->active->setChecked(false);
