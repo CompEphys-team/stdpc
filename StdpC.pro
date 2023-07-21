@@ -168,6 +168,7 @@ HEADERS += \
     src/include/InputConductance.h \
     src/include/InputConductanceDlg.h \
     src/newgui/configwidget.h \
+    src/newgui/depthfilterproxymodel.h \
     src/newgui/modulefactory.h \
     src/newgui/module.h \
     src/newgui/moduleregistry.h \
@@ -255,6 +256,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/models/lineartransform.cpp \
     src/models/sinusoidaltransform.cpp \
     src/newgui/configwidget.cpp \
+    src/newgui/depthfilterproxymodel.cpp \
     src/newgui/modulefactory.cpp \
     src/newgui/module.cpp \
     src/newgui/moduleregistry.cpp \

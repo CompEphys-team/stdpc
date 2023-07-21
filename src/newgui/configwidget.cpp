@@ -3,6 +3,7 @@
 #include "modulefactory.h"
 #include "moduleregistry.h"
 #include "module.h"
+#include "depthfilterproxymodel.h"
 
 ConfigWidget::ConfigWidget(QWidget *parent) :
     QWidget(parent),
@@ -30,6 +31,13 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     ui->comboBox->setUnselectedLabel("Add new...");
     ui->comboBox->setCurrentIndex(-1);
 
+    // Set up tree widget with the ModuleRegistry contents
+    QStandardItemModel *registryModel = ModuleRegistry::instance().getModuleModel();
+    DepthFilterProxyModel* filter = new DepthFilterProxyModel(ui->treeView);
+    filter->setSourceModel(registryModel);
+    filter->setDepth(2);
+    ui->treeView->setModel(filter);
+
     // Add a new Module on combobox select
     connect(ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int idx){
         if (idx == -1)
@@ -37,11 +45,10 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 
         const QString& UID = ui->comboBox->currentData(ModuleFactory::UIDRole).toString();
         Module *module = ModuleFactory::instance().createModule(UID);
-        QModelIndex index = ModuleRegistry::instance().addModule(module);
+        QModelIndex index = filter->mapFromSource(ModuleRegistry::instance().addModule(module));
         if ( index.isValid() ) {
             QModelIndex parent = index.parent();
-            if ( !ui->treeView->isExpanded(parent) )
-                ui->treeView->expand(parent);
+            ui->treeView->expand(parent);
             ui->treeView->scrollTo(index);
             QItemSelectionModel *selection = ui->treeView->selectionModel();
             selection->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
@@ -52,10 +59,6 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 
         ui->comboBox->setCurrentIndex(-1);
     });
-
-    // Set up tree widget with the ModuleRegistry contents
-    QStandardItemModel *registryModel = ModuleRegistry::instance().getModuleModel();
-    ui->treeView->setModel(registryModel);
 
     // Link tree widget selection to sidebox
     connect(ui->treeView->selectionModel(), &QItemSelectionModel::currentChanged, this, [=](const QModelIndex &current, const QModelIndex &){
