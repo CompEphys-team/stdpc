@@ -15,6 +15,9 @@ public:
     explicit ConfigWidget(QWidget *parent = nullptr);
     ~ConfigWidget();
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
+
 private slots:
     void openParams();
 

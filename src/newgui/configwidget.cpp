@@ -1,4 +1,5 @@
 #include "configwidget.h"
+#include "qevent.h"
 #include "ui_configwidget.h"
 #include "modulefactory.h"
 #include "moduleregistry.h"
@@ -37,6 +38,9 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
     filter->setSourceModel(registryModel);
     filter->setDepth(2);
     ui->treeView->setModel(filter);
+
+    // Install event filter (see this->eventFilter() below)
+    ui->treeView->installEventFilter(this);
 
     // Add a new Module on combobox select
     connect(ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int idx){
@@ -122,6 +126,19 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 ConfigWidget::~ConfigWidget()
 {
     delete ui;
+}
+
+bool ConfigWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->treeView && event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Space) {
+            openParams();
+            return true; // Indicate that the event was handled
+        }
+    }
+    return QObject::eventFilter(obj, event);
 }
 
 void ConfigWidget::openParams()
