@@ -59,36 +59,6 @@ void ModuleFactory::registerModule(const QString &UID, const QString& displayNam
     groupItem->appendRow(moduleItem);
 }
 
-QStringList ModuleFactory::getAvailableGroups() const
-{
-    QStringList groupList;
-    for (int i = 0; i < groupModel.rowCount(); ++i)
-    {
-        QStandardItem* groupItem = groupModel.item(i);
-        groupList.append(groupItem->text());
-    }
-    return groupList;
-}
-
-QStringList ModuleFactory::getAvailableModules(const QString& group) const
-{
-    QStringList moduleList;
-    for (int i = 0; i < groupModel.rowCount(); ++i)
-    {
-        QStandardItem* groupItem = groupModel.item(i);
-        if (groupItem->text() == group)
-        {
-            for (int j = 0; j < groupItem->rowCount(); ++j)
-            {
-                QStandardItem* moduleItem = groupItem->child(j);
-                moduleList.append(moduleItem->text());
-            }
-            break;
-        }
-    }
-    return moduleList;
-}
-
 Module* ModuleFactory::createModule(const QString& UID)
 {
     std::function<Module*()> createFunction = moduleCreators.value(UID, nullptr);

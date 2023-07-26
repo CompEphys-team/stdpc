@@ -18,8 +18,6 @@ public:
     static const QString& label(ModuleType);
 
     void registerModule(const QString& UID, const QString& displayName, ModuleType group, std::function<Module*()> createFunction);
-    QStringList getAvailableGroups() const;
-    QStringList getAvailableModules(const QString& group) const;
     Module* createModule(const QString& UID);
     QStandardItemModel* getGroupModel() const;
 
