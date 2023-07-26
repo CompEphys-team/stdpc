@@ -12,9 +12,10 @@ public:
     explicit Module(QObject *parent = nullptr);
     virtual ~Module();
 
-    virtual const QString& uid() const = 0;
-    virtual const QString& name() const = 0;
-    virtual const QString& group() const = 0;
+    const QString& uid() const { return registrar().UID; }
+    const QString& name() const { return registrar().NAME; }
+    const QString& group() const { return registrar().GROUP; }
+
     virtual QWidget *createWidget(QWidget *parent) = 0;
 
     virtual bool active() const = 0;
@@ -24,6 +25,9 @@ public:
 public slots:
     virtual void setActive(bool active) = 0;
     virtual inline void setActiveSettling(bool /*activeSettling*/) { /*no-op*/ };
+
+protected:
+    virtual const ModuleFactory::RegistrarBase& registrar() const = 0;
 };
 
 
@@ -44,14 +48,9 @@ class MyModule : public Module
 {
     Q_OBJECT
 public:
-    static const ModuleFactory::Registrar<MyModule> REG;
-
     explicit MyModule(QObject *parent = nullptr);
     ~MyModule() override;
 
-    const QString& uid() const override { return REG.UID; }
-    const QString& name() const override { return REG.NAME; }
-    const QString& group() const override { return REG.GROUP; }
     QWidget * createWidget(QWidget *parent) override;
 
     inline bool active() const override { return p.active; }
@@ -61,6 +60,10 @@ public:
 public slots:
     inline void setActive(bool active) override { p.active = active; }
     inline void setActiveSettling(bool active) override { p.activeSettling = active; }
+
+protected:
+    static const ModuleFactory::Registrar<MyModule> REG;
+    const ModuleFactory::RegistrarBase& registrar() const override { return REG; }
 
 private:
     PARAMETERS_DECL(Derived, MyParameters)

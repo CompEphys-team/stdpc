@@ -20,18 +20,27 @@ public:
     Module* createModule(const QString& UID);
     QStandardItemModel* getGroupModel() const;
 
-    template <class T>
-    class Registrar
+    class RegistrarBase
     {
-    public:
-        Registrar(const QString& UID, const QString& name, const QString& group) :
+    protected:
+        RegistrarBase(const QString& UID, const QString& name, const QString& group) :
             UID(UID),
             NAME(name),
             GROUP(group)
+        {}
+    public:
+        const QString UID, NAME, GROUP;
+    };
+
+    template <class T>
+    class Registrar : public RegistrarBase
+    {
+    public:
+        Registrar(const QString& UID, const QString& name, const QString& group) :
+            RegistrarBase(UID, name, group)
         {
             ModuleFactory::instance().registerModule(UID, name, group, [](){ return new T; });
         }
-        const QString UID, NAME, GROUP;
     };
 
     static const int UIDRole = Qt::UserRole + 2;
