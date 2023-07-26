@@ -12,7 +12,7 @@ Module::~Module()
 }
 
 
-const ModuleFactory::Registrar<MyModule> MyModule::REG("MyMod", "My Module", "My Group");
+const ModuleFactory::Registrar<MyModule> MyModule::REG("MyMod", "My Module", ModuleFactory::Other);
 
 MyModule::MyModule(QObject *parent)
 {

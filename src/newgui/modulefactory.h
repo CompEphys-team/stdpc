@@ -14,7 +14,10 @@ class ModuleFactory
 public:
     static ModuleFactory& instance();
 
-    void registerModule(const QString& UID, const QString& displayName, const QString& group, std::function<Module*()> createFunction);
+    enum ModuleType { DAQ, Tool, Synapse, Current, Other };
+    static const QString& label(ModuleType);
+
+    void registerModule(const QString& UID, const QString& displayName, ModuleType group, std::function<Module*()> createFunction);
     QStringList getAvailableGroups() const;
     QStringList getAvailableModules(const QString& group) const;
     Module* createModule(const QString& UID);
@@ -23,20 +26,21 @@ public:
     class RegistrarBase
     {
     protected:
-        RegistrarBase(const QString& UID, const QString& name, const QString& group) :
+        RegistrarBase(const QString& UID, const QString& name, ModuleType group) :
             UID(UID),
             NAME(name),
             GROUP(group)
         {}
     public:
-        const QString UID, NAME, GROUP;
+        const QString UID, NAME;
+        const ModuleType GROUP;
     };
 
     template <class T>
     class Registrar : public RegistrarBase
     {
     public:
-        Registrar(const QString& UID, const QString& name, const QString& group) :
+        Registrar(const QString& UID, const QString& name, ModuleType group) :
             RegistrarBase(UID, name, group)
         {
             ModuleFactory::instance().registerModule(UID, name, group, [](){ return new T; });

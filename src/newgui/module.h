@@ -14,7 +14,7 @@ public:
 
     const QString& uid() const { return registrar().UID; }
     const QString& name() const { return registrar().NAME; }
-    const QString& group() const { return registrar().GROUP; }
+    const QString& group() const { return ModuleFactory::label(registrar().GROUP); }
 
     virtual QWidget *createWidget(QWidget *parent) = 0;
 
