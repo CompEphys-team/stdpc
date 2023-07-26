@@ -1,5 +1,5 @@
 #include "configwidget.h"
-#include "qevent.h"
+#include <QKeyEvent>
 #include "ui_configwidget.h"
 #include "modulefactory.h"
 #include "moduleregistry.h"
