@@ -1,10 +1,10 @@
 #ifndef MODULEFACTORY_H
 #define MODULEFACTORY_H
 
-#include <qstring.h>
-#include <qstringlist.h>
-#include <qhash.h>
-#include <qstandarditemmodel.h>
+#include <QString>
+#include <QStringList>
+#include <QHash>
+#include <QStandardItemModel>
 #include <functional>
 
 class Module;
