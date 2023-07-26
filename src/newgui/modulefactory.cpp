@@ -4,7 +4,7 @@
 ModuleFactory::ModuleFactory()
 {
     for (ModuleType type : {DAQ, Tool, Synapse, Current})
-        groupModel.appendRow(new QStandardItem(label(type)));
+        model.appendRow(new QStandardItem(label(type)));
 }
 
 ModuleFactory::~ModuleFactory()
@@ -38,9 +38,9 @@ void ModuleFactory::registerModule(const QString &UID, const QString& displayNam
 
     QStandardItem* groupItem = nullptr;
     QString groupLabel = label(group);
-    for (int i = 0; i < groupModel.rowCount(); ++i)
+    for (int i = 0; i < model.rowCount(); ++i)
     {
-        QStandardItem* item = groupModel.item(i);
+        QStandardItem* item = model.item(i);
         if (item->text() == groupLabel)
         {
             groupItem = item;
@@ -51,7 +51,7 @@ void ModuleFactory::registerModule(const QString &UID, const QString& displayNam
     if (!groupItem)
     {
         groupItem = new QStandardItem(groupLabel);
-        groupModel.appendRow(groupItem);
+        model.appendRow(groupItem);
     }
 
     QStandardItem* moduleItem = new QStandardItem(displayName);
@@ -69,7 +69,7 @@ Module* ModuleFactory::createModule(const QString& UID)
     return nullptr;
 }
 
-QStandardItemModel* ModuleFactory::getGroupModel() const
+QStandardItemModel* ModuleFactory::getModel() const
 {
-    return const_cast<QStandardItemModel*>(&groupModel);
+    return const_cast<QStandardItemModel*>(&model);
 }

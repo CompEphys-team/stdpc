@@ -14,7 +14,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
 
     // Set up combobox with the ModuleFactory hierarchy
     QTreeView *availableModulesView = new QTreeView(ui->comboBox);
-    QStandardItemModel* model = ModuleFactory::instance().getGroupModel();
+    QStandardItemModel* model = ModuleFactory::instance().getModel();
     ui->comboBox->setView(availableModulesView);
     ui->comboBox->setModel(model);
     availableModulesView->header()->hide();

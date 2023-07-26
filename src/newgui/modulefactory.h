@@ -19,7 +19,7 @@ public:
 
     void registerModule(const QString& UID, const QString& displayName, ModuleType group, std::function<Module*()> createFunction);
     Module* createModule(const QString& UID);
-    QStandardItemModel* getGroupModel() const;
+    QStandardItemModel* getModel() const;
 
     class RegistrarBase
     {
@@ -51,7 +51,7 @@ private:
     ModuleFactory();
     ~ModuleFactory();
 
-    QStandardItemModel groupModel;
+    QStandardItemModel model;
     QHash<QString, std::function<Module*()>> moduleCreators;
 };
 
