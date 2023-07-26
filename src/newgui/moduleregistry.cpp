@@ -51,7 +51,7 @@ QModelIndex ModuleRegistry::addModule(Module *module)
     if (!groupItem)
     {
         groupItem = new QStandardItem(group);
-        groupItem->setFlags(groupItem->flags() & ~Qt::ItemIsEnabled);
+        groupItem->setFlags(groupItem->flags() & ~Qt::ItemIsSelectable);
         registeredModules.appendRow(groupItem);
         registeredModules.sort(0);
     }

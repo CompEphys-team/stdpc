@@ -124,11 +124,12 @@ bool ConfigWidget::eventFilter(QObject *obj, QEvent *event)
 void ConfigWidget::openParams()
 {
     QItemSelectionModel *selectionModel = ui->treeView->selectionModel();
-    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
-    if ( selectedIndexes.length() != 1 )
+    QModelIndex index = selectionModel->currentIndex();
+    if ( !index.isValid() )
         return;
-    QModelIndex &index = selectedIndexes.first();
     Module *module = index.data(ModuleRegistry::ModPtr).value<Module*>();
+    if ( !module )
+        return;
     QWidget *dialog = module->createWidget(this);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->show();
