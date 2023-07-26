@@ -48,8 +48,7 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             return;
 
         const QString& UID = ui->comboBox->currentData(ModuleFactory::UIDRole).toString();
-        Module *module = ModuleFactory::instance().createModule(UID);
-        QModelIndex index = filter->mapFromSource(ModuleRegistry::instance().addModule(module));
+        QModelIndex index = filter->mapFromSource(ModuleRegistry::instance().addModule(UID));
         if ( index.isValid() ) {
             QModelIndex parent = index.parent();
             ui->treeView->expand(parent);
@@ -57,8 +56,6 @@ ConfigWidget::ConfigWidget(QWidget *parent) :
             QItemSelectionModel *selection = ui->treeView->selectionModel();
             selection->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
             ui->treeView->setFocus();
-        } else {
-            delete module;
         }
 
         ui->comboBox->setCurrentIndex(-1);

@@ -65,6 +65,12 @@ QModelIndex ModuleRegistry::addModule(Module *module)
     return registeredModules.indexFromItem(newItem);
 }
 
+QModelIndex ModuleRegistry::addModule(const QString &UID)
+{
+    Module* module = ModuleFactory::instance().createModule(UID);
+    return addModule(module);
+}
+
 void ModuleRegistry::removeModule(Module *module)
 {
     if (!module)

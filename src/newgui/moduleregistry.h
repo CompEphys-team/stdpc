@@ -11,6 +11,7 @@ public:
     static ModuleRegistry& instance();
 
     QModelIndex addModule(Module *module);
+    QModelIndex addModule(const QString& UID);
     void removeModule(Module *module);
     QStandardItemModel* getModuleModel() const;
 
