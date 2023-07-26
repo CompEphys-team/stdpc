@@ -35,11 +35,20 @@
  * }
  */
 class Parameters {
+    using readlater_tuple = std::tuple<QString, int, std::function<void(void)>>;
+
 public:
+    struct ReadLater
+    {
+        QString message;
+        std::function<void(void)> read;
+    };
+
     QString read(const QStringList& path, const QVariant& value, int pathIndex=0);
+    ReadLater readLater(const QStringList& path, const QVariant& value, int pathIndex=0);
     void write(std::ostream& os, const QString& prefix) const;
 
-    std::tuple<QString, int> _read(const QStringList& path, const QVariant& value, int pathIndex);
+    readlater_tuple _read(const QStringList& path, const QVariant& value, int pathIndex);
 
 protected:
     Parameters() = default;
@@ -48,7 +57,7 @@ protected:
     class _RegistryBase
     {
     public:
-        virtual std::tuple<QString, int> read(Parameters* self, const QStringList& path, int index, const QVariant& value) const = 0;
+        virtual readlater_tuple read(Parameters* self, const QStringList& path, int index, const QVariant& value) const = 0;
         virtual void write(const Parameters* self, std::ostream& os, const QString& prefix) const = 0;
 
         inline _RegistryBase *getBaseReg() const { return baseReg; }
@@ -75,11 +84,10 @@ protected:
         typename std::enable_if<(std::is_arithmetic_v<T> || std::is_base_of_v<QString, T>) && std::is_base_of_v<Owner, Params>, void>::type
         add(const QString& parameterName, T Owner::* paramPtr, bool deprecated=false)
         {
-            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
+            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> readlater_tuple {
                 if ( index < path.size() )
-                    return {QString("Unexpected child %1 of %2 at position %3 in %4.").arg(path[index], parameterName, QString::number(index), path.join('.')), index};
-                self->*paramPtr = value.value<T>();
-                return {QString(), index};
+                    return {QString("Unexpected child %1 of %2 at position %3 in %4.").arg(path[index], parameterName, QString::number(index), path.join('.')), index, qt_noop};
+                return {QString(), index, [=]{self->*paramPtr = value.value<T>();}};
             };
             if ( !deprecated )
                 writers[parameterName] = [=](const Params* self, std::ostream& os, const QString& prefix){
@@ -92,9 +100,9 @@ protected:
         typename std::enable_if<std::is_base_of_v<Parameters, T> && std::is_base_of_v<Owner, Params>, void>::type
         add(const QString& parameterName, T Owner::* structPtr, bool deprecated=false)
         {
-            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
+            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> readlater_tuple {
                 if ( index >= path.size() )
-                    return {QString("Expected child of %2 at position %3 in %4.").arg(parameterName, QString::number(index), path.join('.')), index};
+                    return {QString("Expected child of %2 at position %3 in %4.").arg(parameterName, QString::number(index), path.join('.')), index, qt_noop};
                 return (self->*structPtr)._read(path, value, index);
             };
             if ( !deprecated )
@@ -108,16 +116,16 @@ protected:
         typename std::enable_if<std::is_base_of_v<Parameters, T> && std::is_base_of_v<Owner, Params>, void>::type
         add(const QString& parameterName, std::vector<T> Owner::* vectorPtr, bool deprecated=false)
         {
-            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> std::tuple<QString, int> {
+            readers[parameterName] = [=](Params* self, const QStringList& path, int index, const QVariant& value) -> readlater_tuple {
                 std::vector<T> &vec = self->*vectorPtr;
                 if ( index >= path.size() )
-                    return {QString("Missing index to %2 at position %3 in %4.").arg(parameterName, QString::number(index), path.join('.')), index};
+                    return {QString("Missing index to %2 at position %3 in %4.").arg(parameterName, QString::number(index), path.join('.')), index, qt_noop};
                 bool ok;
                 int vecIdx = path[index].toInt(&ok);
                 if ( !ok || vecIdx < 0 )
-                    return {QString("Index %1 to %2 at position %3 in %4 is invalid.").arg(path[index], parameterName, QString::number(index), path.join('.')), index};
+                    return {QString("Index %1 to %2 at position %3 in %4 is invalid.").arg(path[index], parameterName, QString::number(index), path.join('.')), index, qt_noop};
                 if ( ++index >= path.size() )
-                    return {QString("Expected child of %2[%1] at position %3 in %4.").arg(QString::number(vecIdx), parameterName, QString::number(index), path.join('.')), index};
+                    return {QString("Expected child of %2[%1] at position %3 in %4.").arg(QString::number(vecIdx), parameterName, QString::number(index), path.join('.')), index, qt_noop};
                 if ( vecIdx >= vec.size() )
                     vec.resize(vecIdx + 1);
                 return vec[vecIdx]._read(path, value, index);
@@ -133,17 +141,17 @@ protected:
         }
 
     private:
-        QMap<QString, std::function<std::tuple<QString, int>(Params *self, const QStringList&, int, const QVariant&)>> readers;
+        QMap<QString, std::function<readlater_tuple(Params *self, const QStringList&, int, const QVariant&)>> readers;
         QMap<QString, std::function<void(const Params *self, std::ostream&, const QString&)>> writers;
 
-        std::tuple<QString, int> read(Parameters* self, const QStringList& path, int index, const QVariant& value) const override
+        readlater_tuple read(Parameters* self, const QStringList& path, int index, const QVariant& value) const override
         {
             Params* trueSelf = static_cast<Params*>(self);
             if ( index >= path.size() )
-                return {QString("Expected child at position %3 in %4.").arg(QString::number(index), path.join(".")), index};
+                return {QString("Expected child at position %3 in %4.").arg(QString::number(index), path.join(".")), index, qt_noop};
             QString parameterName = path[index];
             if ( !readers.contains(parameterName) )
-                return {QString("Unregistered parameter %1 at position %3 in %4").arg(parameterName, QString::number(index), path.join(".")), index};
+                return {QString("Unregistered parameter %1 at position %3 in %4").arg(parameterName, QString::number(index), path.join(".")), index, qt_noop};
             return readers.value(parameterName)(trueSelf, path, index+1, value);
         }
 

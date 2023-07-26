@@ -36,8 +36,9 @@ MyModule::MyModule(QObject *parent)
     for ( int i = 0; i < paths.size(); ++i ) {
         const QStringList& path = paths[i];
         const QVariant& value = values[i];
-        QString retval = p.read(path, value);
-        qDebug() << retval << '\t' << paths[i] << '\t' << values[i];
+        auto retval = p.readLater(path, value);
+        qDebug() << retval.message << '\t' << paths[i] << '\t' << values[i];
+        retval.read();
     }
 
     p.write(std::cout, "p.");

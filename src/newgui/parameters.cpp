@@ -2,15 +2,23 @@
 
 QString Parameters::read(const QStringList &path, const QVariant &value, int pathIndex)
 {
+    readlater_tuple ret = _read(path, value, pathIndex);
+    std::get<2>(ret)();
     return std::get<0>(_read(path, value, pathIndex));
 }
 
-std::tuple<QString, int> Parameters::_read(const QStringList &path, const QVariant &value, int pathIndex)
+Parameters::ReadLater Parameters::readLater(const QStringList &path, const QVariant &value, int pathIndex)
 {
-    std::vector<std::tuple<QString, int>> retvals;
+    readlater_tuple ret = _read(path, value, pathIndex);
+    return {std::get<0>(ret), std::get<2>(ret)};
+}
+
+Parameters::readlater_tuple Parameters::_read(const QStringList &path, const QVariant &value, int pathIndex)
+{
+    std::vector<readlater_tuple> retvals;
     _RegistryBase* reg = getRegistry();
     while ( reg ) {
-        std::tuple<QString, int> retval = reg->read(this, path, pathIndex, value);
+        readlater_tuple retval = reg->read(this, path, pathIndex, value);
         if ( std::get<0>(retval).isEmpty() )
             return retval;
         retvals.emplace_back(retval);
@@ -28,7 +36,7 @@ std::tuple<QString, int> Parameters::_read(const QStringList &path, const QVaria
                 causes.append(std::get<0>(retval));
             }
         }
-        return {causes.join(" --OR-- "), deepest};
+        return {causes.join(" --OR-- "), deepest, qt_noop};
     }
 }
 
