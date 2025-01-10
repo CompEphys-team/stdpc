@@ -106,3 +106,70 @@ void SimulDAQDlg::on_OutputFileB_clicked()
         change= true;
     }
 }
+
+SimulDAQDialog::SimulDAQDialog(SDAQData &data, QWidget *parent) :
+    QDialog(parent),
+    p(data)
+{
+    setupUi(this);
+//    connect(inChannels, SIGNAL(clicked(bool)), this, SLOT(openInChnDlg()));
+//    connect(outChannels, SIGNAL(clicked(bool)), this, SLOT(openOutChnDlg()));
+    connect(InputFileB, SIGNAL(clicked(bool)), this, SLOT(browseInputFile()));
+    connect(OutputFileB, SIGNAL(clicked(bool)), this, SLOT(browseOutputFile()));
+
+    leLabel->setText(p.label);
+    InputFileE->setText(p.inFileName);
+    OutputFileE->setText(p.outFileName);
+    inChannelE->setText(QString::number(p.inChn.size()));
+    outChannelE->setText(QString::number(p.outChn.size()));
+    inTFacE->setText(QString::number(p.inTFac));
+    outDtE->setText(QString::number(p.outDt*1e3));
+    cbRewind->setChecked(p.rewindAfterSettling);
+}
+
+void SimulDAQDialog::accept()
+{
+    apply();
+    QDialog::accept();
+}
+
+void SimulDAQDialog::apply()
+{
+    bool changed = false;
+    uint inChnNo = p.inChn.size(), outChnNo = p.outChn.size();
+    getEntry(inChnNo, inChannelE->text().toUInt(), changed);
+    getEntry(outChnNo, outChannelE->text().toUInt(), changed);
+    if ( changed ) {
+        p.inChn.resize(inChnNo);
+        p.outChn.resize(outChnNo);
+        for ( inChnData &i : p.inChn )
+          i.active = true;
+        for ( outChnData &i : p.outChn )
+          i.active = true;
+    }
+    getEntry<QString>(p.label, leLabel->text(), changed);
+    getEntry<QString>(p.inFileName, InputFileE->text(), changed);
+    getEntry<QString>(p.outFileName, OutputFileE->text(), changed);
+    getEntry(p.inTFac, inTFacE->text().toDouble(), changed);
+    getEntry(p.outDt, outDtE->text().toDouble()*1e-3, changed);
+    getEntry(p.rewindAfterSettling, cbRewind->isChecked(), changed);
+
+    if ( changed )
+        emit applied();
+}
+
+void SimulDAQDialog::browseInputFile()
+{
+    QString file = QFileDialog::getOpenFileName(this, "Select input file...", InputFileE->text());
+    if ( !file.isEmpty() ) {
+        InputFileE->setText(file);
+    }
+}
+
+void SimulDAQDialog::browseOutputFile()
+{
+    QString file = QFileDialog::getSaveFileName(this, "Select output file...", OutputFileE->text());
+    if ( !file.isEmpty() ) {
+        OutputFileE->setText(file);
+    }
+}

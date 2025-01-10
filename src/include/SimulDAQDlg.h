@@ -46,4 +46,26 @@ protected:
      SDAQData bak;
 };
 
+class SimulDAQDialog : public QDialog, private Ui::SimulDAQDlg
+{
+    Q_OBJECT
+
+public:
+    SimulDAQDialog(SDAQData &data, QWidget *parent=nullptr);
+
+public slots:
+    void accept() override;
+    void apply();
+
+signals:
+    void applied();
+
+private slots:
+    void browseInputFile();
+    void browseOutputFile();
+
+private:
+    SDAQData &p;
+};
+
 #endif

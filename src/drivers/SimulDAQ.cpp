@@ -25,6 +25,32 @@
 #include "SimulDAQDlg.h"
 extern Q_CORE_EXPORT int qt_ntfs_permission_lookup;
 
+
+const ModuleFactory::Registrar<SimulDAQModule> SimulDAQModule::REG("SDAQp", "SimulDAQ", ModuleFactory::DAQ);
+
+SimulDAQModule::SimulDAQModule(QObject *parent) :
+    Module(parent)
+{
+}
+
+SimulDAQModule::~SimulDAQModule()
+{
+}
+
+QWidget *SimulDAQModule::createWidget(QWidget *parent)
+{
+    SimulDAQDialog* dlg = new SimulDAQDialog(p, parent);
+    connect(dlg, &SimulDAQDialog::applied, this, &SimulDAQModule::init);
+    return dlg;
+}
+
+void SimulDAQModule::init()
+{
+//    QString foo;
+//    if ( p.active )
+//        daq.initialize_board(foo);
+}
+
 /// Construct a single self-registering proxy
 static SimulDAQProxy *prox = SimulDAQProxy::get();
 std::vector<SDAQData> SimulDAQProxy::p;

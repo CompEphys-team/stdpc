@@ -101,5 +101,34 @@ class SimulDAQ: public DAQ
     
     void flush_analog_out();
 };
-      
+
+#include "module.h"
+
+class SimulDAQModule : public Module
+{
+    Q_OBJECT
+public:
+
+    explicit SimulDAQModule(QObject *parent = nullptr);
+    ~SimulDAQModule() override;
+
+    QWidget * createWidget(QWidget *parent) override;
+
+    inline bool active() const override { return p.active; }
+
+public slots:
+    inline void setActive(bool active) override { p.active = active; }
+
+protected:
+    static const ModuleFactory::Registrar<SimulDAQModule> REG;
+    const ModuleFactory::RegistrarBase& registrar() const override { return REG; }
+
+private slots:
+    void init();
+
+private:
+    SDAQData p;
+//    SimulDAQ daq;
+};
+
 #endif

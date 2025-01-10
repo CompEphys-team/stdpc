@@ -62,6 +62,12 @@ QModelIndex ModuleRegistry::addModule(Module *module)
     groupItem->appendRow(newItem);
     groupItem->sortChildren(0);
 
+    // Mock: Add children
+    for ( int i=0; i < 3; i++ ) {
+        QStandardItem* child = new QStandardItem(QString("Child %1").arg(i+1));
+        newItem->appendRow(child);
+    }
+
     return registeredModules.indexFromItem(newItem);
 }
 

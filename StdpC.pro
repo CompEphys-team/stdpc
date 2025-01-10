@@ -167,6 +167,7 @@ HEADERS += \
     src/include/treewidgetitem_models.h \
     src/include/InputConductance.h \
     src/include/InputConductanceDlg.h \
+    src/newgui/configuration.h \
     src/newgui/configwidget.h \
     src/newgui/depthfilterproxymodel.h \
     src/newgui/modulefactory.h \
@@ -255,6 +256,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/models/channeltransform.cpp \
     src/models/lineartransform.cpp \
     src/models/sinusoidaltransform.cpp \
+    src/newgui/configuration.cpp \
     src/newgui/configwidget.cpp \
     src/newgui/depthfilterproxymodel.cpp \
     src/newgui/modulefactory.cpp \
