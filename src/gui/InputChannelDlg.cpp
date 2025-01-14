@@ -90,6 +90,7 @@ void InputChannelDlg::init()
   #define X8 675
   #define X9 700
   #define X10 750
+  #define X11 850
 
   QCheckBox *cbtmp;
   QComboBox *qctmp;
@@ -141,6 +142,16 @@ void InputChannelDlg::init()
   lb= new QLabel(this);
   lb->setGeometry(QRect(X9, Y0-45, 60, 36));
   lb->setText(QString("  Save\nChannel"));
+  allLabel.append(lb);
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X10+10, Y0-45, 80, 36));
+  lb->setText(QString("  Active\nElectrode"));
+  allLabel.append(lb);
+
+  lb= new QLabel(this);
+  lb->setGeometry(QRect(X11+10, Y0-45, 60, 36));
+  lb->setText(QString("ΔF/F"));
   allLabel.append(lb);
 
   for (int i= 0; i < ChnNo; i++) {
@@ -212,6 +223,14 @@ void InputChannelDlg::init()
     });
     btntmp->setEnabled(false);
     calib.append(btntmp);
+
+    btntmp= new QPushButton("Calibrate", this);
+    btntmp->setGeometry(QRect(X11, Y0+i*DY-1, 70, 20));
+    btntmp->setObjectName(QString("Calibrate ")+nm);
+    connect(btntmp, &QPushButton::clicked, [=](){
+
+    });
+    fluorescenceCalib.append(btntmp);
   }
   QRect geo= this->geometry();
   geo.setHeight(Y0+ChnNo*DY+60);

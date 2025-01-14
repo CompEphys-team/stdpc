@@ -57,6 +57,7 @@ class InputChannelDlg : public QDialog, private Ui::InputChannelDlg
      QVector<QLineEdit *> bias;
      QVector<QCheckBox *> saveChnl;
      QVector<QPushButton *> calib;
+     QVector<QPushButton *> fluorescenceCalib;
 
      QVector<elecCalibParams> calibBackup;
 
