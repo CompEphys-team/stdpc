@@ -77,6 +77,7 @@ FORMS += $$PWD/src/gui/MainWin.ui \
     src/gui/treewidgetitem_models.ui \
     src/gui/InputConductanceDlg.ui \
     src/gui/MicroManagerDAQDlg.ui \
+    src/gui/FluorescenceCompDlg.ui \
 
 HEADERS += \
     $$PWD/src/include/Mainwin.h \
@@ -168,6 +169,7 @@ HEADERS += \
     src/include/InputConductanceDlg.h \
     src/include/MicroManagerDAQ.h \
     src/include/MicroManagerDAQDlg.h \
+    src/include/FluorescenceCompDlg.h \
 
 SOURCES += $$PWD/src/core/Main.cpp \
     $$PWD/src/gui/MainWin.cpp \
@@ -252,6 +254,7 @@ SOURCES += $$PWD/src/core/Main.cpp \
     src/models/sinusoidaltransform.cpp \
     src/drivers/MicroManagerDAQ.cpp \
     src/gui/MicroManagerDAQDlg.cpp \
+    src/gui/FluorescenceCompDlg.cpp \
 
 digidata {
     mingw {

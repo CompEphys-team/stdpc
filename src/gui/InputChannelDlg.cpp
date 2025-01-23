@@ -20,6 +20,7 @@
 #include "InputChannelDlg.h"
 #include <QMessageBox>
 #include "ElectrodeCompDlg.h"
+#include "FluorescenceCompDlg.h"
 
 InputChannelDlg::InputChannelDlg(size_t idx, DAQProxy *proxy, QWidget *parent) :
     QDialog(parent),
@@ -228,7 +229,12 @@ void InputChannelDlg::init()
     btntmp->setGeometry(QRect(X11, Y0+i*DY-1, 70, 20));
     btntmp->setObjectName(QString("Calibrate ")+nm);
     connect(btntmp, &QPushButton::clicked, [=](){
-
+        ChannelIndex dex(proxy, idx, i, true);
+        FluorescenceCompDlg *calibDlg = new FluorescenceCompDlg(factor[i], bias[i], dex, this);
+        if ( calibDlg->exec() == QDialog::Accepted ) {
+            calibDlg->exportData();
+        }
+        delete calibDlg;
     });
     fluorescenceCalib.append(btntmp);
   }
