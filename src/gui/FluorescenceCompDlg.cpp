@@ -39,7 +39,7 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     ui->plot->xAxis->setLabel("Time (s)");
     ui->plot->xAxis->setRange(0, 10);
     ui->plot->yAxis->setLabel("Input signal");
-    ui->plot->yAxis->setRange(0, 1); // TODO: Adjust to a reasonable value
+    ui->plot->yAxis->setRange(0, 1);
 
     connect(ui->plot, &QCustomPlot::selectionChangedByUser, this, [=](){
         QList<QCPAxis *> axes = ui->plot->selectedAxes();
@@ -47,10 +47,14 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
             axes = ui->plot->axisRect()->axes();
         ui->plot->axisRect()->setRangeZoomAxes(axes);
         ui->plot->axisRect()->setRangeDragAxes(axes);
-
     });
     ui->plot->axisRect()->setRangeZoomAxes(ui->plot->axisRect()->axes());
     ui->plot->axisRect()->setRangeDragAxes(ui->plot->axisRect()->axes());
+
+    ui->plot->yAxis2->setVisible(true);
+    ui->plot->yAxis2->setSelectableParts(QCPAxis::spNone);
+    ui->plot->yAxis2->setLabel("Voltage (mV)");
+    connect(ui->plot->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(adjustAxis()));
 
     resetGraph();
     ui->plot->replot();
@@ -165,6 +169,14 @@ void FluorescenceCompDlg::updateInputs()
         bias = V0 - f0*gain;  // V0 = f0 * gain + bias
     }
     updateOutputs();
+    adjustAxis();
+}
+
+void FluorescenceCompDlg::adjustAxis()
+{
+    QCPRange r(ui->plot->yAxis->range());
+    ui->plot->yAxis2->setRange((r.lower*gain + bias)*1e3, (r.upper*gain + bias)*1e3); // *1e3 for mV rather than V
+    ui->plot->replot(QCustomPlot::rpQueuedReplot);
 }
 
 void FluorescenceCompDlg::updateOutputs()
@@ -180,4 +192,5 @@ void FluorescenceCompDlg::resetGraph()
     ui->plot->clearGraphs();
     ui->plot->addGraph();
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
+    adjustAxis();
 }

@@ -27,6 +27,7 @@ public slots:
     void acquire();
     void calculate();
     void updateInputs();
+    void adjustAxis();
 
 private:
     Ui::FluorescenceCompDlg *ui;
