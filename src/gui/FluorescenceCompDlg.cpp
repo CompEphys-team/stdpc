@@ -55,6 +55,7 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     ui->plot->yAxis2->setSelectableParts(QCPAxis::spNone);
     ui->plot->yAxis2->setLabel("Voltage (mV)");
     connect(ui->plot->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(adjustAxis()));
+    connect(ui->plot->xAxis, qOverload<const QCPRange&>(&QCPAxis::rangeChanged), this, [=](){ if (ui->checkBox->isChecked()) calculate();});
 
     resetGraph();
     ui->plot->replot();
@@ -62,6 +63,7 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(start()));
     connect(ui->inputBaseline, SIGNAL(textChanged(QString)), this, SLOT(updateInputs()));
     connect(ui->inputSpikesize, SIGNAL(textChanged(QString)), this, SLOT(updateInputs()));
+    connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(calculate()));
 }
 
 FluorescenceCompDlg::~FluorescenceCompDlg()
@@ -143,17 +145,30 @@ void FluorescenceCompDlg::acquire()
     ui->plot->replot(QCustomPlot::rpQueuedReplot);
 }
 
-bool comp(QCPGraphData const& left, QCPGraphData const& right)
+bool compValue(QCPGraphData const& left, QCPGraphData const& right)
 {
     return left.value < right.value;
+}
+bool compKey(QCPGraphData const& left, QCPGraphData const& right)
+{
+    return left.key < right.key;
 }
 
 void FluorescenceCompDlg::calculate()
 {
     auto g = ui->plot->graph()->data();
-    std::sort(g->begin(), g->end(), comp);
-    double fmax = (g->end()-1)->value;
-    f0 = (g->begin() + g->size()/2)->value;
+    QCPGraphData *begin(g->begin()), *end(g->end());
+    if ( ui->checkBox->isChecked() ) {
+        // because g->findBegin()/findEnd() return const_iterators, which don't work with std::sort, we need the STL instead:
+        auto range = ui->plot->xAxis->range();
+        QCPGraphData lo(range.lower, 0.), hi(range.upper, 0.);
+        begin = std::lower_bound(begin, end, lo, compKey);
+        end = std::lower_bound(begin, end, hi, compKey);
+    }
+    size_t size = end - begin;
+    std::sort(begin, end, compValue);
+    double fmax = (end-1)->value;
+    f0 = (end - size/2)->value;
     df = fmax - f0;
     g->sort();  // Return to sort-by-key (time) for display.
 
