@@ -166,11 +166,15 @@ void FluorescenceCompDlg::calculate()
         end = std::lower_bound(begin, end, hi, compKey);
     }
     size_t size = end - begin;
-    std::sort(begin, end, compValue);
-    double fmax = (end-1)->value;
-    f0 = (end - size/2)->value;
-    df = fmax - f0;
-    g->sort();  // Return to sort-by-key (time) for display.
+    if ( size > 0 ) {
+        std::sort(begin, end, compValue);
+        double fmax = (end-1)->value;
+        f0 = (end - size/2)->value;
+        df = fmax - f0;
+        g->sort();  // Return to sort-by-key (time) for display.
+    } else {
+        f0 = df = 0;
+    }
 
     updateInputs();
 }
