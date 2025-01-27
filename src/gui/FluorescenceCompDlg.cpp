@@ -100,7 +100,7 @@ void FluorescenceCompDlg::start()
         daq->start();
         DAQClock.reset_RTC();
         dataTimer.start();
-        calcTimer.start(2000);
+        calcTimer.start(100);
     } else {
         ui->status->setText(QString("Failed to initialize: %1").arg(ret));
     }
