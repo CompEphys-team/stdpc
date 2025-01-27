@@ -14,8 +14,8 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     daq(Devices.getDevice(dex)),
     backupGain(daq->params()->inChn[dex.chanID].gainFac),
     backupBias(daq->params()->inChn[dex.chanID].bias),
-    gain(gain->text().toDouble()),
-    bias(bias->text().toDouble()),
+    gain(backupGain),
+    bias(backupBias),
     f0(0),
     df(0)
 {
@@ -186,6 +186,9 @@ void FluorescenceCompDlg::updateInputs()
     if ( df > 0 ) {
         gain = dV/df;  // dV = df * gain
         bias = V0 - f0*gain;  // V0 = f0 * gain + bias
+    } else {
+        gain = backupGain;
+        bias = backupBias;
     }
     updateOutputs();
     adjustAxis();
