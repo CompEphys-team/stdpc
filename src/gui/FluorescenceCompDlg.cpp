@@ -80,7 +80,7 @@ FluorescenceCompDlg::~FluorescenceCompDlg()
 void FluorescenceCompDlg::exportData()
 {
     exportGain->setText(QString::number(gain));
-    exportBias->setText(QString::number(bias));
+    exportBias->setText(QString::number(bias*1e3));  // output in mV
 }
 
 void FluorescenceCompDlg::start()
@@ -203,7 +203,7 @@ void FluorescenceCompDlg::adjustAxis()
 
 void FluorescenceCompDlg::updateOutputs()
 {
-    ui->outputBias->setText(QString::number(bias));
+    ui->outputBias->setText(QString::number(bias*1e3));  // *1e3 for mV
     ui->outputGain->setText(QString::number(gain));
     ui->outputDF->setText(QString::number(df));
     ui->outputF0->setText(QString::number(f0));
