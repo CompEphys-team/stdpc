@@ -28,6 +28,7 @@ public slots:
     void calculate();
     void updateInputs();
     void adjustAxis();
+    void invert();
 
 private:
     Ui::FluorescenceCompDlg *ui;
@@ -42,6 +43,7 @@ private:
     double backupGain, backupBias;
     double gain, bias;
     double f0, df;
+    bool isInverted;
 
     static double V0, dV;
 

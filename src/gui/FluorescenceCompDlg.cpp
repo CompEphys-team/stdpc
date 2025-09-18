@@ -17,12 +17,14 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     gain(backupGain),
     bias(backupBias),
     f0(0),
-    df(0)
+    df(0),
+    isInverted(backupGain < 0)
 {
     ui->setupUi(this);
     updateOutputs();
     ui->inputBaseline->setValue(int(V0 * 1e3));
     ui->inputSpikesize->setValue(int(dV * 1e3));
+    ui->cbInvert->setChecked(isInverted);
 
     daq->params()->inChn[dex.chanID].gainFac = 1;
     daq->params()->inChn[dex.chanID].bias = 0;
@@ -55,7 +57,7 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     ui->plot->yAxis2->setSelectableParts(QCPAxis::spNone);
     ui->plot->yAxis2->setLabel("Voltage (mV)");
     connect(ui->plot->yAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(adjustAxis()));
-    connect(ui->plot->xAxis, qOverload<const QCPRange&>(&QCPAxis::rangeChanged), this, [=](){ if (ui->checkBox->isChecked()) calculate();});
+    connect(ui->plot->xAxis, qOverload<const QCPRange&>(&QCPAxis::rangeChanged), this, [=](){ if (ui->cbVisibleRangeOnly->isChecked()) calculate();});
 
     resetGraph();
     ui->plot->replot();
@@ -63,7 +65,8 @@ FluorescenceCompDlg::FluorescenceCompDlg(QLineEdit *gain, QLineEdit *bias, Chann
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(start()));
     connect(ui->inputBaseline, SIGNAL(textChanged(QString)), this, SLOT(updateInputs()));
     connect(ui->inputSpikesize, SIGNAL(textChanged(QString)), this, SLOT(updateInputs()));
-    connect(ui->checkBox, SIGNAL(toggled(bool)), this, SLOT(calculate()));
+    connect(ui->cbVisibleRangeOnly, SIGNAL(toggled(bool)), this, SLOT(calculate()));
+    connect(ui->cbInvert, SIGNAL(toggled(bool)), this, SLOT(invert()));
 }
 
 FluorescenceCompDlg::~FluorescenceCompDlg()
@@ -79,7 +82,7 @@ FluorescenceCompDlg::~FluorescenceCompDlg()
 
 void FluorescenceCompDlg::exportData()
 {
-    exportGain->setText(QString::number(gain));
+    exportGain->setText(QString::number(gain * (isInverted ? -1 : 1)));
     exportBias->setText(QString::number(bias*1e3));  // output in mV
 }
 
@@ -128,7 +131,7 @@ void FluorescenceCompDlg::acquire()
     bool tRangeFound, vRangeFound;
     QCPRange tRange = ui->plot->graph()->getKeyRange(tRangeFound);
 
-    ui->plot->graph(0)->addData(DAQClock.t, chan->V);
+    ui->plot->graph(0)->addData(DAQClock.t, chan->V * (isInverted ? -1 : 1));
 
     if ( tRangeFound ) {
         double tUpper = ui->plot->xAxis->range().upper;
@@ -158,7 +161,7 @@ void FluorescenceCompDlg::calculate()
 {
     auto g = ui->plot->graph()->data();
     QCPGraphData *begin(g->begin()), *end(g->end());
-    if ( ui->checkBox->isChecked() ) {
+    if ( ui->cbVisibleRangeOnly->isChecked() ) {
         // because g->findBegin()/findEnd() return const_iterators, which don't work with std::sort, we need the STL instead:
         auto range = ui->plot->xAxis->range();
         QCPGraphData lo(range.lower, 0.), hi(range.upper, 0.);
@@ -215,4 +218,30 @@ void FluorescenceCompDlg::resetGraph()
     ui->plot->addGraph();
     ui->plot->xAxis->moveRange(-ui->plot->xAxis->range().lower);
     adjustAxis();
+}
+
+void FluorescenceCompDlg::invert()
+/** Inverts the plotted data.
+ * Note that raw input remains unchanged throughout the lifetime of this dialog.
+ * Toggling isInverted only affects plotted data, both existing and newly added,
+ * which is the basis for all calculation.
+ * Inversion is then also applied to the gain at exportData() to reflect the true input signal.
+ * Perhaps there was a more elegant way of doing this by inverting one of the vertical axes?
+ * */
+{
+    auto g = ui->plot->graph()->data();
+    for ( auto datum = g->begin(); datum != g->end(); ++datum )
+    {
+        datum->value = -datum->value;
+    }
+    isInverted = !isInverted;
+
+    bool vRangeFound;
+    QCPRange vRange = ui->plot->graph()->getValueRange(vRangeFound);
+    if ( vRangeFound ) {
+        double buffer = 0.05 * (vRange.upper - vRange.lower);
+        ui->plot->yAxis->setRange(vRange.lower - buffer, vRange.upper + buffer);
+    }
+
+    calculate();
 }
