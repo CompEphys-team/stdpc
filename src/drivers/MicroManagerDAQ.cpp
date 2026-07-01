@@ -272,10 +272,10 @@ void MicroManagerDAQ::get_scan(bool)
     if ( !connected ) {
         connect();
     } else {
-        if ( drainSocket() ) {
+        while ( drainSocket() ) {
             int lastNewline = rxBuffer.lastIndexOf('\n');
             if (lastNewline == -1)
-                return;
+                break;
 
             // Everything after the last newline is an incomplete line.
             QByteArray tail = rxBuffer.mid(lastNewline + 1);
@@ -293,19 +293,21 @@ void MicroManagerDAQ::get_scan(bool)
             lastLine = lastLine.trimmed();
 
             if (!lastLine.startsWith("!!!S") || !lastLine.endsWith("E!!!"))
-                return;
+                break;
 
             lastLine.remove(0, 4);
             lastLine.chop(4);
 
             QList<QByteArray> values = lastLine.split('\t');
             if (values.size() != 3)
-                return;
+                break;
 
             int roi = values[0].toInt();
             double v = values[2].toDouble();
             if ( roi < actInChnNo )
                 inBuffer[inIdx[roi]] = inGainFac[roi]*v;
+
+            break; // If we actually looped back to read more data and MM were really fast, we could be stuck here forever.
         }
     }
 
