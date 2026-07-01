@@ -76,6 +76,8 @@ class MicroManagerDAQ: public DAQ
 
     bool connect();
     void disconnect();
+
+    bool drainSocket();
 };
 
 #endif

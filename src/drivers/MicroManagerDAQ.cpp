@@ -232,44 +232,47 @@ void MicroManagerDAQ::generate_scan_list(short int chnNo, QVector<short> Chns)
     }
 }
 
+bool MicroManagerDAQ::drainSocket()
+{
+    // Check for existing messages
+    FD_SET readfds;
+    FD_ZERO(&readfds);
+    FD_SET(sock, &readfds);
+
+    char szTemp[8192];
+    bool received_data = false;
+    while(true) {
+        // Drain the socket
+        int bytes_received = recv(sock, szTemp, sizeof(szTemp), 0);
+
+        if ( bytes_received > 0 ) {
+            rxBuffer.append(szTemp, bytes_received);
+            received_data = true;
+            continue;
+        }
+
+        if ( bytes_received == 0 ) {
+            std::cerr << "MMDAQ: Connection closed by peer" << std::endl;
+            disconnect();
+            return false;
+        }
+
+        int err = WSAGetLastError();
+        if (err == WSAEWOULDBLOCK)
+            return received_data;
+        else {
+            std::cerr << "MMDAQ: Unanticipated error during message receipt: " << err << std::endl;
+            return false;
+        }
+    }
+}
+
 void MicroManagerDAQ::get_scan(bool)
 {
     if ( !connected ) {
         connect();
     } else {
-        // Check for existing messages
-        FD_SET readfds;
-        FD_ZERO(&readfds);
-        FD_SET(sock, &readfds);
-
-        char szTemp[8192];
-        bool received_data = false;
-        while(true) {
-            // Drain the socket
-            int bytes_received = recv(sock, szTemp, sizeof(szTemp), 0);
-
-            if ( bytes_received > 0 ) {
-                rxBuffer.append(szTemp, bytes_received);
-                received_data = true;
-                continue;
-            }
-
-            if ( bytes_received == 0 ) {
-                std::cerr << "MMDAQ: Connection closed by peer" << std::endl;
-                disconnect();
-                return;
-            }
-
-            int err = WSAGetLastError();
-            if (err == WSAEWOULDBLOCK)
-                break;
-            else {
-                std::cerr << "MMDAQ: Unanticipated error during message receipt: " << err << std::endl;
-                return;
-            }
-        }
-
-        if ( received_data ) {
+        if ( drainSocket() ) {
             int lastNewline = rxBuffer.lastIndexOf('\n');
             if (lastNewline == -1)
                 return;
