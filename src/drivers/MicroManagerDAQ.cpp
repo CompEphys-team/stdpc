@@ -181,6 +181,14 @@ bool MicroManagerDAQ::connect()
                 return false;
             }
 
+            // Make it non-blocking again for normal operation
+            u_long one = 1;
+            if ( ioctlsocket(sock, FIONBIO, &one) != NO_ERROR ){
+                closesocket(sock);
+                std::cerr << "MMDAQ: Failed to make socket non-blocking" << std::endl;
+                return false;
+            }
+
             connected = true;
         } else if ( ret == SOCKET_ERROR ) {
             std::cerr << "MMDAQ: Failed to check connection status" << std::endl;
@@ -233,49 +241,68 @@ void MicroManagerDAQ::get_scan(bool)
         FD_SET readfds;
         FD_ZERO(&readfds);
         FD_SET(sock, &readfds);
-        timeval t;
-        t.tv_sec = 0;
-        t.tv_usec = 0;
-        if ( select(0, &readfds, 0, 0, &t) > 0 ) {
-            // Read everything
-            char szTemp[8192];
+
+        char szTemp[8192];
+        bool received_data = false;
+        while(true) {
+            // Drain the socket
             int bytes_received = recv(sock, szTemp, sizeof(szTemp), 0);
+
             if ( bytes_received > 0 ) {
                 rxBuffer.append(szTemp, bytes_received);
-                int lastNewline = rxBuffer.lastIndexOf('\n');
-                if (lastNewline == -1)
-                    return;
-
-                // Everything after the last newline is an incomplete line.
-                QByteArray tail = rxBuffer.mid(lastNewline + 1);
-
-                // Process only complete lines.
-                QByteArray complete = rxBuffer.left(lastNewline);
-
-                // Keep the unfinished tail for next recv().
-                rxBuffer = std::move(tail);
-
-                int start = complete.lastIndexOf('\n');
-                QByteArray lastLine =
-                    (start == -1) ? complete : complete.mid(start + 1);
-
-                lastLine = lastLine.trimmed();
-
-                if (!lastLine.startsWith("!!!S") || !lastLine.endsWith("E!!!"))
-                    return;
-
-                lastLine.remove(0, 4);
-                lastLine.chop(4);
-
-                QList<QByteArray> values = lastLine.split('\t');
-                if (values.size() != 3)
-                    return;
-
-                int roi = values[0].toInt();
-                double v = values[2].toDouble();
-                if ( roi < actInChnNo )
-                    inBuffer[inIdx[roi]] = inGainFac[roi]*v;
+                received_data = true;
+                continue;
             }
+
+            if ( bytes_received == 0 ) {
+                std::cerr << "MMDAQ: Connection closed by peer" << std::endl;
+                disconnect();
+                return;
+            }
+
+            int err = WSAGetLastError();
+            if (err == WSAEWOULDBLOCK)
+                break;
+            else {
+                std::cerr << "MMDAQ: Unanticipated error during message receipt: " << err << std::endl;
+                return;
+            }
+        }
+
+        if ( received_data ) {
+            int lastNewline = rxBuffer.lastIndexOf('\n');
+            if (lastNewline == -1)
+                return;
+
+            // Everything after the last newline is an incomplete line.
+            QByteArray tail = rxBuffer.mid(lastNewline + 1);
+
+            // Process only complete lines.
+            QByteArray complete = rxBuffer.left(lastNewline);
+
+            // Keep the unfinished tail for next recv().
+            rxBuffer = std::move(tail);
+
+            int start = complete.lastIndexOf('\n');
+            QByteArray lastLine =
+                (start == -1) ? complete : complete.mid(start + 1);
+
+            lastLine = lastLine.trimmed();
+
+            if (!lastLine.startsWith("!!!S") || !lastLine.endsWith("E!!!"))
+                return;
+
+            lastLine.remove(0, 4);
+            lastLine.chop(4);
+
+            QList<QByteArray> values = lastLine.split('\t');
+            if (values.size() != 3)
+                return;
+
+            int roi = values[0].toInt();
+            double v = values[2].toDouble();
+            if ( roi < actInChnNo )
+                inBuffer[inIdx[roi]] = inGainFac[roi]*v;
         }
     }
 
