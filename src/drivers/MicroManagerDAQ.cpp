@@ -331,7 +331,7 @@ bool MicroManagerDAQ::parsePackets()
             return false;
         }
 
-        const int packetSize = 8 + roiCount * 12;
+        const int packetSize = 8 + roiCount * 8;
 
         // Wait for the rest of the packet.
         if (rxBuffer.size() < packetSize)
@@ -339,16 +339,12 @@ bool MicroManagerDAQ::parsePackets()
 
         p += 8;
 
-        for (int i = 0; i < roiCount; ++i)
+        for (int roi = 0; roi < roiCount; ++roi)
         {
-            qint32 roi = qFromBigEndian<qint32>(
-                reinterpret_cast<const uchar *>(p));
-            p += 4;
-
             double value = readBigEndianDouble(p);
             p += 8;
 
-            if (roi >= 0 && roi < actInChnNo)
+            if (roi < actInChnNo)
                 inBuffer[inIdx[roi]] = inGainFac[roi] * value;
         }
 
