@@ -155,6 +155,24 @@ bool MicroManagerDAQ::connect()
         t.tv_usec = 0;
         int ret = select(0, 0, &fds, 0, &t);
         if ( ret == 1 ) {
+            int err = 0;
+            int len = sizeof(err);
+
+            if (getsockopt(sock, SOL_SOCKET, SO_ERROR,
+                           reinterpret_cast<char*>(&err), &len) == SOCKET_ERROR)
+            {
+                std::cerr << "MMDAQ: getsockopt() failed\n";
+                closesocket(sock);
+                return false;
+            }
+
+            if (err != 0)
+            {
+                std::cerr << "MMDAQ: Connection failed: " << err << "\n";
+                closesocket(sock);
+                return false;
+            }
+
             connecting = false;
 
             // Restore blocking mode
@@ -167,7 +185,8 @@ bool MicroManagerDAQ::connect()
 
             // Send greeting to server
             const char szMsg[] = "hello server\r\n";
-            if (!send(sock, szMsg, strlen(szMsg), 0)) {
+            int n = send(sock, szMsg, strlen(szMsg), 0);
+            if (n == SOCKET_ERROR) {
                 closesocket(sock);
                 std::cerr << "MMDAQ: Failed to send" << std::endl;
                 return false;
