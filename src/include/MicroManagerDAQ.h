@@ -72,6 +72,7 @@ class MicroManagerDAQ: public DAQ
     bool connecting = false;
     SOCKET sock;
     double *inBuffer = nullptr;
+    QByteArray rxBuffer;
 
     bool connect();
     void disconnect();

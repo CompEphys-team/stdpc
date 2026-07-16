@@ -238,28 +238,43 @@ void MicroManagerDAQ::get_scan(bool)
         t.tv_usec = 0;
         if ( select(0, &readfds, 0, 0, &t) > 0 ) {
             // Read everything
-            char szTemp[4096];
-            int bytes_received = recv(sock, szTemp, 4096, 0);
+            char szTemp[8192];
+            int bytes_received = recv(sock, szTemp, sizeof(szTemp), 0);
             if ( bytes_received > 0 ) {
-                // Process line by line
-                QString message(szTemp);
-                QStringList lines(message.split('\n', Qt::SkipEmptyParts));
-                for ( auto line : lines ) {
-                    line = line.trimmed();
-                    if ( !line.startsWith("!!!S") || !line.endsWith("E!!!") )
-                        continue;
-                    else {
-                        line.remove(0, 4);
-                        line.remove(line.length()-4, 4);
-                    }
-                    QStringList values = line.split('\t');
-                    int roi = values[0].toInt();
-                    // values[1] is a timestamp, ignore.
-                    double v = values[2].toDouble();
+                rxBuffer.append(szTemp, bytes_received);
+                int lastNewline = rxBuffer.lastIndexOf('\n');
+                if (lastNewline == -1)
+                    return;
 
-                    if ( roi < actInChnNo )
-                        inBuffer[inIdx[roi]] = inGainFac[roi]*v;
-                }
+                // Everything after the last newline is an incomplete line.
+                QByteArray tail = rxBuffer.mid(lastNewline + 1);
+
+                // Process only complete lines.
+                QByteArray complete = rxBuffer.left(lastNewline);
+
+                // Keep the unfinished tail for next recv().
+                rxBuffer = std::move(tail);
+
+                int start = complete.lastIndexOf('\n');
+                QByteArray lastLine =
+                    (start == -1) ? complete : complete.mid(start + 1);
+
+                lastLine = lastLine.trimmed();
+
+                if (!lastLine.startsWith("!!!S") || !lastLine.endsWith("E!!!"))
+                    return;
+
+                lastLine.remove(0, 4);
+                lastLine.chop(4);
+
+                QList<QByteArray> values = lastLine.split('\t');
+                if (values.size() != 3)
+                    return;
+
+                int roi = values[0].toInt();
+                double v = values[2].toDouble();
+                if ( roi < actInChnNo )
+                    inBuffer[inIdx[roi]] = inGainFac[roi]*v;
             }
         }
     }
