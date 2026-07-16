@@ -25,11 +25,14 @@
 #include <chrono>
 #include <thread>
 #include <string>
+#include <QtEndian>
 
 #include "MicroManagerDAQ.h"
 #include "limits.h"
 #include "AP.h"
 #include "MicroManagerDAQDlg.h"
+
+constexpr qint32 MAGIC = 0x52544931; // "RTI1"
 
 /// Construct a single self-registering proxy
 static MicroManagerDAQProxy *prox = MicroManagerDAQProxy::get();
@@ -286,48 +289,80 @@ bool MicroManagerDAQ::drainSocket()
     }
 }
 
+double readBigEndianDouble(const char *p)
+{
+    quint64 bits = qFromBigEndian<quint64>(
+        reinterpret_cast<const uchar *>(p));
+
+    double value;
+    static_assert(sizeof(bits) == sizeof(value), "double is not size quint64");
+    memcpy(&value, &bits, sizeof(value));
+    return value;
+}
+
+bool MicroManagerDAQ::parsePackets()
+{
+    bool parsedAnything = false;
+
+    while (true)
+    {
+        // Need at least magic + ROI count.
+        if (rxBuffer.size() < 8)
+            return parsedAnything;
+
+        const char *p = rxBuffer.constData();
+
+        qint32 magic = qFromBigEndian<qint32>(
+            reinterpret_cast<const uchar *>(p));
+        qint32 roiCount = qFromBigEndian<qint32>(
+            reinterpret_cast<const uchar *>(p + 4));
+
+        if (magic != MAGIC)
+        {
+            std::cerr << "MMDAQ: Invalid packet magic: " << magic << std::endl;
+            disconnect();
+            return false;
+        }
+
+        if (roiCount < 0 || roiCount > 10000)
+        {
+            std::cerr << "MMDAQ: Invalid ROI count: " << roiCount << std::endl;
+            disconnect();
+            return false;
+        }
+
+        const int packetSize = 8 + roiCount * 12;
+
+        // Wait for the rest of the packet.
+        if (rxBuffer.size() < packetSize)
+            return parsedAnything;
+
+        p += 8;
+
+        for (int i = 0; i < roiCount; ++i)
+        {
+            qint32 roi = qFromBigEndian<qint32>(
+                reinterpret_cast<const uchar *>(p));
+            p += 4;
+
+            double value = readBigEndianDouble(p);
+            p += 8;
+
+            if (roi >= 0 && roi < actInChnNo)
+                inBuffer[inIdx[roi]] = inGainFac[roi] * value;
+        }
+
+        rxBuffer.remove(0, packetSize);
+        parsedAnything = true;
+    }
+}
+
 void MicroManagerDAQ::get_scan(bool)
 {
     if ( !connected ) {
         connect();
-    } else {
-        while ( drainSocket() ) {
-            int lastNewline = rxBuffer.lastIndexOf('\n');
-            if (lastNewline == -1)
-                break;
-
-            // Everything after the last newline is an incomplete line.
-            QByteArray tail = rxBuffer.mid(lastNewline + 1);
-
-            // Process only complete lines.
-            QByteArray complete = rxBuffer.left(lastNewline);
-
-            // Keep the unfinished tail for next recv().
-            rxBuffer = std::move(tail);
-
-            int start = complete.lastIndexOf('\n');
-            QByteArray lastLine =
-                (start == -1) ? complete : complete.mid(start + 1);
-
-            lastLine = lastLine.trimmed();
-
-            if (!lastLine.startsWith("!!!S") || !lastLine.endsWith("E!!!"))
-                break;
-
-            lastLine.remove(0, 4);
-            lastLine.chop(4);
-
-            QList<QByteArray> values = lastLine.split('\t');
-            if (values.size() != 3)
-                break;
-
-            int roi = values[0].toInt();
-            double v = values[2].toDouble();
-            if ( roi < actInChnNo )
-                inBuffer[inIdx[roi]] = inGainFac[roi]*v;
-
-            break; // If we actually looped back to read more data and MM were really fast, we could be stuck here forever.
-        }
+    } else if ( drainSocket() ) {
+        parsePackets();
     }
 
     // Apply to channel
